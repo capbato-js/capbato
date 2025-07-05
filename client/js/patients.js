@@ -100,29 +100,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Overlay logic
+  // Add Patient Button - Navigate to dedicated page
   const addPatientBtn = document.querySelector(".add-new-patient-btn");
-  const overlay = document.getElementById("overlay");
-  const iframe = document.getElementById("addPatientIframe");
-  const closeBtn = document.getElementById("closeBtn");
-
-  if (addPatientBtn && overlay && iframe && closeBtn) {
+  
+  if (addPatientBtn) {
     addPatientBtn.addEventListener("click", () => {
-      overlay.style.display = "flex";
-      iframe.src = "addpatientbtnform.html";
-    });
-
-    closeBtn.addEventListener("click", () => {
-      overlay.style.display = "none";
-      iframe.src = "";
-    });
-
-    window.addEventListener("message", function (event) {
-      if (event.data === "patientAdded") {
-        loadPatients();
-        overlay.style.display = "none";
-        iframe.src = "";
-      }
+      window.location.href = "add-new-patient.html";
     });
   }
 
