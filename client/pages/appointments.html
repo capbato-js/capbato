@@ -74,10 +74,16 @@
       <button id="openAddAppointment" class="add-appointment-btn">+ Add Appointment</button>
     </div>
 
-    <label for="appointmentDate">Select Date:</label>
-    <input type="date" id="appointmentDate">
-    <button id="filterByDate" class="filter-btn">Show Appointments</button>
-    <button id="showAllAppointments" class="filter-btn">Show All</button>
+    <div class="filter-controls">
+      <div class="date-control">
+        <label for="appointmentDate">Select Date:</label>
+        <input type="date" id="appointmentDate">
+      </div>
+      <div class="checkbox-control">
+        <input type="checkbox" id="showAllCheckbox">
+        <label for="showAllCheckbox">Show All</label>
+      </div>
+    </div>
     <p id="appointmentCount" class="appointment-count">Total Appointments: 0</p>
 
       <table>

@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("appointmentbtn").addEventListener("click", () => {
         const today = new Date().toISOString().split("T")[0];
         document.getElementById("appointmentDate").value = today;
+        document.getElementById("showAllCheckbox").checked = false;
         lastViewedDate = today;
         loadAppointmentsByDate(today);
     });
@@ -17,23 +18,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+    // Initialize date input and load today's appointments
     const dateInput = document.getElementById("appointmentDate");
+    const showAllCheckbox = document.getElementById("showAllCheckbox");
+    
     if (dateInput) {
         const today = new Date().toISOString().split("T")[0];
         dateInput.value = today;
         lastViewedDate = today;
+        
+        // Add event listener for date change
+        dateInput.addEventListener("change", function () {
+            const selectedDate = this.value;
+            // Always uncheck "Show All" when date changes and load appointments for selected date
+            showAllCheckbox.checked = false;
+            lastViewedDate = selectedDate;
+            loadAppointmentsByDate(selectedDate);
+        });
     }
 
-    document.getElementById("filterByDate").addEventListener("click", function () {
-        const selectedDate = document.getElementById("appointmentDate").value;
-        lastViewedDate = selectedDate;
-        loadAppointmentsByDate(selectedDate);
-    });
-
-    document.getElementById("showAllAppointments").addEventListener("click", () => {
-        lastViewedDate = null;
-        loadAllAppointments();
-    });
+    // Add event listener for Show All checkbox
+    if (showAllCheckbox) {
+        showAllCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+                lastViewedDate = null;
+                loadAllAppointments();
+            } else {
+                const selectedDate = dateInput.value;
+                lastViewedDate = selectedDate;
+                loadAppointmentsByDate(selectedDate);
+            }
+        });
+    }
 
     loadAppointmentsByDate(lastViewedDate || new Date().toISOString().split("T")[0]);
 
@@ -61,13 +77,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
         window.addEventListener("message", function (event) {
             if (event.data && event.data.type === "appointmentAdded") {
+                const showAllCheckbox = document.getElementById("showAllCheckbox");
+                
                 if (event.data.date) {
+                    // Set the date and ensure Show All is unchecked
                     lastViewedDate = event.data.date;
                     document.getElementById("appointmentDate").value = lastViewedDate;
+                    showAllCheckbox.checked = false;
                     loadAppointmentsByDate(lastViewedDate);
+                } else if (showAllCheckbox.checked) {
+                    // If Show All is checked, reload all appointments
+                    loadAllAppointments();
                 } else if (lastViewedDate) {
+                    // If specific date is selected, reload that date
                     loadAppointmentsByDate(lastViewedDate);
                 } else {
+                    // Default to all appointments
                     loadAllAppointments();
                 }
             }
@@ -291,7 +316,12 @@ async function updateAppointmentStatus(appointmentId, newStatus) {
         const data = await response.json();
         if (response.ok) {
             showToast(`Appointment ${newStatus.toLowerCase()} successfully!`);
-            if (lastViewedDate) {
+            
+            // Check checkbox state to determine how to reload
+            const showAllCheckbox = document.getElementById("showAllCheckbox");
+            if (showAllCheckbox.checked) {
+                loadAllAppointments();
+            } else if (lastViewedDate) {
                 loadAppointmentsByDate(lastViewedDate);
             } else {
                 loadAllAppointments();

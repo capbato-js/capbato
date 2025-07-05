@@ -253,27 +253,69 @@ body::before {
   position: relative;
 }
 
+/* === FILTER CONTROLS === */
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.date-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-control label {
+  font-weight: 600;
+  color: #0b4f6c;
+  font-size: 14px;
+}
+
+.date-control input[type="date"] {
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.date-control input[type="date"]:focus {
+  outline: none;
+  border-color: #4db6ac;
+  box-shadow: 0 0 0 3px rgba(77, 182, 172, 0.1);
+}
+
+.checkbox-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-control input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4db6ac;
+  cursor: pointer;
+}
+
+.checkbox-control label {
+  font-weight: 600;
+  color: #0b4f6c;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-control:hover label {
+  color: #4db6ac;
+}
+
 .appointments-header .add-appointment-btn {
   position: absolute;
   right: 0;
-}
-
-.filter-btn {
-  background-color: #4db6ac;
-  color: white;
-  margin-left: 10px;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-weight: bold;
-  font-size: 14px;
-  border: none;
-  box-shadow: 0 4px 8px rgba(77, 182, 172, 0.2);
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.filter-btn:hover {
-  background-color: #3ba69c;
-  transform: scale(1.05);
 }
 
 .appointments-table {
