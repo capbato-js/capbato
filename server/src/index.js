@@ -3,6 +3,8 @@ dotenv.config()
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import db from './config/db.js';
 import { swaggerUi, specs } from './config/swagger.js';
 
@@ -18,6 +20,10 @@ import addressRoutes from './routes/address.routes.js';
 
 const app = express();
 const PORT = 3001;
+
+// Get directory name for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(cors());
@@ -46,6 +52,33 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Clinic Management System API Documentation'
 }));
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve static files from client directory
+app.use(express.static(path.join(__dirname, '../../client')));
+
+// Root route - serve index.html (must be before indexRoutes)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../client/pages/index.html'));
+});
+
+// Direct HTML file routes (without /pages/ prefix)
+const htmlRoutes = [
+  'appointments', 'laboratory', 'patients', 'prescriptions', 'login', 
+  'register', 'admin', 'accounts', 'doctor-schedule', 'add-appointments',
+  'add-new-patient', 'medical-certificate', 'lab-request-form', 'patientinfo',
+  'receptionist', 'asreceptionist', 'urinalysis', 'fecalysis', 'hematology',
+  'blood-chemistry', 'serology-immunology', 'edit-sched', 'addpatientbtnform',
+  'add-prescription-form', 'phone-validation-test', 'index'
+];
+
+htmlRoutes.forEach(route => {
+  app.get(`/${route}.html`, (req, res) => {
+    res.sendFile(path.join(__dirname, `../../client/pages/${route}.html`));
+  });
+});
 
 // API Routes
 app.use('/', indexRoutes);
