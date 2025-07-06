@@ -296,7 +296,7 @@ function loadLabTestResults() {
                     data-patient-id="${test.patient_id}" 
                     data-patient-name="${test.patient_name}"
                     data-lab-test="${test.lab_test}">
-              View
+              <i class="fas fa-eye"></i> View
             </button>
           </td>
         `;
