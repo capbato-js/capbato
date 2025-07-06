@@ -336,6 +336,47 @@ body::before {
   text-overflow: ellipsis;
 }
 
+/* Text alignment rules for dashboard appointment table */
+/* Left align for names and reason for visit */
+.appointment-table th:nth-child(2), 
+.appointment-table td:nth-child(2) { /* Patient */
+  text-align: left;
+  padding-left: 20px;
+}
+
+.appointment-table th:nth-child(3), 
+.appointment-table td:nth-child(3) { /* Reason for visit */
+  text-align: left;
+  padding-left: 20px;
+}
+
+.appointment-table th:nth-child(6), 
+.appointment-table td:nth-child(6) { /* Doctor */
+  text-align: left;
+  padding-left: 20px;
+}
+
+/* Center align for numbers, dates, times, and status (already default) */
+.appointment-table th:nth-child(1), 
+.appointment-table td:nth-child(1) { /* Patient # */
+  text-align: center;
+}
+
+.appointment-table th:nth-child(4), 
+.appointment-table td:nth-child(4) { /* Contact */
+  text-align: center;
+}
+
+.appointment-table th:nth-child(5), 
+.appointment-table td:nth-child(5) { /* Time */
+  text-align: center;
+}
+
+.appointment-table th:nth-child(7), 
+.appointment-table td:nth-child(7) { /* Status */
+  text-align: center;
+}
+
 .appointment-table th {
   background-color: #dbeeff;
   color: #0047ab;
