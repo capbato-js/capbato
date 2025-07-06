@@ -50,11 +50,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadLabRequests();
       }
 
+      if (window._lastLabViewedMode === "addResult") {
+        // Refresh the lab data and update the modal content without closing it
+        if (window._modalRefreshData) {
+          refreshLabTestModalInPlace(window._modalRefreshData.patientId, window._modalRefreshData.patientName);
+        }
+        loadLabRequests(); // Also refresh the main table
+      }
+
       if (event.data.actionType === "updateLabTable") {
         loadLabRequests(); // ✅ new addition
       }
 
       window._lastLabViewedMode = null;
+      window._modalRefreshData = null;
     }
   });
 
@@ -379,6 +388,15 @@ document.addEventListener("click", (e) => {
       selectedTests: (row.dataset.selectedTests || "").split(",")
     };
 
+    // Store the state for modal refresh after result submission
+    window._lastLabViewedMode = "addResult";
+    window._modalRefreshData = {
+      patientId: lab.patient_id,
+      patientName: lab.patient_name
+    };
+    
+    // Don't close the Lab Tests modal - keep it open
+    // document.getElementById("labTestModal").classList.remove("show");
     openLabOverlay({ ...lab, readOnly: false });
   }
 
@@ -461,6 +479,111 @@ function openLabOverlay(lab) {
   };
 }
 
+// Helper function to refresh the lab test modal with updated data
+function refreshLabTestModal(patientId, patientName) {
+  // Find the updated "View" button for this patient
+  const updatedButton = document.querySelector(`[data-patient-id="${patientId}"] button`);
+  if (updatedButton) {
+    // Simulate clicking the View button to reopen the modal with fresh data
+    updatedButton.click();
+  }
+}
+
+// Helper function to refresh the lab test modal content in place (without closing)
+async function refreshLabTestModalInPlace(patientId, patientName) {
+  try {
+    // Fetch fresh data from the API instead of relying on DOM
+    const res = await fetch("http://localhost:3001/api/lab_requests");
+    const result = await res.json();
+    const labResults = Array.isArray(result) ? result : (result?.rows || []);
+    
+    // Find the data for this specific patient
+    const patientData = labResults.filter(result => result.patient_id === patientId);
+    
+    if (patientData.length === 0) {
+      console.warn("No lab data found for patient:", patientId);
+      return;
+    }
+    
+    // Process the data the same way as in renderLabResults
+    const groupings = {
+      "ROUTINE": ["cbc_with_platelet", "pregnancy_test", "urinalysis", "fecalysis", "occult_blood_test"],
+      "SEROLOGY & IMMUNOLOGY": ["hepa_b_screening", "hepa_a_screening", "hepatitis_profile", "vdrl_rpr", "dengue_ns1", "ca_125_cea_psa"],
+      "BLOOD CHEMISTRY": ["fbs", "bun", "creatinine", "blood_uric_acid", "lipid_profile", "sgot", "sgpt", "alp", "sodium_na", "potassium_k", "hba1c"],
+      "MISCELLANEOUS TEST": ["ecg"],
+      "THYROID FUNCTION TEST": ["t3", "t4", "ft3", "ft4", "tsh"]
+    };
+
+    const labelMap = {
+      cbc_with_platelet: "CBC with Platelet", pregnancy_test: "Pregnancy Test", urinalysis: "Urinalysis",
+      fecalysis: "Fecalysis", occult_blood_test: "Occult Blood Test", hepa_b_screening: "Hepa B Screening",
+      hepa_a_screening: "Hepa A Screening", hepatitis_profile: "Hepatitis Profile", vdrl_rpr: "VDRL/RPR",
+      dengue_ns1: "Dengue NS1", ca_125_cea_psa: "CA 125 / CEA / PSA", fbs: "FBS", bun: "BUN",
+      creatinine: "Creatinine", blood_uric_acid: "Blood Uric Acid", lipid_profile: "Lipid Profile",
+      sgot: "SGOT", sgpt: "SGPT", alp: "ALP", sodium_na: "Sodium Na", potassium_k: "Potassium K+",
+      hba1c: "HBA1C", ecg: "ECG", t3: "T3", t4: "T4", ft3: "FT3", ft4: "FT4", tsh: "TSH"
+    };
+
+    const tests = [];
+    patientData.forEach(result => {
+      for (const [group, fields] of Object.entries(groupings)) {
+        const selected = fields.filter(field => result[field] && result[field].toString().toLowerCase() !== "no");
+        if (selected.length > 0) {
+          tests.push({
+            group,
+            date: result.date,
+            status: result.status || "Pending",
+            testNames: selected.map(f => labelMap[f]),
+            fieldKeys: selected
+          });
+        }
+      }
+    });
+
+    const tbody = document.getElementById("labTestModalBody");
+    if (tbody) {
+      // Clear and repopulate the modal body with fresh data
+      tbody.innerHTML = "";
+      
+      if (!tests || tests.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td colspan="4" style="text-align: center; color: #666;">No test results available</td>
+        `;
+        tbody.appendChild(tr);
+      } else {
+        tests.forEach(({ group, testNames, date, status, fieldKeys }) => {
+          const testsStr = testNames.join(", ");
+          const tr = document.createElement("tr");
+
+          tr.dataset.patientId = patientId;
+          tr.dataset.patientName = patientName;
+          tr.dataset.requestDate = date;
+          tr.dataset.selectedTests = fieldKeys.join(",");
+
+          const actionButtons = status.toLowerCase() === "complete"
+            ? `<button class="btn btn-info btn-sm btn-view">View</button>
+               <button class="btn btn-warning btn-sm btn-edit">Edit</button>`
+            : `<button class="btn btn-success btn-sm add-result-btn">Add Result</button>
+               <button class="btn btn-danger btn-sm btn-cancel">Cancel</button>`;
+
+          tr.innerHTML = `
+            <td>${group}: ${testsStr}</td>
+            <td>${formatDateToReadable(date)}</td>
+            <td class="lab-status">${status}</td>
+            <td><div class="btn-group">${actionButtons}</div></td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+      }
+    }
+    
+    console.log("Modal refreshed in place for patient:", patientId);
+  } catch (error) {
+    console.error("Error refreshing modal in place:", error);
+  }
+}
 
 function showToast(message, duration = 3000) {
   const toast = document.getElementById("labToast");
