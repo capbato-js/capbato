@@ -204,3 +204,87 @@ export const getLabRequestById = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+// ✅ Get Completed Lab Tests for Doctor Dashboard
+export const getCompletedLabTests = async (req, res) => {
+  try {
+    // For demo purposes, show recent completed lab tests
+    // In production, you would filter by today's date: AND DATE(COALESCE(date_taken, request_date)) = CURDATE()
+    const query = `
+      SELECT 
+        patient_id, 
+        patient_name, 
+        request_date AS date,
+        date_taken,
+        status,
+        cbc_with_platelet, pregnancy_test, urinalysis, fecalysis, occult_blood_test,
+        hepa_b_screening, hepa_a_screening, hepatitis_profile, vdrl_rpr, dengue_ns1, ca_125_cea_psa,
+        fbs, bun, creatinine, blood_uric_acid, lipid_profile,
+        sgot, sgpt, alp, sodium_na, potassium_k,
+        hbalc, ecg, t3, t4, ft3, ft4, tsh
+      FROM lab_request_entries
+      WHERE status = 'Complete'
+      ORDER BY date_taken DESC, request_date DESC
+      LIMIT 10
+    `;
+
+    const [results] = await db.query(query);
+    
+    // Process results to format lab test names
+    const formattedResults = results.map(result => {
+      const tests = [];
+      
+      // Map field names to display names
+      const testMap = {
+        cbc_with_platelet: "CBC with Platelet",
+        pregnancy_test: "Pregnancy Test", 
+        urinalysis: "Urinalysis",
+        fecalysis: "Fecalysis",
+        occult_blood_test: "Occult Blood Test",
+        hepa_b_screening: "Hepa B Screening",
+        hepa_a_screening: "Hepa A Screening", 
+        hepatitis_profile: "Hepatitis Profile",
+        vdrl_rpr: "VDRL/RPR",
+        dengue_ns1: "Dengue NS1",
+        ca_125_cea_psa: "CA 125 / CEA / PSA",
+        fbs: "FBS",
+        bun: "BUN",
+        creatinine: "Creatinine",
+        blood_uric_acid: "Blood Uric Acid",
+        lipid_profile: "Lipid Profile",
+        sgot: "SGOT",
+        sgpt: "SGPT", 
+        alp: "ALP",
+        sodium_na: "Sodium Na",
+        potassium_k: "Potassium K+",
+        hbalc: "HBA1C",
+        ecg: "ECG",
+        t3: "T3",
+        t4: "T4", 
+        ft3: "FT3",
+        ft4: "FT4",
+        tsh: "TSH"
+      };
+
+      // Find selected tests
+      Object.entries(testMap).forEach(([key, displayName]) => {
+        if (result[key] && result[key].toString().toLowerCase() !== "no") {
+          tests.push(displayName);
+        }
+      });
+
+      return {
+        patient_id: result.patient_id,
+        patient_name: result.patient_name,
+        lab_test: tests.join(", "),
+        date: result.date_taken || result.date,
+        status: result.status
+      };
+    });
+
+    res.json(formattedResults);
+  } catch (error) {
+    console.error("❌ Error fetching completed lab tests:", error.message);
+    res.status(500).json({ error: "Failed to fetch completed lab tests" });
+  }
+};

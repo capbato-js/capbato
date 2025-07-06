@@ -164,6 +164,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadLabRequests();
 
+  // Check if we need to open modal from dashboard redirect
+  const urlParams = new URLSearchParams(window.location.search);
+  const openModalPatientId = urlParams.get('openModal');
+  const patientName = urlParams.get('patientName');
+  const testType = urlParams.get('testType');
+  const readOnly = urlParams.get('readOnly');
+  
+  console.log('Laboratory URL params:', { openModalPatientId, patientName, testType, readOnly });
+  
+  if (openModalPatientId && patientName) {
+    // If we have testType and readOnly parameters, open the lab overlay directly
+    if (testType && readOnly === 'true') {
+      console.log('Opening lab overlay directly from dashboard');
+      setTimeout(() => {
+        const lab = {
+          patient_id: openModalPatientId,
+          patient_name: decodeURIComponent(patientName),
+          request_date: new Date().toISOString().split('T')[0], // Use today's date as fallback
+          selectedTests: [testType],
+          readOnly: true
+        };
+        console.log('Lab object for overlay:', lab);
+        window._lastLabViewedMode = "view";
+        openLabOverlay(lab);
+      }, 500);
+    } else {
+      // Original behavior: find the patient's row and open the modal
+      setTimeout(() => {
+        const patientRow = document.querySelector(`[data-patient-id="${openModalPatientId}"]`);
+        if (patientRow) {
+          const viewButton = patientRow.closest('tr').querySelector('button');
+          if (viewButton) {
+            viewButton.click();
+          }
+        }
+      }, 500); // Small delay to ensure table is loaded
+    }
+  }
+
   const closeBtn = document.getElementById("closeLabTestModal");
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {

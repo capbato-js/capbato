@@ -113,7 +113,7 @@
             <th>Reason for visit</th>
             <th>Contact</th>
             <th>Time</th>
-            <th>Doctor</th> <!-- ✅ Add this -->
+            <th>Doctor</th>
             <th>Status</th>
           </tr>
         </thead>    
@@ -122,11 +122,36 @@
       <a href="appointments.html" class="see-all-link">See All</a>
     </div>
 
+    <!-- Lab Test Results Table -->
+    <div class="appointments-table-wrapper" id="labResultsSection">
+      <h3>Today's Lab Test Results</h3>
+      <table class="appointment-table">
+        <thead>
+          <tr>
+            <th>Patient #</th>
+            <th>Patient Name</th>
+            <th>Lab Test</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>    
+        <tbody id="labTestResultsBody"></tbody>
+      </table>
+      <a href="laboratory.html" class="see-all-link">See All</a>
+    </div>
+
+  </div>
+
+  <!-- Lab Result Overlay Modal -->
+  <div class="overlay" id="labOverlay">
+    <div class="modal-container">
+      <button class="close-btn" id="closeOverlayBtn">X</button>
+      <iframe id="labIframe" src=""></iframe>
+    </div>
   </div>
 
   <script src="../js/index.js"></script>
   <script src="../js/sidebar.js"></script>
-</body>
-</html>
 </body>
 </html>

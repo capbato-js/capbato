@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Dashboard Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn { padding: 6px 12px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .status-complete { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Lab Test Results Dashboard Test</h1>
+    <div id="error" style="color: red; display: none;"></div>
+    
+    <h3>Recent Lab Test Results</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Patient #</th>
+                <th>Patient Name</th>
+                <th>Lab Test</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="labTestResultsBody">
+            <tr><td colspan="6">Loading...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Simulate doctor role
+        localStorage.setItem('loggedInRole', 'doctor');
+        localStorage.setItem('loggedInUsername', 'Dr. Smith');
+
+        function formatName(name) {
+            return name
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function loadLabTestResults() {
+            fetch('http://localhost:3001/api/lab_requests/completed')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('labTestResultsBody');
+                    tbody.innerHTML = '';
+
+                    // Show latest 5 completed lab tests
+                    const recentTests = data.slice(0, 5);
+
+                    if (recentTests.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">No completed lab tests found</td></tr>';
+                        return;
+                    }
+
+                    recentTests.forEach(test => {
+                        const formattedName = formatName(test.patient_name);
+                        const formattedDate = formatDate(test.date);
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${test.patient_id}</td>
+                            <td>${formattedName}</td>
+                            <td>${test.lab_test}</td>
+                            <td>${formattedDate}</td>
+                            <td><span class="status-complete">${test.status}</span></td>
+                            <td>
+                                <button class="btn view-lab-btn" 
+                                        data-patient-id="${test.patient_id}" 
+                                        data-patient-name="${test.patient_name}">
+                                    View
+                                </button>
+                            </td>
+                        `;
+
+                        tbody.appendChild(row);
+                    });
+
+                    // Add click event listeners for View buttons
+                    tbody.querySelectorAll('.view-lab-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const patientId = this.dataset.patientId;
+                            const patientName = this.dataset.patientName;
+                            
+                            alert(`Would redirect to laboratory page for ${patientName} (${patientId})`);
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error("Error loading lab test results:", err);
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = 'Error loading lab results: ' + err.message;
+                    
+                    const tbody = document.getElementById('labTestResultsBody');
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Error loading lab results</td></tr>';
+                });
+        }
+
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', loadLabTestResults);
+    </script>
+</body>
+</html>
