@@ -25,8 +25,27 @@
       <!-- Reason for Visit -->
       <div class="form-group">
         <label for="visitType">Reason for Visit:</label>
-        <input type="text" id="visitType" name="visitType" required />
+        <select id="visitType" name="visitType" required>
+          <option value="">Select Reason</option>
+          <option value="Consultation">Consultation</option>
+          <option value="Laboratory: Blood chemistry">Laboratory: Blood chemistry</option>
+          <option value="Laboratory: Hematology">Laboratory: Hematology</option>
+          <option value="Laboratory: Serology & Immunology">Laboratory: Serology & Immunology</option>
+          <option value="Laboratory: Urinalysis">Laboratory: Urinalysis</option>
+          <option value="Laboratory: Fecalysis">Laboratory: Fecalysis</option>
+          <option value="Prescription">Prescription</option>
+          <option value="Follow-up check-up">Follow-up check-up</option>
+          <option value="Medical Certificate">Medical Certificate</option>
+          <!-- <option value="Others">Others</option> Remove this for now, apply nalang sa React. -->
+        </select>
       </div>
+
+      <!-- Remove this for now, apply nalang sa React. -->
+      <!-- Custom Reason for Others option -->
+      <!-- <div class="form-group" id="customReasonGroup" style="display: none;">
+        <label for="customReason">Please specify:</label>
+        <input type="text" id="customReason" name="customReason" placeholder="Enter custom reason for visit" />
+      </div> -->
 
       <!-- Date -->
       <div class="form-group">

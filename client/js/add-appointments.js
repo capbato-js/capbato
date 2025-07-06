@@ -32,17 +32,34 @@ document.addEventListener("DOMContentLoaded", () => {
   populateTimeOptions();  // This already includes availability check
   loadPatients();
   loadDoctors();
+  setupVisitTypeHandler(); // Add handler for visit type dropdown
 });
 
 dateInput.addEventListener("change", () => {
   populateTimeOptions();  // Re-check time availability on date change
 });
 
-
-
 timeSelect.addEventListener("change", () => {
   checkTimeSlotAvailability();
 });
+
+// Handle visit type dropdown to show/hide custom reason field
+function setupVisitTypeHandler() {
+  const visitTypeSelect = document.getElementById("visitType");
+  const customReasonGroup = document.getElementById("customReasonGroup");
+  const customReasonInput = document.getElementById("customReason");
+
+  visitTypeSelect.addEventListener("change", function() {
+    if (this.value === "Others") {
+      customReasonGroup.style.display = "block";
+      customReasonInput.setAttribute("required", "true");
+    } else {
+      customReasonGroup.style.display = "none";
+      customReasonInput.removeAttribute("required");
+      customReasonInput.value = ""; // Clear the custom reason when not needed
+    }
+  });
+}
 
 async function populateTimeOptions() {
   const selectedDate = dateInput.value;
@@ -284,7 +301,20 @@ document.getElementById("addAppointmentForm").addEventListener("submit", async f
 
   const patient_name = patientInput.value.trim();
   const patient_id = hiddenPatientIdInput.value.trim();
-  const reason_for_visit = document.getElementById("visitType").value.trim();
+  const visitTypeSelect = document.getElementById("visitType");
+  const customReasonInput = document.getElementById("customReason");
+  
+  // Get the reason for visit - use custom reason if "Others" is selected
+  let reason_for_visit = visitTypeSelect.value.trim();
+  if (reason_for_visit === "Others") {
+    const customReason = customReasonInput.value.trim();
+    if (!customReason) {
+      showInlineError("Please specify the reason for your visit.");
+      return;
+    }
+    reason_for_visit = customReason;
+  }
+  
   const appointment_date = document.getElementById("date").value;
   const appointment_time = document.getElementById("time").value;
   const doctorSelect = document.getElementById("doctorSelect");
@@ -386,7 +416,36 @@ window.addEventListener("message", function (event) {
     if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-edit"></i> Update Appointment';
     
     patientInput.value = app.patient_name;
-    document.getElementById("visitType").value = app.reason_for_visit;
+    
+    // Handle reason for visit - check if it's one of the predefined options
+    const visitTypeSelect = document.getElementById("visitType");
+    const customReasonGroup = document.getElementById("customReasonGroup");
+    const customReasonInput = document.getElementById("customReason");
+    
+    const predefinedOptions = [
+      "Consultation",
+      "Laboratory: Blood chemistry", 
+      "Laboratory: Hematology",
+      "Laboratory: Serology & Immunology",
+      "Laboratory: Urinalysis", 
+      "Laboratory: Fecalysis",
+      "Prescription",
+      "Follow-up check-up",
+      "Medical Certificate"
+    ];
+    
+    if (predefinedOptions.includes(app.reason_for_visit)) {
+      visitTypeSelect.value = app.reason_for_visit;
+      customReasonGroup.style.display = "none";
+      customReasonInput.removeAttribute("required");
+    } else {
+      // It's a custom reason
+      visitTypeSelect.value = "Others";
+      customReasonGroup.style.display = "block";
+      customReasonInput.setAttribute("required", "true");
+      customReasonInput.value = app.reason_for_visit;
+    }
+    
     document.getElementById("date").value = app.appointment_date;
 
     fetchTimeAvailability(app.appointment_date).then(() => {
@@ -417,6 +476,13 @@ window.addEventListener("message", function (event) {
     hiddenPatientIdInput.value = "";
     patientIdDisplay.textContent = "";
     patientIdWrapper.style.display = "none";
+
+    // Reset custom reason field
+    const customReasonGroup = document.getElementById("customReasonGroup");
+    const customReasonInput = document.getElementById("customReason");
+    customReasonGroup.style.display = "none";
+    customReasonInput.removeAttribute("required");
+    customReasonInput.value = "";
 
     const today = new Date().toISOString().split("T")[0];
     dateInput.value = today;
