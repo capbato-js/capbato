@@ -394,6 +394,42 @@ body::before {
   border-bottom: 1px solid #ddd;
 }
 
+/* Text alignment rules for appointment tables in patient info */
+/* Left align for reason for visit, lab tests, and prescriptions */
+.appointment-table th:nth-child(3), 
+.appointment-table td:nth-child(3) { /* Reason for Visit */
+  text-align: left;
+  padding-left: 16px;
+}
+
+.appointment-table th:nth-child(4), 
+.appointment-table td:nth-child(4) { /* Lab Tests Done */
+  text-align: left;
+  padding-left: 16px;
+}
+
+.appointment-table th:nth-child(5), 
+.appointment-table td:nth-child(5) { /* Prescriptions */
+  text-align: left;
+  padding-left: 16px;
+}
+
+/* Center align for dates, times, and status (already default) */
+.appointment-table th:nth-child(1), 
+.appointment-table td:nth-child(1) { /* Date */
+  text-align: center;
+}
+
+.appointment-table th:nth-child(2), 
+.appointment-table td:nth-child(2) { /* Time */
+  text-align: center;
+}
+
+.appointment-table th:nth-child(6), 
+.appointment-table td:nth-child(6) { /* Status */
+  text-align: center;
+}
+
 .appointment-table th {
   background: #dbeeff;
   color: #0047ab;

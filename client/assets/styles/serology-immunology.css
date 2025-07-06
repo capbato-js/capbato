@@ -150,3 +150,19 @@ th, td {
   text-align: center;
   font-size: 14px;
 }
+
+/* Text alignment rules for serology test table */
+/* Left align for test names */
+th:nth-child(1), td:nth-child(1) { /* TEST */
+  text-align: left;
+  padding-left: 12px;
+}
+
+/* Center align for results and reference ranges */
+th:nth-child(2), td:nth-child(2) { /* RESULT */
+  text-align: center;
+}
+
+th:nth-child(3), td:nth-child(3) { /* REFERENCE RANGE */
+  text-align: center;
+}

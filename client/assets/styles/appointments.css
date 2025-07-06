@@ -386,27 +386,48 @@ th {
   font-weight: 600;
 }
 
-/* Column text alignment optimization */
-th:nth-child(1), td:nth-child(1) { /* Patient # column - center aligned */
-  text-align: center;
-}
-
-th:nth-child(2), td:nth-child(2) { /* Patient Name - center aligned */
-  text-align: center;
-  padding-left: 12px;
-}
-
-th:nth-child(6), td:nth-child(6) { /* Doctor - center aligned */
-  text-align: center;
-  padding-left: 12px;
-}
-
-/* Improve text handling for longer content */
-th:nth-child(2), td:nth-child(2),
-th:nth-child(6), td:nth-child(6) {
+/* Text alignment rules for table columns */
+/* Left align for names and labels */
+th:nth-child(2), td:nth-child(2) { /* Patient Name */
+  text-align: left;
+  padding-left: 20px;
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+th:nth-child(3), td:nth-child(3) { /* Reason for Visit */
+  text-align: left;
+  padding-left: 20px;
+}
+
+th:nth-child(6), td:nth-child(6) { /* Doctor */
+  text-align: left;
+  padding-left: 20px;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Center align for numbers, dates, status, and actions (already default) */
+th:nth-child(1), td:nth-child(1) { /* Patient # */
+  text-align: center;
+}
+
+th:nth-child(4), td:nth-child(4) { /* Date */
+  text-align: center;
+}
+
+th:nth-child(5), td:nth-child(5) { /* Time */
+  text-align: center;
+}
+
+th:nth-child(7), td:nth-child(7) { /* Status */
+  text-align: center;
+}
+
+th:nth-child(8), td:nth-child(8) { /* Action */
+  text-align: center;
 }
 
 /* Action column specific styling */

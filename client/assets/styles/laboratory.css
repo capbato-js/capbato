@@ -290,6 +290,26 @@ th, td {
   text-overflow: ellipsis;
 }
 
+/* Text alignment rules for table columns */
+/* Left align for names and labels */
+th:nth-child(2), td:nth-child(2) { /* Patient's Name */
+  text-align: left;
+  padding-left: 20px;
+}
+
+/* Center align for numbers, status, and actions (already default) */
+th:nth-child(1), td:nth-child(1) { /* Patient # */
+  text-align: center;
+}
+
+th:nth-child(3), td:nth-child(3) { /* Status */
+  text-align: center;
+}
+
+th:nth-child(4), td:nth-child(4) { /* Results */
+  text-align: center;
+}
+
 /* Table column widths */
 th:nth-child(1), td:nth-child(1) { width: 20%; } /* Patient # */
 th:nth-child(2), td:nth-child(2) { width: 40%; } /* Full Name */
@@ -446,15 +466,33 @@ td:nth-child(5) {
   overflow-wrap: break-word;
 }
 
-table th {
-  background-color: #dbeeff !important;
-  color: #0047ab !important;
+/* Text alignment rules for lab test modal table */
+/* Left align for test names */
+.lab-test-table th:nth-child(1), 
+.lab-test-table td:nth-child(1) { /* Lab Test */
+  text-align: left;
+  padding-left: 16px;
+  width: 40%;
 }
 
-.lab-test-table th:nth-child(1) { width: 40%; }
-.lab-test-table th:nth-child(2) { width: 20%; }
-.lab-test-table th:nth-child(3) { width: 15%; }
-.lab-test-table th:nth-child(4) { width: 25%; }
+/* Center align for dates, status, and results (already default) */
+.lab-test-table th:nth-child(2), 
+.lab-test-table td:nth-child(2) { /* Date */
+  text-align: center;
+  width: 20%;
+}
+
+.lab-test-table th:nth-child(3), 
+.lab-test-table td:nth-child(3) { /* Status */
+  text-align: center;
+  width: 15%;
+}
+
+.lab-test-table th:nth-child(4), 
+.lab-test-table td:nth-child(4) { /* Results */
+  text-align: center;
+  width: 25%;
+}
 
 .lab-test-table .btn-group {
   display: flex;

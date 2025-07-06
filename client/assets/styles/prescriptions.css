@@ -311,6 +311,32 @@ th, td {
   text-overflow: ellipsis;
 }
 
+/* Text alignment rules for prescriptions table */
+/* Left align for names */
+th:nth-child(2), td:nth-child(2) { /* Patient Name */
+  text-align: left;
+  padding-left: 20px;
+}
+
+th:nth-child(3), td:nth-child(3) { /* Doctor */
+  text-align: left;
+  padding-left: 20px;
+}
+
+th:nth-child(5), td:nth-child(5) { /* Medications */
+  text-align: left;
+  padding-left: 20px;
+}
+
+/* Center align for numbers and dates (already default) */
+th:nth-child(1), td:nth-child(1) { /* Patient Number */
+  text-align: center;
+}
+
+th:nth-child(4), td:nth-child(4) { /* Date Prescribed */
+  text-align: center;
+}
+
 /* Remove right border from last column */
 th:last-child,
 td:last-child {

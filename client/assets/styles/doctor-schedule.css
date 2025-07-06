@@ -383,6 +383,28 @@ h2 {
   border-right: 1px solid #ddd;
 }
 
+/* Text alignment rules for doctors table */
+/* Left align for names */
+.doctors-table th:nth-child(1),
+.doctors-table td:nth-child(1) { /* Doctor's Name */
+  text-align: left;
+  padding-left: 20px;
+  width: 40%;
+}
+
+/* Center align for specialization and contact number */
+.doctors-table th:nth-child(2),
+.doctors-table td:nth-child(2) { /* Specialization */
+  text-align: center;
+  width: 35%;
+}
+
+.doctors-table th:nth-child(3),
+.doctors-table td:nth-child(3) { /* Contact Number */
+  text-align: center;
+  width: 25%;
+}
+
 .doctors-table th:last-child,
 .doctors-table td:last-child {
   border-right: none;
@@ -403,21 +425,7 @@ h2 {
   border-bottom: none;
 }
 
-/* Column widths for better layout */
-.doctors-table th:nth-child(1),
-.doctors-table td:nth-child(1) {
-  width: 40%;
-}
-
-.doctors-table th:nth-child(2),
-.doctors-table td:nth-child(2) {
-  width: 35%;
-}
-
-.doctors-table th:nth-child(3),
-.doctors-table td:nth-child(3) {
-  width: 25%;
-}
+/* Column widths for better layout - moved to alignment rules above */
 
 /* === MAIN CONTENT === */
 .main-content {

@@ -324,6 +324,18 @@ th, td {
   text-overflow: ellipsis;
 }
 
+/* Text alignment rules for table columns */
+/* Left align for names and labels */
+th:nth-child(2), td:nth-child(2) { /* Patient's Name */
+  text-align: left;
+  padding-left: 20px;
+}
+
+/* Center align for numbers, dates, and actions (already default) */
+th:nth-child(1), td:nth-child(1) { /* Patient # */
+  text-align: center;
+}
+
 /* 🔹 Remove right border from last column */
 th:last-child,
 td:last-child {
