@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <td>${user.full_name}</td>
           <td>${user.role}</td>
           <td>
-            <button class="btn btn-sm btn-primary change-password-btn" data-id="${user.id}" data-username="${user.username || ''}">Change Password</button>
+            <button class="btn btn-sm btn-primary change-password-btn" data-id="${user.id}" data-username="${user.username || ''}"><i class="fas fa-key"></i> Change Password</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
       modal.style.justifyContent = 'center';
       modal.innerHTML = `
         <div style="background:white; border-radius:16px; padding:32px 24px; min-width:340px; width:370px; box-sizing:border-box; box-shadow:0 8px 32px rgba(0,0,0,0.18); position:relative;">
-          <button id="closeChangePasswordModal" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; color:#888; cursor:pointer;">&times;</button>
+          <button id="closeChangePasswordModal" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; color:#888; cursor:pointer;"><i class="fas fa-times"></i></button>
           <h3 style="text-align:center; margin-bottom:18px; color:#0b4f6c;">Change Password</h3>
           <form id="changePasswordForm">
             <div class="mb-3">
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <label class="form-label">Confirm Password</label>
               <input type="password" class="form-control" id="confirmPasswordInput" required />
             </div>
-            <button type="submit" class="add-new-patient-btn" style="width:100%;">Change Password</button>
+            <button type="submit" class="add-new-patient-btn" style="width:100%;"><i class="fas fa-key"></i> Change Password</button>
             <div id="changePasswordError" style="color:#d32f2f; margin-top:10px; text-align:center; min-height:22px; word-break:break-word;"></div>
           </form>
         </div>

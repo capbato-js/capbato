@@ -95,14 +95,14 @@
       <!-- Top Row: Title + Edit -->
       <div class="d-flex flex-column align-items-center mb-2" style="position: relative;">
         <h2 class="title-page text-center mb-0" style="width: 100%;">Doctor's Schedule</h2>
-        <button class="btn btn-primary btn-sm" id="editBtn" style="position: absolute; right: 0; top: 0;">Edit</button>
+        <button class="btn btn-primary btn-sm" id="editBtn" style="position: absolute; right: 0; top: 0;"><i class="fas fa-edit"></i> Edit</button>
       </div>
 
       <!-- Second Row: Arrows + Month -->
       <div class="d-flex justify-content-between align-items-center mb-3 calendar-nav-row">
-        <button id="prevMonth" class="btn btn-light fs-4">&larr;</button>
+        <button id="prevMonth" class="btn btn-light fs-4"><i class="fas fa-chevron-left"></i></button>
         <span id="monthLabel" class="fs-5 fw-bold text-uppercase"></span>
-        <button id="nextMonth" class="btn btn-light fs-4">&rarr;</button>
+        <button id="nextMonth" class="btn btn-light fs-4"><i class="fas fa-chevron-right"></i></button>
       </div>
 
       <!-- Calendar Headers -->
@@ -124,7 +124,7 @@
   <!-- Edit Schedule Overlay -->
   <div class="overlay" id="editScheduleOverlay">
     <div class="iframe-container">
-      <button class="close-btn" id="closeEditSchedule">X</button>
+      <button class="close-btn" id="closeEditSchedule"><i class="fas fa-times"></i></button>
       <iframe id="editScheduleIframe"></iframe>
     </div>
   </div>

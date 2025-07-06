@@ -383,7 +383,7 @@ window.addEventListener("message", function (event) {
     const formTitle = document.getElementById("formTitle");
     const submitBtn = document.getElementById("submitBtn");
     if (formTitle) formTitle.textContent = "Update Appointment";
-    if (submitBtn) submitBtn.textContent = "Update Appointment";
+    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-edit"></i> Update Appointment';
     
     patientInput.value = app.patient_name;
     document.getElementById("visitType").value = app.reason_for_visit;
@@ -412,7 +412,7 @@ window.addEventListener("message", function (event) {
     const formTitle = document.getElementById("formTitle");
     const submitBtn = document.getElementById("submitBtn");
     if (formTitle) formTitle.textContent = "Add Appointment";
-    if (submitBtn) submitBtn.textContent = "Add Appointment";
+    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Add Appointment';
 
     hiddenPatientIdInput.value = "";
     patientIdDisplay.textContent = "";

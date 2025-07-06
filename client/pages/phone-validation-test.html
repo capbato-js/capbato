@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phone Validation Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,14 +79,14 @@
         <input type="tel" id="testPhone" class="test-input" placeholder="09278479061" maxlength="11">
         
         <h4>Test Cases:</h4>
-        <button class="test-button" onclick="testValid()">Valid: 09278479061</button>
-        <button class="test-button" onclick="testPartialValid()">Partial Valid: 0</button>
-        <button class="test-button" onclick="testPartialValid2()">Partial Valid: 09</button>
-        <button class="test-button" onclick="testPartialValid3()">Partial Valid: 0912345</button>
-        <button class="test-button" onclick="testInvalidStart()">Invalid Start: 8</button>
-        <button class="test-button" onclick="testInvalidStart2()">Invalid Start: 08</button>
-        <button class="test-button" onclick="testWithDashes()">With Dashes: 09-123-456-789</button>
-        <button class="test-button" onclick="clearField()">Clear Field</button>
+        <button class="test-button" onclick="testValid()"><i class="fas fa-check"></i> Valid: 09278479061</button>
+        <button class="test-button" onclick="testPartialValid()"><i class="fas fa-hourglass-half"></i> Partial Valid: 0</button>
+        <button class="test-button" onclick="testPartialValid2()"><i class="fas fa-hourglass-half"></i> Partial Valid: 09</button>
+        <button class="test-button" onclick="testPartialValid3()"><i class="fas fa-hourglass-half"></i> Partial Valid: 0912345</button>
+        <button class="test-button" onclick="testInvalidStart()"><i class="fas fa-times"></i> Invalid Start: 8</button>
+        <button class="test-button" onclick="testInvalidStart2()"><i class="fas fa-times"></i> Invalid Start: 08</button>
+        <button class="test-button" onclick="testWithDashes()"><i class="fas fa-minus"></i> With Dashes: 09-123-456-789</button>
+        <button class="test-button" onclick="clearField()"><i class="fas fa-eraser"></i> Clear Field</button>
     </div>
 
     <div class="test-group">
