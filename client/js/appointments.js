@@ -215,10 +215,10 @@ function updateAppointmentsTable(appointments) {
 
         let actionButtons = "";
         if (appointment.status === "Cancelled") {
-            actionButtons += `<button class="reconfirm-btn" data-id="${appointment.id}">Reconfirm</button>`;
+            actionButtons += `<button class="reconfirm-btn" data-id="${appointment.id}"><i class="fas fa-redo"></i> Reconfirm</button>`;
         } else {
-            actionButtons += `<button class="modify-btn" data-id="${appointment.id}">Modify</button>`;
-            actionButtons += `<button class="cancel-btn" data-id="${appointment.id}">Cancel</button>`;
+            actionButtons += `<button class="modify-btn" data-id="${appointment.id}"><i class="fas fa-edit"></i> Modify</button>`;
+            actionButtons += `<button class="cancel-btn" data-id="${appointment.id}"><i class="fas fa-times"></i> Cancel</button>`;
         }
 
         const row = `

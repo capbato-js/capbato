@@ -71,7 +71,7 @@
   <div class="main-content">
     <div class="laboratory-header">
       <h2 class="title-page">Laboratory</h2>
-      <button id="addLabTestBtn" class="add-appointment-btn">+ Add Lab Test</button>
+      <button id="addLabTestBtn" class="add-appointment-btn"><i class="fas fa-flask"></i> Add Lab Test</button>
     </div>
 
     <table>
@@ -92,7 +92,7 @@
   <!-- Floating Lab Test Table Modal -->
   <div id="labTestModal" class="lab-modal hidden">
     <div class="modal-content wide-modal">
-      <button class="close-btn top-right" id="closeLabTestModal">X</button>
+      <button class="close-btn top-right" id="closeLabTestModal"><i class="fas fa-times"></i></button>
       <h3>Lab Tests</h3>
       <div class="lab-header-info">
         <p><strong>Patient #:</strong> <span id="labHeaderPatientId"></span></p>
@@ -118,7 +118,7 @@
   <!-- Overlay Modal -->
   <div class="overlay" id="labOverlay">
     <div class="modal-container">
-      <button class="close-btn" id="closeOverlayBtn">X</button>
+      <button class="close-btn" id="closeOverlayBtn"><i class="fas fa-times"></i></button>
       <iframe id="labIframe" src=""></iframe>
     </div>
   </div>
@@ -128,8 +128,8 @@
     <div class="modal-content">
       <p id="cancelConfirmationText">Are you sure you want to cancel this lab test?</p>
       <div class="modal-buttons">
-        <button id="confirmCancelYes" class="modal-btn yes-btn">Yes</button>
-        <button id="confirmCancelNo" class="modal-btn no-btn">No</button>
+        <button id="confirmCancelYes" class="modal-btn yes-btn"><i class="fas fa-check"></i> Yes</button>
+        <button id="confirmCancelNo" class="modal-btn no-btn"><i class="fas fa-times"></i> No</button>
       </div>
     </div>
   </div>

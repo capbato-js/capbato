@@ -316,7 +316,7 @@ function renderLabResults(labResults) {
         <button class="btn btn-primary"
           data-patient-id="${entry.patient_id}"
           data-patient-name="${formattedName}"
-          data-tests='${JSON.stringify(testsToDisplay)}'>View</button>
+          data-tests='${JSON.stringify(testsToDisplay)}'><i class="fas fa-eye"></i> View</button>
       </td>
     `;
 
@@ -330,7 +330,7 @@ function formatDateToReadable(dateString) {
 }
 
 document.addEventListener("click", (e) => {
-  if (e.target && e.target.classList.contains("btn") && e.target.textContent === "View") {
+  if (e.target && e.target.classList.contains("btn") && (e.target.textContent.includes("View") || e.target.innerHTML.includes("View"))) {
     const row = e.target.closest("tr");
     const tests = JSON.parse(e.target.dataset.tests || "[]");
     const modal = document.getElementById("labTestModal");
@@ -359,10 +359,10 @@ document.addEventListener("click", (e) => {
         tr.dataset.selectedTests = fieldKeys.join(",");
 
         const actionButtons = status.toLowerCase() === "complete"
-          ? `<button class="btn btn-info btn-sm btn-view">View</button>
-             <button class="btn btn-warning btn-sm btn-edit">Edit</button>`
-          : `<button class="btn btn-success btn-sm add-result-btn">Add Result</button>
-             <button class="btn btn-danger btn-sm btn-cancel">Cancel</button>`;
+          ? `<button class="btn btn-info btn-sm btn-view"><i class="fas fa-eye"></i> View</button>
+             <button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-edit"></i> Edit</button>`
+          : `<button class="btn btn-success btn-sm add-result-btn"><i class="fas fa-plus"></i> Add Result</button>
+             <button class="btn btn-danger btn-sm btn-cancel"><i class="fas fa-times"></i> Cancel</button>`;
 
         tr.innerHTML = `
           <td>${group}: ${testsStr}</td>
@@ -562,10 +562,10 @@ async function refreshLabTestModalInPlace(patientId, patientName) {
           tr.dataset.selectedTests = fieldKeys.join(",");
 
           const actionButtons = status.toLowerCase() === "complete"
-            ? `<button class="btn btn-info btn-sm btn-view">View</button>
-               <button class="btn btn-warning btn-sm btn-edit">Edit</button>`
-            : `<button class="btn btn-success btn-sm add-result-btn">Add Result</button>
-               <button class="btn btn-danger btn-sm btn-cancel">Cancel</button>`;
+            ? `<button class="btn btn-info btn-sm btn-view"><i class="fas fa-eye"></i> View</button>
+               <button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-edit"></i> Edit</button>`
+            : `<button class="btn btn-success btn-sm add-result-btn"><i class="fas fa-plus"></i> Add Result</button>
+               <button class="btn btn-danger btn-sm btn-cancel"><i class="fas fa-times"></i> Cancel</button>`;
 
           tr.innerHTML = `
             <td>${group}: ${testsStr}</td>
