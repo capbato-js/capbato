@@ -1,0 +1,2 @@
+Follow monorepo, then move the old codes (client and server) to something like legacy so we can easily exclude them from
+unit test and coverage, linting, build, etc.
