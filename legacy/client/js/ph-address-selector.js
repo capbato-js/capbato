@@ -5,7 +5,7 @@
 
 class PHAddressSelector {
   constructor(options = {}) {
-    this.baseURL = options.baseURL || 'http://localhost:3001';
+    this.baseURL = options.baseURL || 'https://capstone-legacy.up.railway.app';
     this.provinceSelect = null;
     this.citySelect = null;
     this.barangaySelect = null;

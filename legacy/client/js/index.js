@@ -159,7 +159,7 @@ function formatName(name) {
 }
 
 function refreshDashboardData() {
-  fetch('http://localhost:3001/appointments/today/confirmed')
+  fetch('https://capstone-legacy.up.railway.app/appointments/today/confirmed')
     .then(res => res.json())
     .then(data => {
       const count = document.getElementById('todayAppointmentsCount');
@@ -167,7 +167,7 @@ function refreshDashboardData() {
     })
     .catch(err => console.error("Error fetching today's total confirmed appointments:", err));
 
-  fetch('http://localhost:3001/appointments/today')
+  fetch('https://capstone-legacy.up.railway.app/appointments/today')
     .then(res => res.json())
     .then(data => {
       const tbody = document.getElementById('todayAppointmentsBody');
@@ -209,7 +209,7 @@ function refreshDashboardData() {
 }
 
 function fetchCurrentPatient() {
-  fetch('http://localhost:3001/appointments/today')
+  fetch('https://capstone-legacy.up.railway.app/appointments/today')
     .then(res => res.json())
     .then(data => {
       const now = new Date();
@@ -258,7 +258,7 @@ function loadLabTestResults() {
     return;
   }
 
-  fetch('http://localhost:3001/api/lab_requests/completed')
+  fetch('https://capstone-legacy.up.railway.app/api/lab_requests/completed')
     .then(res => res.json())
     .then(data => {
       const tbody = document.getElementById('labTestResultsBody');
@@ -318,7 +318,7 @@ function loadLabTestResults() {
           
           try {
             // Fetch the lab request details
-            const response = await fetch(`http://localhost:3001/api/lab_requests/${patientId}`);
+            const response = await fetch(`https://capstone-legacy.up.railway.app/api/lab_requests/${patientId}`);
             const labData = await response.json();
             
             if (labData && labData.patient_id) {

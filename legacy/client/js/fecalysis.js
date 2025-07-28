@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ...results
       };
 
-      fetch("http://localhost:3001/api/lab_requests", {
+      fetch("https://capstone-legacy.up.railway.app/api/lab_requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend)

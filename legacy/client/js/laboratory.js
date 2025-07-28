@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadLabRequests() {
   try {
-    const res = await fetch("http://localhost:3001/api/lab_requests");
+    const res = await fetch("https://capstone-legacy.up.railway.app/api/lab_requests");
     const result = await res.json();
 
     const labResults = Array.isArray(result) ? result : (result?.rows || []);
@@ -532,7 +532,7 @@ function refreshLabTestModal(patientId, patientName) {
 async function refreshLabTestModalInPlace(patientId, patientName) {
   try {
     // Fetch fresh data from the API instead of relying on DOM
-    const res = await fetch("http://localhost:3001/api/lab_requests");
+    const res = await fetch("https://capstone-legacy.up.railway.app/api/lab_requests");
     const result = await res.json();
     const labResults = Array.isArray(result) ? result : (result?.rows || []);
     

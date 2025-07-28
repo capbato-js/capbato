@@ -57,11 +57,11 @@
     const patientNumberDisplay = document.getElementById('patientNumberDisplay');
 
     // Fetch patients and appointments on load
-    fetch('http://localhost:3001/patients')
+    fetch('https://capstone-legacy.up.railway.app/patients')
       .then(res => res.json())
       .then(data => { patients = data; })
       .catch(() => { patients = []; });
-    fetch('http://localhost:3001/appointments')
+    fetch('https://capstone-legacy.up.railway.app/appointments')
       .then(res => res.json())
       .then(data => { appointments = data; })
       .catch(() => { appointments = []; });

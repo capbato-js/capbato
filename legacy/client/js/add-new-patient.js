@@ -370,7 +370,7 @@ document.getElementById("patientFormFields").addEventListener("submit", function
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Patient...';
 
   // Submit data to server
-  fetch("http://localhost:3001/patients/add-patient", {
+  fetch("https://capstone-legacy.up.railway.app/patients/add-patient", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

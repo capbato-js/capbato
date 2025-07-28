@@ -64,7 +64,7 @@ window.addEventListener("message", (event) => {
       printBtn.style.display = readOnly ? "inline-block" : "none";
     }
 
-    fetch(`http://localhost:3001/patients/${patient_id}`)
+    fetch(`https://capstone-legacy.up.railway.app/patients/${patient_id}`)
       .then(res => res.json())
       .then(data => {
         document.getElementById("age").value = data.Age || data.age || "";
@@ -72,7 +72,7 @@ window.addEventListener("message", (event) => {
       })
       .catch(err => console.error("Error fetching patient info:", err));
 
-    fetch(`http://localhost:3001/api/lab_requests/${patient_id}`)
+    fetch(`https://capstone-legacy.up.railway.app/api/lab_requests/${patient_id}`)
       .then(res => res.json())
       .then(results => {
         selectedTests.forEach(testId => {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       suggestionBox.innerHTML = "";
       if (query.length < 2) return;
 
-      fetch(`http://localhost:3001/patients/search?name=${encodeURIComponent(query)}`)
+      fetch(`https://capstone-legacy.up.railway.app/patients/search?name=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
           if (!Array.isArray(data)) return;
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
               patientIdInput.value = patient.id;
               suggestionBox.innerHTML = "";
 
-              fetch(`http://localhost:3001/patients/${patient.id}`)
+              fetch(`https://capstone-legacy.up.railway.app/patients/${patient.id}`)
                 .then(res => res.json())
                 .then(data => {
                   const ageInput = document.getElementById("age");
@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       // ✅ Use patientId and date in the URL to match Express route
-      fetch(`http://localhost:3001/api/lab_requests/${encodeURIComponent(patientId)}/${encodeURIComponent(date)}`, {
+      fetch(`https://capstone-legacy.up.railway.app/api/lab_requests/${encodeURIComponent(patientId)}/${encodeURIComponent(date)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend)

@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function fetchAndRender() {
-    fetch("http://localhost:3001/schedules")
+    fetch("https://capstone-legacy.up.railway.app/schedules")
       .then(res => res.json())
       .then(data => {
         schedulesCache = data;
@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === Doctors Table Logic ===
   function loadDoctorsData() {
-    fetch("http://localhost:3001/doctors")
+    fetch("https://capstone-legacy.up.railway.app/doctors")
       .then(res => res.json())
       .then(data => renderDoctorsTable(data))
       .catch(err => {
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const date = document.getElementById("date").value;
       const day = document.getElementById("day").value;
 
-      fetch("http://localhost:3001/schedules", {
+      fetch("https://capstone-legacy.up.railway.app/schedules", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, day })

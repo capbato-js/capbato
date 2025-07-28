@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
 let patientsData = [];
 
 function loadPatients() {
-  fetch("http://localhost:3001/patients")
+  fetch("https://capstone-legacy.up.railway.app/patients")
     .then((response) => response.json())
     .then((data) => {
       console.log("API Response:", data);

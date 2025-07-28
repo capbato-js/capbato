@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   try {
-    const response = await fetch(`http://localhost:3001/patients/${patientId}`);
+    const response = await fetch(`https://capstone-legacy.up.railway.app/patients/${patientId}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tbody = document.getElementById("appointmentListBody");
     tbody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
 
-    fetch(`http://localhost:3001/appointments/patient/${patientId}`)
+    fetch(`https://capstone-legacy.up.railway.app/appointments/patient/${patientId}`)
       .then(res => res.json())
       .then(data => {
         tbody.innerHTML = "";
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   function renderLabTestsForPatient(patientId) {
-    fetch("http://localhost:3001/api/lab_requests")
+    fetch("https://capstone-legacy.up.railway.app/api/lab_requests")
       .then(res => res.json())
       .then(data => {
         const labData = data.filter(lab => String(lab.patient_id) === String(patientId));

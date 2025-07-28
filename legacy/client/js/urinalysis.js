@@ -49,7 +49,7 @@ window.addEventListener("message", (event) => {
       }
     });
 
-    fetch(`http://localhost:3001/patients/${patient_id}`)
+    fetch(`https://capstone-legacy.up.railway.app/patients/${patient_id}`)
       .then(res => res.json())
       .then(data => {
         document.getElementById("age").value = data.Age || data.age || "";
@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
       suggestionBox.innerHTML = "";
       if (query.length < 2) return;
 
-      fetch(`http://localhost:3001/patients/search?name=${encodeURIComponent(query)}`)
+      fetch(`https://capstone-legacy.up.railway.app/patients/search?name=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
           if (!Array.isArray(data)) return;
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
               patientIdInput.value = patient.id;
               suggestionBox.innerHTML = "";
 
-              fetch(`http://localhost:3001/patients/${patient.id}`)
+              fetch(`https://capstone-legacy.up.railway.app/patients/${patient.id}`)
                 .then(res => res.json())
                 .then(data => {
                   document.getElementById("age").value = data.Age || "";
@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ...results
       };
 
-      fetch("http://localhost:3001/api/lab_requests", {
+      fetch("https://capstone-legacy.up.railway.app/api/lab_requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend)
@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("There was a problem submitting the form.");
         });
 
-      fetch(`http://localhost:3001/api/lab_requests/${patientId}`, {
+      fetch(`https://capstone-legacy.up.railway.app/api/lab_requests/${patientId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

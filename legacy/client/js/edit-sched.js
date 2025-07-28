@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const time = document.getElementById("time").value;
 
     // Save to backend (optional)
-    fetch("http://localhost:3001/schedules", {
+    fetch("https://capstone-legacy.up.railway.app/schedules", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ doctor, date, time })

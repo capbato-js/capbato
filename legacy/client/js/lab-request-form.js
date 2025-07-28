@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const API_BASE = "http://localhost:3001";
+  const API_BASE = "https://capstone-legacy.up.railway.app";
   const nameInput = document.getElementById("patientName");
   const suggestionsContainer = document.getElementById("patientSuggestions");
   const patientIdField = document.getElementById("patientId");
@@ -126,7 +126,7 @@ document.getElementById("labRequestForm").addEventListener("submit", async funct
   }
 
   try {
-    const res = await fetch("http://localhost:3001/api/lab_requests", {
+    const res = await fetch("https://capstone-legacy.up.railway.app/api/lab_requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)

@@ -145,7 +145,7 @@ function formatDateToReadable(dateString) {
 }
 
 function loadAllAppointments() {
-    fetch("http://localhost:3001/appointments")
+    fetch("https://capstone-legacy.up.railway.app/appointments")
         .then(response => response.json())
         .then(data => updateAppointmentsTable(data))
         .catch(error => {
@@ -162,7 +162,7 @@ function loadAppointmentsByDate(date = null) {
         return;
     }
 
-    fetch("http://localhost:3001/appointments")
+    fetch("https://capstone-legacy.up.railway.app/appointments")
         .then(response => response.json())
         .then(data => {
             let filteredAppointments = data.filter(appointment => appointment.appointment_date === selectedDate);
@@ -307,7 +307,7 @@ function confirmCancellation(appointmentId) {
 
 async function updateAppointmentStatus(appointmentId, newStatus) {
     try {
-        const response = await fetch(`http://localhost:3001/appointments/cancel/${appointmentId}`, {
+        const response = await fetch(`https://capstone-legacy.up.railway.app/appointments/cancel/${appointmentId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status: newStatus })

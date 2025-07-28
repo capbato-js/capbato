@@ -68,7 +68,7 @@ async function populateTimeOptions() {
   const isToday = selectedDate === now.toISOString().split("T")[0];
 
   try {
-    const response = await fetch("http://localhost:3001/appointments");
+    const response = await fetch("https://capstone-legacy.up.railway.app/appointments");
     const appointments = await response.json();
     latestAppointments = appointments;
 
@@ -143,7 +143,7 @@ function formatTimeLabel(timeStr) {
 
 async function fetchTimeAvailability(date) {
   try {
-    const response = await fetch("http://localhost:3001/appointments");
+    const response = await fetch("https://capstone-legacy.up.railway.app/appointments");
     const appointments = await response.json();
     latestAppointments = appointments;
 
@@ -243,7 +243,7 @@ function loadPatients() {
     if (query.length < 2) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/patients/search?name=${encodeURIComponent(query)}`);
+      const res = await fetch(`https://capstone-legacy.up.railway.app/patients/search?name=${encodeURIComponent(query)}`);
       const matches = await res.json();
 
       if (!Array.isArray(matches)) return;
@@ -280,7 +280,7 @@ function loadPatients() {
 }
 
 function loadDoctors() {
-  fetch("http://localhost:3001/doctors")
+  fetch("https://capstone-legacy.up.railway.app/doctors")
     .then((res) => res.json())
     .then((doctors) => {
       const select = document.getElementById("doctorSelect");
@@ -359,8 +359,8 @@ document.getElementById("addAppointmentForm").addEventListener("submit", async f
   }
 
   const url = isEditing
-    ? `http://localhost:3001/appointments/update/${editId}`
-    : "http://localhost:3001/appointments/add";
+    ? `https://capstone-legacy.up.railway.app/appointments/update/${editId}`
+    : "https://capstone-legacy.up.railway.app/appointments/add";
   const method = isEditing ? "PUT" : "POST";
 
   try {

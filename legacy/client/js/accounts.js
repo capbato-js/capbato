@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Fetch and render users
-  fetch('http://localhost:3001/users')
+  fetch('https://capstone-legacy.up.railway.app/users')
     .then(res => res.json())
     .then(users => {
       const tbody = document.getElementById('accountsTableBody');
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       try {
-        const res = await fetch('http://localhost:3001/users', {
+        const res = await fetch('https://capstone-legacy.up.railway.app/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ full_name, username, password, role, email, phone })
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:3001/users/${userId}/password`, {
+        const res = await fetch(`https://capstone-legacy.up.railway.app/users/${userId}/password`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password: newPassword })
