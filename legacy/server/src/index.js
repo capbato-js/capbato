@@ -19,7 +19,7 @@ import usersRoutes from './routes/users.routes.js';
 import addressRoutes from './routes/address.routes.js';
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Get directory name for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -109,7 +109,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
   console.log(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
 });

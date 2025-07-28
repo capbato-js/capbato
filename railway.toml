@@ -1,0 +1,12 @@
+[build]
+# Install dependencies and prepare the server
+command = "cd legacy/server && npm install"
+
+[deploy]
+# Start the Express server which serves both API and static files
+startCommand = "cd legacy/server && npm start"
+
+[variables]
+# Set the port for Railway
+PORT = 3001
+NODE_ENV = "production"
