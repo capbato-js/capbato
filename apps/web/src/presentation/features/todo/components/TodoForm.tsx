@@ -2,12 +2,12 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateTodoCommandSchema } from '@nx-starter/application-shared';
-import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Plus } from 'lucide-react';
 import { useTodoFormViewModel } from '../view-models/useTodoFormViewModel';
 import type { TodoFormData } from '../types/FormTypes';
+import { Button, TextInput } from '@mantine/core';
 
 export const TodoForm: React.FC = () => {
   const {
@@ -32,12 +32,11 @@ export const TodoForm: React.FC = () => {
       <CardContent className="pt-6">
         <form onSubmit={onSubmit} className="flex gap-2">
           <div className="flex-1">
-            <Input
+            <TextInput
               {...register('title')}
               placeholder="What needs to be done?"
               disabled={viewModel.isGlobalLoading || viewModel.isSubmitting}
               error={!!errors.title}
-              data-testid="todo-input"
             />
             {errors.title && (
               <p
