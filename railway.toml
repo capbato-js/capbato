@@ -1,21 +1,14 @@
 # Railway configuration for Nx monorepo deployment
-# Deploys apps/web (static site) and apps/api (Node.js server) separately
+# Single service that serves the API
 
-# API Service Configuration
-[api]
-source = "."
-build = { command = "pnpm install && pnpm build:api" }
-start = { command = "node dist/apps/api/main.js" }
+[build]
+command = "pnpm build:api"
 
-[api.variables]
-NODE_ENV = "production"
-PORT = 3001
+[deploy]
+# Start the Express server
+startCommand = "node dist/apps/api/main.js"
 
-# Web Service Configuration  
-[web]
-source = "."
-build = { command = "pnpm install && pnpm build:web" }
-staticPublishPath = "dist/apps/web"
-
-[web.variables]
+[variables]
+# Set the port for Railway
+PORT = 4000
 NODE_ENV = "production"
