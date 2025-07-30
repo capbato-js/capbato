@@ -1,12 +1,21 @@
-[build]
-# Install dependencies and prepare the server
-command = "cd legacy/server && npm install"
+# Railway configuration for Nx monorepo deployment
+# Deploys apps/web (static site) and apps/api (Node.js server) separately
 
-[deploy]
-# Start the Express server which serves both API and static files
-startCommand = "cd legacy/server && npm start"
+# API Service Configuration
+[api]
+source = "."
+build = { command = "pnpm install && pnpm build:api" }
+start = { command = "node dist/apps/api/main.js" }
 
-[variables]
-# Set the port for Railway
+[api.variables]
+NODE_ENV = "production"
 PORT = 3001
+
+# Web Service Configuration  
+[web]
+source = "."
+build = { command = "pnpm install && pnpm build:web" }
+staticPublishPath = "dist/apps/web"
+
+[web.variables]
 NODE_ENV = "production"
