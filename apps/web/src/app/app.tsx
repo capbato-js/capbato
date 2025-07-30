@@ -3,6 +3,15 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { TodoPage } from '../presentation/features/todo';
 import { AboutPage } from '../presentation/features/about';
 import { LoginPage } from '../presentation/features/login';
+import { 
+  DashboardPage,
+  AppointmentsPage,
+  PatientsPage,
+  LaboratoryPage,
+  PrescriptionsPage,
+  DoctorsPage,
+  AccountsPage
+} from '../presentation/features/clinic';
 import { AuthGuard } from '../presentation/components/auth';
 import { useAuthStore } from '../infrastructure/state/AuthStore';
 import '../styles.css';
@@ -18,8 +27,50 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Protected routes - require authentication */}
+        {/* Medical Clinic Protected Routes */}
         <Route path="/" element={
+          <AuthGuard requireAuth={true}>
+            <DashboardPage />
+          </AuthGuard>
+        } />
+        <Route path="/dashboard" element={
+          <AuthGuard requireAuth={true}>
+            <DashboardPage />
+          </AuthGuard>
+        } />
+        <Route path="/appointments" element={
+          <AuthGuard requireAuth={true}>
+            <AppointmentsPage />
+          </AuthGuard>
+        } />
+        <Route path="/patients" element={
+          <AuthGuard requireAuth={true}>
+            <PatientsPage />
+          </AuthGuard>
+        } />
+        <Route path="/laboratory" element={
+          <AuthGuard requireAuth={true}>
+            <LaboratoryPage />
+          </AuthGuard>
+        } />
+        <Route path="/prescriptions" element={
+          <AuthGuard requireAuth={true}>
+            <PrescriptionsPage />
+          </AuthGuard>
+        } />
+        <Route path="/doctors" element={
+          <AuthGuard requireAuth={true}>
+            <DoctorsPage />
+          </AuthGuard>
+        } />
+        <Route path="/accounts" element={
+          <AuthGuard requireAuth={true}>
+            <AccountsPage />
+          </AuthGuard>
+        } />
+
+        {/* Legacy Todo/About routes */}
+        <Route path="/todo" element={
           <AuthGuard requireAuth={true}>
             <TodoPage />
           </AuthGuard>
