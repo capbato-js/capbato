@@ -367,6 +367,54 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(webpack-dev-server@5.2.2)(webpack@5.99.9)
 
+  libs/application-api:
+    dependencies:
+      bcrypt:
+        specifier: ^5.1.1
+        version: 5.1.1(encoding@0.1.13)
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+      tsyringe:
+        specifier: ^4.10.0
+        version: 4.10.0
+
+  libs/application-shared:
+    dependencies:
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+      tsyringe:
+        specifier: ^4.10.0
+        version: 4.10.0
+      zod:
+        specifier: ^4.0.5
+        version: 4.0.5
+
+  libs/application-web:
+    dependencies:
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+
+  libs/domain:
+    dependencies:
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+
+  libs/utils-core:
+    dependencies:
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+
 packages:
 
   '@adobe/css-tools@4.3.3':
