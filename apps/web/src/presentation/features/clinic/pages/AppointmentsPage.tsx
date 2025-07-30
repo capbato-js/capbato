@@ -1,9 +1,99 @@
-import React from 'react';
-import { Box, Title, Text, Button, Group } from '@mantine/core';
-import { IconCalendarPlus } from '@tabler/icons-react';
+import React, { useState } from 'react';
+import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
+import { AppointmentsTable, AppointmentsCalendar, Appointment } from '../../../components/appointments';
+
+// Dummy data for appointments
+const dummyAppointments: Appointment[] = [
+  {
+    id: '1',
+    patientNumber: 'P001',
+    patientName: 'John Doe',
+    reasonForVisit: 'Annual Checkup',
+    date: '2025-07-31',
+    time: '09:00 AM',
+    doctor: 'Dr. Alice Smith',
+    status: 'confirmed'
+  },
+  {
+    id: '2',
+    patientNumber: 'P002',
+    patientName: 'Jane Smith',
+    reasonForVisit: 'Flu Symptoms',
+    date: '2025-07-31',
+    time: '10:30 AM',
+    doctor: 'Dr. John Doe',
+    status: 'pending'
+  },
+  {
+    id: '3',
+    patientNumber: 'P003',
+    patientName: 'Robert Johnson',
+    reasonForVisit: 'Follow-up Consultation',
+    date: '2025-08-01',
+    time: '02:00 PM',
+    doctor: 'Dr. Alice Smith',
+    status: 'confirmed'
+  },
+  {
+    id: '4',
+    patientNumber: 'P004',
+    patientName: 'Emily Davis',
+    reasonForVisit: 'Vaccination',
+    date: '2025-08-01',
+    time: '03:30 PM',
+    doctor: 'Dr. John Doe',
+    status: 'cancelled'
+  },
+  {
+    id: '5',
+    patientNumber: 'P005',
+    patientName: 'Michael Wilson',
+    reasonForVisit: 'Blood Pressure Check',
+    date: '2025-08-02',
+    time: '11:00 AM',
+    doctor: 'Dr. Alice Smith',
+    status: 'pending'
+  },
+  {
+    id: '6',
+    patientNumber: 'P006',
+    patientName: 'Sarah Brown',
+    reasonForVisit: 'Diabetes Management',
+    date: '2025-08-02',
+    time: '01:00 PM',
+    doctor: 'Dr. John Doe',
+    status: 'confirmed'
+  }
+];
 
 export const AppointmentsPage: React.FC = () => {
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+
+  const handleAddAppointment = () => {
+    console.log('Add appointment clicked');
+    // TODO: Implement add appointment functionality
+  };
+
+  const handleModifyAppointment = (appointmentId: string) => {
+    console.log('Modify appointment:', appointmentId);
+    // TODO: Implement modify appointment functionality
+  };
+
+  const handleCancelAppointment = (appointmentId: string) => {
+    console.log('Cancel appointment:', appointmentId);
+    // TODO: Implement cancel appointment functionality
+  };
+
+  const handleReconfirmAppointment = (appointmentId: string) => {
+    console.log('Reconfirm appointment:', appointmentId);
+    // TODO: Implement reconfirm appointment functionality
+  };
+
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date);
+  };
+
   return (
     <MedicalClinicLayout>
       <Box
@@ -15,50 +105,21 @@ export const AppointmentsPage: React.FC = () => {
           minHeight: 'calc(100vh - 140px)'
         }}
       >
-        <Group justify="space-between" align="center" mb="xl">
-          <Box style={{ flex: 1, textAlign: 'center' }}>
-            <Title 
-              order={1}
-              style={{
-                color: '#0b4f6c',
-                fontSize: '28px',
-                fontWeight: 'bold',
-                margin: 0
-              }}
-            >
-              Appointments
-            </Title>
-          </Box>
-          <Button
-            leftSection={<IconCalendarPlus size={16} />}
-            style={{
-              background: 'linear-gradient(45deg, #4db6ac, #26a69a)',
-              border: 'none',
-              borderRadius: '10px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              padding: '12px 25px',
-              boxShadow: '0 4px 15px rgba(77, 182, 172, 0.3)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(77, 182, 172, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(77, 182, 172, 0.3)';
-            }}
-          >
-            Add Appointment
-          </Button>
-        </Group>
-
-        <Box style={{ textAlign: 'center', marginTop: '50px' }}>
-          <Text size="lg" c="dimmed">
-            Appointments content will be implemented here
-          </Text>
-        </Box>
+        <AppointmentsTable
+          appointments={dummyAppointments}
+          selectedDate={selectedDate}
+          onAddAppointment={handleAddAppointment}
+          onModifyAppointment={handleModifyAppointment}
+          onCancelAppointment={handleCancelAppointment}
+          onReconfirmAppointment={handleReconfirmAppointment}
+          onDateSelect={handleDateSelect}
+        />
+        
+        {/* <AppointmentsCalendar
+          appointments={dummyAppointments}
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+        /> */}
       </Box>
     </MedicalClinicLayout>
   );
