@@ -2,7 +2,12 @@ import * as React from 'react';
 
 import { cn } from '../../../lib/utils';
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+interface InputProps extends React.ComponentProps<'input'> {
+  error?: boolean;
+  valid?: boolean;
+}
+
+function Input({ className, type, error, valid, ...props }: InputProps) {
   return (
     <input
       type={type}
@@ -14,11 +19,9 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         'bg-white text-gray-900',
         'box-border',
         // Focus state - matches legacy #17A589 (teal color)
-        'focus:outline-none focus:border-primary',
-        // Valid state - green border
-        'data-[valid=true]:border-green-600',
-        // Error state - red border  
-        'data-[invalid=true]:border-red-600 aria-invalid:border-red-600',
+        'focus:outline-none',
+        error ? 'border-red-600 focus:border-red-600' : 
+        valid ? 'border-green-600 focus:border-green-600' : 'focus:border-primary',
         // Disabled state
         'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
         // File input styling
@@ -29,7 +32,8 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         'selection:bg-primary selection:text-primary-foreground',
         // Dark mode support
         'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600',
-        'dark:focus:border-primary',
+        error ? 'dark:focus:border-red-600' : 
+        valid ? 'dark:focus:border-green-600' : 'dark:focus:border-primary',
         className
       )}
       {...props}

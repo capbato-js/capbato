@@ -36,11 +36,7 @@ export const TodoForm: React.FC = () => {
               {...register('title')}
               placeholder="What needs to be done?"
               disabled={viewModel.isGlobalLoading || viewModel.isSubmitting}
-              className={
-                errors.title
-                  ? 'border-destructive'
-                  : ''
-              }
+              error={!!errors.title}
               data-testid="todo-input"
             />
             {errors.title && (
