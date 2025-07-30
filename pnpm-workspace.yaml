@@ -1,0 +1,12 @@
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - '@tailwindcss/oxide'
+  - bcrypt
+  - better-sqlite3
+  - core-js-pure
+  - esbuild
+  - mongodb-memory-server
+  - nx
+  - sqlite3
+  - unrs-resolver

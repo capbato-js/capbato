@@ -1,0 +1,300 @@
+name: 🧪 Unit Test Coverage Task
+description: Improve unit test coverage for a specific application or library
+title: "[component] Update unit tests to achieve 100% coverage"
+labels: ["testing", "coverage", "enhancement", "copilot"]
+assignees: ["copilot"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component/Library
+      description: Select the component or library that needs test coverage improvement
+      options:
+        - api
+        - web
+        - domain
+        - application-api
+        - application-shared
+        - application-web
+        - utils-core
+    validations:
+      required: true
+
+  - type: textarea
+    id: setup-prerequisites
+    attributes:
+      label: "📋 Setup Prerequisites"
+      description: "**IMPORTANT**: Before working on this issue, ensure you have the correct package manager setup!"
+      value: |
+        ## 🚀 Required Setup Steps
+        
+        **⚠️ CRITICAL**: This project uses **pnpm** as the package manager. Using npm or yarn will cause issues!
+        
+        ### 1. Install pnpm globally (if not already installed)
+        ```bash
+        npm install -g pnpm
+        ```
+        
+        ### 2. Install project dependencies
+        ```bash
+        pnpm install
+        ```
+        
+        ### 3. Verify setup by running tests
+        ```bash
+        # For API components
+        pnpm nx test api
+        
+        # For PWA components  
+        pnpm nx test web
+        
+        # For library components
+        pnpm nx test domain
+        pnpm nx test application-api
+        pnpm nx test application-shared
+        pnpm nx test application-web
+        pnpm nx test utils-core
+        ```
+        
+        **✅ You're ready to work on this issue once these commands run successfully!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this coverage improvement?
+      options:
+        - High - Critical for production readiness
+        - Medium - Important for code quality
+        - Low - Nice to have improvement
+      default: 1
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-coverage
+    attributes:
+      label: Current Coverage Status
+      description: |
+        What's the current test coverage percentage? 
+        Run the appropriate coverage command and paste the results here.
+      placeholder: |
+        Example:
+        ```
+        pnpm test:coverage:api
+        
+        Coverage Summary:
+        Statements: 78.5% (123/157)
+        Branches: 65.2% (45/69)
+        Functions: 82.1% (23/28)
+        Lines: 79.3% (119/150)
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: uncovered-areas
+    attributes:
+      label: Specific Areas Lacking Coverage
+      description: |
+        Which files, functions, or code paths are currently uncovered?
+        You can use coverage reports or tools to identify these.
+      placeholder: |
+        Example:
+        - src/services/user.service.ts - error handling paths
+        - src/controllers/auth.controller.ts - edge cases
+        - src/utils/validation.helper.ts - input sanitization
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-patterns
+    attributes:
+      label: Testing Approach for Coding Agent
+      description: Testing patterns the coding agent should follow
+      value: |
+        ## Testing Guidelines for Coding Agent
+        
+        **Required Testing Patterns:**
+        - [ ] Follow existing unit test patterns in the codebase
+        - [ ] Apply clean architecture testing principles
+        - [ ] Focus on SOLID principles compliance in tests
+        
+        **Recommended Testing Practices:**
+        - [ ] Include edge case testing
+        - [ ] Add integration test scenarios where appropriate
+        - [ ] Mock external dependencies properly
+        - [ ] Test error handling and validation paths
+        
+        **Test Quality Standards:**
+        - Write clear, descriptive test names
+        - Use proper assertions and error messages
+        - Ensure tests are isolated and independent
+        - Mock at architectural boundaries
+        - Test business logic separate from infrastructure
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-commands
+    attributes:
+      label: Test Commands Reference
+      description: Relevant commands for this component (auto-populated based on selection)
+      value: |
+        **Run Tests (Short Commands):**
+        - `pnpm api` - Start API server
+        - `pnpm web` - Start PWA server
+        - `pnpm domain` - Run domain tests
+        - `pnpm application` - Run application-shared tests
+        - `pnpm utils` - Run utils-core tests
+        
+        **Coverage Commands (Short):**
+        - `pnpm covapi` - API coverage
+        - `pnpm covweb` - PWA coverage
+        - `pnpm covdomain` - Domain coverage
+        - `pnpm covapplication` - Application coverage
+        - `pnpm covutils` - Utils coverage
+        
+        **Full Commands:**
+        - `pnpm test:coverage:api` - Run API tests with coverage
+        - `pnpm test:coverage:web` - Run PWA tests with coverage
+        - `pnpm test:coverage:domain` - Run domain tests with coverage
+        - `pnpm test:coverage:application` - Run application tests with coverage
+        - `pnpm test:coverage:utils` - Run utils tests with coverage
+        - `pnpm test:watch` - Run all tests in watch mode
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be accomplished to close this issue?
+      value: |
+        ## Acceptance Criteria
+        
+        ### Coverage Goals
+        - [ ] Achieve 100% statement coverage (or specify target %)
+        - [ ] Achieve 100% branch coverage (or specify target %)
+        - [ ] Achieve 100% function coverage (or specify target %)
+        - [ ] Achieve 100% line coverage (or specify target %)
+        
+        ### Code Quality
+        - [ ] All tests follow existing patterns and best practices
+        - [ ] Tests properly mock external dependencies
+        - [ ] Edge cases and error scenarios are covered
+        - [ ] Tests are maintainable and well-documented
+        - [ ] No regression in existing functionality
+        
+        ### Documentation
+        - [ ] Update any relevant documentation
+        - [ ] Add comments for complex test scenarios
+        - [ ] Ensure test names clearly describe what they're testing
+        
+        ### Validation
+        - [ ] All tests pass consistently
+        - [ ] Coverage reports show target percentage achieved
+        - [ ] No performance degradation in test execution
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Any additional information that would be helpful for implementing this task?
+      placeholder: |
+        - Specific files or functions that are particularly complex
+        - Known edge cases that should be tested
+        - Dependencies that need special mocking considerations
+        - Performance considerations for the tests
+    validations:
+      required: false
+
+  - type: textarea
+    id: commit-message-guidelines
+    attributes:
+      label: "⚠️ CRITICAL: Commit Message Guidelines"
+      description: "**IMPORTANT**: Following these rules is mandatory - commits will FAIL if not followed!"
+      value: |
+        ## ⚠️ MANDATORY Commit Message Format
+        
+        **🚨 FAILURE TO FOLLOW THESE RULES WILL CAUSE COMMIT FAILURES! 🚨**
+        
+        **Format:** `type(scope): subject`
+        
+        **Example:** `test(api): add unit tests for todo service`
+        
+        **Available Types:**
+        - `test` - Adding missing tests or correcting existing tests
+        - `feat` - A new feature  
+        - `fix` - A bug fix
+        - `docs` - Documentation only changes
+        - `refactor` - Code changes that neither fix bugs nor add features
+        - `perf` - Performance improvements
+        - `style` - Formatting changes
+        - `build` - Build system or dependency changes
+        - `ci` - CI configuration changes
+        - `chore` - Other changes
+        
+        **Scope Rules:**
+        - Use kebab-case (lowercase with hyphens)
+        - Examples: `api`, `web`, `domain`, application-shared`, `utils-core`
+        
+        **Scope Rules (REQUIRED):**
+        - Use kebab-case (lowercase with hyphens)
+        - Examples: `api`, `web`, `domain`, application-shared`, `utils-core`
+        
+        **Subject Rules (REQUIRED):**
+        - Start with lowercase letter or number
+        - No period at the end
+        - Header length limits vary by scope:
+          - `api-e2e`, `web-e2e`, application-shared`: max 100 characters
+          - `domain`: max 95 characters  
+          - `api`, `web`: max 93 characters
+          - `utils-core`: max 90 characters
+          - All other scopes: max 82 characters
+        - Be descriptive and specific
+        
+        **Reference:** See `commitlint.config.ts` and `.husky/commit-msg` for complete rules
+        
+        **⚠️ Your commits will be automatically rejected if they don't follow these rules!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: clean-architecture
+    attributes:
+      label: Clean Architecture Compliance for Coding Agent
+      description: Ensure tests align with clean architecture principles
+      value: |
+        ## Clean Architecture Testing Guidelines for Coding Agent
+        
+        **Architecture Testing Requirements:**
+        - [ ] Tests respect dependency inversion (test interfaces, not implementations)
+        - [ ] Domain layer tests are independent of infrastructure concerns
+        - [ ] Application layer tests properly mock domain and infrastructure dependencies
+        - [ ] Tests demonstrate single responsibility principle
+        - [ ] Tests follow open/closed principle (extensible without modification)
+        
+        **Layer-Specific Testing:**
+        - **Domain Core**: Pure business logic tests, no external dependencies
+        - **Application Core**: Test use cases with mocked domain/infrastructure
+        - **Infrastructure**: Test integration points and external service connections
+        
+        **Dependency Management:**
+        - Mock external services at architecture boundaries
+        - Use dependency injection in tests
+        - Test contracts between layers
+        - Validate architectural constraints are maintained
+      render: markdown
+    validations:
+      required: false

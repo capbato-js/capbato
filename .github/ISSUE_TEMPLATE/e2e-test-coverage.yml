@@ -1,0 +1,350 @@
+name: 🎭 E2E Test Coverage
+description: Improve end-to-end test coverage for API or PWA applications
+title: "[component] Update E2E tests to achieve comprehensive coverage"
+labels: ["testing", "e2e", "coverage", "enhancement", "copilot"]
+assignees: ["copilot"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: E2E Test Application
+      description: Select the E2E test application that needs coverage improvement
+      options:
+        - api-e2e (API Integration Tests)
+        - web-e2e (PWA UI Tests)
+    validations:
+      required: true
+
+  - type: textarea
+    id: setup-prerequisites
+    attributes:
+      label: "📋 Setup Prerequisites"
+      description: "**IMPORTANT**: Before working on this issue, ensure you have the correct package manager setup!"
+      value: |
+        ## 🚀 Required Setup Steps
+        
+        **⚠️ CRITICAL**: This project uses **pnpm** as the package manager. Using npm or yarn will cause issues!
+        
+        ### 1. Install pnpm globally (if not already installed)
+        ```bash
+        npm install -g pnpm
+        ```
+        
+        ### 2. Install project dependencies
+        ```bash
+        pnpm install
+        ```
+        
+        ### 3. Verify setup by running tests
+        ```bash
+        # For API components
+        pnpm nx test api
+        
+        # For PWA components  
+        pnpm nx test web
+        
+        # For library components
+        pnpm nx test domain
+        pnpm nx test application-api
+        pnpm nx test application-shared
+        pnpm nx test application-web
+        pnpm nx test utils-core
+        ```
+        
+        **✅ You're ready to work on this issue once these commands run successfully!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: dropdown
+    id: test-type
+    attributes:
+      label: Test Type Focus
+      description: What type of E2E scenarios need coverage?
+      options:
+        - Integration - API endpoints and data flow
+        - UI/UX - User interface interactions
+        - Performance - Response times and load testing
+        - Security - Authentication and authorization
+        - Error Handling - Edge cases and error scenarios
+        - Cross-browser - Browser compatibility
+        - Mobile - Mobile device testing
+        - All - Comprehensive coverage
+      default: 7
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this E2E coverage improvement?
+      options:
+        - High - Critical for production readiness
+        - Medium - Important for user experience
+        - Low - Nice to have improvement
+      default: 1
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-coverage
+    attributes:
+      label: Current E2E Coverage Status
+      description: |
+        What's the current E2E test coverage? 
+        Run the appropriate E2E command and paste the results here.
+      placeholder: |
+        Example:
+        ```
+        pnpm e2e:api
+        
+        Test Results:
+        ✓ API Health Check
+        ✓ Todo CRUD Operations
+        ✗ Error Handling (missing)
+        ✗ Authentication Flow (missing)
+        
+        5 passing tests, 3 missing scenarios
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: missing-scenarios
+    attributes:
+      label: Missing E2E Scenarios
+      description: |
+        Which user flows, API endpoints, or UI interactions lack E2E coverage?
+      placeholder: |
+        **API E2E (api-e2e):**
+        - User registration flow
+        - Password reset workflow
+        - File upload endpoints
+        - Pagination and filtering
+        - Rate limiting behavior
+        
+        **PWA E2E (web-e2e):**
+        - Mobile responsive design
+        - Offline functionality
+        - Push notifications
+        - Service worker updates
+        - Cross-browser compatibility
+    validations:
+      required: false
+
+  - type: textarea
+    id: e2e-categories
+    attributes:
+      label: E2E Test Categories for Coding Agent
+      description: Types of E2E tests the coding agent should implement
+      value: |
+        ## E2E Testing Guidelines for Coding Agent
+        
+        **Essential E2E Tests:**
+        - [ ] Happy path user flows (main user journeys)
+        - [ ] Error handling and edge cases
+        
+        **Additional E2E Coverage:**
+        - [ ] Authentication and authorization flows
+        - [ ] Data validation and form submissions
+        - [ ] API integration and data persistence
+        - [ ] Performance and load testing
+        - [ ] Cross-browser compatibility
+        - [ ] Mobile and responsive design
+        - [ ] Accessibility testing
+        - [ ] Security testing (XSS, CSRF, etc.)
+        
+        **E2E Best Practices:**
+        - Use page object models for maintainable UI tests
+        - Implement proper test data setup and teardown
+        - Use explicit waits instead of implicit delays
+        - Create reusable fixtures and utilities
+        - Test real user scenarios end-to-end
+        - Validate both UI and API integration points
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: User Stories to Test
+      description: |
+        List the user stories or scenarios that need E2E coverage
+      placeholder: |
+        Example:
+        - As a user, I want to create a todo item and see it persist after page refresh
+        - As an admin, I want to bulk delete todos and receive confirmation
+        - As a mobile user, I want to use the app offline and sync when online
+        - As an API consumer, I want to handle rate limiting gracefully
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-commands
+    attributes:
+      label: E2E Test Commands Reference
+      description: Relevant commands for E2E testing (auto-populated based on selection)
+      value: |
+        **Run E2E Tests (Short Commands):**
+        - `pnpm endapi` - Run API E2E tests (api-e2e)
+        - `pnpm endweb` - Run PWA E2E tests (web-e2e)
+        
+        **Full E2E Commands:**
+        - `pnpm e2e` - Run all E2E tests
+        - `pnpm e2e:api` - Run API integration tests (api-e2e)
+        - `pnpm e2e:web` - Run PWA UI tests (web-e2e)
+        - `pnpm e2e:headed` - Run tests with browser UI visible
+        
+        **Development & Debugging:**
+        - API E2E: Uses **Vitest** framework
+        - PWA E2E: Uses **Playwright** framework
+        - `--headed` - Show browser during Playwright tests
+        - `--debug` - Enable debug mode for step-by-step execution
+        
+        **Test Organization:**
+        - **apps/api-e2e/src/api/**: API endpoint tests
+        - **apps/web-e2e/src/**: UI interaction tests
+        - **fixtures/**: Test data and helpers
+        - **pages/**: Page object models (Playwright)
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be accomplished to close this issue?
+      value: |
+        ## Acceptance Criteria
+        
+        ### Test Coverage Goals
+        - [ ] All critical user journeys have E2E coverage
+        - [ ] Happy path and error scenarios are tested
+        - [ ] Cross-browser compatibility verified (if applicable)
+        - [ ] Mobile responsiveness tested (for PWA)
+        - [ ] API integration points validated
+        
+        ### Test Quality
+        - [ ] Tests are reliable and not flaky
+        - [ ] Tests use proper page objects and fixtures
+        - [ ] Tests have clear assertions and error messages
+        - [ ] Tests run efficiently without unnecessary delays
+        - [ ] Tests clean up properly after execution
+        
+        ### Code Organization
+        - [ ] Tests follow existing patterns and structure
+        - [ ] Shared utilities and fixtures are properly used
+        - [ ] Test data management is consistent
+        - [ ] Page objects are maintained (for UI tests)
+        
+        ### Documentation
+        - [ ] New test scenarios are documented
+        - [ ] Test setup instructions are updated
+        - [ ] Complex test flows have explanatory comments
+        
+        ### Validation
+        - [ ] All E2E tests pass in CI environment
+        - [ ] Tests pass on different browsers (if applicable)
+        - [ ] No performance degradation in test execution
+        - [ ] Integration with existing test suite is seamless
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: testing-best-practices
+    attributes:
+      label: E2E Testing Best Practices for Coding Agent
+      description: Ensure E2E tests follow industry standards
+      value: |
+        ## E2E Testing Standards for Coding Agent
+        
+        **Required Practices:**
+        - [ ] Use page object model for UI tests (Playwright)
+        - [ ] Implement proper test data setup and teardown
+        - [ ] Use explicit waits instead of implicit delays
+        - [ ] Create reusable fixtures and test utilities
+        - [ ] Implement proper error handling in tests
+        
+        **Quality Guidelines:**
+        - [ ] Use meaningful test descriptions and assertions
+        - [ ] Optimize tests for parallel execution
+        - [ ] Implement visual regression testing (if applicable)
+        
+        **Framework-Specific Guidelines:**
+        - **Playwright (PWA)**: Use page objects, proper selectors, and async/await
+        - **Vitest (API)**: Use proper mocking, test isolation, and cleanup
+        - Ensure tests are deterministic and reliable
+        - Use data-testid attributes for stable selectors
+        - Implement proper screenshot and trace collection on failure
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Any additional information for implementing E2E tests?
+      placeholder: |
+        - Specific browsers or devices to target
+        - Performance benchmarks to maintain
+        - External services that need mocking
+        - Security scenarios to validate
+        - Accessibility requirements to test
+    validations:
+      required: false
+
+  - type: textarea
+    id: commit-message-guidelines
+    attributes:
+      label: "⚠️ CRITICAL: Commit Message Guidelines"
+      description: "**IMPORTANT**: Following these rules is mandatory - commits will FAIL if not followed!"
+      value: |
+        ## ⚠️ MANDATORY Commit Message Format
+        
+        **🚨 FAILURE TO FOLLOW THESE RULES WILL CAUSE COMMIT FAILURES! 🚨**
+        
+        **Format:** `type(scope): subject`
+        
+        **Example:** `test(web-e2e): add comprehensive ui interaction tests`
+        
+        **Available Types:**
+        - `test` - Adding missing tests or correcting existing tests
+        - `feat` - A new feature  
+        - `fix` - A bug fix
+        - `docs` - Documentation only changes
+        - `refactor` - Code changes that neither fix bugs nor add features
+        - `perf` - Performance improvements
+        - `style` - Formatting changes
+        - `build` - Build system or dependency changes
+        - `ci` - CI configuration changes
+        - `chore` - Other changes
+        
+        **Scope Rules (REQUIRED):**
+        - Use kebab-case (lowercase with hyphens)
+        - Examples: `api-e2e`, `web-e2e`, `api`, `web`
+        
+        **Subject Rules (REQUIRED):**
+        - Start with lowercase letter or number
+        - No period at the end
+        - Header length limits vary by scope:
+          - `api-e2e`, `web-e2e`, application-shared`: max 100 characters
+          - `domain`: max 95 characters  
+          - `api`, `web`: max 93 characters
+          - `utils-core`: max 90 characters
+          - All other scopes: max 82 characters
+        - Be descriptive and specific
+        
+        **Reference:** See `commitlint.config.ts` and `.husky/commit-msg` for complete rules
+        
+        **⚠️ Your commits will be automatically rejected if they don't follow these rules!**
+        
+        **Reference:** See `commitlint.config.ts` for complete rules
+      render: markdown
+    validations:
+      required: false

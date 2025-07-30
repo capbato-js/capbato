@@ -1,0 +1,383 @@
+name: 🎭🔧 E2E Test Fix
+description: Fix failing end-to-end tests for API or PWA applications
+title: "[component] Fix failing E2E tests"
+labels: ["testing", "e2e", "test", "high-priority", "copilot"]
+assignees: ["copilot"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: E2E Test Application
+      description: Select the E2E test application with failing tests
+      options:
+        - api-e2e (API Integration Tests)
+        - web-e2e (PWA UI Tests)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency Level
+      description: How critical are these failing E2E tests?
+      options:
+        - Critical - Blocking deployments/releases
+        - High - Breaking user workflows
+        - Medium - Intermittent failures
+        - Low - Minor test issues
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: setup-prerequisites
+    attributes:
+      label: "📋 Setup Prerequisites"
+      description: "**IMPORTANT**: Before working on this issue, ensure you have the correct package manager setup!"
+      value: |
+        ## 🚀 Required Setup Steps
+        
+        **⚠️ CRITICAL**: This project uses **pnpm** as the package manager. Using npm or yarn will cause issues!
+        
+        ### 1. Install pnpm globally (if not already installed)
+        ```bash
+        npm install -g pnpm
+        ```
+        
+        ### 2. Install project dependencies
+        ```bash
+        pnpm install
+        ```
+        
+        ### 3. Verify setup by running tests
+        ```bash
+        # For API components
+        pnpm nx test api
+        
+        # For PWA components  
+        pnpm nx test web
+        
+        # For library components
+        pnpm nx test domain
+        pnpm nx test application-api
+        pnpm nx test application-shared
+        pnpm nx test application-web
+        pnpm nx test utils-core
+        ```
+        
+        **✅ You're ready to work on this issue once these commands run successfully!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-failure-output
+    attributes:
+      label: E2E Test Failure Output
+      description: |
+        Paste the complete E2E test failure output here (optional - coding agent can analyze failing tests).
+        Run the appropriate E2E command and copy the error messages if available.
+      placeholder: |
+        Example:
+        ```
+        pnpm endweb
+        
+        Running 5 tests using 1 worker
+        
+        ✓ [chromium] › todo.spec.ts:12:5 › should create todo
+        ✗ [chromium] › todo.spec.ts:25:5 › should delete todo
+        
+        Error: Timeout 30000ms exceeded.
+        =========================== logs ===========================
+        waiting for selector "[data-testid='delete-button']"
+        =============================================================
+        
+        2 failed, 3 passed, 5 total
+        ```
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: failing-tests-list
+    attributes:
+      label: Specific Failing E2E Tests
+      description: |
+        List specific E2E test files and cases that are failing (optional - coding agent can identify these)
+      placeholder: |
+        **API E2E Tests (api-e2e):**
+        - src/api/todos.spec.ts
+          - "should create todo via API" test
+          - "should handle validation errors" test
+        
+        **PWA E2E Tests (web-e2e):**
+        - src/todo.spec.ts
+          - "should persist todos after refresh" test
+        - src/responsive.spec.ts
+          - "should work on mobile devices" test
+    validations:
+      required: false
+
+  - type: textarea
+    id: recent-changes
+    attributes:
+      label: Recent Changes
+      description: |
+        What recent changes might have caused these E2E test failures?
+      placeholder: |
+        - Updated UI components or layouts
+        - Changed API endpoints or response formats
+        - Modified authentication flow
+        - Updated test selectors or page objects
+        - Changed build configuration or deployment process
+        - Updated browser or Playwright versions
+        - Modified test environment setup
+    validations:
+      required: false
+
+  - type: textarea
+    id: browser-environment
+    attributes:
+      label: Browser & Environment Details
+      description: |
+        What browsers, devices, or environments are the tests failing on?
+      placeholder: |
+        - Chrome 115+ on macOS (local development)
+        - Firefox 116+ on Ubuntu (CI pipeline)
+        - Mobile Safari on iOS 16+ (device testing)
+        - Headless mode vs headed mode differences
+        - Local environment vs CI environment differences
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-analysis
+    attributes:
+      label: Initial Error Analysis
+      description: |
+        Any initial analysis of what might be causing the E2E failures?
+      placeholder: |
+        - Timeout suggests elements are loading slower than expected
+        - Selector might have changed after UI update
+        - API endpoint seems to be returning different response format
+        - Authentication token might be expiring during test
+        - Test data might not be properly cleaned up between tests
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-commands
+    attributes:
+      label: E2E Debug Commands Reference
+      description: Relevant commands for debugging E2E failures
+      value: |
+        **Run E2E Tests (Short Commands):**
+        - `pnpm endapi` - Run API E2E tests (api-e2e)
+        - `pnpm endweb` - Run PWA E2E tests (web-e2e)
+        
+        **Debug Commands:**
+        - **API E2E (Vitest):**
+          - `pnpm e2e:api` - Run API integration tests
+          - `nx test api-e2e --verbose` - Direct nx command with verbose
+        
+        - **PWA E2E (Playwright):**
+          - `pnpm e2e:web` - Run PWA UI tests
+          - `pnpm e2e:headed` - Show browser during tests (debugging)
+          - `npx playwright show-trace` - View test traces
+          - `npx playwright codegen` - Generate test selectors
+        
+        **Additional Debug Options:**
+        - `--headed` - Show browser during Playwright tests
+        - `--debug` - Step through tests interactively
+        - `--trace on` - Generate execution traces
+        - `--max-failures=1` - Stop after first failure
+        - `--timeout=60000` - Increase timeout for slow operations
+        - `--retries=0` - Disable retries to see pure failures
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be accomplished to close this issue?
+      value: |
+        ## Acceptance Criteria
+        
+        ### Test Execution
+        - [ ] All previously failing E2E tests now pass
+        - [ ] No new E2E test failures introduced
+        - [ ] Tests pass consistently (not flaky)
+        - [ ] Tests run successfully in CI environment
+        - [ ] Cross-browser compatibility maintained
+        
+        ### Root Cause Resolution
+        - [ ] Root cause of failures identified and documented
+        - [ ] Underlying issue fixed (not just test workarounds)
+        - [ ] Similar issues prevented in other E2E tests
+        - [ ] Test reliability improved
+        
+        ### Performance & Reliability
+        - [ ] Test execution time is reasonable
+        - [ ] Tests use proper waits and assertions
+        - [ ] Test data cleanup is working correctly
+        - [ ] Selectors and page objects are robust
+        
+        ### Documentation
+        - [ ] Document any E2E patterns or practices learned
+        - [ ] Update test documentation if patterns changed
+        - [ ] Add comments for complex test scenarios
+        
+        ### Verification
+        - [ ] Run full E2E suite to ensure no regressions
+        - [ ] Verify tests pass in different browsers (if applicable)
+        - [ ] Confirm CI pipeline runs successfully
+        - [ ] Test stability verified over multiple runs
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: debugging-guidance
+    attributes:
+      label: E2E Debugging Guidance for Coding Agent
+      description: |
+        Systematic approach the coding agent should follow to fix E2E tests:
+      value: |
+        **1. Test Environment Analysis:**
+        - Run tests in headed mode to observe browser behavior
+        - Check test environment setup and configuration
+        - Verify browser versions and Playwright configuration
+        - Validate test data and database state
+
+        **2. Selector and Page Object Validation:**
+        - Verify selectors and page objects are up to date
+        - Check for DOM changes that might affect element location
+        - Ensure page object models are correctly implemented
+        - Use `npx playwright codegen` to generate new selectors if needed
+
+        **3. Code Change Impact Analysis:**
+        - Review recent code changes that might affect tests
+        - Analyze API changes and response format modifications
+        - Check for authentication or session management updates
+        - Validate routing or navigation changes
+
+        **4. API and Data Consistency:**
+        - Validate API responses and data consistency
+        - Check for timing issues with async operations
+        - Review test data setup and cleanup processes
+        - Ensure proper handling of async operations
+
+        **5. Cross-Environment Testing:**
+        - Test across different browsers and environments
+        - Review CI/CD pipeline configuration
+        - Compare local vs CI environment differences
+        - Validate timeout settings and network conditions
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Any additional information that would be helpful for debugging these E2E test failures?
+      placeholder: |
+        - Tests were working before specific deployment/release
+        - Failures only occur in CI, not locally
+        - Intermittent failures vs consistent failures
+        - Related to specific features or user workflows
+        - Performance or timeout issues observed
+        - Browser-specific behavior differences
+    validations:
+      required: false
+
+  - type: textarea
+    id: quality-validation-guidance
+    attributes:
+      label: E2E Test Quality Validation Guidance
+      description: |
+        Quality standards the coding agent should ensure when fixing E2E tests:
+      value: |
+        **1. Page Object Model Excellence:**
+        - Tests use proper page object model patterns
+        - Selectors are centralized and maintainable
+        - Page objects encapsulate UI interactions properly
+        - Common actions are abstracted into reusable methods
+
+        **2. Test Reliability Standards:**
+        - Tests have appropriate waits and assertions
+        - Use explicit waits instead of hard-coded delays
+        - Implement proper error handling for flaky elements
+        - Add retry logic for network-dependent operations
+
+        **3. Data Management Quality:**
+        - Test data setup and cleanup is reliable
+        - Tests don't interfere with each other's data
+        - Database state is properly reset between tests
+        - External dependencies are mocked when appropriate
+
+        **4. Test Isolation Requirements:**
+        - Tests are isolated and don't depend on each other
+        - Each test can run independently
+        - No shared state between test cases
+        - Proper setup and teardown for each test
+
+        **5. Selector Robustness:**
+        - Selectors are robust and maintainable
+        - Use data-testid attributes when possible
+        - Avoid brittle CSS selectors
+        - Implement fallback strategies for element location
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: commit-message-guidelines
+    attributes:
+      label: "⚠️ CRITICAL: Commit Message Guidelines"
+      description: "**IMPORTANT**: Following these rules is mandatory - commits will FAIL if not followed!"
+      value: |
+        ## ⚠️ MANDATORY Commit Message Format
+        
+        **🚨 FAILURE TO FOLLOW THESE RULES WILL CAUSE COMMIT FAILURES! 🚨**
+        
+        **Format:** `type(scope): subject`
+        
+        **Example:** `fix(web-e2e): resolve timeout issues in todo tests`
+        
+        **Available Types:**
+        - `fix` - A bug fix (for fixing failing E2E tests)
+        - `test` - Adding missing tests or correcting existing tests
+        - `refactor` - Code changes that neither fix bugs nor add features
+        - `feat` - A new feature  
+        - `docs` - Documentation only changes
+        - `perf` - Performance improvements
+        - `style` - Formatting changes
+        - `build` - Build system or dependency changes
+        - `ci` - CI configuration changes
+        - `chore` - Other changes
+        
+        **Scope Rules (REQUIRED):**
+        - Use kebab-case (lowercase with hyphens)
+        - Examples: `api-e2e`, `web-e2e`, `api`, `web`
+        
+        **Subject Rules (REQUIRED):**
+        - Start with lowercase letter or number
+        - No period at the end
+        - Header length limits vary by scope:
+          - `api-e2e`, `web-e2e`, application-shared`: max 100 characters
+          - `domain`: max 95 characters  
+          - `api`, `web`: max 93 characters
+          - `utils-core`: max 90 characters
+          - All other scopes: max 82 characters
+        - Be descriptive and specific
+        
+        **Reference:** See `commitlint.config.ts` and `.husky/commit-msg` for complete rules
+        
+        **⚠️ Your commits will be automatically rejected if they don't follow these rules!**
+      render: markdown
+    validations:
+      required: false
