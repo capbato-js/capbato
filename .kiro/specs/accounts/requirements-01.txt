@@ -1,0 +1,293 @@
+ACCOUNTS MANAGEMENT COMPREHENSIVE EARS REQUIREMENTS
+
+===================================================================
+AUTHENTICATION AND PAGE ACCESS
+===================================================================
+
+WHEN a user navigates to the accounts page
+THE SYSTEM SHALL verify authentication status and redirect to login page if user is not authenticated
+
+WHEN an authenticated user loads the accounts page
+THE SYSTEM SHALL display the user's role and username in the header area
+
+WHEN the accounts page loads for an authenticated user
+THE SYSTEM SHALL set the appropriate page title to "Accounts Management"
+
+WHEN a user has a valid authentication token stored
+THE SYSTEM SHALL automatically display the accounts page without requiring re-authentication
+
+WHEN authentication tokens are missing or invalid
+THE SYSTEM SHALL redirect to the login page
+
+WHEN the page loads
+THE SYSTEM SHALL retrieve user authentication data from localStorage
+
+WHEN the accounts page loads
+THE SYSTEM SHALL maintain the current user's authentication state
+
+===================================================================
+HEADER DISPLAY AND PROFILE MANAGEMENT
+===================================================================
+
+WHEN the accounts page loads
+THE SYSTEM SHALL display a navigation bar with clinic logo, clinic name, user role, username, and profile avatar
+
+WHEN the accounts page displays user information
+THE SYSTEM SHALL show the user role in uppercase and username below it in the header area
+
+WHEN the accounts page creates a profile avatar
+THE SYSTEM SHALL generate first letter of username and assign a consistent color based on username hash
+
+WHEN a user clicks on the profile avatar
+THE SYSTEM SHALL toggle the visibility of the profile dropdown menu
+
+WHEN a user clicks outside the profile dropdown
+THE SYSTEM SHALL hide the profile dropdown menu
+
+WHEN a user selects "Settings" from the profile dropdown
+THE SYSTEM SHALL close the dropdown and display "Settings functionality coming soon!" alert message
+
+WHEN a user selects "Logout" from the profile dropdown
+THE SYSTEM SHALL clear all stored authentication data from localStorage and redirect to login.html
+
+===================================================================
+SIDEBAR NAVIGATION
+===================================================================
+
+WHEN the accounts page loads
+THE SYSTEM SHALL display a fixed sidebar with navigation menu items for Dashboard, Appointments, Patients, Laboratory, Prescriptions, Doctors, and Accounts
+
+WHEN the current page is the accounts page
+THE SYSTEM SHALL highlight the Accounts menu item as active with special styling and color
+
+WHEN a user hovers over any sidebar menu item
+THE SYSTEM SHALL change the background color and text color to indicate hover state
+
+WHEN a user clicks on any sidebar menu item
+THE SYSTEM SHALL navigate to the corresponding page
+
+===================================================================
+ACCOUNTS TABLE DISPLAY
+===================================================================
+
+WHEN the accounts page loads
+THE SYSTEM SHALL display an accounts management table with columns for Name, Role, and Action
+
+WHEN loading user accounts data
+THE SYSTEM SHALL fetch user data from the API endpoint GET /users
+
+WHEN the accounts table loads
+THE SYSTEM SHALL display "Loading..." message while fetching data
+
+WHEN user data is successfully fetched
+THE SYSTEM SHALL populate the table with user full names, roles, and action buttons
+
+WHEN user data fails to load
+THE SYSTEM SHALL display "Failed to load users." message in the table
+
+WHEN displaying user names in the table
+THE SYSTEM SHALL align names to the left with appropriate padding
+
+WHEN displaying user roles and actions in the table
+THE SYSTEM SHALL center-align the content
+
+WHEN the accounts table displays user data
+THE SYSTEM SHALL show a "Change Password" button with key icon for each user
+
+===================================================================
+CREATE ACCOUNT FUNCTIONALITY
+===================================================================
+
+WHEN the accounts page loads
+THE SYSTEM SHALL display a "Create Account" button with user-plus icon in the header area
+
+WHEN a user clicks the "Create Account" button
+THE SYSTEM SHALL display the create account modal overlay
+
+WHEN the create account modal opens
+THE SYSTEM SHALL display form fields for Full Name, Username, Password, Role, Email, and Phone
+
+WHEN the create account modal opens
+THE SYSTEM SHALL clear any previous error messages
+
+WHEN the create account form is displayed
+THE SYSTEM SHALL provide a dropdown for Role with options: Admin, Receptionist, Doctor
+
+===================================================================
+CREATE ACCOUNT FORM VALIDATION
+===================================================================
+
+WHEN a user submits the create account form
+THE SYSTEM SHALL validate that Full Name, Username, Password, Role, and Email are required fields
+
+WHEN a user submits form with missing required fields
+THE SYSTEM SHALL display error message "All fields except phone are required."
+
+WHEN a user enters a phone number
+THE SYSTEM SHALL validate that phone starts with "09" and is exactly 11 digits
+
+WHEN a user enters an invalid phone number format
+THE SYSTEM SHALL display error message "Phone number must start with 09 and be exactly 11 digits."
+
+WHEN a user enters a password in any form
+THE SYSTEM SHALL validate password contains at least 8 characters, uppercase, lowercase, number, and symbol
+
+WHEN a user enters an invalid password format in any form
+THE SYSTEM SHALL display error message "Password must be at least 8 characters, contain uppercase, lowercase, number, and symbol."
+
+===================================================================
+CREATE ACCOUNT SUBMISSION AND API INTEGRATION
+===================================================================
+
+WHEN a user submits a valid create account form
+THE SYSTEM SHALL send POST request to /users endpoint with form data
+
+WHEN the create account API returns a duplicate username/email error
+THE SYSTEM SHALL display the error message from the server
+
+WHEN account creation is successful
+THE SYSTEM SHALL close the modal, reset the form, and reload the page
+
+WHEN the create account API request fails
+THE SYSTEM SHALL display "Server error." message
+
+WHEN a new account is created successfully
+THE SYSTEM SHALL refresh the accounts table to show the new user
+
+===================================================================
+CHANGE PASSWORD FUNCTIONALITY
+===================================================================
+
+WHEN a user clicks a "Change Password" button
+THE SYSTEM SHALL create and display a change password modal for that specific user
+
+WHEN the change password modal opens
+THE SYSTEM SHALL display the username of the user whose password is being changed
+
+WHEN the change password modal opens
+THE SYSTEM SHALL create form fields for New Password and Confirm Password
+
+WHEN the change password modal opens
+THE SYSTEM SHALL clear any previous error messages and input fields
+
+===================================================================
+CHANGE PASSWORD FORM VALIDATION
+===================================================================
+
+WHEN a user enters a new password that doesn't meet complexity requirements
+THE SYSTEM SHALL display "Password must be at least 8 characters, contain uppercase, lowercase, number, and symbol." error message
+
+WHEN the new password and confirm password fields don't match
+THE SYSTEM SHALL display "Passwords do not match." error message
+
+WHEN both passwords match and meet requirements
+THE SYSTEM SHALL submit the password change request
+
+===================================================================
+CHANGE PASSWORD SUBMISSION AND API INTEGRATION
+===================================================================
+
+WHEN a user submits a valid change password form
+THE SYSTEM SHALL send PUT request to /users/:id/password endpoint with new password
+
+WHEN the change password API returns success
+THE SYSTEM SHALL hide the modal and display "Password changed successfully!" alert
+
+WHEN the change password API returns an error
+THE SYSTEM SHALL display the error message from the server
+
+WHEN the change password API request fails
+THE SYSTEM SHALL display "Server error." message
+
+===================================================================
+MODAL BEHAVIOR AND INTERACTION
+===================================================================
+
+WHEN a user clicks the close button (×) on any modal
+THE SYSTEM SHALL close the modal
+
+WHEN a user clicks outside the modal content
+THE SYSTEM SHALL close the modal
+
+===================================================================
+FORM INPUT BEHAVIOR AND RESTRICTIONS
+===================================================================
+
+WHEN a user types in the phone input field
+THE SYSTEM SHALL restrict input to numeric characters only
+
+WHEN a user types in the phone input field
+THE SYSTEM SHALL limit input to maximum 11 characters
+
+WHEN a user types in the phone input field
+THE SYSTEM SHALL validate the pattern starts with "09" and is exactly 11 digits
+
+WHEN a user selects a role from the dropdown
+THE SYSTEM SHALL update the role field value
+
+WHEN a user types in password fields
+THE SYSTEM SHALL mask the input characters for security
+
+===================================================================
+ERROR HANDLING
+===================================================================
+
+WHEN any form submission fails due to server error
+THE SYSTEM SHALL display "Server error." message
+
+WHEN any API operation returns an error response
+THE SYSTEM SHALL display the returned error message
+
+===================================================================
+API INTEGRATION SPECIFICATIONS
+===================================================================
+
+WHEN the system fetches user accounts
+THE SYSTEM SHALL call GET /users and expect response with id, full_name, and role fields
+
+WHEN the system creates a new account
+THE SYSTEM SHALL call POST /users with full_name, username, password, role, email, and phone fields
+
+WHEN the system changes a user password
+THE SYSTEM SHALL call PUT /users/:id/password with password field
+
+===================================================================
+UI STYLING AND RESPONSIVE DESIGN
+===================================================================
+
+WHEN the accounts page is displayed
+THE SYSTEM SHALL apply consistent styling with rounded corners, shadows, and color scheme
+
+WHEN the accounts page is displayed
+THE SYSTEM SHALL apply responsive design with proper spacing and alignment
+
+WHEN form elements are displayed
+THE SYSTEM SHALL use Bootstrap form classes for consistent appearance
+
+WHEN buttons are hovered
+THE SYSTEM SHALL provide visual feedback with color changes and scale transformations
+
+WHEN modals are displayed
+THE SYSTEM SHALL overlay the page with semi-transparent background and centered modal content
+
+WHEN the accounts table is displayed
+THE SYSTEM SHALL apply alternating row styles and proper spacing for readability
+
+WHEN form validation errors occur
+THE SYSTEM SHALL display error messages in red color below the form
+
+===================================================================
+DATA PERSISTENCE AND STATE MANAGEMENT
+===================================================================
+
+WHEN the page loads
+THE SYSTEM SHALL retrieve user authentication data from localStorage
+
+WHEN the accounts page loads
+THE SYSTEM SHALL maintain the current user's authentication state
+
+WHEN a new account is created successfully
+THE SYSTEM SHALL refresh the accounts table to show the new user
+
+WHEN authentication tokens are missing or invalid
+THE SYSTEM SHALL redirect to the login page
