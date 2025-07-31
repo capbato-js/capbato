@@ -189,7 +189,6 @@ export const AccountsPage: React.FC = () => {
           </Text>
         }
         centered
-        size="sm"
         styles={{
           content: {
             borderRadius: '16px',

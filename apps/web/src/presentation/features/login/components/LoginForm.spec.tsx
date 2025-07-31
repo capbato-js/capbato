@@ -1,14 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
+import { MantineProvider } from '@mantine/core';
 import { LoginForm } from './LoginForm';
 
 // Mock the view model
 const mockViewModel = {
   handleFormSubmit: vi.fn(),
   isSubmitting: false,
-  error: null,
+  error: null as string | null,
   clearError: vi.fn(),
   validateEmail: vi.fn(),
   getFieldError: vi.fn(),
@@ -19,12 +20,14 @@ vi.mock('../view-models/useLoginFormViewModel', () => ({
   useLoginFormViewModel: () => mockViewModel,
 }));
 
-// Helper function to render with router
+// Helper function to render with router and MantineProvider
 const renderWithRouter = (component: React.ReactElement) => {
   return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
+    <MantineProvider>
+      <BrowserRouter>
+        {component}
+      </BrowserRouter>
+    </MantineProvider>
   );
 };
 
@@ -126,13 +129,11 @@ describe('LoginForm', () => {
     }, { timeout: 1000 });
   });
 
-  it('should show forgot password and create account links', () => {
+  it('should show forgot password link', () => {
     renderWithRouter(<LoginForm />);
 
     expect(screen.getByTestId('forgot-password-link')).toBeInTheDocument();
-    expect(screen.getByTestId('create-account-link')).toBeInTheDocument();
     expect(screen.getByText('Forgot Password?')).toBeInTheDocument();
-    expect(screen.getByText('Create Account')).toBeInTheDocument();
   });
 
   it('should have proper accessibility attributes', () => {
@@ -144,10 +145,10 @@ describe('LoginForm', () => {
     const rememberMeCheckbox = screen.getByTestId('login-remember-me-checkbox');
 
     expect(identifierInput).toHaveAttribute('type', 'text');
-    expect(identifierInput).toHaveAttribute('placeholder', 'Username or Email');
+    expect(identifierInput).toHaveAttribute('placeholder', 'Enter your username or email');
     
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(passwordInput).toHaveAttribute('placeholder', 'Password');
+    expect(passwordInput).toHaveAttribute('placeholder', 'Enter your password');
     
     expect(submitButton).toHaveAttribute('type', 'submit');
     expect(rememberMeCheckbox).toHaveAttribute('role', 'checkbox');

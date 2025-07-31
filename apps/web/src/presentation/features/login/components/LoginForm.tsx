@@ -2,11 +2,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginFormSchema } from '@nx-starter/application-shared';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Checkbox } from '../../../components/ui/checkbox';
-import { User, Lock, LogIn } from 'lucide-react';
+import { Button, TextInput, Paper, Title, Checkbox, Alert, Group, Stack } from '@mantine/core';
+import { IconUser, IconLock, IconLogin } from '@tabler/icons-react';
 import { useLoginFormViewModel } from '../view-models/useLoginFormViewModel';
 import type { LoginFormData } from '../types';
 
@@ -22,7 +19,7 @@ export const LoginForm: React.FC = () => {
     reset,
     watch,
     setValue,
-    formState: { errors, isValid, isDirty },
+    formState: { errors },
     setFocus,
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginFormSchema),
@@ -75,13 +72,32 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[400px] mx-auto">
-      <Card className="bg-white shadow-xl border-0 rounded-[20px] shadow-[0_8px_20px_rgba(0,0,0,0.15)]">
-        <CardContent className="p-8 pt-8">
-          <h1 className="text-[28px] font-normal text-center mb-6 text-[#0b4f6c] font-[system-ui,Segoe_UI,Tahoma,Geneva,Verdana,sans-serif]">
-            Login
-          </h1>
-          
+    <div className="w-full max-w-[350px] mx-auto">
+      <Paper 
+        withBorder={false} 
+        p="xl" 
+        className="bg-white"
+        style={{
+          borderRadius: '15px',
+          boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+          padding: '30px 25px'
+        }}
+      >
+        <Title order={2} ta="center" mb="lg" style={{ color: '#0b4f6c' }}>
+          Login
+        </Title>
+        
+        {/* Error message */}
+        {/* {viewModel.error && (
+          <Alert 
+            color="red" 
+            mb="md"
+            data-testid="login-error"
+          >
+            {viewModel.error}
+          </Alert>
+        )} */}
+
           {/* Error message */}
           {viewModel.error && (
             <div 
@@ -92,142 +108,81 @@ export const LoginForm: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={onSubmit} onKeyDown={handleKeyDown}>
+        <form onSubmit={onSubmit} onKeyDown={handleKeyDown}>
+          <Stack gap="md">
             {/* Username/Email Field */}
-            <div className="relative mb-3">
-              <div 
-                className="flex items-center bg-[#f5f7fa] border border-[#ccc] rounded-[10px] overflow-hidden mt-[15px] h-[50px]"
-              >
-                <div className="pl-3 pr-2">
-                  <User className="h-5 w-5 text-[#4db6ac]" />
-                </div>
-                <Input
-                  {...register('identifier')}
-                  type="text"
-                  placeholder="Username or Email"
-                  disabled={viewModel.isSubmitting}
-                  onChange={(e) => {
-                    // First call the register's onChange
-                    register('identifier').onChange(e);
-                    // Then call our custom handler
-                    handleInputChange();
-                  }}
-                  className="bg-transparent h-full focus:bg-[#e6f4f1] text-[#333] placeholder-[#888] text-[15px] px-[15px] w-full box-border border-none outline-none shadow-none rounded-tl-none rounded-bl-none"
-                  data-testid="login-identifier-input"
-                  style={{ boxShadow: 'none' }}
-                />
-              </div>
-              {errors.identifier && (
-                <p
-                  className="text-sm text-red-600 mt-1 px-3 text-[crimson]"
-                  data-testid="login-identifier-error"
-                >
-                  {errors.identifier.message}
-                </p>
-              )}
-            </div>
+            <TextInput
+              {...register('identifier')}
+              label="Username or Email"
+              placeholder={errors.identifier?.message ? "" : "Enter your username or email"}
+              leftSection={<IconUser size={18} />}
+              disabled={viewModel.isSubmitting}
+              onChange={(e) => {
+                register('identifier').onChange(e);
+                handleInputChange();
+              }}
+              error={errors.identifier?.message}
+              data-testid="login-identifier-input"
+            />
 
             {/* Password Field */}
-            <div className="relative mb-3">
-              <div 
-                className="flex items-center bg-[#f5f7fa] border border-[#ccc] rounded-[10px] overflow-hidden mt-[15px] h-[50px]"
-              >
-                <div className="pl-3 pr-2">
-                  <Lock className="h-5 w-5 text-[#4db6ac]" />
-                </div>
-                <Input
-                  {...register('password')}
-                  type="password"
-                  placeholder="Password"
-                  disabled={viewModel.isSubmitting}
-                  onChange={(e) => {
-                    // First call the register's onChange
-                    register('password').onChange(e);
-                    // Then call our custom handler
-                    handleInputChange();
-                  }}
-                  className="bg-transparent h-full focus:bg-[#e6f4f1] text-[#333] placeholder-[#888] text-[15px] px-[15px] w-full box-border border-none outline-none shadow-none rounded-tl-none rounded-bl-none"
-                  data-testid="login-password-input"
-                  style={{ boxShadow: 'none' }}
-                />
-              </div>
-              {errors.password && (
-                <p
-                  className="text-sm text-red-600 mt-1 px-3 text-[crimson]"
-                  data-testid="login-password-error"
-                >
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+            <TextInput
+              {...register('password')}
+              type="password"
+              label="Password"
+              placeholder={errors.password?.message ? "" : "Enter your password"}
+              leftSection={<IconLock size={18} />}
+              disabled={viewModel.isSubmitting}
+              onChange={(e) => {
+                register('password').onChange(e);
+                handleInputChange();
+              }}
+              error={errors.password?.message}
+              data-testid="login-password-input"
+            />
 
             {/* Remember Me Checkbox */}
-            <div className="flex items-center space-x-2 mt-4">
+            <Group mt="sm">
               <Checkbox
                 checked={watch('rememberMe')}
-                onCheckedChange={(checked) => setValue('rememberMe', !!checked)}
-                id="rememberMe"
+                onChange={(event) => setValue('rememberMe', event.currentTarget.checked)}
+                label="Remember Me"
                 disabled={viewModel.isSubmitting}
-                className="data-[state=checked]:bg-[#4db6ac] data-[state=checked]:border-[#4db6ac]"
                 data-testid="login-remember-me-checkbox"
               />
-              <label
-                htmlFor="rememberMe"
-                className="text-sm text-gray-700 cursor-pointer select-none"
-              >
-                Remember Me
-              </label>
-            </div>
+            </Group>
 
             {/* Submit Button */}
             <Button
               type="submit"
               disabled={isFormEmpty || viewModel.isSubmitting}
-              className="w-full bg-[#4db6ac] hover:bg-[#3ba69c] active:bg-[#b2dfdb] active:text-[#004d40] text-white font-bold border-0 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 mt-4 h-[50px] rounded-[10px] text-[16px]"
+              fullWidth
+              leftSection={viewModel.isSubmitting ? undefined : <IconLogin size={18} />}
+              loading={viewModel.isSubmitting}
+              size="md"
+              mt="md"
               data-testid="login-submit-button"
             >
-              <LogIn className="h-5 w-5 mr-2" />
-              {viewModel.isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Login
-                </>
-              ) : (
-                'Login'
-              )}
+              Login
             </Button>
-          </form>
+          </Stack>
+        </form>
 
-          {/* Additional Links (Placeholder for future features) */}
-          <div className="mt-6 text-center space-y-2">
-            <button
-              type="button"
-              className="text-[#4db6ac] hover:text-[#3ba69c] text-sm font-medium underline"
-              onClick={() => {
-                // TODO: Implement forgot password functionality
-                console.log('Forgot password clicked');
-              }}
-              data-testid="forgot-password-link"
-            >
-              Forgot Password?
-            </button>
-            <div className="text-gray-600 text-sm">
-              Don't have an account?{' '}
-              <button
-                type="button"
-                className="text-[#4db6ac] hover:text-[#3ba69c] font-medium underline"
-                onClick={() => {
-                  // TODO: Implement navigation to register page
-                  console.log('Create account clicked');
-                }}
-                data-testid="create-account-link"
-              >
-                Create Account
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Forgot Password Link */}
+        {/* <Group justify="center" mt="lg">
+          <Button
+            variant="subtle"
+            size="sm"
+            onClick={() => {
+              // TODO: Implement forgot password functionality
+              console.log('Forgot password clicked');
+            }}
+            data-testid="forgot-password-link"
+          >
+            Forgot Password?
+          </Button>
+        </Group> */}
+      </Paper>
     </div>
   );
 };
