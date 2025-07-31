@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginFormSchema } from '@nx-starter/application-shared';
@@ -12,6 +12,9 @@ export const LoginForm: React.FC = () => {
   
   // Get remembered credentials
   const rememberedCredentials = viewModel.getRememberedCredentials();
+  
+  // Track if initial focus has been set to prevent re-running focus logic
+  const initialFocusSet = useRef(false);
   
   const {
     register,
@@ -38,16 +41,19 @@ export const LoginForm: React.FC = () => {
   // Check if form is empty based on watched values
   const isFormEmpty = !identifier?.trim() || !password?.trim();
 
-  // Set focus on appropriate field when component mounts
+  // Set focus on appropriate field when component mounts (only once)
   useEffect(() => {
-    if (rememberedCredentials?.identifier) {
-      // If identifier is remembered, focus on password field
-      setFocus('password');
-    } else {
-      // Otherwise focus on identifier field
-      setFocus('identifier');
+    if (!initialFocusSet.current) {
+      if (rememberedCredentials?.identifier) {
+        // If identifier is remembered, focus on password field
+        setFocus('password');
+      } else {
+        // Otherwise focus on identifier field
+        setFocus('identifier');
+      }
+      initialFocusSet.current = true;
     }
-  }, [setFocus, rememberedCredentials]);
+  }, [setFocus]);
 
   const onSubmit = handleSubmit(async (data: LoginFormData) => {
     const success = await viewModel.handleFormSubmit(data.identifier, data.password, data.rememberMe);
