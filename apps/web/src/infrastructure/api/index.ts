@@ -5,3 +5,6 @@ export { IAuthApiService } from './IAuthApiService';
 export { AuthApiService } from './AuthApiService';
 export { MockAuthApiService } from './MockAuthApiService';
 export { AuthCommandService } from './AuthCommandService';
+export { IPatientApiService } from './IPatientApiService';
+export { PatientApiService } from './PatientApiService';
+export { ApiPatientRepository } from './ApiPatientRepository';

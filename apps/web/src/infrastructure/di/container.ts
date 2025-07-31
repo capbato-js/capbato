@@ -10,10 +10,14 @@ import { IAuthApiService } from '../api/IAuthApiService';
 import { AuthApiService } from '../api/AuthApiService';
 import { MockAuthApiService } from '../api/MockAuthApiService';
 import { AuthCommandService } from '../api/AuthCommandService';
+import { IPatientApiService } from '../api/IPatientApiService';
+import { PatientApiService } from '../api/PatientApiService';
+import { ApiPatientRepository } from '../api/ApiPatientRepository';
 import { getFeatureFlags, configProvider } from '../config';
 import {
   TodoCommandService,
   TodoQueryService,
+  PatientQueryService,
   CreateTodoUseCase,
   UpdateTodoUseCase,
   DeleteTodoUseCase,
@@ -24,6 +28,8 @@ import {
   GetCompletedTodosQueryHandler,
   GetTodoStatsQueryHandler,
   GetTodoByIdQueryHandler,
+  GetAllPatientsQueryHandler,
+  GetPatientByIdQueryHandler,
   TOKENS,
 } from '@nx-starter/application-shared';
 import type { ITodoRepository } from '@nx-starter/domain';
@@ -31,6 +37,8 @@ import type {
   ITodoCommandService,
   ITodoQueryService,
   IAuthCommandService,
+  IPatientQueryService,
+  IPatientRepository,
 } from '@nx-starter/application-shared';
 
 // Initialize configuration before using it
@@ -48,6 +56,7 @@ export const configureDI = () => {
   
   // Infrastructure Layer - API Services (always register for potential future use)
   container.registerSingleton<ITodoApiService>(TOKENS.TodoApiService, TodoApiService);
+  container.registerSingleton<IPatientApiService>('IPatientApiService', PatientApiService);
   
   // Auth API Service - use mock in development if auth is not enabled
   if (enableAuth && useApiBackend) {
@@ -65,11 +74,21 @@ export const configureDI = () => {
       TOKENS.TodoRepository,
       ApiTodoRepository
     );
+    container.registerSingleton<IPatientRepository>(
+      TOKENS.PatientRepository,
+      ApiPatientRepository
+    );
   } else {
     console.log('💾 Using local Dexie.js for data storage');
     container.registerSingleton<ITodoRepository>(
       TOKENS.TodoRepository,
       TodoRepository
+    );
+    // For patients, we'll still use API backend even in local mode
+    // since there's no local patient repository implementation
+    container.registerSingleton<IPatientRepository>(
+      TOKENS.PatientRepository,
+      ApiPatientRepository
     );
   }
 
@@ -104,6 +123,14 @@ export const configureDI = () => {
     TOKENS.GetTodoByIdQueryHandler,
     GetTodoByIdQueryHandler
   );
+  container.registerSingleton(
+    TOKENS.GetAllPatientsQueryHandler,
+    GetAllPatientsQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetPatientByIdQueryHandler,
+    GetPatientByIdQueryHandler
+  );
 
   // Application Layer - CQRS Services
   container.registerSingleton<ITodoCommandService>(
@@ -117,6 +144,10 @@ export const configureDI = () => {
   container.registerSingleton<IAuthCommandService>(
     TOKENS.AuthCommandService,
     AuthCommandService
+  );
+  container.registerSingleton<IPatientQueryService>(
+    TOKENS.PatientQueryService,
+    PatientQueryService
   );
 };
 

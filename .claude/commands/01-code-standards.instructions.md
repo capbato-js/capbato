@@ -1,5 +1,9 @@
 # Code Standards & Consistency
 
+## IMPORTANT!!
+- Follow existing codebase patterns. See tree apps/web/src or tree apps/api/src so you will have a good idea of the patterns used.
+We use Clean Architecture and the domain and application layers live in libs/ . Run tree libs/ to see the structure.
+
 ## Primary Rule: Follow Existing Codebase Patterns
 **Always analyze the existing codebase first and match its patterns, conventions, and style.**
 

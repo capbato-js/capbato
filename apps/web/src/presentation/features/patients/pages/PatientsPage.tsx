@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Box } from '@mantine/core';
+import React from 'react';
+import { Box, LoadingOverlay, Alert, Button } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { PatientsTable } from '../components';
-import { Patient } from '../types';
-import { mockPatients } from '../../../data/mockPatients';
+import { usePatientViewModel } from '../view-models';
 
 export const PatientsPage: React.FC = () => {
-  const [patients] = useState<Patient[]>(mockPatients);
+  const { patients, isLoading, error, clearError } = usePatientViewModel();
 
   const handleAddPatient = () => {
     console.log('Add new patient');
@@ -21,9 +20,24 @@ export const PatientsPage: React.FC = () => {
           borderRadius: '15px',
           padding: '30px',
           boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)'
+          minHeight: 'calc(100vh - 140px)',
+          position: 'relative'
         }}
       >
+        <LoadingOverlay visible={isLoading} />
+        
+        {error && (
+          <Alert 
+            color="red" 
+            title="Error"
+            mb="md"
+            withCloseButton
+            onClose={clearError}
+          >
+            {error}
+          </Alert>
+        )}
+        
         <PatientsTable
           patients={patients}
           onAddPatient={handleAddPatient}

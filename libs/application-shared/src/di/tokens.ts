@@ -19,6 +19,7 @@ export const TOKENS = {
   TodoQueryService: 'ITodoQueryService',
   AuthCommandService: 'IAuthCommandService',
   AuthQueryService: 'IAuthQueryService',
+  PatientQueryService: 'IPatientQueryService',
 
   // Application Layer - Use Cases (Commands)
   CreateTodoUseCase: 'CreateTodoUseCase',

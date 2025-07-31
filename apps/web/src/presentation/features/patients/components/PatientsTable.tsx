@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box } from '@mantine/core';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common';
-import { Patient } from '../types';
+import { PatientListDto } from '@nx-starter/application-shared';
 
 interface PatientsTableProps {
-  patients: Patient[];
+  patients: PatientListDto[];
   onAddPatient?: () => void;
 }
 
@@ -12,7 +12,13 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
   patients,
   onAddPatient
 }) => {
-  const columns: TableColumn<Patient>[] = [
+  // Transform patients to include fullName for display
+  const patientsWithFullName = patients.map(patient => ({
+    ...patient,
+    fullName: [patient.firstName, patient.middleName, patient.lastName].filter(Boolean).join(' ')
+  }));
+
+  const columns: TableColumn<typeof patientsWithFullName[0]>[] = [
     {
       key: 'patientNumber',
       header: 'Patient #',
@@ -39,11 +45,11 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
       />
       
       <DataTable
-        data={patients}
+        data={patientsWithFullName}
         columns={columns}
         searchable={true}
         searchPlaceholder="Search patients..."
-        searchFields={['fullName', 'patientNumber', 'phoneNumber']}
+        searchFields={['fullName', 'patientNumber']}
         emptyStateMessage="No patients found"
       />
     </Box>

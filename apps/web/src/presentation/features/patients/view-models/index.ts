@@ -1,0 +1,1 @@
+export { usePatientViewModel } from './usePatientViewModel';

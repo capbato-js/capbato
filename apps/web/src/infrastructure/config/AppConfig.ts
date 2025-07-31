@@ -22,6 +22,11 @@ export interface ApiConfiguration {
       validate: string;
       me: string;
     };
+    patients: {
+      base: string;
+      all: string;
+      byId: (id: string) => string;
+    };
   };
 }
 

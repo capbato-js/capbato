@@ -1,0 +1,1 @@
+export { mapDomainPatientToFrontend, mapDomainPatientsToFrontend } from './PatientMapper';

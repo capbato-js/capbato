@@ -7,3 +7,4 @@
 export * from './TodoCommandService';
 export * from './TodoQueryService';
 export * from './AuthService';
+export * from './PatientQueryService';

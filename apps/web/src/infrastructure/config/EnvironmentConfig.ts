@@ -42,6 +42,11 @@ export function getEnvironmentConfig(): AppConfig {
           validate: '/api/auth/validate',
           me: '/api/auth/me',
         },
+        patients: {
+          base: '/api/patients',
+          all: '/api/patients',
+          byId: (id: string) => `/api/patients/${id}`,
+        },
       },
     },
     features: {
