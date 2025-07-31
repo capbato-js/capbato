@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Button, Title, Text, Group, Checkbox, Table } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { Icon } from '../common';
 import { Appointment } from './types';
 
@@ -22,13 +23,15 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   onReconfirmAppointment,
   onDateSelect,
 }) => {
-  const [selectedDate, setSelectedDate] = useState(initialSelectedDate || new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<Date>(
+    initialSelectedDate ? new Date(initialSelectedDate) : new Date()
+  );
   const [showAll, setShowAll] = useState(false);
 
   // Update local state when prop changes
   React.useEffect(() => {
     if (initialSelectedDate) {
-      setSelectedDate(initialSelectedDate);
+      setSelectedDate(new Date(initialSelectedDate));
     }
   }, [initialSelectedDate]);
 
@@ -37,13 +40,17 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     if (showAll) {
       return appointments;
     }
-    return appointments.filter(appointment => appointment.date === selectedDate);
+    const selectedDateString = selectedDate.toISOString().split('T')[0];
+    return appointments.filter(appointment => appointment.date === selectedDateString);
   }, [appointments, selectedDate, showAll]);
 
-  const handleDateChange = (newDate: string) => {
-    setSelectedDate(newDate);
-    if (onDateSelect) {
-      onDateSelect(newDate);
+  const handleDateChange = (value: string | null) => {
+    if (value) {
+      const date = new Date(value);
+      setSelectedDate(date);
+      if (onDateSelect) {
+        onDateSelect(value);
+      }
     }
   };
 
@@ -115,33 +122,12 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
         </Title>
         <Button
           onClick={onAddAppointment}
+          leftSection={<Icon icon="fas fa-calendar-plus" />}
           style={{
             position: 'absolute',
-            right: 0,
-            background: 'linear-gradient(45deg, #4db6ac, #26a69a)',
-            color: 'white',
-            border: 'none',
-            padding: '12px 25px',
-            borderRadius: '10px',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(77, 182, 172, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(77, 182, 172, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(77, 182, 172, 0.3)';
+            right: 0
           }}
         >
-          <Icon icon="fas fa-calendar-plus" />
           Add Appointment
         </Button>
       </Box>
@@ -172,26 +158,14 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
           >
             Select Date:
           </Text>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => handleDateChange(e.target.value)}
-            style={{
-              padding: '8px 12px',
-              border: '2px solid #e0e0e0',
-              borderRadius: '8px',
-              fontSize: '14px',
-              transition: 'border-color 0.3s ease, box-shadow 0.3s ease'
-            }}
-            onFocus={(e) => {
-              e.target.style.outline = 'none';
-              e.target.style.borderColor = '#4db6ac';
-              e.target.style.boxShadow = '0 0 0 3px rgba(77, 182, 172, 0.1)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#e0e0e0';
-              e.target.style.boxShadow = 'none';
-            }}
+          <DateInput
+            value={selectedDate.toISOString().split('T')[0]}
+            onChange={handleDateChange}
+            placeholder="Pick date"
+            size="sm"
+            valueFormat="MM/DD/YYYY"
+            rightSection={<Icon icon="fas fa-calendar" size={14} />}
+            style={{ width: '140px' }}
           />
         </Box>
         
@@ -463,79 +437,30 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                   <Group gap="xs" justify="center">
                     <Button
                       size="xs"
+                      variant="filled"
+                      color="cyan"
                       onClick={() => onModifyAppointment(appointment.id)}
-                      style={{
-                        backgroundColor: '#17a2b8',
-                        color: 'white',
-                        fontFamily: 'inherit',
-                        fontWeight: 600,
-                        border: 'none',
-                        padding: '6px 14px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        fontSize: '14px',
-                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#138496';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#17a2b8';
-                      }}
+                      leftSection={<Icon icon="fas fa-edit" size={12} />}
                     >
                       Modify
                     </Button>
                     {appointment.status === 'cancelled' ? (
                       <Button
                         size="xs"
+                        variant="filled"
+                        color="teal"
                         onClick={() => onReconfirmAppointment(appointment.id)}
-                        style={{
-                          backgroundColor: '#00acc1',
-                          color: 'white',
-                          fontWeight: 'bold',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '6px 14px',
-                          cursor: 'pointer',
-                          boxShadow: '0 4px 8px rgba(0, 172, 193, 0.3)',
-                          transition: 'background-color 0.3s ease, transform 0.2s ease',
-                          fontSize: '14px'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#008b9a';
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#00acc1';
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
+                        leftSection={<Icon icon="fas fa-redo" size={12} />}
                       >
                         Reconfirm
                       </Button>
                     ) : (
                       <Button
                         size="xs"
+                        variant="filled"
+                        color="red"
                         onClick={() => onCancelAppointment(appointment.id)}
-                        style={{
-                          backgroundColor: '#dc3545',
-                          color: 'white',
-                          fontFamily: 'inherit',
-                          fontWeight: 600,
-                          border: 'none',
-                          padding: '6px 14px',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          fontSize: '14px',
-                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#c82333';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#dc3545';
-                        }}
+                        leftSection={<Icon icon="fas fa-times" size={12} />}
                       >
                         Cancel
                       </Button>

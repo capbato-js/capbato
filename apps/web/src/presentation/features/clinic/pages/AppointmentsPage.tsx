@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { AppointmentsTable, AppointmentsCalendar, Appointment } from '../../../components/appointments';
+import { AppointmentsTable, Appointment } from '../../../components/appointments';
 
 // Dummy data for appointments
 const dummyAppointments: Appointment[] = [
@@ -114,12 +114,6 @@ export const AppointmentsPage: React.FC = () => {
           onReconfirmAppointment={handleReconfirmAppointment}
           onDateSelect={handleDateSelect}
         />
-        
-        {/* <AppointmentsCalendar
-          appointments={dummyAppointments}
-          selectedDate={selectedDate}
-          onDateSelect={handleDateSelect}
-        /> */}
       </Box>
     </MedicalClinicLayout>
   );
