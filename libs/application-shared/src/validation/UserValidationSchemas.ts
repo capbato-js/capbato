@@ -11,8 +11,10 @@ export const USER_VALIDATION_ERRORS = {
   REG_MISSING_LASTNAME: 'Last name is required', 
   REG_MISSING_EMAIL: 'Email address is required',
   REG_MISSING_PASSWORD: 'Password is required',
+  REG_MISSING_ROLE: 'Role is required',
   REG_INVALID_EMAIL: 'Please provide a valid email address',
   REG_WEAK_PASSWORD: 'Password must be at least 8 characters long with at least one uppercase letter, one lowercase letter, and one number',
+  REG_INVALID_ROLE: 'Role must be one of: admin, doctor, receptionist',
   REG_EMAIL_EXISTS: 'This email address is already registered',
   REG_INVALID_NAME: 'Names can only contain letters, spaces, and hyphens',
   AUTH_MISSING_IDENTIFIER: 'Email or username is required',
@@ -57,12 +59,21 @@ export const PasswordSchema = z
   .regex(/[a-z]/, USER_VALIDATION_ERRORS.REG_WEAK_PASSWORD)
   .regex(/[0-9]/, USER_VALIDATION_ERRORS.REG_WEAK_PASSWORD);
 
+// Role validation schema
+export const RoleSchema = z
+  .string()
+  .min(1, USER_VALIDATION_ERRORS.REG_MISSING_ROLE)
+  .refine((value) => ['admin', 'doctor', 'receptionist'].includes(value.toLowerCase()), {
+    message: USER_VALIDATION_ERRORS.REG_INVALID_ROLE,
+  });
+
 // Register user command validation schema
 export const RegisterUserCommandSchema = z.object({
   firstName: FirstNameSchema,
   lastName: LastNameSchema,
   email: EmailSchema,
   password: PasswordSchema,
+  role: RoleSchema,
 });
 
 // Login user command validation schema (matches DTO interface)

@@ -110,3 +110,9 @@ export class AuthInvalidEmailException extends DomainException {
     super('Please provide a valid email address', 'AUTH_INVALID_EMAIL', 400);
   }
 }
+
+export class InvalidRoleException extends DomainException {
+  constructor(reason: string) {
+    super(`${reason}`, 'INVALID_ROLE');
+  }
+}

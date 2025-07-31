@@ -43,6 +43,7 @@ export class MongooseUserRepository implements IUserRepository {
       email: user.email.value,
       username: user.username.value,
       hashedPassword: user.hashedPassword.value,
+      role: user.role.value,
       createdAt: user.createdAt,
     });
 
@@ -133,6 +134,7 @@ export class MongooseUserRepository implements IUserRepository {
       email: doc.email,
       username: doc.username,
       hashedPassword: doc.hashedPassword,
+      role: doc.role,
       createdAt: doc.createdAt,
     });
   }

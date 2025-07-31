@@ -38,8 +38,8 @@ export class AuthController {
    * POST /api/auth/register - Register a new user
    * 
    * Core Registration Processing:
-   * WHEN a client sends POST request to /api/auth/register with firstName, lastName, email, and password 
-   * THE SYSTEM SHALL validate all required fields, generate username from email prefix, create user account, and return HTTP 201 with user ID
+   * WHEN a client sends POST request to /api/auth/register with firstName, lastName, email, password, and role
+   * THE SYSTEM SHALL validate all required fields (including role: admin|doctor|receptionist), generate username from email prefix, create user account, and return HTTP 201 with user ID
    */
   @Post('/register')
   @HttpCode(201)
@@ -60,7 +60,7 @@ export class AuthController {
    * 
    * Core Authentication:
    * WHEN a client sends POST request to /api/auth/login with valid email/username and password 
-   * THE SYSTEM SHALL authenticate credentials and return HTTP 200 with JWT token and user profile
+   * THE SYSTEM SHALL authenticate credentials and return HTTP 200 with JWT token containing user role and user profile
    */
   @Post('/login')
   @HttpCode(200)

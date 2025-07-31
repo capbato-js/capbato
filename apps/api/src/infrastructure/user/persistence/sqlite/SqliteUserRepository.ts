@@ -11,6 +11,7 @@ interface UserRecord {
   email: string;
   username: string;
   hashedPassword: string;
+  role: string;
   createdAt: string; // SQLite datetime as string
 }
 
@@ -57,8 +58,8 @@ export class SqliteUserRepository implements IUserRepository {
 
   async create(user: User): Promise<string> {
     const stmt = this.db.prepare(`
-      INSERT INTO users (id, firstName, lastName, email, username, hashedPassword, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO users (id, firstName, lastName, email, username, hashedPassword, role, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -68,6 +69,7 @@ export class SqliteUserRepository implements IUserRepository {
       user.email.value,
       user.username.value,
       user.hashedPassword.value,
+      user.role.value,
       user.createdAt.toISOString()
     );
 
@@ -170,6 +172,7 @@ export class SqliteUserRepository implements IUserRepository {
       email: row.email,
       username: row.username,
       hashedPassword: row.hashedPassword,
+      role: row.role,
       createdAt: new Date(row.createdAt),
     });
   }

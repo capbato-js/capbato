@@ -53,6 +53,7 @@ export class TypeOrmUserRepository implements IUserRepository {
       email: user.email.value,
       username: user.username.value,
       hashedPassword: user.hashedPassword.value,
+      role: user.role.value,
       createdAt: user.createdAt,
     });
 
@@ -147,6 +148,7 @@ export class TypeOrmUserRepository implements IUserRepository {
       email: entity.email,
       username: entity.username,
       hashedPassword: entity.hashedPassword,
+      role: entity.role,
       createdAt: entity.createdAt,
     });
   }

@@ -14,3 +14,4 @@ export * from './Email';
 export * from './Username';
 export * from './HashedPassword';
 export * from './Name';
+export * from './Role';

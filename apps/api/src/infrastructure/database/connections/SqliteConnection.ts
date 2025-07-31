@@ -56,9 +56,21 @@ class SqliteConnectionManager {
         email TEXT NOT NULL UNIQUE,
         username TEXT NOT NULL UNIQUE,
         hashedPassword TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'receptionist',
         createdAt TEXT NOT NULL
       )
     `);
+
+    // Migration: Add role column to existing users table if it doesn't exist
+    try {
+      this.db.exec(`
+        ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'receptionist'
+      `);
+      console.log('🔄 Added role column to existing users table');
+    } catch (error) {
+      // Column already exists or other error - this is expected for new tables
+      // console.log('Role column already exists or table is new');
+    }
 
     console.log('📦 SQLite tables initialized');
   }

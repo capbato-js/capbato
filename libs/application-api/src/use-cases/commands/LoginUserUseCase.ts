@@ -52,7 +52,7 @@ export class LoginUserUseCase {
     const token = this.jwtService.generateToken({
       userId: user.id,
       email: user.email.value,
-      role: 'user' // Default role, can be enhanced later
+      role: user.role.value
     });
 
     // 4. Return token with user profile
