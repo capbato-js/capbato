@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../../infrastructure/state/AuthStore';
-import { LogoutButton } from '../auth/LogoutButton';
+import { LogoutButton } from '../../features/auth';
 
 export const Navigation: React.FC = () => {
   const location = useLocation();

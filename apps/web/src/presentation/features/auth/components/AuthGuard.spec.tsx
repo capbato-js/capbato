@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter, useLocation } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthGuard } from './AuthGuard';
 
 // Extend vitest matchers
@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 
 // Mock the auth store
 const mockUseAuthStore = vi.fn();
-vi.mock('../../../infrastructure/state/AuthStore', () => ({
+vi.mock('../../../../infrastructure/state/AuthStore', () => ({
   useAuthStore: () => mockUseAuthStore(),
 }));
 

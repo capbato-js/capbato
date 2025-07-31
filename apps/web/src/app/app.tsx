@@ -8,7 +8,7 @@ import { AppointmentsPage } from '../presentation/features/appointments';
 import { PatientsPage } from '../presentation/features/patients';
 import { LaboratoryPage, PrescriptionsPage } from '../presentation/features/medical-records';
 import { DoctorsPage, AccountsPage } from '../presentation/features/staff';
-import { AuthGuard } from '../presentation/components/auth';
+import { AuthGuard } from '../presentation/features/auth';
 import { useAuthStore } from '../infrastructure/state/AuthStore';
 import '../styles.css';
 
