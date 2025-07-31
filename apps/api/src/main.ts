@@ -6,7 +6,7 @@ import {
   getServerConfig, 
   getApplicationConfig, 
   getApiConfig,
-  configProvider 
+  configProvider
 } from './config';
 
 // Load environment variables
@@ -21,6 +21,39 @@ export async function startServer() {
     const serverConfig = getServerConfig();
     const appConfig = getApplicationConfig();
     const apiConfig = getApiConfig();
+
+    // ⚠️ DEVELOPMENT WARNING: Check for dangerous production settings
+    if (serverConfig.environment === 'production' && process.env.ALLOW_PRODUCTION_AUTO_MIGRATION === 'true') {
+      console.log('');
+      console.log('🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨');
+      console.log('🚨                    ⚠️  CRITICAL WARNING ⚠️                           🚨');
+      console.log('🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨');
+      console.log('🚨');
+      console.log('🚨  AUTO-MIGRATION IS ENABLED IN PRODUCTION ENVIRONMENT!');
+      console.log('🚨');
+      console.log('🚨  ⚠️  This is EXTREMELY DANGEROUS and should NEVER be used in real production!');
+      console.log('🚨  ⚠️  Database schema will be automatically synchronized on startup!');
+      console.log('🚨  ⚠️  This can cause IRREVERSIBLE DATA LOSS!');
+      console.log('🚨  ⚠️  This feature is intended for DEVELOPMENT PURPOSES ONLY!');
+      console.log('🚨');
+      console.log('🚨  📝 To disable this dangerous feature:');
+      console.log('🚨     Set ALLOW_PRODUCTION_AUTO_MIGRATION=false in your environment');
+      console.log('🚨     Or remove the environment variable entirely');
+      console.log('🚨');
+      console.log('🚨  📚 For production databases, use proper migration scripts instead:');
+      console.log('🚨     - Create migration files manually');
+      console.log('🚨     - Use TypeORM CLI: npm run typeorm:migration:generate');
+      console.log('🚨     - Run migrations with: npm run typeorm:migration:run');
+      console.log('🚨');
+      console.log('🚨  ⏰ This application will continue in 10 seconds...');
+      console.log('🚨     Press Ctrl+C to abort and fix the configuration!');
+      console.log('🚨');
+      console.log('🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨');
+      console.log('');
+      
+      // Give time to read the warning and abort if needed
+      await new Promise(resolve => setTimeout(resolve, 10000));
+    }
 
     // Configure dependency injection (now async)
     await configureDI();

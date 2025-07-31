@@ -1,7 +1,14 @@
 import { DataSource } from 'typeorm';
 import { TodoEntity } from '../../todo/persistence/typeorm/TodoEntity';
 import { UserEntity } from '../../user/persistence/typeorm/UserEntity';
-import { getDatabaseConfig, isDevelopment } from '../../../config';
+import { getDatabaseConfig, isDevelopment, isProduction } from '../../../config';
+
+/**
+ * ⚠️ DEVELOPMENT WARNING: Auto-migration in production is DANGEROUS!
+ * This configuration temporarily allows database schema synchronization
+ * in production for development purposes only.
+ * NEVER use this in a real production environment!
+ */
 
 /**
  * Shared TypeORM DataSource configuration
@@ -10,11 +17,25 @@ import { getDatabaseConfig, isDevelopment } from '../../../config';
 export const createTypeOrmDataSource = (): DataSource => {
   const dbConfig = getDatabaseConfig();
   
+  // Check for dangerous production auto-migration setting
+  const allowProductionAutoMigration = process.env.ALLOW_PRODUCTION_AUTO_MIGRATION === 'true';
+  const shouldSynchronize = isDevelopment() || allowProductionAutoMigration;
+  
+  // Show warnings for production auto-migration
+  if (isProduction() && allowProductionAutoMigration) {
+    console.warn('🚨 DANGER: Auto-migration enabled in PRODUCTION environment!');
+    console.warn('🚨 This is a DEVELOPMENT-ONLY feature and should NEVER be used in real production!');
+    console.warn('🚨 Database schema will be automatically synchronized on startup!');
+    console.warn('🚨 This can cause DATA LOSS in production databases!');
+    console.warn('🚨 Set ALLOW_PRODUCTION_AUTO_MIGRATION=false to disable this dangerous feature!');
+    console.warn('🚨 Use proper database migrations instead!');
+  }
+  
   // Base configuration
   const baseConfig = {
     entities: [TodoEntity, UserEntity],
-    synchronize: isDevelopment(),
-    logging: isDevelopment(),
+    synchronize: shouldSynchronize,
+    logging: isDevelopment() || (isProduction() && allowProductionAutoMigration), // Extra logging for production debug
   };
 
   // Database-specific configuration
