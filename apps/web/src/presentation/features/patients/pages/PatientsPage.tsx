@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { PatientsTable } from '../../../components/patients';
-import { Patient } from '../../../components/patients/types';
+import { PatientsTable } from '../components';
+import { Patient } from '../types';
 import { mockPatients } from '../../../data/mockPatients';
 
 export const PatientsPage: React.FC = () => {

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { DoctorsTable, CustomCalendar, Doctor, ScheduleEntry } from '../../../components/doctors';
+import { DoctorsTable, CustomCalendar } from '../components';
+import { Doctor, ScheduleEntry } from '../types';
 
 // Dummy data for doctors
 const dummyDoctors: Doctor[] = [

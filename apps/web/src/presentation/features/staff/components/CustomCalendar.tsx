@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Button, Title } from '@mantine/core';
-import { Icon } from '../common';
-import { Appointment } from './types';
+import { Icon } from '../../../components/common';
+import { ScheduleEntry } from '../types';
 
-interface AppointmentsCalendarProps {
-  appointments: Appointment[];
-  onDateSelect?: (date: string) => void;
-  selectedDate?: string;
+interface CustomCalendarProps {
+  schedules: ScheduleEntry[];
+  onEdit?: () => void;
 }
 
 const MONTHS = [
@@ -16,11 +15,7 @@ const MONTHS = [
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({ 
-  appointments, 
-  onDateSelect,
-  selectedDate 
-}) => {
+export const CustomCalendar: React.FC<CustomCalendarProps> = ({ schedules, onEdit }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const currentYear = currentDate.getFullYear();
@@ -53,45 +48,55 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
     setCurrentDate(new Date(currentYear, currentMonth + 1, 1));
   };
 
-  // Get appointments for a specific date
-  const getAppointmentsForDate = (day: number) => {
+  const getScheduleForDate = (day: number) => {
     const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return appointments.filter(appointment => appointment.date === dateString);
-  };
-
-  // Check if a date is selected
-  const isDateSelected = (day: number) => {
-    if (!selectedDate) return false;
-    const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return dateString === selectedDate;
-  };
-
-  const handleDateClick = (day: number) => {
-    if (onDateSelect) {
-      const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      onDateSelect(dateString);
-    }
+    return schedules.find(schedule => schedule.date === dateString);
   };
 
   return (
     <Box style={{ marginTop: '30px' }}>
-      {/* Calendar Title */}
-      <Box style={{ marginBottom: '20px' }}>
-        <Title
+      {/* Top Row: Title + Edit */}
+      <Box 
+        style={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginBottom: '8px',
+          position: 'relative'
+        }}
+      >
+        <Title 
           order={2}
           style={{
             color: '#0b4f6c',
-            fontSize: '22px',
+            fontSize: '28px',
             fontWeight: 'bold',
-            textAlign: 'center',
-            marginBottom: '8px'
+            margin: 0,
+            width: '100%',
+            textAlign: 'center'
           }}
         >
-          Appointments Calendar
+          Doctor's Schedule
         </Title>
+        {onEdit && (
+          <Button
+            size="sm"
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              backgroundColor: '#007bff',
+              border: 'none'
+            }}
+            onClick={onEdit}
+          >
+            <Icon icon="fas fa-edit" style={{ marginRight: '5px' }} />
+            Edit
+          </Button>
+        )}
       </Box>
 
-      {/* Navigation */}
+      {/* Second Row: Arrows + Month */}
       <Box 
         style={{
           display: 'flex',
@@ -184,85 +189,56 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
             );
           }
 
-          const dayAppointments = getAppointmentsForDate(day);
-          const isSelected = isDateSelected(day);
+          const schedule = getScheduleForDate(day);
           
           return (
             <Box
               key={day}
-              onClick={() => handleDateClick(day)}
               style={{
-                backgroundColor: isSelected ? '#b9f6ca' : '#ecf5ff',
+                backgroundColor: '#ecf5ff',
                 borderRadius: '12px',
                 padding: '10px',
                 minHeight: '100px',
                 fontWeight: 500,
                 color: '#333',
-                boxShadow: isSelected ? '0 4px 8px rgba(77, 182, 172, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.05)',
-                position: 'relative',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                border: isSelected ? '2px solid #4db6ac' : '2px solid transparent'
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                position: 'relative'
               }}
             >
               <Box
                 style={{
                   fontSize: '14px',
-                  fontWeight: 'bold',
-                  marginBottom: '6px'
+                  fontWeight: 'bold'
                 }}
               >
                 {day}
               </Box>
               
-              {dayAppointments.length > 0 && (
+              {schedule && (
                 <Box
                   style={{
-                    fontSize: '11px',
+                    marginTop: '6px',
+                    fontSize: '12px',
                     backgroundColor: 'transparent',
                     color: '#0047ab',
                     fontWeight: 600,
-                    lineHeight: 1.2
+                    lineHeight: 1.3,
+                    wordBreak: 'break-word'
                   }}
                 >
-                  {dayAppointments.slice(0, 3).map((appointment) => (
+                  {schedule.details && (
                     <Box
-                      key={appointment.id}
+                      component="strong"
                       style={{
-                        marginBottom: '2px',
-                        padding: '2px 4px',
-                        backgroundColor: 
-                          appointment.status === 'confirmed' ? '#b9f6ca' :
-                          appointment.status === 'pending' ? '#ffcc80' :
-                          '#ff8a80',
-                        borderRadius: '4px',
-                        fontSize: '10px',
-                        fontWeight: 'bold',
-                        color: 
-                          appointment.status === 'confirmed' ? '#006400' :
-                          appointment.status === 'pending' ? '#8c5000' :
-                          '#8b0000',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
+                        display: 'block',
+                        fontSize: '13px',
+                        color: '#0b4f6c'
                       }}
                     >
-                      {appointment.time} - {appointment.patientName.split(' ')[0]}
-                    </Box>
-                  ))}
-                  {dayAppointments.length > 3 && (
-                    <Box
-                      style={{
-                        fontSize: '10px',
-                        fontWeight: 'bold',
-                        color: '#0b4f6c',
-                        textAlign: 'center',
-                        marginTop: '2px'
-                      }}
-                    >
-                      +{dayAppointments.length - 3} more
+                      {schedule.details}
                     </Box>
                   )}
+                  {schedule.note}
                 </Box>
               )}
             </Box>

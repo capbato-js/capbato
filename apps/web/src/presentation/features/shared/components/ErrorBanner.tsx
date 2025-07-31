@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '../ui/button';
-import { useErrorBannerViewModel } from './useErrorBannerViewModel';
+import { Button } from '../../../components/ui/button';
+import { useErrorBannerViewModel } from '../view-models/useErrorBannerViewModel';
 
 export const ErrorBanner: React.FC = () => {
   const viewModel = useErrorBannerViewModel();

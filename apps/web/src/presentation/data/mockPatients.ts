@@ -1,4 +1,4 @@
-import { Patient } from '../components/patients/types';
+import { Patient } from '../features/patients/types';
 
 // Calculate age from date of birth
 const calculateAge = (dateOfBirth: string): number => {

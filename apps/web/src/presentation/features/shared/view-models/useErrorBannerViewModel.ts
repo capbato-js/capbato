@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { useTodoStore } from '../../../infrastructure/state/TodoStore';
-import type { ErrorBannerViewModel } from '../../interfaces/TodoViewModels';
+import { useTodoStore } from '../../../../infrastructure/state/TodoStore';
+import type { ErrorBannerViewModel } from '../../todo/view-models/interfaces/TodoViewModels';
 
 /**
  * View Model for Error Banner component

@@ -13,7 +13,7 @@ const mockViewModel = {
   handleLogout: vi.fn(),
 };
 
-vi.mock('./view-models/useLogoutViewModel', () => ({
+vi.mock('../../features/auth/view-models/useLogoutViewModel', () => ({
   useLogoutViewModel: () => mockViewModel,
 }));
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextInput, Button, Table, Title } from '@mantine/core';
-import { Icon } from '../common';
-import { Patient } from './types';
+import { Icon } from '../../../components/common';
+import { Patient } from '../types';
 
 interface PatientsTableProps {
   patients: Patient[];

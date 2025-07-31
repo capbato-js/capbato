@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { AppointmentsTable, Appointment } from '../../../components/appointments';
+import { AppointmentsTable } from '../components';
+import { Appointment } from '../types';
 
 // Dummy data for appointments
 const dummyAppointments: Appointment[] = [

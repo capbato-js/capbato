@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Button, Title, Text, Group, Checkbox, Table } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
-import { Icon } from '../common';
-import { Appointment } from './types';
+import { Icon } from '../../../components/common';
+import { Appointment } from '../types';
 
 interface AppointmentsTableProps {
   appointments: Appointment[];

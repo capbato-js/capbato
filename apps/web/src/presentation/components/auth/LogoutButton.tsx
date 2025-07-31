@@ -1,7 +1,7 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useLogoutViewModel } from './view-models/useLogoutViewModel';
+import { useLogoutViewModel } from '../../features/auth/view-models/useLogoutViewModel';
 
 interface LogoutButtonProps {
   className?: string;

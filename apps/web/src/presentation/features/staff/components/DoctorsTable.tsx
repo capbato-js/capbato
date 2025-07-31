@@ -1,12 +1,6 @@
 import React from 'react';
 import { Box, Title } from '@mantine/core';
-
-export interface Doctor {
-  id: string;
-  name: string;
-  specialization: string;
-  contactNumber: string;
-}
+import { Doctor } from '../types';
 
 interface DoctorsTableProps {
   doctors: Doctor[];

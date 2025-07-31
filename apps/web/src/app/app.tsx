@@ -3,15 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { TodoPage } from '../presentation/features/todo';
 import { AboutPage } from '../presentation/features/about';
 import { LoginPage } from '../presentation/features/login';
-import { 
-  DashboardPage,
-  AppointmentsPage,
-  PatientsPage,
-  LaboratoryPage,
-  PrescriptionsPage,
-  DoctorsPage,
-  AccountsPage
-} from '../presentation/features/clinic';
+import { DashboardPage } from '../presentation/features/dashboard';
+import { AppointmentsPage } from '../presentation/features/appointments';
+import { PatientsPage } from '../presentation/features/patients';
+import { LaboratoryPage, PrescriptionsPage } from '../presentation/features/medical-records';
+import { DoctorsPage, AccountsPage } from '../presentation/features/staff';
 import { AuthGuard } from '../presentation/components/auth';
 import { useAuthStore } from '../infrastructure/state/AuthStore';
 import '../styles.css';
