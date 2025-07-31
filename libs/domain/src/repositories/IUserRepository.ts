@@ -5,8 +5,10 @@ export interface IUserRepository {
   getByEmail(email: string): Promise<User | undefined>;
   getByUsername(username: string): Promise<User | undefined>;
   getByEmailOrUsername(identifier: string): Promise<User | undefined>;
+  getAll(): Promise<User[]>;
   create(user: User): Promise<string>;
   update(id: string, changes: Partial<User>): Promise<void>;
+  updatePassword(id: string, hashedPassword: string): Promise<void>;
   delete(id: string): Promise<void>;
   existsByEmail(email: string): Promise<boolean>;
   existsByUsername(username: string): Promise<boolean>;

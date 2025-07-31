@@ -12,6 +12,7 @@ interface UserRecord {
   username: string;
   hashedPassword: string;
   role: string;
+  mobile?: string;
   createdAt: string; // SQLite datetime as string
 }
 
@@ -56,10 +57,16 @@ export class SqliteUserRepository implements IUserRepository {
     return row ? this.mapToUserEntity(row) : undefined;
   }
 
+  async getAll(): Promise<User[]> {
+    const stmt = this.db.prepare('SELECT * FROM users ORDER BY createdAt DESC');
+    const rows = stmt.all() as UserRecord[];
+    return rows.map(row => this.mapToUserEntity(row));
+  }
+
   async create(user: User): Promise<string> {
     const stmt = this.db.prepare(`
-      INSERT INTO users (id, firstName, lastName, email, username, hashedPassword, role, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO users (id, firstName, lastName, email, username, hashedPassword, role, mobile, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -70,6 +77,7 @@ export class SqliteUserRepository implements IUserRepository {
       user.username.value,
       user.hashedPassword.value,
       user.role.value,
+      user.mobile?.value || null,
       user.createdAt.toISOString()
     );
 
@@ -114,6 +122,15 @@ export class SqliteUserRepository implements IUserRepository {
       `UPDATE users SET ${updates.join(', ')} WHERE id = ?`
     );
     const result = stmt.run(...params);
+
+    if (result.changes === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+  }
+
+  async updatePassword(id: string, hashedPassword: string): Promise<void> {
+    const stmt = this.db.prepare('UPDATE users SET hashedPassword = ? WHERE id = ?');
+    const result = stmt.run(hashedPassword, id);
 
     if (result.changes === 0) {
       throw new Error(`User with ID ${id} not found`);
@@ -173,6 +190,7 @@ export class SqliteUserRepository implements IUserRepository {
       username: row.username,
       hashedPassword: row.hashedPassword,
       role: row.role,
+      mobile: row.mobile,
       createdAt: new Date(row.createdAt),
     });
   }

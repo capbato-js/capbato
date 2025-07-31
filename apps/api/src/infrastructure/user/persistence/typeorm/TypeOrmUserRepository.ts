@@ -45,6 +45,11 @@ export class TypeOrmUserRepository implements IUserRepository {
     return userEntity ? this.mapToUserDomain(userEntity) : undefined;
   }
 
+  async getAll(): Promise<User[]> {
+    const userEntities = await this.repository.find();
+    return userEntities.map(entity => this.mapToUserDomain(entity));
+  }
+
   async create(user: User): Promise<string> {
     const userEntity = this.repository.create({
       id: user.id,
@@ -54,6 +59,7 @@ export class TypeOrmUserRepository implements IUserRepository {
       username: user.username.value,
       hashedPassword: user.hashedPassword.value,
       role: user.role.value,
+      mobile: user.mobile?.value,
       createdAt: user.createdAt,
     });
 
@@ -89,6 +95,14 @@ export class TypeOrmUserRepository implements IUserRepository {
     }
 
     const result = await this.repository.update(id, updateData);
+    
+    if (result.affected === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+  }
+
+  async updatePassword(id: string, hashedPassword: string): Promise<void> {
+    const result = await this.repository.update(id, { hashedPassword });
     
     if (result.affected === 0) {
       throw new Error(`User with ID ${id} not found`);
@@ -149,6 +163,7 @@ export class TypeOrmUserRepository implements IUserRepository {
       username: entity.username,
       hashedPassword: entity.hashedPassword,
       role: entity.role,
+      mobile: entity.mobile,
       createdAt: entity.createdAt,
     });
   }

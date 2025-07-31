@@ -45,6 +45,10 @@ export class InMemoryUserRepository implements IUserRepository {
     return await this.getByUsername(identifier);
   }
 
+  async getAll(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   async create(user: User): Promise<string> {
     this.users.set(user.id, user);
     return user.id;
@@ -59,6 +63,27 @@ export class InMemoryUserRepository implements IUserRepository {
     // For in-memory, we'd need to create a new user instance with changes
     // This is simplified - in real implementation, we'd handle partial updates properly
     throw new Error('Update not implemented for in-memory repository');
+  }
+
+  async updatePassword(id: string, hashedPassword: string): Promise<void> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+
+    // Create new user with updated password
+    const updatedUser = User.create(
+      existingUser.id,
+      existingUser.firstName.value,
+      existingUser.lastName.value,
+      existingUser.email.value,
+      existingUser.username.value,
+      hashedPassword,
+      existingUser.role.value,
+      existingUser.mobile?.value
+    );
+
+    this.users.set(id, updatedUser);
   }
 
   async delete(id: string): Promise<void> {
@@ -106,12 +131,5 @@ export class InMemoryUserRepository implements IUserRepository {
    */
   async clear(): Promise<void> {
     this.users.clear();
-  }
-
-  /**
-   * Utility method to get all users (for testing)
-   */
-  async getAll(): Promise<User[]> {
-    return Array.from(this.users.values());
   }
 }

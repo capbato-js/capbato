@@ -9,6 +9,10 @@ import { UserModel, IUserDocument } from './UserSchema';
  */
 @injectable()
 export class MongooseUserRepository implements IUserRepository {
+  async getAll(): Promise<User[]> {
+    const userDocs = await UserModel.find().exec();
+    return userDocs.map(doc => this.mapToUserDomain(doc));
+  }
 
   async getById(id: string): Promise<User | undefined> {
     const userDoc = await UserModel.findById(id).exec();
@@ -44,6 +48,7 @@ export class MongooseUserRepository implements IUserRepository {
       username: user.username.value,
       hashedPassword: user.hashedPassword.value,
       role: user.role.value,
+      mobile: user.mobile?.value,
       createdAt: user.createdAt,
     });
 
@@ -52,26 +57,30 @@ export class MongooseUserRepository implements IUserRepository {
   }
 
   async update(id: string, changes: Partial<User>): Promise<void> {
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     if (changes.firstName !== undefined) {
-      updateData.firstName = (changes.firstName as any).value;
+      updateData.firstName = changes.firstName.value;
     }
 
     if (changes.lastName !== undefined) {
-      updateData.lastName = (changes.lastName as any).value;
+      updateData.lastName = changes.lastName.value;
     }
 
     if (changes.email !== undefined) {
-      updateData.email = (changes.email as any).value;
+      updateData.email = changes.email.value;
     }
 
     if (changes.username !== undefined) {
-      updateData.username = (changes.username as any).value;
+      updateData.username = changes.username.value;
     }
 
     if (changes.hashedPassword !== undefined) {
-      updateData.hashedPassword = (changes.hashedPassword as any).value;
+      updateData.hashedPassword = changes.hashedPassword.value;
+    }
+
+    if (changes.mobile !== undefined) {
+      updateData.mobile = changes.mobile?.value;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -80,6 +89,13 @@ export class MongooseUserRepository implements IUserRepository {
 
     const result = await UserModel.updateOne({ _id: id }, updateData).exec();
     
+    if (result.matchedCount === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+  }
+
+  async updatePassword(id: string, hashedPassword: string): Promise<void> {
+    const result = await UserModel.updateOne({ _id: id }, { hashedPassword }).exec();
     if (result.matchedCount === 0) {
       throw new Error(`User with ID ${id} not found`);
     }
@@ -135,6 +151,7 @@ export class MongooseUserRepository implements IUserRepository {
       username: doc.username,
       hashedPassword: doc.hashedPassword,
       role: doc.role,
+      mobile: doc.mobile,
       createdAt: doc.createdAt,
     });
   }

@@ -26,6 +26,7 @@ export const TOKENS = {
   ToggleTodoUseCase: 'ToggleTodoUseCase',
   RegisterUserUseCase: 'RegisterUserUseCase',
   LoginUserUseCase: 'LoginUserUseCase',
+  ChangeUserPasswordUseCase: 'ChangeUserPasswordUseCase',
 
   // Application Layer - Use Cases (Queries)
   GetAllTodosQueryHandler: 'GetAllTodosQueryHandler',
@@ -34,6 +35,7 @@ export const TOKENS = {
   GetCompletedTodosQueryHandler: 'GetCompletedTodosQueryHandler',
   GetTodoStatsQueryHandler: 'GetTodoStatsQueryHandler',
   GetTodoByIdQueryHandler: 'GetTodoByIdQueryHandler',
+  GetAllUsersQueryHandler: 'GetAllUsersQueryHandler',
 
   // Domain Layer - Services
   TodoDomainService: 'TodoDomainService',

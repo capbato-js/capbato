@@ -15,3 +15,4 @@ export * from './Username';
 export * from './HashedPassword';
 export * from './Name';
 export * from './Role';
+export * from './Mobile';

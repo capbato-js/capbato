@@ -9,9 +9,18 @@ export interface RegisterUserCommand {
   email: string;
   password: string;
   role: string;
+  mobile?: string;
 }
 
 export interface LoginUserCommand {
   identifier: string; // Can be email or username
   password: string;
+}
+
+// Query type for getting all users
+export type GetAllUsersQuery = Record<string, never>;
+
+export interface ChangeUserPasswordCommand {
+  userId: string;
+  newPassword: string;
 }

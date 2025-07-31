@@ -10,6 +10,7 @@ export interface UserDto {
   email: string;
   username: string;
   role: string;
+  mobile?: string;
   createdAt: Date;
 }
 
@@ -20,6 +21,7 @@ export interface RegisterUserResponseDto {
   email: string;
   username: string;
   role: string;
+  mobile?: string;
   createdAt: Date;
 }
 
@@ -32,5 +34,6 @@ export interface LoginUserResponseDto {
     email: string;
     username: string;
     role: string;
+    mobile?: string;
   };
 }

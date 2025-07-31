@@ -4,6 +4,7 @@ import { useExpressServer, useContainer } from 'routing-controllers';
 import { container } from '../infrastructure/di/container';
 import { TodoController } from '../presentation/controllers/TodoController';
 import { AuthController } from '../presentation/controllers/AuthController';
+import { UsersController } from '../presentation/controllers/UsersController';
 import { TestController } from '../presentation/controllers/TestController';
 import { RoutingControllersErrorHandler } from '../shared/middleware/RoutingControllersErrorHandler';
 import { requestLogger } from '../presentation/middleware/errorHandler';
@@ -60,7 +61,7 @@ export const createApp = (): express.Application => {
   });
 
   // Configure controllers based on environment
-  const controllers: any[] = [TodoController, AuthController];
+  const controllers: any[] = [TodoController, AuthController, UsersController];
   
   // Only add TestController in non-production environments
   if (!isProduction()) {

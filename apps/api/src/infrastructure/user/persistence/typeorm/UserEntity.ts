@@ -27,6 +27,9 @@ export class UserEntity {
   @Column('varchar', { length: 20 })
   role!: string;
 
+  @Column('varchar', { length: 20, nullable: true })
+  mobile?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 }

@@ -18,6 +18,7 @@ export class UserMapper {
       email: user.email.value,
       username: user.username.value,
       role: user.role.value,
+      mobile: user.mobile?.value,
       createdAt: user.createdAt,
     };
   }
@@ -33,6 +34,7 @@ export class UserMapper {
       email: user.email.value,
       username: user.username.value,
       role: user.role.value,
+      mobile: user.mobile?.value,
       createdAt: user.createdAt,
     };
   }
@@ -50,6 +52,7 @@ export class UserMapper {
         email: user.email.value,
         username: user.username.value,
         role: user.role.value,
+        mobile: user.mobile?.value,
       },
     };
   }
@@ -72,6 +75,7 @@ export class UserMapper {
     username: string;
     hashedPassword: string;
     role: string;
+    mobile?: string;
     createdAt: Date;
   }): User {
     return User.create(
@@ -81,7 +85,8 @@ export class UserMapper {
       plainObject.email,
       plainObject.username,
       plainObject.hashedPassword,
-      plainObject.role
+      plainObject.role,
+      plainObject.mobile
     );
   }
 }

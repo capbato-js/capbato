@@ -9,6 +9,7 @@ export interface RegisterUserRequestDto {
   email: string;
   password: string;
   role: string;
+  mobile?: string;
 }
 
 export interface LoginUserRequestDto {

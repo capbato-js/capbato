@@ -50,7 +50,8 @@ export class RegisterUserUseCase {
       command.email,
       username,
       hashedPassword,
-      command.role
+      command.role,
+      command.mobile
     );
 
     // 5. Persist user

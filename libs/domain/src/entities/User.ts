@@ -4,6 +4,7 @@ import { Username } from '../value-objects/Username';
 import { HashedPassword } from '../value-objects/HashedPassword';
 import { Name } from '../value-objects/Name';
 import { Role } from '../value-objects/Role';
+import { Mobile } from '../value-objects/Mobile';
 import { UserRegisteredEvent } from '../events/UserEvents';
 
 export interface UserProps {
@@ -13,6 +14,7 @@ export interface UserProps {
   username: Username;
   hashedPassword: HashedPassword;
   role: Role;
+  mobile?: Mobile;
   createdAt: Date;
 }
 
@@ -23,6 +25,7 @@ export class User extends AggregateRoot<string> {
   private readonly _username: Username;
   private readonly _hashedPassword: HashedPassword;
   private readonly _role: Role;
+  private readonly _mobile?: Mobile;
   private readonly _createdAt: Date;
 
   constructor(id: string, props: UserProps) {
@@ -33,6 +36,7 @@ export class User extends AggregateRoot<string> {
     this._username = props.username;
     this._hashedPassword = props.hashedPassword;
     this._role = props.role;
+    this._mobile = props.mobile;
     this._createdAt = props.createdAt;
 
     // Add domain event when user is created
@@ -63,6 +67,10 @@ export class User extends AggregateRoot<string> {
     return this._role;
   }
 
+  get mobile(): Mobile | undefined {
+    return this._mobile;
+  }
+
   get createdAt(): Date {
     return this._createdAt;
   }
@@ -78,7 +86,8 @@ export class User extends AggregateRoot<string> {
     email: string,
     username: string,
     hashedPassword: string,
-    role: string
+    role: string,
+    mobile?: string
   ): User {
     return new User(id, {
       firstName: Name.create(firstName),
@@ -87,6 +96,7 @@ export class User extends AggregateRoot<string> {
       username: Username.create(username),
       hashedPassword: HashedPassword.create(hashedPassword),
       role: Role.create(role),
+      mobile: Mobile.createOptional(mobile),
       createdAt: new Date(),
     });
   }
@@ -100,6 +110,7 @@ export class User extends AggregateRoot<string> {
       username: this._username.value,
       hashedPassword: this._hashedPassword.value,
       role: this._role.value,
+      mobile: this._mobile?.value,
       createdAt: this._createdAt,
     };
   }

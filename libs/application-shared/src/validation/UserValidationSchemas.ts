@@ -17,6 +17,7 @@ export const USER_VALIDATION_ERRORS = {
   REG_INVALID_ROLE: 'Role must be one of: admin, doctor, receptionist',
   REG_EMAIL_EXISTS: 'This email address is already registered',
   REG_INVALID_NAME: 'Names can only contain letters, spaces, and hyphens',
+  REG_INVALID_MOBILE: 'Please provide a valid Philippine mobile number (09xxxxxxxxx or +639xxxxxxxxx)',
   AUTH_MISSING_IDENTIFIER: 'Email or username is required',
   AUTH_MISSING_PASSWORD: 'Password is required',
   AUTH_INVALID_EMAIL: 'Please provide a valid email address'
@@ -59,6 +60,19 @@ export const PasswordSchema = z
   .regex(/[a-z]/, USER_VALIDATION_ERRORS.REG_WEAK_PASSWORD)
   .regex(/[0-9]/, USER_VALIDATION_ERRORS.REG_WEAK_PASSWORD);
 
+// Mobile validation schema for Philippine numbers
+export const MobileSchema = z
+  .string()
+  .optional()
+  .refine((value) => {
+    if (!value) return true; // Optional field
+    const cleanMobile = value.replace(/[\s\-()]/g, '');
+    // Philippine mobile: 09xxxxxxxxx or +639xxxxxxxxx
+    return /^(\+639|09)\d{9}$/.test(cleanMobile);
+  }, {
+    message: USER_VALIDATION_ERRORS.REG_INVALID_MOBILE,
+  });
+
 // Role validation schema
 export const RoleSchema = z
   .string()
@@ -74,6 +88,7 @@ export const RegisterUserCommandSchema = z.object({
   email: EmailSchema,
   password: PasswordSchema,
   role: RoleSchema,
+  mobile: MobileSchema,
 });
 
 // Login user command validation schema (matches DTO interface)
@@ -101,14 +116,27 @@ export const LoginFormSchema = LoginUserCommandSchema.extend({
   rememberMe: z.boolean().optional(),
 });
 
+// Change password command validation schema
+export const ChangeUserPasswordCommandSchema = z.object({
+  userId: z.string().min(1, 'User ID is required').uuid('Invalid user ID format'),
+  newPassword: PasswordSchema,
+});
+
+// Get all users query schema (empty object)  
+export const GetAllUsersQuerySchema = z.object({});
+
 // Export all schemas for easy access
 export const UserValidationSchemas = {
   RegisterUserCommand: RegisterUserCommandSchema,
   LoginUserCommand: LoginUserCommandSchema,
   LoginForm: LoginFormSchema,
+  ChangeUserPasswordCommand: ChangeUserPasswordCommandSchema,
+  GetAllUsersQuery: GetAllUsersQuerySchema,
   FirstName: FirstNameSchema,
   LastName: LastNameSchema,
   Email: EmailSchema,
   Password: PasswordSchema,
   Name: NameSchema,
+  Mobile: MobileSchema,
+  Role: RoleSchema,
 } as const;

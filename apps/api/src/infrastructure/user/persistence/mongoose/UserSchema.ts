@@ -12,6 +12,7 @@ export interface IUserDocument extends Document {
   username: string;
   hashedPassword: string;
   role: string;
+  mobile?: string;
   createdAt: Date;
 }
 
@@ -53,6 +54,11 @@ const UserSchema = new Schema<IUserDocument>({
     required: true,
     enum: ['admin', 'doctor', 'receptionist'],
     lowercase: true,
+  },
+  mobile: {
+    type: String,
+    required: false,
+    maxlength: 20,
   },
   createdAt: {
     type: Date,

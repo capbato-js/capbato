@@ -28,6 +28,8 @@ import {
 import {
   RegisterUserUseCase,
   LoginUserUseCase,
+  GetAllUsersQueryHandler,
+  ChangeUserPasswordUseCase,
   BcryptPasswordHashingService,
   JwtService,
   JwtConfig,
@@ -80,11 +82,16 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.ToggleTodoUseCase, ToggleTodoUseCase);
   container.registerSingleton(TOKENS.RegisterUserUseCase, RegisterUserUseCase);
   container.registerSingleton(TOKENS.LoginUserUseCase, LoginUserUseCase);
+  container.registerSingleton(TOKENS.ChangeUserPasswordUseCase, ChangeUserPasswordUseCase);
 
   // Application Layer - Use Cases (Queries)
   container.registerSingleton(
     TOKENS.GetAllTodosQueryHandler,
     GetAllTodosQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetAllUsersQueryHandler,
+    GetAllUsersQueryHandler
   );
   container.registerSingleton(
     TOKENS.GetActiveTodosQueryHandler,
