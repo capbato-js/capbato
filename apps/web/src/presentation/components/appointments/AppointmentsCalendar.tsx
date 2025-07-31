@@ -204,18 +204,6 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
                 transition: 'all 0.2s ease',
                 border: isSelected ? '2px solid #4db6ac' : '2px solid transparent'
               }}
-              onMouseEnter={(e) => {
-                if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = '#dbe5ff';
-                  e.currentTarget.style.transform = 'scale(1.02)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = '#ecf5ff';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }
-              }}
             >
               <Box
                 style={{

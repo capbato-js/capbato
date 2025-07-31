@@ -188,18 +188,6 @@ export const AccountsPage: React.FC = () => {
               boxShadow: '0 4px 8px rgba(77, 182, 172, 0.3)',
               transition: 'background-color 0.3s ease, transform 0.2s ease'
             }}
-            onMouseEnter={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.backgroundColor = '#3ba69c';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.backgroundColor = '#4db6ac';
-                e.currentTarget.style.transform = 'scale(1)';
-              }
-            }}
           >
             <Icon icon="fas fa-user-plus" style={{ marginRight: '8px' }} />
             Create Account

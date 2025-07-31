@@ -91,30 +91,6 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   transition: 'all 0.3s ease',
                   position: 'relative'
                 }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = '#f8f9fa';
-                    e.currentTarget.style.color = '#4db6ac';
-                    // Update icon color on hover
-                    const icon = e.currentTarget.querySelector('i') as HTMLElement;
-                    if (icon) icon.style.color = '#4db6ac';
-                    // Update text color on hover  
-                    const text = e.currentTarget.querySelector('[data-text-element]') as HTMLElement;
-                    if (text) text.style.color = '#4db6ac';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#666';
-                    // Reset icon color
-                    const icon = e.currentTarget.querySelector('i') as HTMLElement;
-                    if (icon) icon.style.color = '#666';
-                    // Reset text color
-                    const text = e.currentTarget.querySelector('[data-text-element]') as HTMLElement;
-                    if (text) text.style.color = '#666';
-                  }
-                }}
               >
               <Group gap="sm">
                 <Icon 

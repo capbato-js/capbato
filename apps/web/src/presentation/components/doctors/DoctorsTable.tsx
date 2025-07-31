@@ -98,12 +98,6 @@ export const DoctorsTable: React.FC<DoctorsTableProps> = ({ doctors }) => {
                   cursor: 'pointer',
                   transition: 'background-color 0.2s ease'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8f9fa';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }}
               >
                 <td 
                   style={{
