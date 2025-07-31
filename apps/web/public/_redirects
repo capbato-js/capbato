@@ -1,0 +1,5 @@
+# Netlify redirects for SPA routing
+# This tells Netlify to serve index.html for all routes that don't match static files
+# The 200 status code means this is a rewrite, not a redirect
+
+/*    /index.html   200
