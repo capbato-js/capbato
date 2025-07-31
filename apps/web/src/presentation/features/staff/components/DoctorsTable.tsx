@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Title } from '@mantine/core';
+import { Box } from '@mantine/core';
+import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { Doctor } from '../types';
 
 interface DoctorsTableProps {
@@ -7,127 +8,44 @@ interface DoctorsTableProps {
 }
 
 export const DoctorsTable: React.FC<DoctorsTableProps> = ({ doctors }) => {
+  // Define columns for the DataTable
+  const columns: TableColumn<Doctor>[] = [
+    {
+      key: 'name',
+      header: 'Doctor\'s Name',
+      width: '40%',
+      align: 'left',
+      searchable: true
+    },
+    {
+      key: 'specialization',
+      header: 'Specialization',
+      width: '35%',
+      align: 'center',
+      searchable: true
+    },
+    {
+      key: 'contactNumber',
+      header: 'Contact Number',
+      width: '25%',
+      align: 'center',
+      searchable: true
+    }
+  ];
+
   return (
     <Box style={{ marginBottom: '35px' }}>
-      <Box style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <Title 
-          order={2}
-          style={{
-            color: '#0b4f6c',
-            fontSize: '28px',
-            fontWeight: 'bold',
-            margin: 0
-          }}
-        >
-          Doctors
-        </Title>
-      </Box>
+      <DataTableHeader 
+        title="Doctors"
+      />
       
-      <Box 
-        style={{ 
-          overflowX: 'auto',
-          borderRadius: '10px',
-          overflow: 'hidden'
-        }}
-      >
-        <table 
-          style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            background: 'white',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-          }}
-        >
-          <thead>
-            <tr>
-              <th 
-                style={{
-                  padding: '16px',
-                  textAlign: 'left',
-                  paddingLeft: '20px',
-                  width: '40%',
-                  borderBottom: '1px solid #ddd',
-                  borderRight: '1px solid #ddd',
-                  background: '#dbeeff',
-                  color: '#0047ab',
-                  fontWeight: 600
-                }}
-              >
-                Doctor's Name
-              </th>
-              <th 
-                style={{
-                  padding: '16px',
-                  textAlign: 'center',
-                  width: '35%',
-                  borderBottom: '1px solid #ddd',
-                  borderRight: '1px solid #ddd',
-                  background: '#dbeeff',
-                  color: '#0047ab',
-                  fontWeight: 600
-                }}
-              >
-                Specialization
-              </th>
-              <th 
-                style={{
-                  padding: '16px',
-                  textAlign: 'center',
-                  width: '25%',
-                  borderBottom: '1px solid #ddd',
-                  background: '#dbeeff',
-                  color: '#0047ab',
-                  fontWeight: 600
-                }}
-              >
-                Contact Number
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {doctors.map((doctor, index) => (
-              <tr 
-                key={doctor.id}
-                style={{
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s ease'
-                }}
-              >
-                <td 
-                  style={{
-                    padding: '16px',
-                    textAlign: 'left',
-                    paddingLeft: '20px',
-                    borderBottom: index === doctors.length - 1 ? 'none' : '1px solid #ddd',
-                    borderRight: '1px solid #ddd'
-                  }}
-                >
-                  {doctor.name}
-                </td>
-                <td 
-                  style={{
-                    padding: '16px',
-                    textAlign: 'center',
-                    borderBottom: index === doctors.length - 1 ? 'none' : '1px solid #ddd',
-                    borderRight: '1px solid #ddd'
-                  }}
-                >
-                  {doctor.specialization}
-                </td>
-                <td 
-                  style={{
-                    padding: '16px',
-                    textAlign: 'center',
-                    borderBottom: index === doctors.length - 1 ? 'none' : '1px solid #ddd'
-                  }}
-                >
-                  {doctor.contactNumber}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Box>
+      <DataTable
+        data={doctors}
+        columns={columns}
+        searchable={true}
+        searchPlaceholder="Search doctors by name, specialization, or contact number..."
+        emptyStateMessage="No doctors found"
+      />
     </Box>
   );
 };

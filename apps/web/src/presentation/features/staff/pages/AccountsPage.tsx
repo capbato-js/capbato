@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Box, 
-  Title, 
-  Button, 
-  Group, 
-  Table, 
+  Button,
   Modal,
   TextInput,
   Select,
@@ -15,8 +12,9 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon } from '../../../components/common';
+import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { useAccountsViewModel, type CreateAccountData } from '../view-models/useAccountsViewModel';
+import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useAccountsViewModel';
 
 export const AccountsPage: React.FC = () => {
   const {
@@ -64,62 +62,37 @@ export const AccountsPage: React.FC = () => {
     await changeAccountPermissions(accountId);
   };
 
-  const handleCloseModal = () => {
-    setFormData({
-      fullName: '',
-      username: '',
-      password: '',
-      role: '',
-      email: '',
-      phone: ''
-    });
-    setFormError(null);
-    close();
-  };
-
-  const tableRows = accounts.map((account) => (
-    <Table.Tr key={account.id}>
-      <Table.Td 
-        style={{ 
-          textAlign: 'left', 
-          paddingLeft: '20px',
-          padding: '14px',
-          borderBottom: '1px solid #ddd',
-          borderRight: '1px solid #ddd',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}
-      >
-        {account.name}
-      </Table.Td>
-      <Table.Td 
-        style={{ 
-          textAlign: 'center',
-          padding: '14px',
-          borderBottom: '1px solid #ddd',
-          borderRight: '1px solid #ddd',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}
-      >
-        {account.role}
-      </Table.Td>
-      <Table.Td 
-        style={{ 
-          textAlign: 'center',
-          padding: '14px',
-          borderBottom: '1px solid #ddd',
-          borderRight: 'none',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}
-      >
+  // Define columns for the DataTable
+  const columns: TableColumn<Account>[] = [
+    {
+      key: 'name',
+      header: 'Name',
+      width: '40%',
+      align: 'left',
+      searchable: true
+    },
+    {
+      key: 'role',
+      header: 'Role',
+      width: '30%',
+      align: 'center',
+      searchable: true,
+      render: (value: string) => (
+        <Text style={{ textTransform: 'capitalize' }}>
+          {value}
+        </Text>
+      )
+    },
+    {
+      key: 'id',
+      header: 'Action',
+      width: '30%',
+      align: 'center',
+      searchable: false,
+      render: (value: any, record: Account) => (
         <Button
           size="xs"
-          onClick={() => handleChangePermissions(account.id)}
+          onClick={() => handleChangePermissions(record.id)}
           disabled={isLoading}
           style={{
             backgroundColor: '#007bff',
@@ -134,9 +107,22 @@ export const AccountsPage: React.FC = () => {
           <Icon icon="fas fa-cog" style={{ marginRight: '4px' }} />
           Change Permissions
         </Button>
-      </Table.Td>
-    </Table.Tr>
-  ));
+      )
+    }
+  ];
+
+  const handleCloseModal = () => {
+    setFormData({
+      fullName: '',
+      username: '',
+      password: '',
+      role: '',
+      email: '',
+      phone: ''
+    });
+    setFormError(null);
+    close();
+  };
 
   return (
     <MedicalClinicLayout>
@@ -161,38 +147,12 @@ export const AccountsPage: React.FC = () => {
           </Alert>
         )}
 
-        <Group justify="space-between" align="center" mb="xl">
-          <Box style={{ flex: 1, textAlign: 'center' }}>
-            <Title 
-              order={1}
-              style={{
-                color: '#0b4f6c',
-                fontSize: '28px',
-                fontWeight: 'bold',
-                margin: 0
-              }}
-            >
-              Accounts Management
-            </Title>
-          </Box>
-          <Button
-            onClick={open}
-            disabled={isLoading}
-            style={{
-              backgroundColor: '#4db6ac',
-              border: 'none',
-              borderRadius: '10px',
-              fontSize: '15px',
-              fontWeight: 'bold',
-              padding: '10px 20px',
-              boxShadow: '0 4px 8px rgba(77, 182, 172, 0.3)',
-              transition: 'background-color 0.3s ease, transform 0.2s ease'
-            }}
-          >
-            <Icon icon="fas fa-user-plus" style={{ marginRight: '8px' }} />
-            Create Account
-          </Button>
-        </Group>
+        <DataTableHeader 
+          title="Accounts Management"
+          onAddItem={open}
+          addButtonText="Create Account"
+          addButtonIcon="fas fa-user-plus"
+        />
 
         {isLoading && accounts.length === 0 ? (
           <Box style={{ textAlign: 'center', padding: '50px' }}>
@@ -200,63 +160,14 @@ export const AccountsPage: React.FC = () => {
             <Text style={{ marginTop: '20px' }}>Loading accounts...</Text>
           </Box>
         ) : (
-          <Table
-            style={{
-              backgroundColor: 'white',
-              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}
-          >
-            <Table.Thead>
-              <Table.Tr
-                style={{
-                  backgroundColor: '#dbeeff'
-                }}
-              >
-                <Table.Th
-                  style={{
-                    color: '#0047ab',
-                    fontWeight: 600,
-                    textAlign: 'left',
-                    paddingLeft: '20px',
-                    padding: '14px',
-                    borderBottom: '1px solid #ddd',
-                    borderRight: '1px solid #ddd'
-                  }}
-                >
-                  Name
-                </Table.Th>
-                <Table.Th
-                  style={{
-                    color: '#0047ab',
-                    fontWeight: 600,
-                    textAlign: 'center',
-                    padding: '14px',
-                    borderBottom: '1px solid #ddd',
-                    borderRight: '1px solid #ddd'
-                  }}
-                >
-                  Role
-                </Table.Th>
-                <Table.Th
-                  style={{
-                    color: '#0047ab',
-                    fontWeight: 600,
-                    textAlign: 'center',
-                    padding: '14px',
-                    borderBottom: '1px solid #ddd',
-                    borderRight: 'none'
-                  }}
-                >
-                  Action
-                </Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {tableRows}
-            </Table.Tbody>
-          </Table>
+          <DataTable
+            data={accounts}
+            columns={columns}
+            searchable={true}
+            searchPlaceholder="Search accounts by name or role..."
+            emptyStateMessage="No accounts found"
+            isLoading={isLoading && accounts.length === 0}
+          />
         )}
       </Box>
 
@@ -365,15 +276,8 @@ export const AccountsPage: React.FC = () => {
           <Button
             onClick={handleCreateAccount}
             loading={isLoading}
-            style={{
-              backgroundColor: '#4db6ac',
-              border: 'none',
-              borderRadius: '10px',
-              fontSize: '15px',
-              fontWeight: 'bold',
-              width: '100%',
-              marginTop: '10px'
-            }}
+            fullWidth
+            mt="md"
             disabled={!formData.fullName || !formData.username || !formData.password || !formData.role || !formData.email}
           >
             {isLoading ? 'Creating Account...' : 'Create Account'}
