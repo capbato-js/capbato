@@ -5,6 +5,7 @@ import { container } from '../infrastructure/di/container';
 import { TodoController } from '../presentation/controllers/TodoController';
 import { AuthController } from '../presentation/controllers/AuthController';
 import { UsersController } from '../presentation/controllers/UsersController';
+import { PatientController } from '../presentation/controllers/PatientController';
 import { TestController } from '../presentation/controllers/TestController';
 import { RoutingControllersErrorHandler } from '../shared/middleware/RoutingControllersErrorHandler';
 import { requestLogger } from '../presentation/middleware/errorHandler';
@@ -61,7 +62,7 @@ export const createApp = (): express.Application => {
   });
 
   // Configure controllers based on environment
-  const controllers: any[] = [TodoController, AuthController, UsersController];
+  const controllers: any[] = [TodoController, AuthController, UsersController, PatientController];
   
   // Only add TestController in non-production environments
   if (!isProduction()) {
@@ -92,6 +93,7 @@ export const createApp = (): express.Application => {
       endpoints: {
         health: `${apiConfig.prefix}${apiConfig.endpoints.health}`,
         todos: `${apiConfig.prefix}${apiConfig.endpoints.todos}`,
+        patients: `${apiConfig.prefix}${apiConfig.endpoints.patients}`,
         auth: `${apiConfig.prefix}${apiConfig.endpoints.auth.base}`,
         register: `${apiConfig.prefix}${apiConfig.endpoints.auth.register}`,
         documentation: `${apiConfig.prefix}${apiConfig.endpoints.documentation}`,

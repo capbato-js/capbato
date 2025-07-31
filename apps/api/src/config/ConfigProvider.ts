@@ -111,6 +111,7 @@ const getFallbackConfig = (): AppConfig => ({
     endpoints: {
       health: '/health',
       todos: '/todos',
+      patients: '/patients',
       auth: {
         base: '/auth',
         login: '/auth/login',

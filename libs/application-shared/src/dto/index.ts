@@ -12,3 +12,7 @@ export * from './TodoRequestDtos';
 export * from './UserCommands';
 export * from './UserDto';
 export * from './UserRequestDtos';
+export * from './PatientCommands';
+export * from './PatientQueries';
+export * from './PatientDto';
+export * from './PatientRequestDtos';

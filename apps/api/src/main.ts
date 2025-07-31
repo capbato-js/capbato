@@ -68,6 +68,7 @@ export async function startServer() {
       console.log(`📖 API documentation available at http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}`);
       console.log(`🔍 Health check: http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}${apiConfig.prefix}${apiConfig.endpoints.health}`);
       console.log(`📝 Todos API: http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}${apiConfig.prefix}${apiConfig.endpoints.todos}`);
+      console.log(`👥 Patients API: http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}${apiConfig.prefix}${apiConfig.endpoints.patients}`);
     });
 
     // Graceful shutdown

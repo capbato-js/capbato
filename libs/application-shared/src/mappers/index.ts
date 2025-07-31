@@ -6,3 +6,4 @@
 // Export all mappers
 export * from './TodoMapper';
 export * from './UserMapper';
+export * from './PatientMapper';

@@ -122,6 +122,7 @@ export interface ApiConfiguration {
   endpoints: {
     health: string;
     todos: string;
+    patients: string;
     auth: {
       base: string;
       login: string;

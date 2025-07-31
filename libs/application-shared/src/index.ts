@@ -10,3 +10,4 @@ export * from './services';
 export * from './use-cases';
 export * from './validation';
 export * from './di';
+export * from './domain';
