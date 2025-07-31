@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { AppointmentsTable } from '../components';
+import { DataTableHeader } from '../../../components/common';
+import { AppointmentsTable, AppointmentsFilterControls, AppointmentCountDisplay } from '../components';
 import { Appointment } from '../types';
 
 // Dummy data for appointments
@@ -69,7 +70,8 @@ const dummyAppointments: Appointment[] = [
 ];
 
 export const AppointmentsPage: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showAll, setShowAll] = useState<boolean>(false);
 
   const handleAddAppointment = () => {
     console.log('Add appointment clicked');
@@ -91,9 +93,22 @@ export const AppointmentsPage: React.FC = () => {
     // TODO: Implement reconfirm appointment functionality
   };
 
-  const handleDateSelect = (date: string) => {
-    setSelectedDate(date);
+  const handleDateChange = (value: string | null) => {
+    if (value) {
+      setSelectedDate(new Date(value));
+    }
   };
+
+  const handleShowAllChange = (checked: boolean) => {
+    setShowAll(checked);
+  };
+
+  // Filter appointments based on date and showAll flag
+  const filteredAppointments = showAll 
+    ? dummyAppointments 
+    : dummyAppointments.filter(appointment => 
+        appointment.date === selectedDate.toISOString().split('T')[0]
+      );
 
   return (
     <MedicalClinicLayout>
@@ -106,14 +121,27 @@ export const AppointmentsPage: React.FC = () => {
           minHeight: 'calc(100vh - 140px)'
         }}
       >
-        <AppointmentsTable
-          appointments={dummyAppointments}
+        <DataTableHeader
+          title="Appointments"
+          onAddItem={handleAddAppointment}
+          addButtonText="Add Appointment"
+          addButtonIcon="fas fa-calendar-plus"
+        />
+        
+        <AppointmentsFilterControls
           selectedDate={selectedDate}
-          onAddAppointment={handleAddAppointment}
+          onDateChange={handleDateChange}
+          showAll={showAll}
+          onShowAllChange={handleShowAllChange}
+        />
+
+        <AppointmentCountDisplay count={filteredAppointments.length} />
+        
+        <AppointmentsTable
+          appointments={filteredAppointments}
           onModifyAppointment={handleModifyAppointment}
           onCancelAppointment={handleCancelAppointment}
           onReconfirmAppointment={handleReconfirmAppointment}
-          onDateSelect={handleDateSelect}
         />
       </Box>
     </MedicalClinicLayout>
