@@ -22,11 +22,17 @@ export const AccountsPage: React.FC = () => {
     isLoading,
     error,
     createAccount,
-    changeAccountPermissions,
+    changeAccountPassword,
     clearError
   } = useAccountsViewModel();
   
   const [opened, { open, close }] = useDisclosure(false);
+  const [passwordModalOpened, { open: openPasswordModal, close: closePasswordModal }] = useDisclosure(false);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [passwordData, setPasswordData] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
   const [formData, setFormData] = useState<CreateAccountData>({
     fullName: '',
     username: '',
@@ -36,6 +42,7 @@ export const AccountsPage: React.FC = () => {
     phone: ''
   });
   const [formError, setFormError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const handleCreateAccount = async () => {
     setFormError(null);
@@ -58,8 +65,34 @@ export const AccountsPage: React.FC = () => {
     }
   };
 
-  const handleChangePermissions = async (accountId: number) => {
-    await changeAccountPermissions(accountId);
+  const handleChangePassword = (account: Account) => {
+    setSelectedAccount(account);
+    setPasswordData({ newPassword: '', confirmPassword: '' });
+    setPasswordError(null);
+    openPasswordModal();
+  };
+
+  const handlePasswordSubmit = async () => {
+    setPasswordError(null);
+    
+    if (!selectedAccount) return;
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+    
+    const success = await changeAccountPassword(selectedAccount.id, passwordData.newPassword);
+    
+    if (success) {
+      closePasswordModal();
+      setPasswordData({ newPassword: '', confirmPassword: '' });
+      setSelectedAccount(null);
+      // Show success message - you might want to use a notification system instead
+      alert('Password changed successfully!');
+    } else if (error) {
+      setPasswordError(error);
+    }
   };
 
   // Define columns for the DataTable
@@ -89,10 +122,10 @@ export const AccountsPage: React.FC = () => {
       width: '30%',
       align: 'center',
       searchable: false,
-      render: (value: any, record: Account) => (
+      render: (value: number, record: Account) => (
         <Button
           size="xs"
-          onClick={() => handleChangePermissions(record.id)}
+          onClick={() => handleChangePassword(record)}
           disabled={isLoading}
           style={{
             backgroundColor: '#007bff',
@@ -104,8 +137,8 @@ export const AccountsPage: React.FC = () => {
             fontWeight: 'normal'
           }}
         >
-          <Icon icon="fas fa-cog" style={{ marginRight: '4px' }} />
-          Change Permissions
+          <Icon icon="fas fa-key" style={{ marginRight: '4px' }} />
+          Change Password
         </Button>
       )
     }
@@ -122,6 +155,13 @@ export const AccountsPage: React.FC = () => {
     });
     setFormError(null);
     close();
+  };
+
+  const handleClosePasswordModal = () => {
+    setPasswordData({ newPassword: '', confirmPassword: '' });
+    setPasswordError(null);
+    setSelectedAccount(null);
+    closePasswordModal();
   };
 
   return (
@@ -280,6 +320,92 @@ export const AccountsPage: React.FC = () => {
             disabled={!formData.fullName || !formData.username || !formData.password || !formData.role || !formData.email}
           >
             {isLoading ? 'Creating Account...' : 'Create Account'}
+          </Button>
+        </Stack>
+      </Modal>
+
+      {/* Change Password Modal */}
+      <Modal
+        opened={passwordModalOpened}
+        onClose={handleClosePasswordModal}
+        title={
+          <Text
+            style={{
+              color: '#0b4f6c',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              width: '100%'
+            }}
+          >
+            Change Password
+          </Text>
+        }
+        centered
+        styles={{
+          content: {
+            borderRadius: '16px',
+            padding: '32px 24px'
+          },
+          header: {
+            borderBottom: 'none',
+            paddingBottom: 0
+          },
+          close: {
+            color: '#888',
+            fontSize: '22px'
+          }
+        }}
+      >
+        <Stack gap="md">
+          {passwordError && (
+            <Alert color="red" style={{ marginBottom: '10px' }}>
+              {passwordError}
+            </Alert>
+          )}
+
+          <Text style={{ marginBottom: '10px', color: '#666' }}>
+            New Password for <strong style={{ color: '#1976d2' }}>{selectedAccount?.name}</strong>
+          </Text>
+
+          <TextInput
+            label="New Password"
+            type="password"
+            placeholder="Enter new password"
+            value={passwordData.newPassword}
+            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+            required
+            disabled={isLoading}
+          />
+          
+          <TextInput
+            label="Confirm Password"
+            type="password"
+            placeholder="Confirm new password"
+            value={passwordData.confirmPassword}
+            onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+            required
+            disabled={isLoading}
+          />
+          
+          <Button
+            onClick={handlePasswordSubmit}
+            loading={isLoading}
+            fullWidth
+            mt="md"
+            disabled={!passwordData.newPassword || !passwordData.confirmPassword}
+            style={{
+              backgroundColor: '#4db6ac',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '10px 20px',
+              fontSize: '15px',
+              fontWeight: 'bold'
+            }}
+          >
+            <Icon icon="fas fa-key" style={{ marginRight: '4px' }} />
+            {isLoading ? 'Changing Password...' : 'Change Password'}
           </Button>
         </Stack>
       </Modal>

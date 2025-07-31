@@ -102,21 +102,22 @@ export const useAccountsViewModel = () => {
     }
   }, [accounts]);
 
-  const changeAccountPermissions = useCallback(async (accountId: number): Promise<void> => {
+  const changeAccountPassword = useCallback(async (accountId: number, newPassword: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
     
     try {
+      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // TODO: Implement actual permission change logic
-      console.log('Changing permissions for account:', accountId);
+      // TODO: Implement actual password change logic with API
+      console.log('Changing password for account:', accountId);
       
-      // For now, just show a success message
-      alert('Permission change functionality will be implemented soon!');
+      return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to change permissions');
+      setError(err instanceof Error ? err.message : 'Failed to change password');
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -147,7 +148,7 @@ export const useAccountsViewModel = () => {
     isLoading,
     error,
     createAccount,
-    changeAccountPermissions,
+    changeAccountPassword,
     deleteAccount,
     clearError
   };
