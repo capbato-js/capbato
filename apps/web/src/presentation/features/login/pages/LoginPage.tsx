@@ -13,7 +13,6 @@ export const LoginPage: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        paddingTop: '100px',
         background: 'linear-gradient(to bottom right, rgb(109, 174, 218), #4db6ac)',
         margin: 0
       }}

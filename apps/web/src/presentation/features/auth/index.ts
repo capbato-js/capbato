@@ -5,3 +5,4 @@
 
 export { AuthGuard } from './components/AuthGuard';
 export { LogoutButton } from './components/LogoutButton';
+export { useLogoutViewModel } from './view-models/useLogoutViewModel';
