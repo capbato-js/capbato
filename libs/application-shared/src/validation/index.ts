@@ -55,3 +55,23 @@ export * from './DoctorValidationService';
 // Export address validation schemas and services
 export * from './AddressValidationSchemas';
 export * from './AddressValidationService';
+// Export schedule validation schemas and services (excluding DoctorIdSchema to avoid conflict)
+export {
+  ScheduleIdSchema,
+  ScheduleDateSchema,
+  ScheduleTimeSchema,
+  CreateScheduleCommandSchema,
+  UpdateScheduleCommandSchema,
+  DeleteScheduleCommandSchema,
+  GetScheduleByIdQuerySchema,
+  GetSchedulesByDateQuerySchema,
+  GetSchedulesByDoctorQuerySchema,
+  ScheduleValidationSchemas,
+  type CreateScheduleCommand,
+  type UpdateScheduleCommand,
+  type DeleteScheduleCommand,
+  type GetScheduleByIdQuery,
+  type GetSchedulesByDateQuery,
+  type GetSchedulesByDoctorQuery,
+} from './ScheduleValidationSchemas';
+export * from './ScheduleValidationService';

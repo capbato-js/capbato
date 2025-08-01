@@ -14,6 +14,7 @@ export const TOKENS = {
   PatientRepository: 'IPatientRepository',
   DoctorRepository: 'IDoctorRepository',
   AddressRepository: 'IAddressRepository',
+  ScheduleRepository: 'IScheduleRepository',
 
   // Infrastructure Layer - Services
   PasswordHashingService: 'IPasswordHashingService',
@@ -38,6 +39,9 @@ export const TOKENS = {
   ChangeUserPasswordUseCase: 'ChangeUserPasswordUseCase',
   CreatePatientUseCase: 'CreatePatientUseCase',
   CreateDoctorProfileCommandHandler: 'CreateDoctorProfileCommandHandler',
+  CreateScheduleUseCase: 'CreateScheduleUseCase',
+  UpdateScheduleUseCase: 'UpdateScheduleUseCase',
+  DeleteScheduleUseCase: 'DeleteScheduleUseCase',
 
   // Application Layer - Use Cases (Queries)
   GetAllTodosQueryHandler: 'GetAllTodosQueryHandler',
@@ -58,6 +62,13 @@ export const TOKENS = {
   GetAllProvincesQueryHandler: 'GetAllProvincesQueryHandler',
   GetCitiesByProvinceCodeQueryHandler: 'GetCitiesByProvinceCodeQueryHandler',
   GetBarangaysByCityCodeQueryHandler: 'GetBarangaysByCityCodeQueryHandler',
+  GetAllSchedulesQueryHandler: 'GetAllSchedulesQueryHandler',
+  GetScheduleByIdQueryHandler: 'GetScheduleByIdQueryHandler',
+  GetSchedulesByDateQueryHandler: 'GetSchedulesByDateQueryHandler',
+  GetSchedulesByDoctorQueryHandler: 'GetSchedulesByDoctorQueryHandler',
+  GetTodaySchedulesQueryHandler: 'GetTodaySchedulesQueryHandler',
+  GetTodayDoctorQueryHandler: 'GetTodayDoctorQueryHandler',
+  GetScheduleStatsQueryHandler: 'GetScheduleStatsQueryHandler',
 
   // Domain Layer - Services
   TodoDomainService: 'TodoDomainService',
@@ -84,6 +95,13 @@ export const TOKENS = {
   GetCitiesValidationService: 'GetCitiesValidationService',
   GetBarangaysValidationService: 'GetBarangaysValidationService',
   AddressValidationService: 'AddressValidationService',
+  CreateScheduleValidationService: 'CreateScheduleValidationService',
+  UpdateScheduleValidationService: 'UpdateScheduleValidationService',
+  DeleteScheduleValidationService: 'DeleteScheduleValidationService',
+  GetScheduleByIdValidationService: 'GetScheduleByIdValidationService',
+  GetSchedulesByDateValidationService: 'GetSchedulesByDateValidationService',
+  GetSchedulesByDoctorValidationService: 'GetSchedulesByDoctorValidationService',
+  ScheduleValidationService: 'ScheduleValidationService',
 } as const;
 
 // Type-safe token keys

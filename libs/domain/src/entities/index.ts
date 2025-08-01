@@ -13,3 +13,4 @@ export * from './Doctor';
 export * from './Province';
 export * from './City';
 export * from './Barangay';
+export * from './Schedule';

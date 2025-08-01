@@ -23,3 +23,6 @@ export * from './ContactNumber';
 export * from './ProvinceCode';
 export * from './CityCode';
 export * from './BarangayCode';
+export * from './ScheduleId';
+export * from './ScheduleDate';
+export * from './ScheduleTime';
