@@ -8,8 +8,6 @@ import {
 } from 'typeorm';
 
 @Entity('patient')
-@Index(['patientNumber'], { unique: true })
-@Index(['contactNumber'], { unique: true })
 @Index(['firstName', 'lastName']) // For name-based searches
 @Index(['dateOfBirth']) // For age-based queries
 export class PatientEntity {
