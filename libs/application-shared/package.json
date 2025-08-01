@@ -9,7 +9,6 @@
     "@nx-starter/domain": "workspace:*",
     "tsyringe": "^4.10.0",
     "zod": "^4.0.5",
-    "tslib": "^2.3.0",
-    "vitest": "*"
+    "tslib": "^2.3.0"
   }
 }

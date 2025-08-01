@@ -25,7 +25,9 @@ export interface ApiConfiguration {
     patients: {
       base: string;
       all: string;
+      create: string;
       byId: (id: string) => string;
+      stats: string;
     };
   };
 }

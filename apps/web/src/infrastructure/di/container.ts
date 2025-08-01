@@ -10,6 +10,10 @@ import { IAuthApiService } from '../api/IAuthApiService';
 import { AuthApiService } from '../api/AuthApiService';
 import { MockAuthApiService } from '../api/MockAuthApiService';
 import { AuthCommandService } from '../api/AuthCommandService';
+import { 
+  PatientCommandService, 
+  PatientQueryService
+} from '../services/PatientService';
 import { IPatientApiService } from '../api/IPatientApiService';
 import { PatientApiService } from '../api/PatientApiService';
 import { ApiPatientRepository } from '../api/ApiPatientRepository';
@@ -20,7 +24,6 @@ import { getFeatureFlags, configProvider } from '../config';
 import {
   TodoCommandService,
   TodoQueryService,
-  PatientQueryService,
   CreateTodoUseCase,
   UpdateTodoUseCase,
   DeleteTodoUseCase,
@@ -40,6 +43,7 @@ import type {
   ITodoCommandService,
   ITodoQueryService,
   IAuthCommandService,
+  IPatientCommandService,
   IPatientQueryService,
   IPatientRepository,
   IUserQueryService,
@@ -149,6 +153,10 @@ export const configureDI = () => {
   container.registerSingleton<IAuthCommandService>(
     TOKENS.AuthCommandService,
     AuthCommandService
+  );
+  container.registerSingleton<IPatientCommandService>(
+    TOKENS.PatientCommandService,
+    PatientCommandService
   );
   container.registerSingleton<IPatientQueryService>(
     TOKENS.PatientQueryService,

@@ -1,15 +1,16 @@
 import React from 'react';
 import { Box, Alert, Button } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { PatientsTable } from '../components';
 import { usePatientViewModel } from '../view-models';
 
 export const PatientsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { patients, isLoading, error, clearError } = usePatientViewModel();
 
   const handleAddPatient = () => {
-    console.log('Add new patient');
-    // TODO: Open add patient modal or navigate to add page
+    navigate('/patients/new');
   };
 
   return (
