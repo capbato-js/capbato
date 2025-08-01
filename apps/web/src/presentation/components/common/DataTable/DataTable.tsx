@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Box, TextInput, Table, Text, Skeleton } from '@mantine/core';
+import { Box, TextInput, Table, Skeleton } from '@mantine/core';
 import { DataTableProps, SearchableItem } from './types';
 
 export function DataTable<T extends SearchableItem>({
@@ -9,7 +9,8 @@ export function DataTable<T extends SearchableItem>({
   searchPlaceholder = 'Search...',
   searchFields,
   isLoading = false,
-  emptyStateMessage = 'No data available'
+  emptyStateMessage = 'No data available',
+  skeletonRowCount = 5
 }: DataTableProps<T>) {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -39,7 +40,7 @@ export function DataTable<T extends SearchableItem>({
   }, [data, searchQuery, searchFields, columns, searchable]);
 
   // Create skeleton rows for loading state
-  const skeletonRows = Array.from({ length: 5 }, (_, index) => (
+  const skeletonRows = Array.from({ length: skeletonRowCount }, (_, index) => (
     <Table.Tr key={`skeleton-${index}`}>
       {columns.map((column, colIndex) => (
         <Table.Td

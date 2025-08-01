@@ -29,6 +29,14 @@ export interface ApiConfiguration {
       byId: (id: string) => string;
       stats: string;
     };
+    doctors: {
+      base: string;
+      all: string;
+      byId: (id: string) => string;
+      byUserId: (userId: string) => string;
+      bySpecialization: (specialization: string) => string;
+      check: (userId: string) => string;
+    };
   };
 }
 

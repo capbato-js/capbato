@@ -2,23 +2,7 @@ import React from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { DoctorsTable, CustomCalendar } from '../components';
-import { Doctor, ScheduleEntry } from '../types';
-
-// Dummy data for doctors
-const dummyDoctors: Doctor[] = [
-  {
-    id: '1',
-    name: 'Dr. John Doe',
-    specialization: 'Cardiology',
-    contactNumber: '123456789'
-  },
-  {
-    id: '2',
-    name: 'Dr. Alice Smith',
-    specialization: 'Pediatrics',
-    contactNumber: '098765432'
-  },
-];
+import { ScheduleEntry } from '../types';
 
 // Dummy schedule data for July 2025
 const dummySchedules: ScheduleEntry[] = [
@@ -66,8 +50,8 @@ export const DoctorsPage: React.FC = () => {
           minHeight: 'calc(100vh - 140px)'
         }}
       >
-        {/* Doctors Table */}
-        <DoctorsTable doctors={dummyDoctors} />
+        {/* Doctors Table - Now uses real API data */}
+        <DoctorsTable />
         
         {/* Doctor's Schedule Calendar */}
         <CustomCalendar 

@@ -49,6 +49,14 @@ export function getEnvironmentConfig(): AppConfig {
           byId: (id: string) => `/api/patients/${id}`,
           stats: '/api/patients/total',
         },
+        doctors: {
+          base: '/api/doctors',
+          all: '/api/doctors',
+          byId: (id: string) => `/api/doctors/${id}`,
+          byUserId: (userId: string) => `/api/doctors/user/${userId}`,
+          bySpecialization: (specialization: string) => `/api/doctors/specialization/${specialization}`,
+          check: (userId: string) => `/api/doctors/check/${userId}`,
+        },
       },
     },
     features: {
