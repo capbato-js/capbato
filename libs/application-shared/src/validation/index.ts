@@ -51,3 +51,7 @@ export * from './PatientValidationService';
 // Export doctor validation schemas and services
 export * from './DoctorValidationSchemas';
 export * from './DoctorValidationService';
+
+// Export address validation schemas and services
+export * from './AddressValidationSchemas';
+export * from './AddressValidationService';

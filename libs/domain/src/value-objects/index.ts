@@ -20,3 +20,6 @@ export * from './DoctorId';
 export * from './DoctorName';
 export * from './Specialization';
 export * from './ContactNumber';
+export * from './ProvinceCode';
+export * from './CityCode';
+export * from './BarangayCode';

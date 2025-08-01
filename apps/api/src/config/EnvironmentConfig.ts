@@ -237,6 +237,7 @@ export function getEnvironmentConfig(): AppConfig {
         todos: parseString('API_TODOS_ENDPOINT', process.env.API_TODOS_ENDPOINT, '/todos'),
         patients: parseString('API_PATIENTS_ENDPOINT', process.env.API_PATIENTS_ENDPOINT, '/patients'),
         doctors: parseString('API_DOCTORS_ENDPOINT', process.env.API_DOCTORS_ENDPOINT, '/doctors'),
+        address: parseString('API_ADDRESS_ENDPOINT', process.env.API_ADDRESS_ENDPOINT, '/address'),
         auth: {
           base: parseString('API_AUTH_BASE', process.env.API_AUTH_BASE, '/auth'),
           login: parseString('API_AUTH_LOGIN', process.env.API_AUTH_LOGIN, '/auth/login'),

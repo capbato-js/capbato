@@ -113,6 +113,7 @@ const getFallbackConfig = (): AppConfig => ({
       todos: '/todos',
       patients: '/patients',
       doctors: '/doctors',
+      address: '/address',
       auth: {
         base: '/auth',
         login: '/auth/login',

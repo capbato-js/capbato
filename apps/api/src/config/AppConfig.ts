@@ -124,6 +124,7 @@ export interface ApiConfiguration {
     todos: string;
     patients: string;
     doctors: string;
+    address: string;
     auth: {
       base: string;
       login: string;

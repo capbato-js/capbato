@@ -9,6 +9,7 @@ import { InMemoryPatientRepository } from '../patient/persistence/in-memory/InMe
 import { TypeOrmPatientRepository } from '../patient/persistence/typeorm/TypeOrmPatientRepository';
 import { InMemoryDoctorRepository } from '../doctor/persistence/in-memory/InMemoryDoctorRepository';
 import { TypeOrmDoctorRepository } from '../doctor/persistence/typeorm/TypeOrmDoctorRepository';
+import { InMemoryAddressRepository } from '../address/persistence';
 import {
   CreateTodoUseCase,
   UpdateTodoUseCase,
@@ -41,6 +42,12 @@ import {
   DoctorValidationService,
   GetDoctorByIdValidationService,
   GetDoctorsBySpecializationValidationService,
+  GetAllProvincesQueryHandler,
+  GetCitiesByProvinceCodeQueryHandler,
+  GetBarangaysByCityCodeQueryHandler,
+  AddressValidationService,
+  GetCitiesValidationService,
+  GetBarangaysValidationService,
 } from '@nx-starter/application-shared';
 import {
   RegisterUserUseCase,
@@ -59,7 +66,7 @@ import {
   GetDoctorByUserIdQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
 } from '@nx-starter/application-shared';
-import type { ITodoRepository, IUserRepository, IDoctorRepository } from '@nx-starter/domain';
+import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
 import { UserDomainService } from '@nx-starter/domain';
 import { getTypeOrmDataSource } from '../database/connections/TypeOrmConnection';
@@ -91,6 +98,12 @@ export const configureDI = async () => {
   container.registerInstance<IDoctorRepository>(
     TOKENS.DoctorRepository,
     doctorRepositoryImplementation
+  );
+
+  const addressRepositoryImplementation = await getAddressRepositoryImplementation();
+  container.registerInstance<IAddressRepository>(
+    TOKENS.AddressRepository,
+    addressRepositoryImplementation
   );
 
   // Infrastructure Layer - Services  
@@ -181,6 +194,18 @@ export const configureDI = async () => {
     TOKENS.CheckDoctorProfileExistsQueryHandler,
     CheckDoctorProfileExistsQueryHandler
   );
+  container.registerSingleton(
+    TOKENS.GetAllProvincesQueryHandler,
+    GetAllProvincesQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetCitiesByProvinceCodeQueryHandler,
+    GetCitiesByProvinceCodeQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetBarangaysByCityCodeQueryHandler,
+    GetBarangaysByCityCodeQueryHandler
+  );
 
   // Application Layer - Validation Services
   container.registerSingleton(
@@ -238,6 +263,18 @@ export const configureDI = async () => {
   container.registerSingleton(
     TOKENS.DoctorValidationService,
     DoctorValidationService
+  );
+  container.registerSingleton(
+    TOKENS.GetCitiesValidationService,
+    GetCitiesValidationService
+  );
+  container.registerSingleton(
+    TOKENS.GetBarangaysValidationService,
+    GetBarangaysValidationService
+  );
+  container.registerSingleton(
+    TOKENS.AddressValidationService,
+    AddressValidationService
   );
 
   // Domain Layer - Domain Services
@@ -406,6 +443,12 @@ async function getDoctorRepositoryImplementation(): Promise<IDoctorRepository> {
       return new TypeOrmDoctorRepository(dataSource);
     }
   }
+}
+
+async function getAddressRepositoryImplementation(): Promise<IAddressRepository> {
+  // Address data is static JSON, so we always use in-memory implementation
+  console.log('📦 Using in-memory address repository with Philippine data');
+  return new InMemoryAddressRepository();
 }
 
 // Export container and tokens for use in controllers

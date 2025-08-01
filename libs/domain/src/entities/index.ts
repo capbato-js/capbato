@@ -10,3 +10,6 @@ export * from './Entity';
 export * from './Todo';
 export * from './User';
 export * from './Doctor';
+export * from './Province';
+export * from './City';
+export * from './Barangay';

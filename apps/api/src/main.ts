@@ -70,6 +70,7 @@ export async function startServer() {
       console.log(`📝 Todos API: http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}${apiConfig.prefix}${apiConfig.endpoints.todos}`);
       console.log(`👥 Patients API: http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}${apiConfig.prefix}${apiConfig.endpoints.patients}`);
       console.log(`👨‍⚕️ Doctors API: http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}${apiConfig.prefix}${apiConfig.endpoints.doctors}`);
+      console.log(`🏠 Address API: http://${serverConfig.host === '0.0.0.0' ? 'localhost' : serverConfig.host}:${serverConfig.port}${apiConfig.prefix}${apiConfig.endpoints.address}`);
     });
 
     // Graceful shutdown

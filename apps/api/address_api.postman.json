@@ -1,0 +1,471 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-ghij-klm1234567890",
+    "name": "Address API",
+    "description": "Philippine address data endpoints for healthcare clinic\n\n## Address API Architecture\nThe API provides hierarchical Philippine address data:\n\n**Province Level:**\n- `code`: Unique province identifier (e.g., 'METRO_MANILA', 'CEBU')\n- `name`: Full province name (e.g., 'Metro Manila', 'Cebu')\n\n**City/Municipality Level:**\n- `code`: Unique city identifier (e.g., 'manila', 'quezon_city')\n- `name`: Full city/municipality name (e.g., 'Manila', 'Quezon City')\n- Filtered by province code\n\n**Barangay Level:**\n- `code`: Unique barangay identifier (e.g., 'B001', 'B002')\n- `name`: Full barangay name (e.g., 'Barangay 1', 'Poblacion')\n- Filtered by city code\n\n**Data Source:**\nAll data is loaded from a comprehensive Philippine address JSON file containing:\n- 17 regions\n- 81 provinces\n- 1,634+ cities/municipalities\n- 42,000+ barangays\n\n**API Response Structure:**\nAll endpoints return consistent response format:\n```json\n{\n  \"success\": true,\n  \"data\": [...],\n  \"message\": \"Optional message\"\n}\n```\n\n**Use Cases:**\n- **Province Selection**: Get all provinces for dropdown/select components\n- **City Selection**: Get cities based on selected province\n- **Barangay Selection**: Get barangays based on selected city\n- **Address Forms**: Build hierarchical address selection forms\n- **Data Validation**: Validate Philippine addresses\n\n**Performance Notes:**\n- Data is loaded once at startup from JSON file\n- In-memory repository provides fast response times\n- No database queries required\n- Suitable for high-frequency address lookups\n\n**Integration with Other APIs:**\nThis Address API is designed to work with Patient and Doctor APIs for complete address information in healthcare records.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "Get All Provinces",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/provinces",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "provinces"]
+        },
+        "description": "Get all provinces in the Philippines\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"code\": \"METRO_MANILA\",\n      \"name\": \"Metro Manila\"\n    },\n    {\n      \"code\": \"CEBU\",\n      \"name\": \"Cebu\"\n    }\n  ]\n}\n```\n\n**Use Case:** Populate province dropdown in address forms"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Cities - Metro Manila",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/cities/{{metro_manila_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "cities", "{{metro_manila_code}}"]
+        },
+        "description": "Get all cities/municipalities in Metro Manila\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"code\": \"manila\",\n      \"name\": \"Manila\"\n    },\n    {\n      \"code\": \"quezon_city\",\n      \"name\": \"Quezon City\"\n    },\n    {\n      \"code\": \"makati\",\n      \"name\": \"Makati\"\n    }\n  ]\n}\n```\n\n**Use Case:** Populate city dropdown after province selection"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Cities - Cebu Province",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/cities/{{cebu_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "cities", "{{cebu_code}}"]
+        },
+        "description": "Get all cities/municipalities in Cebu Province\n\n**Expected Cities:** Cebu City, Mandaue, Lapu-Lapu, Talisay, etc."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Cities - Davao Region",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/cities/{{davao_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "cities", "{{davao_code}}"]
+        },
+        "description": "Get all cities/municipalities in Davao Region"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Cities - Invalid Province Code (Should Fail)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/cities/INVALID_PROVINCE",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "cities", "INVALID_PROVINCE"]
+        },
+        "description": "Test error handling with invalid province code\n\n**Expected:** Empty array or error response"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Cities - Empty Province Code (Should Fail)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/cities/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "cities", ""]
+        },
+        "description": "Test validation error with empty province code\n\n**Expected:** 400 Bad Request with validation error"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Barangays - Manila City",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/barangays/{{manila_city_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "barangays", "{{manila_city_code}}"]
+        },
+        "description": "Get all barangays in Manila City\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"code\": \"B001\",\n      \"name\": \"Barangay 1\"\n    },\n    {\n      \"code\": \"B002\",\n      \"name\": \"Barangay 2\"\n    }\n  ]\n}\n```\n\n**Expected:** 896+ barangays (Manila has many barangays)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Barangays - Quezon City",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/barangays/{{quezon_city_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "barangays", "{{quezon_city_code}}"]
+        },
+        "description": "Get all barangays in Quezon City\n\n**Expected:** 142 barangays (Quezon City has exactly 142 barangays)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Barangays - Makati City",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/barangays/{{makati_city_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "barangays", "{{makati_city_code}}"]
+        },
+        "description": "Get all barangays in Makati City\n\n**Expected:** 33 barangays (Makati has 33 barangays)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Barangays - Cebu City",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/barangays/{{cebu_city_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "barangays", "{{cebu_city_code}}"]
+        },
+        "description": "Get all barangays in Cebu City"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Barangays - Small Municipality",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/barangays/{{small_municipality_code}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "barangays", "{{small_municipality_code}}"]
+        },
+        "description": "Get barangays from a smaller municipality\n\n**Expected:** Fewer barangays (rural areas typically have fewer barangays)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Barangays - Invalid City Code (Should Fail)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/barangays/INVALID_CITY",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "barangays", "INVALID_CITY"]
+        },
+        "description": "Test error handling with invalid city code\n\n**Expected:** Empty array or error response"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Barangays - Empty City Code (Should Fail)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/barangays/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "barangays", ""]
+        },
+        "description": "Test validation error with empty city code\n\n**Expected:** 400 Bad Request with validation error"
+      },
+      "response": []
+    },
+    {
+      "name": "Complete Address Flow - Metro Manila",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/provinces",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "provinces"]
+        },
+        "description": "**Complete Address Selection Flow Demo**\n\n**Step 1:** Get all provinces (this request)\n**Step 2:** User selects 'Metro Manila' → Get cities with province code\n**Step 3:** User selects 'Manila' → Get barangays with city code\n**Step 4:** User selects specific barangay\n\n**Typical Flow:**\n1. `GET /api/address/provinces`\n2. `GET /api/address/cities/METRO_MANILA`\n3. `GET /api/address/barangays/manila`\n\n**Result:** Complete hierarchical address selection"
+      },
+      "response": []
+    },
+    {
+      "name": "Performance Test - Multiple Requests",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/address/provinces",
+          "host": ["{{base_url}}"],
+          "path": ["api", "address", "provinces"]
+        },
+        "description": "**Performance Test Request**\n\nSince data is loaded in-memory, all requests should be very fast.\nUse this to test response times for:\n\n- Province loading (81 provinces)\n- City loading (varies by province)\n- Barangay loading (varies significantly by city)\n\n**Expected Performance:**\n- Provinces: < 10ms\n- Cities: < 10ms\n- Barangays: < 50ms (larger datasets)\n\n**Note:** Run this multiple times to test consistency"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000",
+      "type": "string",
+      "description": "Base URL for the API server"
+    },
+    {
+      "key": "metro_manila_code",
+      "value": "METRO_MANILA",
+      "type": "string",
+      "description": "Metro Manila province code - replace with actual code from provinces response"
+    },
+    {
+      "key": "cebu_code",
+      "value": "CEBU",
+      "type": "string",
+      "description": "Cebu province code - replace with actual code from provinces response"
+    },
+    {
+      "key": "davao_code",
+      "value": "DAVAO_DEL_SUR",
+      "type": "string",
+      "description": "Davao province code - replace with actual code from provinces response"
+    },
+    {
+      "key": "manila_city_code",
+      "value": "manila",
+      "type": "string",
+      "description": "Manila city code - replace with actual code from cities response"
+    },
+    {
+      "key": "quezon_city_code",
+      "value": "quezon_city",
+      "type": "string",
+      "description": "Quezon City code - replace with actual code from cities response"
+    },
+    {
+      "key": "makati_city_code",
+      "value": "makati",
+      "type": "string",
+      "description": "Makati city code - replace with actual code from cities response"
+    },
+    {
+      "key": "cebu_city_code",
+      "value": "cebu_city",
+      "type": "string",
+      "description": "Cebu City code - replace with actual code from cities response"
+    },
+    {
+      "key": "small_municipality_code",
+      "value": "adams",
+      "type": "string",
+      "description": "Small municipality code for testing - replace with actual code"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Address API Pre-request Script",
+          "// This script can be used to set up dynamic variables or validate prerequisites",
+          "",
+          "// Example: Set timestamp for request tracking",
+          "pm.globals.set('request_timestamp', new Date().toISOString());",
+          "",
+          "// Example: Validate base_url is set",
+          "if (!pm.variables.get('base_url')) {",
+          "    console.warn('⚠️ base_url variable not set. Using default: http://localhost:4000');",
+          "    pm.variables.set('base_url', 'http://localhost:4000');",
+          "}",
+          "",
+          "console.log('🏠 Address API Request:', pm.info.requestName);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Address API Global Test Script",
+          "// These tests run after every request in the collection",
+          "",
+          "// Test 1: Response time should be reasonable",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(1000); // 1 second",
+          "});",
+          "",
+          "// Test 2: Response should be JSON",
+          "pm.test('Response is JSON', function () {",
+          "    pm.response.to.have.header('content-type');",
+          "    pm.expect(pm.response.headers.get('content-type')).to.include('application/json');",
+          "});",
+          "",
+          "// Test 3: Success responses should have proper structure",
+          "if (pm.response.code === 200) {",
+          "    pm.test('Success response has correct structure', function () {",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData).to.have.property('success');",
+          "        pm.expect(jsonData).to.have.property('data');",
+          "        pm.expect(jsonData.success).to.be.true;",
+          "        pm.expect(jsonData.data).to.be.an('array');",
+          "    });",
+          "",
+          "    pm.test('Data items have required properties', function () {",
+          "        const jsonData = pm.response.json();",
+          "        if (jsonData.data.length > 0) {",
+          "            const firstItem = jsonData.data[0];",
+          "            pm.expect(firstItem).to.have.property('code');",
+          "            pm.expect(firstItem).to.have.property('name');",
+          "            pm.expect(firstItem.code).to.be.a('string');",
+          "            pm.expect(firstItem.name).to.be.a('string');",
+          "        }",
+          "    });",
+          "}",
+          "",
+          "// Test 4: Error responses should have proper structure",
+          "if (pm.response.code >= 400) {",
+          "    pm.test('Error response has proper structure', function () {",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData).to.have.property('success');",
+          "        pm.expect(jsonData.success).to.be.false;",
+          "    });",
+          "}",
+          "",
+          "// Log response summary",
+          "console.log('📊 Response Summary:', {",
+          "    status: pm.response.code,",
+          "    time: pm.response.responseTime + 'ms',",
+          "    size: pm.response.responseSize + ' bytes'",
+          "});",
+          "",
+          "// Store response data for chaining requests",
+          "if (pm.response.code === 200) {",
+          "    const jsonData = pm.response.json();",
+          "    ",
+          "    // Store province codes from provinces endpoint",
+          "    if (pm.info.requestName === 'Get All Provinces' && jsonData.data.length > 0) {",
+          "        const provinces = jsonData.data;",
+          "        console.log('🏛️ Found', provinces.length, 'provinces');",
+          "        ",
+          "        // Update variables with actual province codes",
+          "        const metroManila = provinces.find(p => p.name.toLowerCase().includes('metro manila'));",
+          "        const cebu = provinces.find(p => p.name.toLowerCase().includes('cebu'));",
+          "        ",
+          "        if (metroManila) pm.collectionVariables.set('metro_manila_code', metroManila.code);",
+          "        if (cebu) pm.collectionVariables.set('cebu_code', cebu.code);",
+          "    }",
+          "    ",
+          "    // Store city codes from cities endpoint",
+          "    if (pm.info.requestName.includes('Get Cities') && jsonData.data.length > 0) {",
+          "        const cities = jsonData.data;",
+          "        console.log('🏙️ Found', cities.length, 'cities');",
+          "        ",
+          "        // Update variables with actual city codes",
+          "        const manila = cities.find(c => c.name.toLowerCase() === 'manila');",
+          "        const quezonCity = cities.find(c => c.name.toLowerCase().includes('quezon'));",
+          "        const makati = cities.find(c => c.name.toLowerCase() === 'makati');",
+          "        ",
+          "        if (manila) pm.collectionVariables.set('manila_city_code', manila.code);",
+          "        if (quezonCity) pm.collectionVariables.set('quezon_city_code', quezonCity.code);",
+          "        if (makati) pm.collectionVariables.set('makati_city_code', makati.code);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ]
+}
