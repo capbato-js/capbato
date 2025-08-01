@@ -22,6 +22,7 @@ export const TOKENS = {
   TodoQueryService: 'ITodoQueryService',
   AuthCommandService: 'IAuthCommandService',
   AuthQueryService: 'IAuthQueryService',
+  PatientCommandService: 'IPatientCommandService',
   PatientQueryService: 'IPatientQueryService',
   UserQueryService: 'IUserQueryService',
 

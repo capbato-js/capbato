@@ -7,5 +7,6 @@
 export * from './TodoCommandService';
 export * from './TodoQueryService';
 export * from './AuthService';
-export * from './PatientQueryService';
 export * from './UserQueryService';
+export * from './PatientCommandService';
+export * from './PatientQueryService';

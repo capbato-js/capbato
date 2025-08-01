@@ -21,8 +21,10 @@ export const usePatientStore = create<PatientStore>()(
           patientDetails: {},
           status: 'idle',
           patientDetailsStatus: {},
+          createPatientStatus: 'idle',
           error: null,
           patientDetailsErrors: {},
+          createPatientError: null,
 
           // Computed values as functions
           getIsLoading() {
@@ -41,8 +43,16 @@ export const usePatientStore = create<PatientStore>()(
             return get().patientDetailsStatus[id] === 'loading';
           },
 
+          getIsCreatingPatient() {
+            return get().createPatientStatus === 'loading';
+          },
+
           getPatientDetailsError(id: string) {
             return get().patientDetailsErrors[id] || null;
+          },
+
+          getCreatePatientError() {
+            return get().createPatientError;
           },
 
           getPatientDetails(id: string) {
@@ -96,6 +106,52 @@ export const usePatientStore = create<PatientStore>()(
             }
           },
 
+          async createPatient(command) {
+            set((state) => {
+              state.createPatientStatus = 'loading';
+              state.createPatientError = null;
+            });
+
+            try {
+              const response = await getApiService().createPatient(command);
+              const newPatient = response.data;
+              
+              set((state) => {
+                // Add new patient to the list (optimistic update)
+                const newPatientListItem = {
+                  id: newPatient.id,
+                  patientNumber: newPatient.patientNumber,
+                  firstName: newPatient.firstName,
+                  lastName: newPatient.lastName,
+                  middleName: newPatient.middleName,
+                  age: newPatient.age,
+                  gender: newPatient.gender,
+                  contactNumber: newPatient.contactNumber,
+                  address: newPatient.address,
+                  dateOfBirth: newPatient.dateOfBirth,
+                };
+                state.patients.push(newPatientListItem);
+                
+                // Also cache the full patient details
+                state.patientDetails[newPatient.id] = newPatient;
+                state.patientDetailsStatus[newPatient.id] = 'succeeded';
+                
+                state.createPatientStatus = 'succeeded';
+              });
+              
+              return newPatient;
+            } catch (error) {
+              set((state) => {
+                state.createPatientError =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to create patient';
+                state.createPatientStatus = 'failed';
+              });
+              return null;
+            }
+          },
+
           clearError() {
             set((state) => {
               state.error = null;
@@ -110,6 +166,15 @@ export const usePatientStore = create<PatientStore>()(
               state.patientDetailsErrors[id] = null;
               if (state.patientDetailsStatus[id] === 'failed') {
                 state.patientDetailsStatus[id] = 'idle';
+              }
+            });
+          },
+
+          clearCreatePatientError() {
+            set((state) => {
+              state.createPatientError = null;
+              if (state.createPatientStatus === 'failed') {
+                state.createPatientStatus = 'idle';
               }
             });
           },
