@@ -1,0 +1,191 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Patient API",
+    "description": "Patient management endpoints for healthcare clinic\n\n## Address Structure\nThe API now supports structured address fields for better data organization:\n\n**Patient Address Fields:**\n- `houseNumber` (optional): House/unit number\n- `streetName` (optional): Street name\n- `barangay` (optional): Barangay/district\n- `cityMunicipality` (optional): City or municipality\n- `province` (optional): Province/region\n\n**Guardian Address Fields:**\n- `guardianHouseNumber` (optional): Guardian's house/unit number\n- `guardianStreetName` (optional): Guardian's street name\n- `guardianBarangay` (optional): Guardian's barangay/district\n- `guardianCityMunicipality` (optional): Guardian's city or municipality\n- `guardianProvince` (optional): Guardian's province/region\n\n**Note:** At least one address field is required. The API maintains backward compatibility by providing computed `address` and `guardianAddress` fields in responses.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 2,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "Get Patient Statistics",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/patients/total",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients", "total"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Patients",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/patients",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Patient by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/patients/{{patient_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients", "{{patient_id}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create New Patient",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Dela Cruz\",\n  \"middleName\": \"Santos\",\n  \"dateOfBirth\": \"1990-05-15\",\n  \"gender\": \"Male\",\n  \"contactNumber\": \"09171234567\",\n  \"houseNumber\": \"123\",\n  \"streetName\": \"Main Street\",\n  \"barangay\": \"Barangay Santo Niño\",\n  \"cityMunicipality\": \"Quezon City\",\n  \"province\": \"Metro Manila\",\n  \"guardianName\": \"Maria Dela Cruz\",\n  \"guardianGender\": \"Female\",\n  \"guardianRelationship\": \"Mother\",\n  \"guardianContactNumber\": \"09187654321\",\n  \"guardianHouseNumber\": \"123\",\n  \"guardianStreetName\": \"Main Street\",\n  \"guardianBarangay\": \"Barangay Santo Niño\",\n  \"guardianCityMunicipality\": \"Quezon City\",\n  \"guardianProvince\": \"Metro Manila\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/patients",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Patient - Minimal Data",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Garcia\",\n  \"dateOfBirth\": \"1985-12-25\",\n  \"gender\": \"Female\",\n  \"contactNumber\": \"09281234567\",\n  \"houseNumber\": \"456\",\n  \"streetName\": \"Oak Avenue\",\n  \"barangay\": \"Poblacion\",\n  \"cityMunicipality\": \"Makati City\",\n  \"province\": \"Metro Manila\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/patients",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Patient - Child with Guardian",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Miguel\",\n  \"lastName\": \"Santos\",\n  \"middleName\": \"Cruz\",\n  \"dateOfBirth\": \"2015-08-10\",\n  \"gender\": \"Male\",\n  \"contactNumber\": \"09351234567\",\n  \"houseNumber\": \"789\",\n  \"streetName\": \"Pine Street\",\n  \"barangay\": \"San Antonio\",\n  \"cityMunicipality\": \"Pasig City\",\n  \"province\": \"Metro Manila\",\n  \"guardianName\": \"Rosa Santos\",\n  \"guardianGender\": \"Female\",\n  \"guardianRelationship\": \"Mother\",\n  \"guardianContactNumber\": \"09361234567\",\n  \"guardianHouseNumber\": \"789\",\n  \"guardianStreetName\": \"Pine Street\",\n  \"guardianBarangay\": \"San Antonio\",\n  \"guardianCityMunicipality\": \"Pasig City\",\n  \"guardianProvince\": \"Metro Manila\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/patients",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Patient - Partial Address",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Carlos\",\n  \"lastName\": \"Reyes\",\n  \"dateOfBirth\": \"1978-03-22\",\n  \"gender\": \"Male\",\n  \"contactNumber\": \"09451234567\",\n  \"streetName\": \"Rizal Avenue\",\n  \"cityMunicipality\": \"Cebu City\",\n  \"province\": \"Cebu\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/patients",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Patient - Complete Address Details",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Isabella\",\n  \"lastName\": \"Rodriguez\",\n  \"middleName\": \"Fernandez\",\n  \"dateOfBirth\": \"1992-11-08\",\n  \"gender\": \"Female\",\n  \"contactNumber\": \"09561234567\",\n  \"houseNumber\": \"Unit 2B, Tower 1\",\n  \"streetName\": \"Ayala Avenue\",\n  \"barangay\": \"Bel-Air\",\n  \"cityMunicipality\": \"Makati City\",\n  \"province\": \"Metro Manila\",\n  \"guardianName\": \"Elena Rodriguez\",\n  \"guardianGender\": \"Female\",\n  \"guardianRelationship\": \"Sister\",\n  \"guardianContactNumber\": \"09571234567\",\n  \"guardianHouseNumber\": \"45\",\n  \"guardianStreetName\": \"Taft Avenue\",\n  \"guardianBarangay\": \"Malate\",\n  \"guardianCityMunicipality\": \"Manila\",\n  \"guardianProvince\": \"Metro Manila\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/patients",
+          "host": ["{{base_url}}"],
+          "path": ["api", "patients"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "patient_id",
+      "value": "replace-with-actual-patient-id",
+      "type": "string"
+    }
+  ]
+}
