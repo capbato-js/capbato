@@ -1,4 +1,4 @@
-import { LoginUserCommand, LoginUserResponseDto } from '@nx-starter/application-shared';
+import { LoginUserCommand, LoginUserResponseDto, RegisterUserCommand } from '@nx-starter/application-shared';
 
 /**
  * Authentication API Service Interface
@@ -9,6 +9,11 @@ export interface IAuthApiService {
    * Login user with credentials
    */
   login(command: LoginUserCommand): Promise<LoginUserResponseDto>;
+  
+  /**
+   * Register new user account
+   */
+  register(command: RegisterUserCommand): Promise<{ id: string }>;
   
   /**
    * Validate JWT token

@@ -1,51 +1,59 @@
 import { useState, useCallback } from 'react';
+import { container, TOKENS } from '../../../../infrastructure/di/container';
+import { IAuthCommandService, RegisterUserCommand } from '@nx-starter/application-shared';
+import { extractErrorMessage } from '../../../../infrastructure/utils/ErrorMapping';
 
 export interface Account {
   id: number;
-  name: string;
+  firstName: string;
+  lastName: string;
   role: 'admin' | 'doctor' | 'receptionist';
   email: string;
-  phone: string;
+  mobile?: string;
 }
 
 export interface CreateAccountData {
-  fullName: string;
-  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   password: string;
   role: string;
-  email: string;
-  phone: string;
+  mobile?: string;
 }
 
 // Dummy data for accounts
 const initialAccounts: Account[] = [
   {
     id: 1,
-    name: 'Anjela Depanes',
+    firstName: 'Anjela',
+    lastName: 'Depanes',
     role: 'receptionist',
     email: 'anjela.depanes@clinic.com',
-    phone: '09123456789'
+    mobile: '09123456789'
   },
   {
     id: 2,
-    name: 'abcd',
+    firstName: 'ABCD',
+    lastName: 'User',
     role: 'receptionist',
     email: 'abcd@clinic.com',
-    phone: '09987654321'
+    mobile: '09987654321'
   },
   {
     id: 3,
-    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     role: 'doctor',
     email: 'dr.johndoe@clinic.com',
-    phone: '09111222333'
+    mobile: '09111222333'
   },
   {
     id: 4,
-    name: 'AJ Admin',
+    firstName: 'AJ',
+    lastName: 'Admin',
     role: 'admin',
     email: 'admin@clinic.com',
-    phone: '09444555666'
+    mobile: '09444555666'
   }
 ];
 
@@ -59,48 +67,42 @@ export const useAccountsViewModel = () => {
     setError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Get the auth command service from the container
+      const authCommandService = container.resolve<IAuthCommandService>(TOKENS.AuthCommandService);
       
-      // Validate required fields
-      if (!data.fullName || !data.username || !data.password || !data.role || !data.email) {
-        throw new Error('All required fields must be filled');
-      }
+      // Create the register command
+      const registerCommand: RegisterUserCommand = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        mobile: data.mobile
+      };
       
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(data.email)) {
-        throw new Error('Please enter a valid email address');
-      }
+      // Call the API to create the account
+      const result = await authCommandService.register(registerCommand);
       
-      // Validate phone format (Philippine format)
-      if (data.phone && !/^09[0-9]{9}$/.test(data.phone)) {
-        throw new Error('Phone number must start with 09 and be 11 digits');
-      }
-      
-      // Check if username already exists
-      if (accounts.some(account => account.name.toLowerCase() === data.fullName.toLowerCase())) {
-        throw new Error('An account with this name already exists');
-      }
-      
-      // Create new account
+      // Create new account for local state with generated ID from API
       const newAccount: Account = {
-        id: Date.now(),
-        name: data.fullName,
+        id: parseInt(result.id, 10), // Convert string ID to number for local state
+        firstName: data.firstName,
+        lastName: data.lastName,
         role: data.role as 'admin' | 'doctor' | 'receptionist',
         email: data.email,
-        phone: data.phone
+        mobile: data.mobile
       };
       
       setAccounts(prev => [...prev, newAccount]);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create account');
+      const errorMessage = extractErrorMessage(err);
+      setError(errorMessage);
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [accounts]);
+  }, []);
 
   const changeAccountPassword = useCallback(async (accountId: number, newPassword: string): Promise<boolean> => {
     setIsLoading(true);

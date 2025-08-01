@@ -1,4 +1,4 @@
-import { LoginUserCommand, LoginUserResponseDto } from '../dto';
+import { LoginUserCommand, LoginUserResponseDto, RegisterUserCommand } from '../dto';
 
 /**
  * Authentication Command Service Interface
@@ -9,6 +9,11 @@ export interface IAuthCommandService {
    * Process user login
    */
   login(command: LoginUserCommand): Promise<LoginUserResponseDto>;
+  
+  /**
+   * Process user registration
+   */
+  register(command: RegisterUserCommand): Promise<{ id: string }>;
 }
 
 /**

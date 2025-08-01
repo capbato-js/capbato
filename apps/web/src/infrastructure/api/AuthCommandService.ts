@@ -4,6 +4,7 @@ import { IAuthApiService } from '../api/IAuthApiService';
 import {
   LoginUserCommand,
   LoginUserResponseDto,
+  RegisterUserCommand,
   TOKENS,
 } from '@nx-starter/application-shared';
 import { extractErrorMessage } from '../utils/ErrorMapping';
@@ -21,6 +22,16 @@ export class AuthCommandService implements IAuthCommandService {
   async login(command: LoginUserCommand): Promise<LoginUserResponseDto> {
     try {
       return await this.authApiService.login(command);
+    } catch (error: unknown) {
+      // Use the unified error extraction utility that handles typed errors
+      const errorMessage = extractErrorMessage(error);
+      throw new Error(errorMessage);
+    }
+  }
+
+  async register(command: RegisterUserCommand): Promise<{ id: string }> {
+    try {
+      return await this.authApiService.register(command);
     } catch (error: unknown) {
       // Use the unified error extraction utility that handles typed errors
       const errorMessage = extractErrorMessage(error);

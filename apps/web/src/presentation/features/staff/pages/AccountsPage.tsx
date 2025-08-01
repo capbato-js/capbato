@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   Box, 
   Button,
@@ -11,6 +13,7 @@ import {
   Loader 
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { RegisterUserCommandSchema } from '@nx-starter/application-shared';
 import { Icon } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
@@ -33,37 +36,38 @@ export const AccountsPage: React.FC = () => {
     newPassword: '',
     confirmPassword: ''
   });
-  const [formData, setFormData] = useState<CreateAccountData>({
-    fullName: '',
-    username: '',
-    password: '',
-    role: '',
-    email: '',
-    phone: ''
-  });
-  const [formError, setFormError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const handleCreateAccount = async () => {
-    setFormError(null);
-    
-    const success = await createAccount(formData);
+  // React Hook Form setup for create account
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm<CreateAccountData>({
+    resolver: zodResolver(RegisterUserCommandSchema),
+    mode: 'onChange',
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      role: '',
+      mobile: '',
+    },
+  });
+
+  const onSubmit = handleSubmit(async (data: CreateAccountData) => {
+    const success = await createAccount(data);
     
     if (success) {
-      // Reset form and close modal
-      setFormData({
-        fullName: '',
-        username: '',
-        password: '',
-        role: '',
-        email: '',
-        phone: ''
-      });
-      close();
-    } else if (error) {
-      setFormError(error);
+      reset(); // Reset form
+      close(); // Close modal
+      // Accounts list will refresh automatically via view model
     }
-  };
+    // Error handling is managed by the view model and displayed via error state
+  });
 
   const handleChangePassword = (account: Account) => {
     setSelectedAccount(account);
@@ -145,15 +149,8 @@ export const AccountsPage: React.FC = () => {
   ];
 
   const handleCloseModal = () => {
-    setFormData({
-      fullName: '',
-      username: '',
-      password: '',
-      role: '',
-      email: '',
-      phone: ''
-    });
-    setFormError(null);
+    reset(); // Reset form using React Hook Form
+    clearError(); // Clear any view model errors
     close();
   };
 
@@ -244,84 +241,80 @@ export const AccountsPage: React.FC = () => {
           }
         }}
       >
-        <Stack gap="md">
-          {formError && (
-            <Alert color="red" style={{ marginBottom: '10px' }}>
-              {formError}
-            </Alert>
-          )}
-
-          <TextInput
-            label="Full Name"
-            placeholder="Enter full name"
-            value={formData.fullName}
-            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            required
+        <form onSubmit={onSubmit}>
+          <Stack gap="md">
+            <TextInput
+            label="First Name"
+            placeholder="Enter first name"
+            error={errors.firstName?.message}
             disabled={isLoading}
+            {...register('firstName')}
           />
           
           <TextInput
-            label="Username"
-            placeholder="Enter username"
-            value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            required
+            label="Last Name"
+            placeholder="Enter last name"
+            error={errors.lastName?.message}
             disabled={isLoading}
-          />
-          
-          <TextInput
-            label="Password"
-            type="password"
-            placeholder="Enter password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-            disabled={isLoading}
-          />
-          
-          <Select
-            label="Role"
-            placeholder="Select role"
-            value={formData.role}
-            onChange={(value) => setFormData({ ...formData, role: value || '' })}
-            data={[
-              { value: 'admin', label: 'Admin' },
-              { value: 'receptionist', label: 'Receptionist' },
-              { value: 'doctor', label: 'Doctor' }
-            ]}
-            required
-            disabled={isLoading}
+            {...register('lastName')}
           />
           
           <TextInput
             label="Email"
             type="email"
             placeholder="Enter email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
+            error={errors.email?.message}
             disabled={isLoading}
+            {...register('email')}
           />
           
           <TextInput
-            label="Phone"
+            label="Password"
+            type="password"
+            placeholder="Enter password"
+            error={errors.password?.message}
+            disabled={isLoading}
+            {...register('password')}
+          />
+          
+          <Controller
+            name="role"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Role"
+                placeholder="Select role"
+                error={fieldState.error?.message}
+                data={[
+                  { value: 'admin', label: 'Admin' },
+                  { value: 'receptionist', label: 'Receptionist' },
+                  { value: 'doctor', label: 'Doctor' }
+                ]}
+                disabled={isLoading}
+                {...field}
+              />
+            )}
+          />
+          
+          <TextInput
+            label="Mobile Number"
             placeholder="09XXXXXXXXX"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            error={errors.mobile?.message}
             maxLength={11}
             disabled={isLoading}
+            {...register('mobile')}
           />
           
           <Button
-            onClick={handleCreateAccount}
+            type="submit"
             loading={isLoading}
             fullWidth
             mt="md"
-            disabled={!formData.fullName || !formData.username || !formData.password || !formData.role || !formData.email}
           >
             {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </Stack>
+        </form>
       </Modal>
 
       {/* Change Password Modal */}
@@ -365,7 +358,7 @@ export const AccountsPage: React.FC = () => {
           )}
 
           <Text style={{ marginBottom: '10px', color: '#666' }}>
-            New Password for <strong style={{ color: '#1976d2' }}>{selectedAccount?.name}</strong>
+            New Password for <strong style={{ color: '#1976d2' }}>{selectedAccount?.firstName} {selectedAccount?.lastName}</strong>
           </Text>
 
           <TextInput

@@ -5,6 +5,7 @@ import { getApiConfig } from './config/ApiConfig';
 import {
   LoginUserCommand,
   LoginUserResponseDto,
+  RegisterUserCommand,
   ApiSuccessResponse,
   TOKENS,
 } from '@nx-starter/application-shared';
@@ -47,6 +48,31 @@ export class AuthApiService implements IAuthApiService {
     
     console.log('🔐 AuthApiService received response:', apiResponse);
     console.log('🔐 AuthApiService extracting token:', apiResponse.data.token);
+    
+    return apiResponse.data;
+  }
+
+  async register(command: RegisterUserCommand): Promise<{ id: string }> {
+    if (!this.apiConfig.endpoints.auth) {
+      throw new Error('Authentication endpoints not configured');
+    }
+    
+    const response = await this.httpClient.post<ApiSuccessResponse<{ id: string }>>(
+      this.apiConfig.endpoints.auth.register,
+      command
+    );
+    
+    if (!response.data) {
+      throw new Error('Registration failed - no response data');
+    }
+    
+    // Extract the actual registration data from the API response wrapper
+    const apiResponse = response.data;
+    if (!apiResponse.success || !apiResponse.data) {
+      throw new Error('Registration failed - invalid response format');
+    }
+    
+    console.log('🔐 AuthApiService register response:', apiResponse);
     
     return apiResponse.data;
   }
