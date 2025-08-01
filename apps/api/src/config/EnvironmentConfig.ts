@@ -2,7 +2,20 @@
  * Environment Variable Mappings and Default Values
  * Maps environment variables to application configuration with enhanced type safety
  * 
- * This module handles the mapping of environment variables to typed configuration objects.
+ * This module h    security: {
+      cors: {
+        origin: parseCorsOrigins('CORS_ORIGIN', process.env.CORS_ORIGIN, [
+          'http://localhost:3000',
+          'http://localhost:4200',
+          'http://localhost:5173',
+          'http://127.0.0.1:3000',
+          'http://127.0.0.1:4200',
+          'http://127.0.0.1:5173'
+        ]),
+        credentials: parseBoolean('CORS_CREDENTIALS', process.env.CORS_CREDENTIALS, true),
+        methods: parseArray('CORS_METHODS', process.env.CORS_METHODS, ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
+        allowedHeaders: parseArray('CORS_ALLOWED_HEADERS', process.env.CORS_ALLOWED_HEADERS, ['Content-Type', 'Authorization']),
+      },the mapping of environment variables to typed configuration objects.
  * It provides robust validation, type conversion, and error handling for all environment
  * variables used by the application.
  * 
@@ -103,6 +116,33 @@ export function getEnvironmentConfig(): AppConfig {
       // Fallback to comma-separated parsing
       return value.split(',').map(s => s.trim()).filter(s => s.length > 0);
     }
+  };
+
+  // Helper function to parse CORS origins (can be string or array)
+  const parseCorsOrigins = (envVar: string, value: string | undefined, defaultValue: string | string[]): string | string[] => {
+    if (!value) return defaultValue;
+    
+    // Try to parse as JSON array first
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(item => typeof item === 'string');
+      }
+      // If it's a string in JSON format, return as single string
+      if (typeof parsed === 'string') {
+        return parsed;
+      }
+    } catch (error) {
+      // Not valid JSON, continue with fallback parsing
+    }
+    
+    // Check if it contains comma (multiple origins)
+    if (value.includes(',')) {
+      return value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    }
+    
+    // Single origin
+    return value.trim();
   };
 
   // Helper function to validate required string values
@@ -301,7 +341,11 @@ export const environmentOverrides = {
   staging: {
     security: {
       cors: {
-        origin: process.env.STAGING_CORS_ORIGIN || 'https://staging.yourapp.com',
+        origin: process.env.STAGING_CORS_ORIGIN ? 
+          (process.env.STAGING_CORS_ORIGIN.includes(',') ? 
+            process.env.STAGING_CORS_ORIGIN.split(',').map(s => s.trim()) : 
+            process.env.STAGING_CORS_ORIGIN) : 
+          'https://staging.yourapp.com',
       },
       rateLimit: {
         maxRequests: 200,
@@ -327,7 +371,11 @@ export const environmentOverrides = {
     },
     security: {
       cors: {
-        origin: process.env.PRODUCTION_CORS_ORIGIN || 'https://yourapp.com',
+        origin: process.env.PRODUCTION_CORS_ORIGIN ? 
+          (process.env.PRODUCTION_CORS_ORIGIN.includes(',') ? 
+            process.env.PRODUCTION_CORS_ORIGIN.split(',').map(s => s.trim()) : 
+            process.env.PRODUCTION_CORS_ORIGIN) : 
+          'https://yourapp.com',
       },
       jwt: {
         expiresIn: '24h', // Shorter token expiration in production
