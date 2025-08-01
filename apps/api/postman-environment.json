@@ -1,34 +1,13 @@
 {
-  "id": "task-app-environment",
-  "name": "Task App Development Environment",
+  "id": "clinic-management-environment",
+  "name": "Clinic Management System Environment",
   "values": [
     {
       "key": "baseUrl",
       "value": "http://localhost:4000",
       "enabled": true,
       "type": "default",
-      "description": "Base URL for the Task App API server"
-    },
-    {
-      "key": "sampleTodoId",
-      "value": "todo-123",
-      "enabled": true,
-      "type": "default",
-      "description": "Sample todo ID for testing. Replace with actual ID from create todo response."
-    },
-    {
-      "key": "testUserEmail",
-      "value": "test.user@example.com",
-      "enabled": true,
-      "type": "default",
-      "description": "Test email for user registration scenarios"
-    },
-    {
-      "key": "testUserId",
-      "value": "",
-      "enabled": true,
-      "type": "default",
-      "description": "Test user ID from registration response"
+      "description": "Base URL for the Clinic Management System API server"
     },
     {
       "key": "authToken",
@@ -38,32 +17,74 @@
       "description": "JWT authentication token from login response"
     },
     {
+      "key": "testUserId",
+      "value": "",
+      "enabled": true,
+      "type": "default",
+      "description": "Test user ID from registration response"
+    },
+    {
+      "key": "testPatientId",
+      "value": "",
+      "enabled": true,
+      "type": "default",
+      "description": "Test patient ID from patient creation response"
+    },
+    {
+      "key": "todoId",
+      "value": "",
+      "enabled": true,
+      "type": "default",
+      "description": "Todo ID from todo creation response"
+    },
+    {
+      "key": "testEmail",
+      "value": "",
+      "enabled": true,
+      "type": "default",
+      "description": "Dynamic test email for registration scenarios"
+    },
+    {
       "key": "loginTestEmail",
-      "value": "login.test@example.com",
+      "value": "test.admin@clinic.com",
       "enabled": true,
       "type": "default",
       "description": "Fixed email for login testing scenarios"
     },
     {
       "key": "loginTestPassword",
-      "value": "LoginTest123",
+      "value": "AdminPass123",
       "enabled": true,
       "type": "default",
       "description": "Fixed password for login testing scenarios"
     },
     {
-      "key": "loginTestUserId",
-      "value": "",
+      "key": "doctorTestEmail",
+      "value": "doctor.test@clinic.com",
       "enabled": true,
       "type": "default",
-      "description": "User ID from login test user registration"
+      "description": "Fixed email for doctor role testing"
     },
     {
-      "key": "loginTestUsername",
-      "value": "",
+      "key": "doctorTestPassword",
+      "value": "DoctorPass123",
       "enabled": true,
       "type": "default",
-      "description": "Username generated for login test user"
+      "description": "Fixed password for doctor role testing"
+    },
+    {
+      "key": "receptionistTestEmail",
+      "value": "receptionist.test@clinic.com",
+      "enabled": true,
+      "type": "default",
+      "description": "Fixed email for receptionist role testing"
+    },
+    {
+      "key": "receptionistTestPassword",
+      "value": "ReceptionistPass123",
+      "enabled": true,
+      "type": "default",
+      "description": "Fixed password for receptionist role testing"
     }
   ],
   "_postman_variable_scope": "environment",
