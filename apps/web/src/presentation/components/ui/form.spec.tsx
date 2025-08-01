@@ -10,7 +10,7 @@ import {
   FormDescription,
   FormMessage,
 } from './form';
-import { Input } from './input';
+import { FormTextInput } from './FormTextInput';
 import React from 'react';
 
 // Test wrapper component that uses react-hook-form
@@ -35,7 +35,7 @@ const TestForm = ({
             <FormItem>
               <FormLabel>Test Label</FormLabel>
               <FormControl>
-                <Input placeholder="Test input" {...field} />
+                <FormTextInput placeholder="Test input" {...field} />
               </FormControl>
               <FormDescription>This is a test description</FormDescription>
               <FormMessage />
@@ -98,7 +98,7 @@ describe('Form Components', () => {
                 <FormItem>
                   <FormLabel>Context Test</FormLabel>
                   <FormControl>
-                    <Input data-testid="context-input" {...field} />
+                    <FormTextInput data-testid="context-input" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -211,7 +211,7 @@ describe('Form Components', () => {
                   <FormItem>
                     <FormLabel>Error Label</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <FormTextInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -289,7 +289,7 @@ describe('Form Components', () => {
                   <FormItem>
                     <FormLabel>Test Field</FormLabel>
                     <FormControl>
-                      <Input placeholder="test input" {...field} />
+                      <FormTextInput placeholder="test input" {...field} />
                     </FormControl>
                     <FormDescription>Test description</FormDescription>
                     <FormMessage />
@@ -416,7 +416,7 @@ describe('Form Components', () => {
                   <FormItem>
                     <FormLabel>Test Field</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <FormTextInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -462,7 +462,7 @@ describe('Form Components', () => {
                 <FormItem>
                   <FormLabel>Test Field</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <FormTextInput {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -582,7 +582,7 @@ describe('Form Components', () => {
                   <FormItem>
                     <FormLabel>Required Field</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <FormTextInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

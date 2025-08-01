@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginFormSchema } from '@nx-starter/application-shared';
-import { Button, TextInput, Paper, Title, Checkbox, Alert, Group, Stack } from '@mantine/core';
+import { FormTextInput } from '../../../components/ui/FormTextInput';
+import { Button, Paper, Title, Checkbox, Group, Stack } from '@mantine/core';
 import { IconUser, IconLock, IconLogin } from '@tabler/icons-react';
 import { useLoginFormViewModel } from '../view-models/useLoginFormViewModel';
 import type { LoginFormData } from '../types';
@@ -107,7 +108,7 @@ export const LoginForm: React.FC = () => {
           {/* Error message */}
           {viewModel.error && (
             <div 
-              className="text-red-600 text-sm mb-4 text-center text-[crimson]"
+              className="text-red-600 text-sm mb-4 text-center"
               data-testid="login-error"
             >
               {viewModel.error}
@@ -117,33 +118,33 @@ export const LoginForm: React.FC = () => {
         <form onSubmit={onSubmit} onKeyDown={handleKeyDown}>
           <Stack gap="md">
             {/* Username/Email Field */}
-            <TextInput
+            <FormTextInput
               {...register('identifier')}
               label="Username or Email"
-              placeholder={errors.identifier?.message ? "" : "Enter your username or email"}
+              placeholder="Enter your username or email"
               leftSection={<IconUser size={18} />}
               disabled={viewModel.isSubmitting}
               onChange={(e) => {
                 register('identifier').onChange(e);
                 handleInputChange();
               }}
-              error={errors.identifier?.message}
+              error={errors.identifier}
               data-testid="login-identifier-input"
             />
 
             {/* Password Field */}
-            <TextInput
+            <FormTextInput
               {...register('password')}
               type="password"
               label="Password"
-              placeholder={errors.password?.message ? "" : "Enter your password"}
+              placeholder="Enter your password"
               leftSection={<IconLock size={18} />}
               disabled={viewModel.isSubmitting}
               onChange={(e) => {
                 register('password').onChange(e);
                 handleInputChange();
               }}
-              error={errors.password?.message}
+              error={errors.password}
               data-testid="login-password-input"
             />
 

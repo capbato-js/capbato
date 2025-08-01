@@ -1,7 +1,7 @@
 import React from 'react';
 import { Todo } from '@nx-starter/domain';
 import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
+import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Checkbox } from '../../../components/ui/checkbox';
 import { cn } from '../../../../lib/utils';
@@ -34,7 +34,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
 
           {viewModel.isEditing ? (
             <div className="flex-1 flex gap-2">
-              <Input
+              <FormTextInput
                 value={viewModel.editTitle}
                 onChange={(e) =>
                   viewModel.handleEditTitleChange(e.target.value)

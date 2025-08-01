@@ -25,6 +25,7 @@ export {
   LoginUserCommandSchema,
   LoginFormSchema,
   ChangeUserPasswordCommandSchema,
+  ChangePasswordFormSchema,
   GetAllUsersQuerySchema,
   FirstNameSchema,
   LastNameSchema,

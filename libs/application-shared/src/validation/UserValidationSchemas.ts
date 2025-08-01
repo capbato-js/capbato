@@ -122,6 +122,15 @@ export const ChangeUserPasswordCommandSchema = z.object({
   newPassword: PasswordSchema,
 });
 
+// Change password form validation schema (with confirmation)
+export const ChangePasswordFormSchema = z.object({
+  newPassword: PasswordSchema,
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
 // Get all users query schema (empty object)  
 export const GetAllUsersQuerySchema = z.object({});
 
@@ -131,6 +140,7 @@ export const UserValidationSchemas = {
   LoginUserCommand: LoginUserCommandSchema,
   LoginForm: LoginFormSchema,
   ChangeUserPasswordCommand: ChangeUserPasswordCommandSchema,
+  ChangePasswordForm: ChangePasswordFormSchema,
   GetAllUsersQuery: GetAllUsersQuerySchema,
   FirstName: FirstNameSchema,
   LastName: LastNameSchema,

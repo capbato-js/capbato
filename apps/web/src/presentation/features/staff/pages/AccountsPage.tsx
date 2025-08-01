@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   Box, 
   Button,
-  TextInput,
-  Select,
-  Stack,
   Text,
   Alert,
   Loader 
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { RegisterUserCommandSchema } from '@nx-starter/application-shared';
 import { Icon, Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useAccountsViewModel';
+import { CreateAccountForm, ChangePasswordForm } from '../components';
 
 export const AccountsPage: React.FC = () => {
   const {
@@ -31,65 +26,33 @@ export const AccountsPage: React.FC = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [passwordModalOpened, { open: openPasswordModal, close: closePasswordModal }] = useDisclosure(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [passwordData, setPasswordData] = useState({
-    newPassword: '',
-    confirmPassword: ''
-  });
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  // React Hook Form setup for create account
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    formState: { errors },
-  } = useForm<CreateAccountData>({
-    resolver: zodResolver(RegisterUserCommandSchema),
-    mode: 'onChange',
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      role: '',
-      mobile: '',
-    },
-  });
-
-  const onSubmit = handleSubmit(async (data: CreateAccountData) => {
+  const handleCreateAccount = async (data: CreateAccountData) => {
     const success = await createAccount(data);
     
     if (success) {
-      reset(); // Reset form
       close(); // Close modal
       // Accounts list will refresh automatically via view model
     }
     // Error handling is managed by the view model and displayed via error state
-  });
+  };
 
   const handleChangePassword = (account: Account) => {
     setSelectedAccount(account);
-    setPasswordData({ newPassword: '', confirmPassword: '' });
     setPasswordError(null);
     openPasswordModal();
   };
 
-  const handlePasswordSubmit = async () => {
+  const handlePasswordSubmit = async (newPassword: string) => {
     setPasswordError(null);
     
     if (!selectedAccount) return;
     
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError('Passwords do not match.');
-      return;
-    }
-    
-    const success = await changeAccountPassword(selectedAccount.id, passwordData.newPassword);
+    const success = await changeAccountPassword(selectedAccount.id, newPassword);
     
     if (success) {
       closePasswordModal();
-      setPasswordData({ newPassword: '', confirmPassword: '' });
       setSelectedAccount(null);
       // Show success message - you might want to use a notification system instead
       alert('Password changed successfully!');
@@ -148,13 +111,11 @@ export const AccountsPage: React.FC = () => {
   ];
 
   const handleCloseModal = () => {
-    reset(); // Reset form using React Hook Form
     clearError(); // Clear any view model errors
     close();
   };
 
   const handleClosePasswordModal = () => {
-    setPasswordData({ newPassword: '', confirmPassword: '' });
     setPasswordError(null);
     setSelectedAccount(null);
     closePasswordModal();
@@ -213,85 +174,10 @@ export const AccountsPage: React.FC = () => {
         onClose={handleCloseModal}
         title="Create Account"
       >
-        <form onSubmit={onSubmit} noValidate>
-          <Stack gap="md">
-            <TextInput
-            label="First Name"
-            placeholder="Enter first name"
-            error={errors.firstName?.message}
-            disabled={isLoading}
-            required
-            {...register('firstName')}
-          />
-          
-          <TextInput
-            label="Last Name"
-            placeholder="Enter last name"
-            error={errors.lastName?.message}
-            disabled={isLoading}
-            required
-            {...register('lastName')}
-          />
-          
-          <TextInput
-            label="Email"
-            type="email"
-            placeholder="Enter email"
-            error={errors.email?.message}
-            disabled={isLoading}
-            required
-            {...register('email')}
-          />
-          
-          <TextInput
-            label="Password"
-            type="password"
-            placeholder="Enter password"
-            error={errors.password?.message}
-            disabled={isLoading}
-            required
-            {...register('password')}
-          />
-          
-          <Controller
-            name="role"
-            control={control}
-            render={({ field, fieldState }) => (
-              <Select
-                label="Role"
-                placeholder="Select role"
-                error={fieldState.error?.message}
-                data={[
-                  { value: 'admin', label: 'Admin' },
-                  { value: 'receptionist', label: 'Receptionist' },
-                  { value: 'doctor', label: 'Doctor' }
-                ]}
-                disabled={isLoading}
-                required
-                {...field}
-              />
-            )}
-          />
-          
-          <TextInput
-            label="Mobile Number"
-            placeholder="09XXXXXXXXX"
-            error={errors.mobile?.message}
-            maxLength={11}
-            disabled={isLoading}
-            {...register('mobile')}
-          />
-          
-          <Button
-            type="submit"
-            loading={isLoading}
-            fullWidth
-            mt="md"
-          >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
-          </Button>
-        </Stack>
-        </form>
+        <CreateAccountForm
+          onSubmit={handleCreateAccount}
+          isLoading={isLoading}
+        />
       </Modal>
 
       {/* Change Password Modal */}
@@ -300,50 +186,14 @@ export const AccountsPage: React.FC = () => {
         onClose={handleClosePasswordModal}
         title="Change Password"
       >
-        <form onSubmit={(e) => { e.preventDefault(); handlePasswordSubmit(); }} noValidate>
-          <Stack gap="md">
-            {passwordError && (
-              <Alert color="red" style={{ marginBottom: '10px' }}>
-                {passwordError}
-              </Alert>
-            )}
-
-            <Text style={{ marginBottom: '10px', color: '#666' }}>
-              New Password for <strong style={{ color: '#1976d2' }}>{selectedAccount?.firstName} {selectedAccount?.lastName}</strong>
-            </Text>
-
-            <TextInput
-              label="New Password"
-              type="password"
-              placeholder="Enter new password"
-              value={passwordData.newPassword}
-              onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-              disabled={isLoading}
-              required
-            />
-            
-            <TextInput
-              label="Confirm Password"
-              type="password"
-              placeholder="Confirm new password"
-              value={passwordData.confirmPassword}
-              onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-              disabled={isLoading}
-              required
-            />
-            
-            <Button
-              type="submit"
-              loading={isLoading}
-              fullWidth
-              mt="md"
-              disabled={!passwordData.newPassword || !passwordData.confirmPassword}
-            >
-              <Icon icon="fas fa-key" style={{ marginRight: '4px' }} />
-              {isLoading ? 'Changing Password...' : 'Change Password'}
-            </Button>
-          </Stack>
-        </form>
+        {selectedAccount && (
+          <ChangePasswordForm
+            account={selectedAccount}
+            onSubmit={handlePasswordSubmit}
+            isLoading={isLoading}
+            error={passwordError}
+          />
+        )}
       </Modal>
     </MedicalClinicLayout>
   );
