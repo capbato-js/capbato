@@ -8,3 +8,5 @@ export { AuthCommandService } from './AuthCommandService';
 export { IPatientApiService } from './IPatientApiService';
 export { PatientApiService } from './PatientApiService';
 export { ApiPatientRepository } from './ApiPatientRepository';
+export { IUserApiService } from './IUserApiService';
+export { UserApiService } from './UserApiService';

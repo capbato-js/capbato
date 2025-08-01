@@ -13,6 +13,9 @@ import { AuthCommandService } from '../api/AuthCommandService';
 import { IPatientApiService } from '../api/IPatientApiService';
 import { PatientApiService } from '../api/PatientApiService';
 import { ApiPatientRepository } from '../api/ApiPatientRepository';
+import { IUserApiService } from '../api/IUserApiService';
+import { UserApiService } from '../api/UserApiService';
+import { WebUserQueryService } from '../services/WebUserQueryService';
 import { getFeatureFlags, configProvider } from '../config';
 import {
   TodoCommandService,
@@ -39,6 +42,7 @@ import type {
   IAuthCommandService,
   IPatientQueryService,
   IPatientRepository,
+  IUserQueryService,
 } from '@nx-starter/application-shared';
 
 // Initialize configuration before using it
@@ -57,6 +61,7 @@ export const configureDI = () => {
   // Infrastructure Layer - API Services (always register for potential future use)
   container.registerSingleton<ITodoApiService>(TOKENS.TodoApiService, TodoApiService);
   container.registerSingleton<IPatientApiService>(TOKENS.PatientApiService, PatientApiService);
+  container.registerSingleton<IUserApiService>(TOKENS.UserApiService, UserApiService);
   
   // Auth API Service - use mock in development if auth is not enabled
   if (enableAuth && useApiBackend) {
@@ -148,6 +153,10 @@ export const configureDI = () => {
   container.registerSingleton<IPatientQueryService>(
     TOKENS.PatientQueryService,
     PatientQueryService
+  );
+  container.registerSingleton<IUserQueryService>(
+    TOKENS.UserQueryService,
+    WebUserQueryService
   );
 };
 

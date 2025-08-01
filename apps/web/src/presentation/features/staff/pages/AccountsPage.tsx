@@ -10,7 +10,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Icon, Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useAccountsViewModel';
+import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useEnhancedAccountsViewModel';
 import { CreateAccountForm, ChangePasswordForm } from '../components';
 
 export const AccountsPage: React.FC = () => {
@@ -88,7 +88,7 @@ export const AccountsPage: React.FC = () => {
       width: '30%',
       align: 'center',
       searchable: false,
-      render: (value: number, record: Account) => (
+      render: (value: string, record: Account) => (
         <Button
           size="xs"
           onClick={() => handleChangePassword(record)}
@@ -158,7 +158,10 @@ export const AccountsPage: React.FC = () => {
           </Box>
         ) : (
           <DataTable
-            data={accounts}
+            data={accounts.map(account => ({
+              ...account,
+              name: `${account.firstName} ${account.lastName}`
+            }))}
             columns={columns}
             searchable={true}
             searchPlaceholder="Search accounts by name or role..."

@@ -5,6 +5,7 @@ export const TOKENS = {
   TodoApiService: 'ITodoApiService',
   AuthApiService: 'IAuthApiService',
   PatientApiService: 'IPatientApiService',
+  UserApiService: 'IUserApiService',
   
   // Infrastructure Layer - Repositories
   TodoRepository: 'ITodoRepository',
@@ -22,6 +23,7 @@ export const TOKENS = {
   AuthCommandService: 'IAuthCommandService',
   AuthQueryService: 'IAuthQueryService',
   PatientQueryService: 'IPatientQueryService',
+  UserQueryService: 'IUserQueryService',
 
   // Application Layer - Use Cases (Commands)
   CreateTodoUseCase: 'CreateTodoUseCase',
