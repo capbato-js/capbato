@@ -6,7 +6,7 @@
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
   "dependencies": {
-    "@nx-starter/domain": "*",
+    "@nx-starter/domain": "workspace:*",
     "tsyringe": "^4.10.0",
     "zod": "^4.0.5",
     "tslib": "^2.3.0",
