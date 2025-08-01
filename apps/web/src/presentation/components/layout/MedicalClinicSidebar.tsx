@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Box, UnstyledButton, Group, Text } from '@mantine/core';
 import { Icon } from '../common';
+import styles from './MedicalClinicSidebar.module.css';
 
 interface NavigationItem {
   path: string;
@@ -77,6 +78,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
               <UnstyledButton
                 component={NavLink}
                 to={item.path}
+                className={styles.navItem}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -95,6 +97,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
               <Group gap="sm">
                 <Icon 
                   icon={item.icon} 
+                  className={styles.navIcon}
                   style={{ 
                     fontSize: '16px',
                     color: isActive ? '#4db6ac' : '#666',
@@ -104,6 +107,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                 <Text 
                   size="sm" 
                   data-text-element="true"
+                  className={styles.navText}
                   style={{ 
                     color: isActive ? '#4db6ac' : '#666',
                     fontSize: '14px',

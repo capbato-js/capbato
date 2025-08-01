@@ -1,0 +1,14 @@
+/* Medical Clinic Sidebar Hover Styles */
+.navItem {
+  transition: all 0.3s ease;
+}
+
+.navItem:hover {
+  background-color: #f8f9fa !important;
+  color: #4db6ac !important;
+}
+
+.navItem:hover .navIcon,
+.navItem:hover .navText {
+  color: #4db6ac !important;
+}
