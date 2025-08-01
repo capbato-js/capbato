@@ -8,3 +8,4 @@ export * from './TodoQueryHandlers';
 export * from './PatientQueryHandlers';
 export * from './DoctorQueryHandlers';
 export * from './AddressQueryHandlers';
+export * from './ScheduleQueryHandlers';

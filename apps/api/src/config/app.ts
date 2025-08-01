@@ -8,6 +8,7 @@ import { UsersController } from '../presentation/controllers/UsersController';
 import { PatientController } from '../presentation/controllers/PatientController';
 import { DoctorController } from '../presentation/controllers/DoctorController';
 import { AddressController } from '../presentation/controllers/AddressController';
+import { ScheduleController } from '../presentation/controllers/ScheduleController';
 import { TestController } from '../presentation/controllers/TestController';
 import { RoutingControllersErrorHandler } from '../shared/middleware/RoutingControllersErrorHandler';
 import { requestLogger } from '../presentation/middleware/errorHandler';
@@ -64,7 +65,7 @@ export const createApp = (): express.Application => {
   });
 
   // Configure controllers based on environment
-  const controllers: any[] = [TodoController, AuthController, UsersController, PatientController, DoctorController, AddressController];
+const controllers: any[] = [TodoController, AuthController, UsersController, PatientController, DoctorController, AddressController, ScheduleController];
   
   // Only add TestController in non-production environments
   if (!isProduction()) {
@@ -98,6 +99,7 @@ export const createApp = (): express.Application => {
         patients: `${apiConfig.prefix}${apiConfig.endpoints.patients}`,
         doctors: `${apiConfig.prefix}${apiConfig.endpoints.doctors}`,
         address: `${apiConfig.prefix}${apiConfig.endpoints.address}`,
+        schedules: `${apiConfig.prefix}/schedules`,
         auth: `${apiConfig.prefix}${apiConfig.endpoints.auth.base}`,
         register: `${apiConfig.prefix}${apiConfig.endpoints.auth.register}`,
         documentation: `${apiConfig.prefix}${apiConfig.endpoints.documentation}`,

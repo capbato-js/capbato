@@ -10,6 +10,10 @@ import { TypeOrmPatientRepository } from '../patient/persistence/typeorm/TypeOrm
 import { InMemoryDoctorRepository } from '../doctor/persistence/in-memory/InMemoryDoctorRepository';
 import { TypeOrmDoctorRepository } from '../doctor/persistence/typeorm/TypeOrmDoctorRepository';
 import { InMemoryAddressRepository } from '../address/persistence';
+import { InMemoryScheduleRepository } from '../schedule/persistence/in-memory/InMemoryScheduleRepository';
+import { TypeOrmScheduleRepository } from '../schedule/persistence/typeorm/TypeOrmScheduleRepository';
+import { SqliteScheduleRepository } from '../schedule/persistence/sqlite/SqliteScheduleRepository';
+import { MongooseScheduleRepository } from '../schedule/persistence/mongoose/MongooseScheduleRepository';
 import {
   CreateTodoUseCase,
   UpdateTodoUseCase,
@@ -50,6 +54,25 @@ import {
   GetBarangaysValidationService,
 } from '@nx-starter/application-shared';
 import {
+  CreateScheduleUseCase,
+  UpdateScheduleUseCase,
+  DeleteScheduleUseCase,
+  GetAllSchedulesQueryHandler,
+  GetScheduleByIdQueryHandler,
+  GetSchedulesByDateQueryHandler,
+  GetSchedulesByDoctorQueryHandler,
+  GetTodaySchedulesQueryHandler,
+  GetTodayDoctorQueryHandler,
+  GetScheduleStatsQueryHandler,
+  ScheduleValidationService,
+  CreateScheduleValidationService,
+  UpdateScheduleValidationService,
+  DeleteScheduleValidationService,
+  GetScheduleByIdValidationService,
+  GetSchedulesByDateValidationService,
+  GetSchedulesByDoctorValidationService,
+} from '@nx-starter/application-shared';
+import {
   RegisterUserUseCase,
   LoginUserUseCase,
   ChangeUserPasswordUseCase,
@@ -66,7 +89,7 @@ import {
   GetDoctorByUserIdQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
 } from '@nx-starter/application-shared';
-import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository } from '@nx-starter/domain';
+import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
 import { UserDomainService } from '@nx-starter/domain';
 import { getTypeOrmDataSource } from '../database/connections/TypeOrmConnection';
@@ -100,10 +123,17 @@ export const configureDI = async () => {
     doctorRepositoryImplementation
   );
 
+  // Container registration code
   const addressRepositoryImplementation = await getAddressRepositoryImplementation();
   container.registerInstance<IAddressRepository>(
     TOKENS.AddressRepository,
     addressRepositoryImplementation
+  );
+
+  const scheduleRepositoryImplementation = await getScheduleRepositoryImplementation();
+  container.registerInstance<IScheduleRepository>(
+    TOKENS.ScheduleRepository,
+    scheduleRepositoryImplementation
   );
 
   // Infrastructure Layer - Services  
@@ -136,6 +166,11 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.ChangeUserPasswordUseCase, ChangeUserPasswordUseCase);
   container.registerSingleton(TOKENS.CreatePatientUseCase, CreatePatientUseCase);
   container.registerSingleton(TOKENS.CreateDoctorProfileCommandHandler, CreateDoctorProfileCommandHandler);
+
+  // Schedule Use Cases
+  container.registerSingleton(TOKENS.CreateScheduleUseCase, CreateScheduleUseCase);
+  container.registerSingleton(TOKENS.UpdateScheduleUseCase, UpdateScheduleUseCase);
+  container.registerSingleton(TOKENS.DeleteScheduleUseCase, DeleteScheduleUseCase);
 
   // Application Layer - Use Cases (Queries)
   container.registerSingleton(
@@ -207,6 +242,15 @@ export const configureDI = async () => {
     GetBarangaysByCityCodeQueryHandler
   );
 
+  // Schedule Query Handlers
+  container.registerSingleton(TOKENS.GetAllSchedulesQueryHandler, GetAllSchedulesQueryHandler);
+  container.registerSingleton(TOKENS.GetScheduleByIdQueryHandler, GetScheduleByIdQueryHandler);
+  container.registerSingleton(TOKENS.GetSchedulesByDateQueryHandler, GetSchedulesByDateQueryHandler);
+  container.registerSingleton(TOKENS.GetSchedulesByDoctorQueryHandler, GetSchedulesByDoctorQueryHandler);
+  container.registerSingleton(TOKENS.GetTodaySchedulesQueryHandler, GetTodaySchedulesQueryHandler);
+  container.registerSingleton(TOKENS.GetTodayDoctorQueryHandler, GetTodayDoctorQueryHandler);
+  container.registerSingleton(TOKENS.GetScheduleStatsQueryHandler, GetScheduleStatsQueryHandler);
+
   // Application Layer - Validation Services
   container.registerSingleton(
     TOKENS.CreateTodoValidationService,
@@ -276,6 +320,15 @@ export const configureDI = async () => {
     TOKENS.AddressValidationService,
     AddressValidationService
   );
+
+  // Schedule Validation Services
+  container.registerSingleton(TOKENS.CreateScheduleValidationService, CreateScheduleValidationService);
+  container.registerSingleton(TOKENS.UpdateScheduleValidationService, UpdateScheduleValidationService);
+  container.registerSingleton(TOKENS.DeleteScheduleValidationService, DeleteScheduleValidationService);
+  container.registerSingleton(TOKENS.GetScheduleByIdValidationService, GetScheduleByIdValidationService);
+  container.registerSingleton(TOKENS.GetSchedulesByDateValidationService, GetSchedulesByDateValidationService);
+  container.registerSingleton(TOKENS.GetSchedulesByDoctorValidationService, GetSchedulesByDoctorValidationService);
+  container.registerSingleton(TOKENS.ScheduleValidationService, ScheduleValidationService);
 
   // Domain Layer - Domain Services
   // UserDomainService is instantiated manually in use cases (Clean Architecture best practice)
@@ -449,6 +502,51 @@ async function getAddressRepositoryImplementation(): Promise<IAddressRepository>
   // Address data is static JSON, so we always use in-memory implementation
   console.log('📦 Using in-memory address repository with Philippine data');
   return new InMemoryAddressRepository();
+}
+
+async function getScheduleRepositoryImplementation(): Promise<IScheduleRepository> {
+  const dbConfig = getDatabaseConfig();
+  const dbType = dbConfig.type;
+  const ormType = dbConfig.orm || 'native';
+
+  console.log(`📦 Using Schedule repository: ${ormType} ORM with ${dbType} database`);
+
+  // Handle memory database (always uses in-memory repository)
+  if (dbType === 'memory') {
+    console.log('📦 Using in-memory schedule repository');
+    return new InMemoryScheduleRepository();
+  }
+
+  // Handle MongoDB (always uses Mongoose)
+  if (dbType === 'mongodb') {
+    await connectMongoDB();
+    console.log('📦 Using Mongoose schedule repository with MongoDB');
+    return new MongooseScheduleRepository();
+  }
+
+  // Handle SQL databases with different ORMs
+  switch (ormType) {
+    case 'typeorm': {
+      const dataSource = await getTypeOrmDataSource();
+      console.log(`📦 Using TypeORM schedule repository with ${dbType}`);
+      return new TypeOrmScheduleRepository(dataSource);
+    }
+
+    case 'native':
+    default: {
+      if (dbType === 'sqlite') {
+        console.log('📦 Using native SQLite schedule repository');
+        return new SqliteScheduleRepository();
+      }
+
+      // For other databases without native support, default to TypeORM
+      console.log(
+        `📦 No native support for ${dbType}, falling back to TypeORM for schedule repository`
+      );
+      const dataSource = await getTypeOrmDataSource();
+      return new TypeOrmScheduleRepository(dataSource);
+    }
+  }
 }
 
 // Export container and tokens for use in controllers

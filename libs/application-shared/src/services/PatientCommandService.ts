@@ -12,25 +12,3 @@ export interface IPatientCommandService {
    */
   createPatient(command: CreatePatientCommand): Promise<PatientDto>;
 }
-
-/**
- * Patient Query Service Interface
- * Handles patient-related query operations following CQRS pattern
- * This interface belongs in the shared application layer
- */
-export interface IPatientQueryService {
-  /**
-   * Get all patients
-   */
-  getAllPatients(): Promise<PatientListDto[]>;
-  
-  /**
-   * Get patient by ID
-   */
-  getPatientById(id: string): Promise<PatientDto>;
-  
-  /**
-   * Get patient statistics
-   */
-  getPatientStats(): Promise<PatientStatsDto>;
-}

@@ -143,3 +143,64 @@ export class InvalidContactNumberException extends DomainException {
     super(`Invalid contact number: ${reason}`, 'INVALID_CONTACT_NUMBER');
   }
 }
+
+/**
+ * Schedule-specific domain exceptions
+ */
+export class ScheduleNotFoundException extends DomainException {
+  constructor(id: string) {
+    super(`Schedule with ID ${id} not found`, 'SCHEDULE_NOT_FOUND', 404);
+  }
+}
+
+export class InvalidScheduleDateException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid schedule date: ${reason}`, 'INVALID_SCHEDULE_DATE');
+  }
+}
+
+export class InvalidScheduleTimeException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid schedule time: ${reason}`, 'INVALID_SCHEDULE_TIME');
+  }
+}
+
+export class InvalidDoctorNameForScheduleException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid doctor name for schedule: ${reason}`, 'INVALID_DOCTOR_NAME_FOR_SCHEDULE');
+  }
+}
+
+export class InvalidDoctorIdForScheduleException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid doctor ID for schedule: ${reason}`, 'INVALID_DOCTOR_ID_FOR_SCHEDULE');
+  }
+}
+
+export class DoctorNotFoundForScheduleException extends DomainException {
+  constructor(doctorId: string) {
+    super(`Doctor with ID ${doctorId} not found for schedule`, 'DOCTOR_NOT_FOUND_FOR_SCHEDULE', 404);
+  }
+}
+
+export class ScheduleConflictException extends DomainException {
+  constructor(doctorName: string, date: string, time: string) {
+    super(
+      `Schedule conflict: Dr. ${doctorName} already has a conflicting appointment on ${date} around ${time}`, 
+      'SCHEDULE_CONFLICT', 
+      409
+    );
+  }
+}
+
+export class PastScheduleException extends DomainException {
+  constructor() {
+    super('Cannot create or modify schedules for past dates/times', 'PAST_SCHEDULE', 400);
+  }
+}
+
+export class InvalidScheduleIdException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid schedule ID: ${reason}`, 'INVALID_SCHEDULE_ID');
+  }
+}
