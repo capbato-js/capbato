@@ -52,14 +52,26 @@ export class CreatePatientUseCase {
       command.dateOfBirth,
       command.gender as 'Male' | 'Female',
       sanitizedContactNumber,
-      command.address,
+      {
+        houseNumber: command.houseNumber,
+        streetName: command.streetName,
+        province: command.province,
+        cityMunicipality: command.cityMunicipality,
+        barangay: command.barangay,
+      },
       {
         middleName: command.middleName,
         guardianName: command.guardianName,
         guardianGender: command.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: command.guardianRelationship,
         guardianContactNumber: sanitizedGuardianContactNumber,
-        guardianAddress: command.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: command.guardianHouseNumber,
+          streetName: command.guardianStreetName,
+          province: command.guardianProvince,
+          cityMunicipality: command.guardianCityMunicipality,
+          barangay: command.guardianBarangay,
+        },
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -79,7 +91,13 @@ export class CreatePatientUseCase {
       command.dateOfBirth,
       command.gender as 'Male' | 'Female',
       sanitizedContactNumber,
-      command.address,
+      {
+        houseNumber: command.houseNumber,
+        streetName: command.streetName,
+        province: command.province,
+        cityMunicipality: command.cityMunicipality,
+        barangay: command.barangay,
+      },
       {
         id,
         middleName: command.middleName,
@@ -87,7 +105,13 @@ export class CreatePatientUseCase {
         guardianGender: command.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: command.guardianRelationship,
         guardianContactNumber: sanitizedGuardianContactNumber,
-        guardianAddress: command.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: command.guardianHouseNumber,
+          streetName: command.guardianStreetName,
+          province: command.guardianProvince,
+          cityMunicipality: command.guardianCityMunicipality,
+          barangay: command.guardianBarangay,
+        },
         createdAt: patient.createdAt,
         updatedAt: patient.updatedAt,
       }

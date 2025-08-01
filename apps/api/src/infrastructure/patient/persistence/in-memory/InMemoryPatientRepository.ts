@@ -30,7 +30,13 @@ export class InMemoryPatientRepository implements IPatientRepository {
       patient.dateOfBirth,
       patient.gender,
       patient.contactNumber,
-      patient.address,
+      {
+        houseNumber: patient.houseNumber,
+        streetName: patient.streetName,
+        province: patient.province,
+        cityMunicipality: patient.cityMunicipality,
+        barangay: patient.barangay,
+      },
       {
         id,
         middleName: patient.middleName,
@@ -38,7 +44,13 @@ export class InMemoryPatientRepository implements IPatientRepository {
         guardianGender: patient.guardianGender,
         guardianRelationship: patient.guardianRelationship,
         guardianContactNumber: patient.guardianContactNumber,
-        guardianAddress: patient.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: patient.guardianHouseNumber,
+          streetName: patient.guardianStreetName,
+          province: patient.guardianProvince,
+          cityMunicipality: patient.guardianCityMunicipality,
+          barangay: patient.guardianBarangay,
+        },
         createdAt: patient.createdAt,
         updatedAt: patient.updatedAt,
       }
@@ -78,7 +90,13 @@ export class InMemoryPatientRepository implements IPatientRepository {
       changes.dateOfBirth !== undefined ? changes.dateOfBirth : existingPatient.dateOfBirth,
       changes.gender !== undefined ? changes.gender : existingPatient.gender,
       changes.contactNumber !== undefined ? changes.contactNumber : existingPatient.contactNumber,
-      changes.address !== undefined ? changes.address : existingPatient.address,
+      {
+        houseNumber: changes.houseNumber !== undefined ? changes.houseNumber : existingPatient.houseNumber,
+        streetName: changes.streetName !== undefined ? changes.streetName : existingPatient.streetName,
+        province: changes.province !== undefined ? changes.province : existingPatient.province,
+        cityMunicipality: changes.cityMunicipality !== undefined ? changes.cityMunicipality : existingPatient.cityMunicipality,
+        barangay: changes.barangay !== undefined ? changes.barangay : existingPatient.barangay,
+      },
       {
         id: existingPatient.id,
         middleName: changes.middleName !== undefined ? changes.middleName : existingPatient.middleName,
@@ -86,7 +104,13 @@ export class InMemoryPatientRepository implements IPatientRepository {
         guardianGender: changes.guardianGender !== undefined ? changes.guardianGender : existingPatient.guardianGender,
         guardianRelationship: changes.guardianRelationship !== undefined ? changes.guardianRelationship : existingPatient.guardianRelationship,
         guardianContactNumber: changes.guardianContactNumber !== undefined ? changes.guardianContactNumber : existingPatient.guardianContactNumber,
-        guardianAddress: changes.guardianAddress !== undefined ? changes.guardianAddress : existingPatient.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: changes.guardianHouseNumber !== undefined ? changes.guardianHouseNumber : existingPatient.guardianHouseNumber,
+          streetName: changes.guardianStreetName !== undefined ? changes.guardianStreetName : existingPatient.guardianStreetName,
+          province: changes.guardianProvince !== undefined ? changes.guardianProvince : existingPatient.guardianProvince,
+          cityMunicipality: changes.guardianCityMunicipality !== undefined ? changes.guardianCityMunicipality : existingPatient.guardianCityMunicipality,
+          barangay: changes.guardianBarangay !== undefined ? changes.guardianBarangay : existingPatient.guardianBarangay,
+        },
         createdAt: existingPatient.createdAt,
         updatedAt: new Date(),
       }
@@ -252,7 +276,13 @@ export class InMemoryPatientRepository implements IPatientRepository {
         patient.dateOfBirth,
         patient.gender,
         patient.contactNumber,
-        patient.address,
+        {
+          houseNumber: patient.houseNumber,
+          streetName: patient.streetName,
+          province: patient.province,
+          cityMunicipality: patient.cityMunicipality,
+          barangay: patient.barangay,
+        },
         {
           id,
           middleName: patient.middleName,
@@ -260,7 +290,13 @@ export class InMemoryPatientRepository implements IPatientRepository {
           guardianGender: patient.guardianGender,
           guardianRelationship: patient.guardianRelationship,
           guardianContactNumber: patient.guardianContactNumber,
-          guardianAddress: patient.guardianAddress,
+          guardianAddressInfo: {
+            houseNumber: patient.guardianHouseNumber,
+            streetName: patient.guardianStreetName,
+            province: patient.guardianProvince,
+            cityMunicipality: patient.guardianCityMunicipality,
+            barangay: patient.guardianBarangay,
+          },
           createdAt: patient.createdAt,
           updatedAt: patient.updatedAt,
         }

@@ -16,18 +16,14 @@ import {
   TOKENS,
   PatientValidationService,
   PatientIdSchema,
-  isPatientDomainError,
-  getHttpStatusForPatientError,
 } from '@nx-starter/application-shared';
 import {
   PatientResponse,
   PatientListResponse,
   PatientStatsResponse,
-  PatientOperationResponse,
   CreatePatientRequestDto,
 } from '@nx-starter/application-shared';
 import { ApiResponseBuilder } from '../dto/ApiResponse';
-import { HttpError } from 'routing-controllers';
 
 /**
  * REST API Controller for Patient operations
@@ -54,12 +50,8 @@ export class PatientController {
    */
   @Get('/total')
   async getPatientStats(): Promise<PatientStatsResponse> {
-    try {
-      const stats = await this.getPatientStatsQueryHandler.execute();
-      return ApiResponseBuilder.success(stats);
-    } catch (error) {
-      this.handleError(error);
-    }
+    const stats = await this.getPatientStatsQueryHandler.execute();
+    return ApiResponseBuilder.success(stats);
   }
 
   /**
@@ -67,13 +59,9 @@ export class PatientController {
    */
   @Get('/')
   async getAllPatients(): Promise<PatientListResponse> {
-    try {
-      const patients = await this.getAllPatientsQueryHandler.execute();
-      const patientListDtos = PatientMapper.toListDtoArray(patients);
-      return ApiResponseBuilder.success(patientListDtos);
-    } catch (error) {
-      this.handleError(error);
-    }
+    const patients = await this.getAllPatientsQueryHandler.execute();
+    const patientListDtos = PatientMapper.toListDtoArray(patients);
+    return ApiResponseBuilder.success(patientListDtos);
   }
 
   /**
@@ -81,15 +69,11 @@ export class PatientController {
    */
   @Get('/:id')
   async getPatientById(@Param('id') id: string): Promise<PatientResponse> {
-    try {
-      // Validate the ID parameter
-      const validatedId = PatientIdSchema.parse(id);
-      const patient = await this.getPatientByIdQueryHandler.execute({ id: validatedId });
-      const patientDto = PatientMapper.toDto(patient);
-      return ApiResponseBuilder.success(patientDto);
-    } catch (error) {
-      this.handleError(error);
-    }
+    // Validate the ID parameter
+    const validatedId = PatientIdSchema.parse(id);
+    const patient = await this.getPatientByIdQueryHandler.execute({ id: validatedId });
+    const patientDto = PatientMapper.toDto(patient);
+    return ApiResponseBuilder.success(patientDto);
   }
 
   /**
@@ -98,45 +82,10 @@ export class PatientController {
   @Post('/')
   @HttpCode(201)
   async createPatient(@Body() body: CreatePatientRequestDto): Promise<PatientResponse> {
-    try {
-      const validatedData = this.validationService.validateCreateCommand(body);
-      const patient = await this.createPatientUseCase.execute(validatedData);
-      const patientDto = PatientMapper.toDto(patient);
-      
-      return ApiResponseBuilder.success(patientDto);
-    } catch (error) {
-      this.handleError(error);
-    }
-  }
-
-  /**
-   * Error handler that converts domain errors to HTTP errors
-   */
-  private handleError(error: unknown): never {
-    // Handle domain-specific errors
-    if (isPatientDomainError(error)) {
-      const statusCode = getHttpStatusForPatientError(error);
-      throw new HttpError(statusCode, error.message);
-    }
-
-    // Handle validation errors (from Zod)
-    if (error && typeof error === 'object' && 'issues' in error) {
-      const zodError = error as { issues: Array<{ message: string; path?: string[] }> };
-      const messages = zodError.issues.map(issue => {
-        const path = issue.path?.join('.') || 'field';
-        return `${path}: ${issue.message}`;
-      });
-      throw new HttpError(400, `Validation failed: ${messages.join(', ')}`);
-    }
-
-    // Handle generic errors
-    if (error instanceof Error) {
-      console.error('❌ Patient Controller Error:', error.message, error.stack);
-      throw new HttpError(500, 'Internal server error');
-    }
-
-    // Fallback for unknown errors
-    console.error('❌ Unknown Patient Controller Error:', error);
-    throw new HttpError(500, 'Internal server error');
+    const validatedData = this.validationService.validateCreateCommand(body);
+    const patient = await this.createPatientUseCase.execute(validatedData);
+    const patientDto = PatientMapper.toDto(patient);
+    
+    return ApiResponseBuilder.success(patientDto);
   }
 }

@@ -8,14 +8,26 @@ export interface CreatePatientRequestDto {
   dateOfBirth: string; // YYYY-MM-DD format
   gender: string;
   contactNumber: string;
-  address: string;
+  
+  // Address Information
+  houseNumber?: string;
+  streetName?: string;
+  province?: string;
+  cityMunicipality?: string;
+  barangay?: string;
   
   // Guardian Information (optional but complete when provided)
   guardianName?: string;
   guardianGender?: string;
   guardianRelationship?: string;
   guardianContactNumber?: string;
-  guardianAddress?: string;
+  
+  // Guardian Address Information
+  guardianHouseNumber?: string;
+  guardianStreetName?: string;
+  guardianProvince?: string;
+  guardianCityMunicipality?: string;
+  guardianBarangay?: string;
 }
 
 // Response types for consistent API responses

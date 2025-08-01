@@ -7,7 +7,7 @@ import {
   Index,
 } from 'typeorm';
 
-@Entity('patient')
+@Entity('patients')
 @Index(['firstName', 'lastName']) // For name-based searches
 @Index(['dateOfBirth']) // For age-based queries
 export class PatientEntity {
@@ -53,8 +53,44 @@ export class PatientEntity {
   })
   contactNumber!: string;
 
-  @Column({ type: 'text' })
-  address!: string;
+  // Address Information
+  @Column({ 
+    type: 'varchar', 
+    length: 20, 
+    nullable: true,
+    name: 'house_number'
+  })
+  houseNumber?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 100, 
+    nullable: true,
+    name: 'street_name'
+  })
+  streetName?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 50, 
+    nullable: true
+  })
+  province?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 50, 
+    nullable: true,
+    name: 'city_municipality'
+  })
+  cityMunicipality?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 50, 
+    nullable: true
+  })
+  barangay?: string;
 
   // Guardian Information
   @Column({ 
@@ -89,12 +125,46 @@ export class PatientEntity {
   })
   guardianContactNumber?: string;
 
+  // Guardian Address Information
   @Column({ 
-    type: 'text', 
+    type: 'varchar', 
+    length: 20, 
     nullable: true,
-    name: 'guardian_address'
+    name: 'guardian_house_number'
   })
-  guardianAddress?: string;
+  guardianHouseNumber?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 100, 
+    nullable: true,
+    name: 'guardian_street_name'
+  })
+  guardianStreetName?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 50, 
+    nullable: true,
+    name: 'guardian_province'
+  })
+  guardianProvince?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 50, 
+    nullable: true,
+    name: 'guardian_city_municipality'
+  })
+  guardianCityMunicipality?: string;
+
+  @Column({ 
+    type: 'varchar', 
+    length: 50, 
+    nullable: true,
+    name: 'guardian_barangay'
+  })
+  guardianBarangay?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

@@ -124,15 +124,38 @@ export const CreatePatientCommandSchema = z.object({
   dateOfBirth: z.string().superRefine(validateDateOfBirth),
   gender: GenderSchema,
   contactNumber: z.string().superRefine(validatePhilippineMobile),
-  address: z.string().min(1, 'Address is required').max(200, 'Address cannot exceed 200 characters'),
+  
+  // Address Information
+  houseNumber: z.string().max(20, 'House number cannot exceed 20 characters').optional(),
+  streetName: z.string().max(100, 'Street name cannot exceed 100 characters').optional(),
+  province: z.string().max(50, 'Province cannot exceed 50 characters').optional(),
+  cityMunicipality: z.string().max(50, 'City/Municipality cannot exceed 50 characters').optional(),
+  barangay: z.string().max(50, 'Barangay cannot exceed 50 characters').optional(),
   
   // Guardian Information (optional but complete when provided)
   guardianName: z.string().optional(),
   guardianGender: GenderSchema.optional(),
   guardianRelationship: z.string().optional(),
   guardianContactNumber: z.string().optional(),
-  guardianAddress: z.string().max(200, 'Guardian address cannot exceed 200 characters').optional(),
+  
+  // Guardian Address Information
+  guardianHouseNumber: z.string().max(20, 'Guardian house number cannot exceed 20 characters').optional(),
+  guardianStreetName: z.string().max(100, 'Guardian street name cannot exceed 100 characters').optional(),
+  guardianProvince: z.string().max(50, 'Guardian province cannot exceed 50 characters').optional(),
+  guardianCityMunicipality: z.string().max(50, 'Guardian city/municipality cannot exceed 50 characters').optional(),
+  guardianBarangay: z.string().max(50, 'Guardian barangay cannot exceed 50 characters').optional(),
 }).superRefine(validateGuardianInfo)
+.superRefine((data, ctx) => {
+  // Validate that at least one address field is provided
+  const hasAddress = data.houseNumber || data.streetName || data.province || data.cityMunicipality || data.barangay;
+  if (!hasAddress) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'At least one address field is required',
+      path: ['address'],
+    });
+  }
+})
 .transform((data) => ({
   ...data,
   // Sanitize phone numbers

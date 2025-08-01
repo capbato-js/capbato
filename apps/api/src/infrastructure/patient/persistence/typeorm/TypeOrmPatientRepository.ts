@@ -36,12 +36,23 @@ export class TypeOrmPatientRepository implements IPatientRepository {
       dateOfBirth: patient.dateOfBirth,
       gender: patient.gender,
       contactNumber: patient.contactNumber,
-      address: patient.address,
+      // Address fields
+      houseNumber: patient.houseNumber,
+      streetName: patient.streetName,
+      province: patient.province,
+      cityMunicipality: patient.cityMunicipality,
+      barangay: patient.barangay,
+      // Guardian fields
       guardianName: patient.guardianName,
       guardianGender: patient.guardianGender,
       guardianRelationship: patient.guardianRelationship,
       guardianContactNumber: patient.guardianContactNumber,
-      guardianAddress: patient.guardianAddress,
+      // Guardian address fields
+      guardianHouseNumber: patient.guardianHouseNumber,
+      guardianStreetName: patient.guardianStreetName,
+      guardianProvince: patient.guardianProvince,
+      guardianCityMunicipality: patient.guardianCityMunicipality,
+      guardianBarangay: patient.guardianBarangay,
       createdAt: patient.createdAt,
       updatedAt: patient.updatedAt,
     });
@@ -86,12 +97,26 @@ export class TypeOrmPatientRepository implements IPatientRepository {
     if (changes.dateOfBirth !== undefined) updateData.dateOfBirth = changes.dateOfBirth;
     if (changes.gender !== undefined) updateData.gender = changes.gender;
     if (changes.contactNumber !== undefined) updateData.contactNumber = changes.contactNumber;
-    if (changes.address !== undefined) updateData.address = changes.address;
+    
+    // Address fields
+    if (changes.houseNumber !== undefined) updateData.houseNumber = changes.houseNumber;
+    if (changes.streetName !== undefined) updateData.streetName = changes.streetName;
+    if (changes.province !== undefined) updateData.province = changes.province;
+    if (changes.cityMunicipality !== undefined) updateData.cityMunicipality = changes.cityMunicipality;
+    if (changes.barangay !== undefined) updateData.barangay = changes.barangay;
+    
+    // Guardian fields
     if (changes.guardianName !== undefined) updateData.guardianName = changes.guardianName;
     if (changes.guardianGender !== undefined) updateData.guardianGender = changes.guardianGender;
     if (changes.guardianRelationship !== undefined) updateData.guardianRelationship = changes.guardianRelationship;
     if (changes.guardianContactNumber !== undefined) updateData.guardianContactNumber = changes.guardianContactNumber;
-    if (changes.guardianAddress !== undefined) updateData.guardianAddress = changes.guardianAddress;
+    
+    // Guardian address fields
+    if (changes.guardianHouseNumber !== undefined) updateData.guardianHouseNumber = changes.guardianHouseNumber;
+    if (changes.guardianStreetName !== undefined) updateData.guardianStreetName = changes.guardianStreetName;
+    if (changes.guardianProvince !== undefined) updateData.guardianProvince = changes.guardianProvince;
+    if (changes.guardianCityMunicipality !== undefined) updateData.guardianCityMunicipality = changes.guardianCityMunicipality;
+    if (changes.guardianBarangay !== undefined) updateData.guardianBarangay = changes.guardianBarangay;
 
     await this.repository.update(id, updateData);
   }
@@ -276,7 +301,13 @@ export class TypeOrmPatientRepository implements IPatientRepository {
       entity.dateOfBirth,
       entity.gender,
       entity.contactNumber,
-      entity.address,
+      {
+        houseNumber: entity.houseNumber,
+        streetName: entity.streetName,
+        province: entity.province,
+        cityMunicipality: entity.cityMunicipality,
+        barangay: entity.barangay,
+      },
       {
         id: entity.id,
         middleName: entity.middleName,
@@ -284,7 +315,13 @@ export class TypeOrmPatientRepository implements IPatientRepository {
         guardianGender: entity.guardianGender,
         guardianRelationship: entity.guardianRelationship,
         guardianContactNumber: entity.guardianContactNumber,
-        guardianAddress: entity.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: entity.guardianHouseNumber,
+          streetName: entity.guardianStreetName,
+          province: entity.guardianProvince,
+          cityMunicipality: entity.guardianCityMunicipality,
+          barangay: entity.guardianBarangay,
+        },
         createdAt: entity.createdAt,
         updatedAt: entity.updatedAt,
       }

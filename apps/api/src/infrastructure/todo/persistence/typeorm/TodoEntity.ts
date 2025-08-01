@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-@Entity('todo')
+@Entity('todos')
 export class TodoEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

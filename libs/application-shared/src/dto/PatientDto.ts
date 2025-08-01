@@ -10,14 +10,28 @@ export interface PatientDto {
   age: number; // Computed dynamically from dateOfBirth
   gender: string;
   contactNumber: string;
-  address: string;
+  
+  // Address Information
+  houseNumber?: string;
+  streetName?: string;
+  province?: string;
+  cityMunicipality?: string;
+  barangay?: string;
+  address: string; // Computed full address for backward compatibility
   
   // Guardian Information
   guardianName?: string;
   guardianGender?: string;
   guardianRelationship?: string;
   guardianContactNumber?: string;
-  guardianAddress?: string;
+  
+  // Guardian Address Information
+  guardianHouseNumber?: string;
+  guardianStreetName?: string;
+  guardianProvince?: string;
+  guardianCityMunicipality?: string;
+  guardianBarangay?: string;
+  guardianAddress?: string; // Computed full address for backward compatibility
   
   createdAt: string;
   updatedAt: string;
@@ -30,14 +44,26 @@ export interface CreatePatientDto {
   dateOfBirth: string; // YYYY-MM-DD format
   gender: string;
   contactNumber: string;
-  address: string;
+  
+  // Address Information
+  houseNumber?: string;
+  streetName?: string;
+  province?: string;
+  cityMunicipality?: string;
+  barangay?: string;
   
   // Guardian Information (optional but complete when provided)
   guardianName?: string;
   guardianGender?: string;
   guardianRelationship?: string;
   guardianContactNumber?: string;
-  guardianAddress?: string;
+  
+  // Guardian Address Information
+  guardianHouseNumber?: string;
+  guardianStreetName?: string;
+  guardianProvince?: string;
+  guardianCityMunicipality?: string;
+  guardianBarangay?: string;
 }
 
 export interface PatientStatsDto {

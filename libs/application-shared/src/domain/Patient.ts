@@ -11,14 +11,26 @@ export interface IPatient {
   dateOfBirth: Date;
   gender: 'Male' | 'Female';
   contactNumber: string;
-  address: string;
+  
+  // Address Information
+  houseNumber?: string;
+  streetName?: string;
+  province?: string;
+  cityMunicipality?: string;
+  barangay?: string;
   
   // Guardian Information
   guardianName?: string;
   guardianGender?: 'Male' | 'Female';
   guardianRelationship?: string;
   guardianContactNumber?: string;
-  guardianAddress?: string;
+  
+  // Guardian Address Information
+  guardianHouseNumber?: string;
+  guardianStreetName?: string;
+  guardianProvince?: string;
+  guardianCityMunicipality?: string;
+  guardianBarangay?: string;
   
   createdAt: Date;
   updatedAt: Date;
@@ -33,14 +45,26 @@ export class Patient implements IPatient {
   private readonly _dateOfBirth: Date;
   private readonly _gender: 'Male' | 'Female';
   private readonly _contactNumber: string;
-  private readonly _address: string;
+  
+  // Address Information
+  private readonly _houseNumber?: string;
+  private readonly _streetName?: string;
+  private readonly _province?: string;
+  private readonly _cityMunicipality?: string;
+  private readonly _barangay?: string;
   
   // Guardian Information
   private readonly _guardianName?: string;
   private readonly _guardianGender?: 'Male' | 'Female';
   private readonly _guardianRelationship?: string;
   private readonly _guardianContactNumber?: string;
-  private readonly _guardianAddress?: string;
+  
+  // Guardian Address Information
+  private readonly _guardianHouseNumber?: string;
+  private readonly _guardianStreetName?: string;
+  private readonly _guardianProvince?: string;
+  private readonly _guardianCityMunicipality?: string;
+  private readonly _guardianBarangay?: string;
   
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
@@ -52,7 +76,13 @@ export class Patient implements IPatient {
     dateOfBirth: Date | string,
     gender: 'Male' | 'Female',
     contactNumber: string,
-    address: string,
+    addressInfo: {
+      houseNumber?: string;
+      streetName?: string;
+      province?: string;
+      cityMunicipality?: string;
+      barangay?: string;
+    },
     options: {
       id?: string;
       middleName?: string;
@@ -60,7 +90,13 @@ export class Patient implements IPatient {
       guardianGender?: 'Male' | 'Female';
       guardianRelationship?: string;
       guardianContactNumber?: string;
-      guardianAddress?: string;
+      guardianAddressInfo?: {
+        houseNumber?: string;
+        streetName?: string;
+        province?: string;
+        cityMunicipality?: string;
+        barangay?: string;
+      };
       createdAt?: Date;
       updatedAt?: Date;
     } = {}
@@ -73,14 +109,27 @@ export class Patient implements IPatient {
     this._dateOfBirth = typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : dateOfBirth;
     this._gender = gender;
     this._contactNumber = contactNumber;
-    this._address = address;
+    
+    // Address Information
+    this._houseNumber = addressInfo.houseNumber;
+    this._streetName = addressInfo.streetName;
+    this._province = addressInfo.province;
+    this._cityMunicipality = addressInfo.cityMunicipality;
+    this._barangay = addressInfo.barangay;
     
     // Guardian Information
     this._guardianName = options.guardianName;
     this._guardianGender = options.guardianGender;
     this._guardianRelationship = options.guardianRelationship;
     this._guardianContactNumber = options.guardianContactNumber;
-    this._guardianAddress = options.guardianAddress;
+    
+    // Guardian Address Information
+    const guardianAddr = options.guardianAddressInfo;
+    this._guardianHouseNumber = guardianAddr?.houseNumber;
+    this._guardianStreetName = guardianAddr?.streetName;
+    this._guardianProvince = guardianAddr?.province;
+    this._guardianCityMunicipality = guardianAddr?.cityMunicipality;
+    this._guardianBarangay = guardianAddr?.barangay;
     
     this._createdAt = options.createdAt || new Date();
     this._updatedAt = options.updatedAt || new Date();
@@ -121,10 +170,28 @@ export class Patient implements IPatient {
     return this._contactNumber;
   }
 
-  get address(): string {
-    return this._address;
+  // Address getters
+  get houseNumber(): string | undefined {
+    return this._houseNumber;
   }
 
+  get streetName(): string | undefined {
+    return this._streetName;
+  }
+
+  get province(): string | undefined {
+    return this._province;
+  }
+
+  get cityMunicipality(): string | undefined {
+    return this._cityMunicipality;
+  }
+
+  get barangay(): string | undefined {
+    return this._barangay;
+  }
+
+  // Guardian Information getters
   get guardianName(): string | undefined {
     return this._guardianName;
   }
@@ -141,8 +208,25 @@ export class Patient implements IPatient {
     return this._guardianContactNumber;
   }
 
-  get guardianAddress(): string | undefined {
-    return this._guardianAddress;
+  // Guardian Address getters
+  get guardianHouseNumber(): string | undefined {
+    return this._guardianHouseNumber;
+  }
+
+  get guardianStreetName(): string | undefined {
+    return this._guardianStreetName;
+  }
+
+  get guardianProvince(): string | undefined {
+    return this._guardianProvince;
+  }
+
+  get guardianCityMunicipality(): string | undefined {
+    return this._guardianCityMunicipality;
+  }
+
+  get guardianBarangay(): string | undefined {
+    return this._guardianBarangay;
   }
 
   get createdAt(): Date {
@@ -169,8 +253,37 @@ export class Patient implements IPatient {
     return ageService.getAgeCategory(this.age);
   }
 
+  // Computed address properties for backward compatibility
+  get address(): string {
+    const addressParts = [
+      this._houseNumber,
+      this._streetName,
+      this._barangay,
+      this._cityMunicipality,
+      this._province
+    ].filter(Boolean);
+    return addressParts.join(', ');
+  }
+
+  get guardianAddress(): string | undefined {
+    if (!this.hasGuardianAddressInfo) return undefined;
+    
+    const addressParts = [
+      this._guardianHouseNumber,
+      this._guardianStreetName,
+      this._guardianBarangay,
+      this._guardianCityMunicipality,
+      this._guardianProvince
+    ].filter(Boolean);
+    return addressParts.length > 0 ? addressParts.join(', ') : undefined;
+  }
+
   get hasGuardianInfo(): boolean {
     return !!(this._guardianName || this._guardianGender || this._guardianRelationship || this._guardianContactNumber);
+  }
+
+  get hasGuardianAddressInfo(): boolean {
+    return !!(this._guardianHouseNumber || this._guardianStreetName || this._guardianProvince || this._guardianCityMunicipality || this._guardianBarangay);
   }
 
   // Domain methods
@@ -237,8 +350,10 @@ export class Patient implements IPatient {
       throw new InvalidPatientDataError('Contact number is required', 'contactNumber');
     }
 
-    if (!this._address?.trim()) {
-      throw new InvalidPatientDataError('Address is required', 'address');
+    // Address validation - at least one address field should be provided
+    if (!this._houseNumber?.trim() && !this._streetName?.trim() && !this._province?.trim() && 
+        !this._cityMunicipality?.trim() && !this._barangay?.trim()) {
+      throw new InvalidPatientDataError('At least one address field is required', 'address');
     }
 
     // Phone number validation
@@ -296,7 +411,13 @@ export class Patient implements IPatient {
       this._dateOfBirth,
       this._gender,
       this._contactNumber,
-      this._address,
+      {
+        houseNumber: this._houseNumber,
+        streetName: this._streetName,
+        province: this._province,
+        cityMunicipality: this._cityMunicipality,
+        barangay: this._barangay,
+      },
       {
         id: this._id,
         middleName: this._middleName,
@@ -304,7 +425,13 @@ export class Patient implements IPatient {
         guardianGender: this._guardianGender,
         guardianRelationship: this._guardianRelationship,
         guardianContactNumber: this._guardianContactNumber,
-        guardianAddress: this._guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: this._guardianHouseNumber,
+          streetName: this._guardianStreetName,
+          province: this._guardianProvince,
+          cityMunicipality: this._guardianCityMunicipality,
+          barangay: this._guardianBarangay,
+        },
         createdAt: this._createdAt,
         updatedAt: new Date(),
       }

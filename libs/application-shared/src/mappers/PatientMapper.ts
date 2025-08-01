@@ -22,14 +22,28 @@ export class PatientMapper {
       age: patient.age, // Computed dynamically
       gender: patient.gender,
       contactNumber: patient.contactNumber,
-      address: patient.address,
+      
+      // Address Information
+      houseNumber: patient.houseNumber,
+      streetName: patient.streetName,
+      province: patient.province,
+      cityMunicipality: patient.cityMunicipality,
+      barangay: patient.barangay,
+      address: patient.address, // Computed full address for backward compatibility
       
       // Guardian Information
       guardianName: patient.guardianName,
       guardianGender: patient.guardianGender,
       guardianRelationship: patient.guardianRelationship,
       guardianContactNumber: patient.guardianContactNumber,
-      guardianAddress: patient.guardianAddress,
+      
+      // Guardian Address Information
+      guardianHouseNumber: patient.guardianHouseNumber,
+      guardianStreetName: patient.guardianStreetName,
+      guardianProvince: patient.guardianProvince,
+      guardianCityMunicipality: patient.guardianCityMunicipality,
+      guardianBarangay: patient.guardianBarangay,
+      guardianAddress: patient.guardianAddress, // Computed full address for backward compatibility
       
       createdAt: patient.createdAt.toISOString(),
       updatedAt: patient.updatedAt.toISOString(),
@@ -77,7 +91,13 @@ export class PatientMapper {
       new Date(dto.dateOfBirth),
       dto.gender as 'Male' | 'Female',
       dto.contactNumber,
-      dto.address,
+      {
+        houseNumber: dto.houseNumber,
+        streetName: dto.streetName,
+        province: dto.province,
+        cityMunicipality: dto.cityMunicipality,
+        barangay: dto.barangay,
+      },
       {
         id: dto.id,
         middleName: dto.middleName,
@@ -85,7 +105,13 @@ export class PatientMapper {
         guardianGender: dto.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: dto.guardianRelationship,
         guardianContactNumber: dto.guardianContactNumber,
-        guardianAddress: dto.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: dto.guardianHouseNumber,
+          streetName: dto.guardianStreetName,
+          province: dto.guardianProvince,
+          cityMunicipality: dto.guardianCityMunicipality,
+          barangay: dto.guardianBarangay,
+        },
         createdAt: new Date(dto.createdAt),
         updatedAt: new Date(dto.updatedAt),
       }
@@ -103,14 +129,26 @@ export class PatientMapper {
       new Date(dto.dateOfBirth),
       dto.gender as 'Male' | 'Female',
       dto.contactNumber,
-      dto.address,
+      {
+        houseNumber: dto.houseNumber,
+        streetName: dto.streetName,
+        province: dto.province,
+        cityMunicipality: dto.cityMunicipality,
+        barangay: dto.barangay,
+      },
       {
         middleName: dto.middleName,
         guardianName: dto.guardianName,
         guardianGender: dto.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: dto.guardianRelationship,
         guardianContactNumber: dto.guardianContactNumber,
-        guardianAddress: dto.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: dto.guardianHouseNumber,
+          streetName: dto.guardianStreetName,
+          province: dto.guardianProvince,
+          cityMunicipality: dto.guardianCityMunicipality,
+          barangay: dto.guardianBarangay,
+        },
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -130,12 +168,23 @@ export class PatientMapper {
     dateOfBirth: Date;
     gender: 'Male' | 'Female';
     contactNumber: string;
-    address: string;
+    // Address fields
+    houseNumber?: string;
+    streetName?: string;
+    province?: string;
+    cityMunicipality?: string;
+    barangay?: string;
+    // Guardian fields
     guardianName?: string;
     guardianGender?: 'Male' | 'Female';
     guardianRelationship?: string;
     guardianContactNumber?: string;
-    guardianAddress?: string;
+    // Guardian address fields
+    guardianHouseNumber?: string;
+    guardianStreetName?: string;
+    guardianProvince?: string;
+    guardianCityMunicipality?: string;
+    guardianBarangay?: string;
     createdAt: Date;
     updatedAt: Date;
   }): Patient {
@@ -146,7 +195,13 @@ export class PatientMapper {
       obj.dateOfBirth,
       obj.gender,
       obj.contactNumber,
-      obj.address,
+      {
+        houseNumber: obj.houseNumber,
+        streetName: obj.streetName,
+        province: obj.province,
+        cityMunicipality: obj.cityMunicipality,
+        barangay: obj.barangay,
+      },
       {
         id: obj.id,
         middleName: obj.middleName,
@@ -154,7 +209,13 @@ export class PatientMapper {
         guardianGender: obj.guardianGender,
         guardianRelationship: obj.guardianRelationship,
         guardianContactNumber: obj.guardianContactNumber,
-        guardianAddress: obj.guardianAddress,
+        guardianAddressInfo: {
+          houseNumber: obj.guardianHouseNumber,
+          streetName: obj.guardianStreetName,
+          province: obj.guardianProvince,
+          cityMunicipality: obj.guardianCityMunicipality,
+          barangay: obj.guardianBarangay,
+        },
         createdAt: obj.createdAt,
         updatedAt: obj.updatedAt,
       }
@@ -176,12 +237,23 @@ export class PatientMapper {
     dateOfBirth: Date;
     gender: 'Male' | 'Female';
     contactNumber: string;
-    address: string;
+    // Address fields
+    houseNumber?: string;
+    streetName?: string;
+    province?: string;
+    cityMunicipality?: string;
+    barangay?: string;
+    // Guardian fields
     guardianName?: string;
     guardianGender?: 'Male' | 'Female';
     guardianRelationship?: string;
     guardianContactNumber?: string;
-    guardianAddress?: string;
+    // Guardian address fields
+    guardianHouseNumber?: string;
+    guardianStreetName?: string;
+    guardianProvince?: string;
+    guardianCityMunicipality?: string;
+    guardianBarangay?: string;
     createdAt: Date;
     updatedAt: Date;
   } {
@@ -194,12 +266,23 @@ export class PatientMapper {
       dateOfBirth: patient.dateOfBirth,
       gender: patient.gender,
       contactNumber: patient.contactNumber,
-      address: patient.address,
+      // Address fields
+      houseNumber: patient.houseNumber,
+      streetName: patient.streetName,
+      province: patient.province,
+      cityMunicipality: patient.cityMunicipality,
+      barangay: patient.barangay,
+      // Guardian fields
       guardianName: patient.guardianName,
       guardianGender: patient.guardianGender,
       guardianRelationship: patient.guardianRelationship,
       guardianContactNumber: patient.guardianContactNumber,
-      guardianAddress: patient.guardianAddress,
+      // Guardian address fields
+      guardianHouseNumber: patient.guardianHouseNumber,
+      guardianStreetName: patient.guardianStreetName,
+      guardianProvince: patient.guardianProvince,
+      guardianCityMunicipality: patient.guardianCityMunicipality,
+      guardianBarangay: patient.guardianBarangay,
       createdAt: patient.createdAt,
       updatedAt: patient.updatedAt,
     };
