@@ -116,3 +116,30 @@ export class InvalidRoleException extends DomainException {
     super(`${reason}`, 'INVALID_ROLE');
   }
 }
+
+/**
+ * Doctor-specific domain exceptions
+ */
+export class DoctorNotFoundException extends DomainException {
+  constructor(id: string) {
+    super(`Doctor with ID ${id} not found`, 'DOCTOR_NOT_FOUND', 404);
+  }
+}
+
+export class InvalidDoctorNameException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid doctor name: ${reason}`, 'INVALID_DOCTOR_NAME');
+  }
+}
+
+export class InvalidSpecializationException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid specialization: ${reason}`, 'INVALID_SPECIALIZATION');
+  }
+}
+
+export class InvalidContactNumberException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid contact number: ${reason}`, 'INVALID_CONTACT_NUMBER');
+  }
+}

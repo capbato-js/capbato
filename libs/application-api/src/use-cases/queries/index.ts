@@ -3,3 +3,6 @@
  */
 
 export * from './GetAllUsersQueryHandler';
+export * from './GetAllDoctorsQueryHandler';
+export * from './GetDoctorByIdQueryHandler';
+export * from './GetDoctorsBySpecializationQueryHandler';

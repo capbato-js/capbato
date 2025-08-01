@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { TodoEntity } from '../../todo/persistence/typeorm/TodoEntity';
 import { UserEntity } from '../../user/persistence/typeorm/UserEntity';
 import { PatientEntity } from '../../patient/persistence/typeorm/PatientEntity';
+import { DoctorEntity } from '../../doctor/persistence/typeorm/DoctorEntity';
 import { getDatabaseConfig, isDevelopment, isProduction } from '../../../config';
 
 /**
@@ -34,7 +35,7 @@ export const createTypeOrmDataSource = (): DataSource => {
   
   // Base configuration
   const baseConfig = {
-    entities: [TodoEntity, UserEntity, PatientEntity],
+    entities: [TodoEntity, UserEntity, PatientEntity, DoctorEntity],
     synchronize: shouldSynchronize,
     logging: isDevelopment() || (isProduction() && allowProductionAutoMigration), // Extra logging for production debug
   };

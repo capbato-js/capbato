@@ -1,8 +1,8 @@
 {
   "info": {
     "name": "Clinic Management System API - Comprehensive",
-    "description": "Complete API collection for the Clinic Management System with Clean Architecture. This collection includes comprehensive test scenarios for authentication, patient management, user management, and todos with happy paths, validation errors, and edge cases.\n\n## API Coverage\n\n### Authentication (/api/auth)\n- User registration with role-based access\n- User login with email/username support\n- JWT token management\n\n### Patient Management (/api/patients)\n- Patient CRUD operations\n- Patient statistics and reporting\n- Structured address management\n- Guardian information handling\n\n### User Management (/api/users)\n- User listing and management\n- Password change functionality\n- Role-based operations\n\n### Todo Management (/api/todos)\n- Complete todo CRUD operations\n- Todo filtering and statistics\n- Priority and completion management\n\n## Testing Strategy\n\nThis collection follows comprehensive testing best practices:\n- **Happy Path Testing**: Core functionality validation\n- **Error Handling**: Validation errors, authentication failures, not found scenarios\n- **Schema Validation**: Response structure verification\n- **Dynamic Data**: Variable management for realistic test flows\n- **Performance Testing**: Response time validations\n- **Security Testing**: Authentication and authorization flows",
-    "version": "2.1.0",
+    "description": "Complete API collection for the Clinic Management System with Clean Architecture. This collection includes comprehensive test scenarios for authentication, patient management, user management, doctor management, and todos with happy paths, validation errors, and edge cases.\n\n## API Coverage\n\n### Authentication (/api/auth)\n- User registration with role-based access\n- User login with email/username support\n- JWT token management\n\n### Patient Management (/api/patients)\n- Patient CRUD operations\n- Patient statistics and reporting\n- Structured address management\n- Guardian information handling\n\n### User Management (/api/users)\n- User listing and management\n- Password change functionality\n- Role-based operations\n\n### Doctor Management (/api/doctors)\n- Doctor profile CRUD operations\n- User-Doctor relationship management\n- Philippine and US phone number validation\n- Medical specialization tracking\n- License and experience management\n\n### Todo Management (/api/todos)\n- Complete todo CRUD operations\n- Todo filtering and statistics\n- Priority and completion management\n\n## Testing Strategy\n\nThis collection follows comprehensive testing best practices:\n- **Happy Path Testing**: Core functionality validation\n- **Error Handling**: Validation errors, authentication failures, not found scenarios\n- **Schema Validation**: Response structure verification\n- **Dynamic Data**: Variable management for realistic test flows\n- **Performance Testing**: Response time validations\n- **Security Testing**: Authentication and authorization flows",
+    "version": "2.2.0",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -35,6 +35,12 @@
       "value": "",
       "type": "string",
       "description": "Dynamic todo ID for testing"
+    },
+    {
+      "key": "testDoctorId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic doctor ID for testing"
     },
     {
       "key": "testEmail",
@@ -1201,6 +1207,346 @@
               "path": ["api", "users", "{{testUserId}}", "password"]
             },
             "description": "Test validation error when newPassword field is missing from request"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctor Management",
+      "description": "Complete doctor profile CRUD operations with User relationship management, Philippine phone validation, and comprehensive testing scenarios",
+      "item": [
+        {
+          "name": "Create Doctor Profile - Happy Path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "    pm.expect(responseJson.data).to.have.property('id');",
+                  "    pm.expect(responseJson.data).to.have.property('userId');",
+                  "    pm.expect(responseJson.data).to.have.property('specialization');",
+                  "    pm.expect(responseJson.data).to.have.property('medicalContactNumber');",
+                  "    pm.expect(responseJson.data).to.have.property('isActive', true);",
+                  "});",
+                  "",
+                  "pm.test('Created doctor has Philippine mobile format', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const doctor = responseJson.data;",
+                  "    pm.expect(doctor.medicalContactNumber).to.match(/^09\\d{9}$/);",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "// Store doctor ID for future tests",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.collectionVariables.set('testDoctorId', responseJson.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-{{$randomUUID}}\",\n  \"specialization\": \"Cardiology\",\n  \"medicalContactNumber\": \"09278479061\",\n  \"licenseNumber\": \"MD-{{$randomInt}}\",\n  \"yearsOfExperience\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors"]
+            },
+            "description": "Create a new doctor profile with valid Philippine mobile number and all required fields"
+          }
+        },
+        {
+          "name": "Create Doctor Profile - Philippine Landline",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Created doctor has landline format', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const doctor = responseJson.data;",
+                  "    // Should accept Philippine landline formats",
+                  "    pm.expect(doctor.medicalContactNumber).to.be.a('string');",
+                  "    pm.expect(doctor.medicalContactNumber.length).to.be.greaterThan(7);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-{{$randomUUID}}\",\n  \"specialization\": \"Dermatology\",\n  \"medicalContactNumber\": \"028765432\",\n  \"licenseNumber\": \"MD-{{$randomInt}}\",\n  \"yearsOfExperience\": 8\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors"]
+            },
+            "description": "Create doctor profile with Philippine landline number (Metro Manila area code)"
+          }
+        },
+        {
+          "name": "Get All Doctors - Happy Path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each doctor has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    if (responseJson.data.length > 0) {",
+                  "        const doctor = responseJson.data[0];",
+                  "        pm.expect(doctor).to.have.property('id');",
+                  "        pm.expect(doctor).to.have.property('userId');",
+                  "        pm.expect(doctor).to.have.property('specialization');",
+                  "        pm.expect(doctor).to.have.property('medicalContactNumber');",
+                  "        pm.expect(doctor).to.have.property('isActive');",
+                  "        // Should include User data via relationship",
+                  "        pm.expect(doctor).to.have.property('user');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors"]
+            },
+            "description": "Retrieve all doctor profiles with User relationship data"
+          }
+        },
+        {
+          "name": "Create Doctor Profile - Invalid Phone Format",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has error structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions contact number validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const errorMessage = responseJson.error.toLowerCase();",
+                  "    pm.expect(errorMessage).to.satisfy(function(msg) {",
+                  "        return msg.includes('contact') || msg.includes('phone') || msg.includes('format');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-{{$randomUUID}}\",\n  \"specialization\": \"Pediatrics\",\n  \"medicalContactNumber\": \"08123456789\",\n  \"licenseNumber\": \"MD-{{$randomInt}}\",\n  \"yearsOfExperience\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors"]
+            },
+            "description": "Test validation error for invalid Philippine phone number (wrong start digits)"
+          }
+        },
+        {
+          "name": "Create Doctor Profile - Missing Required Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has error structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions missing fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const errorMessage = responseJson.error.toLowerCase();",
+                  "    pm.expect(errorMessage).to.satisfy(function(msg) {",
+                  "        return msg.includes('required') || msg.includes('missing') || msg.includes('specialization');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-{{$randomUUID}}\",\n  \"medicalContactNumber\": \"09123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors"]
+            },
+            "description": "Test validation error when required specialization field is missing"
+          }
+        },
+        {
+          "name": "Create Doctor Profile - US Phone Format",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Created doctor has US phone format', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const doctor = responseJson.data;",
+                  "    // Should accept US format (10 digits or 11 digits starting with 1)",
+                  "    pm.expect(doctor.medicalContactNumber).to.be.a('string');",
+                  "    pm.expect(doctor.medicalContactNumber.length).to.be.oneOf([10, 11]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-{{$randomUUID}}\",\n  \"specialization\": \"Neurology\",\n  \"medicalContactNumber\": \"5551234567\",\n  \"licenseNumber\": \"MD-{{$randomInt}}\",\n  \"yearsOfExperience\": 12\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors"]
+            },
+            "description": "Create doctor profile with US phone number format (10 digits)"
           }
         }
       ]

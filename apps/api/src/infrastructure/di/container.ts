@@ -7,6 +7,8 @@ import { MongooseTodoRepository } from '../todo/persistence/mongoose/MongooseTod
 import { InMemoryUserRepository, SqliteUserRepository, TypeOrmUserRepository, MongooseUserRepository } from '../user/persistence';
 import { InMemoryPatientRepository } from '../patient/persistence/in-memory/InMemoryPatientRepository';
 import { TypeOrmPatientRepository } from '../patient/persistence/typeorm/TypeOrmPatientRepository';
+import { InMemoryDoctorRepository } from '../doctor/persistence/in-memory/InMemoryDoctorRepository';
+import { TypeOrmDoctorRepository } from '../doctor/persistence/typeorm/TypeOrmDoctorRepository';
 import {
   CreateTodoUseCase,
   UpdateTodoUseCase,
@@ -36,17 +38,28 @@ import {
   PatientValidationService,
   CreatePatientValidationService,
   GetPatientByIdValidationService,
+  DoctorValidationService,
+  GetDoctorByIdValidationService,
+  GetDoctorsBySpecializationValidationService,
 } from '@nx-starter/application-shared';
 import {
   RegisterUserUseCase,
   LoginUserUseCase,
-  GetAllUsersQueryHandler,
   ChangeUserPasswordUseCase,
   BcryptPasswordHashingService,
   JwtService,
   JwtConfig,
+  GetAllUsersQueryHandler,
+  GetDoctorByIdQueryHandler,
+  GetDoctorsBySpecializationQueryHandler,
+  CreateDoctorProfileCommandHandler,
 } from '@nx-starter/application-api';
-import type { ITodoRepository, IUserRepository } from '@nx-starter/domain';
+import {
+  GetAllDoctorsQueryHandler,
+  GetDoctorByUserIdQueryHandler,
+  CheckDoctorProfileExistsQueryHandler,
+} from '@nx-starter/application-shared';
+import type { ITodoRepository, IUserRepository, IDoctorRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
 import { UserDomainService } from '@nx-starter/domain';
 import { getTypeOrmDataSource } from '../database/connections/TypeOrmConnection';
@@ -72,6 +85,12 @@ export const configureDI = async () => {
   container.registerInstance<IPatientRepository>(
     TOKENS.PatientRepository,
     patientRepositoryImplementation
+  );
+
+  const doctorRepositoryImplementation = await getDoctorRepositoryImplementation();
+  container.registerInstance<IDoctorRepository>(
+    TOKENS.DoctorRepository,
+    doctorRepositoryImplementation
   );
 
   // Infrastructure Layer - Services  
@@ -103,6 +122,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.LoginUserUseCase, LoginUserUseCase);
   container.registerSingleton(TOKENS.ChangeUserPasswordUseCase, ChangeUserPasswordUseCase);
   container.registerSingleton(TOKENS.CreatePatientUseCase, CreatePatientUseCase);
+  container.registerSingleton(TOKENS.CreateDoctorProfileCommandHandler, CreateDoctorProfileCommandHandler);
 
   // Application Layer - Use Cases (Queries)
   container.registerSingleton(
@@ -140,6 +160,26 @@ export const configureDI = async () => {
   container.registerSingleton(
     TOKENS.GetPatientStatsQueryHandler,
     GetPatientStatsQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetAllDoctorsQueryHandler,
+    GetAllDoctorsQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetDoctorByIdQueryHandler,
+    GetDoctorByIdQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetDoctorsBySpecializationQueryHandler,
+    GetDoctorsBySpecializationQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetDoctorByUserIdQueryHandler,
+    GetDoctorByUserIdQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.CheckDoctorProfileExistsQueryHandler,
+    CheckDoctorProfileExistsQueryHandler
   );
 
   // Application Layer - Validation Services
@@ -186,6 +226,18 @@ export const configureDI = async () => {
   container.registerSingleton(
     TOKENS.PatientValidationService,
     PatientValidationService
+  );
+  container.registerSingleton(
+    TOKENS.GetDoctorByIdValidationService,
+    GetDoctorByIdValidationService
+  );
+  container.registerSingleton(
+    TOKENS.GetDoctorsBySpecializationValidationService,
+    GetDoctorsBySpecializationValidationService
+  );
+  container.registerSingleton(
+    TOKENS.DoctorValidationService,
+    DoctorValidationService
   );
 
   // Domain Layer - Domain Services
@@ -317,6 +369,41 @@ async function getPatientRepositoryImplementation(): Promise<IPatientRepository>
       );
       const dataSource = await getTypeOrmDataSource();
       return new TypeOrmPatientRepository(dataSource);
+    }
+  }
+}
+
+async function getDoctorRepositoryImplementation(): Promise<IDoctorRepository> {
+  const dbConfig = getDatabaseConfig();
+  const dbType = dbConfig.type;
+  const ormType = dbConfig.orm || 'native';
+
+  console.log(`📦 Using Doctor repository: ${ormType} ORM with ${dbType} database`);
+
+  // Handle memory database (always uses in-memory repository)
+  if (dbType === 'memory') {
+    console.log('📦 Using in-memory doctor repository');
+    return new InMemoryDoctorRepository();
+  }
+
+  // Handle SQL databases with TypeORM (Doctor supports TypeORM and in-memory like Patient)
+  // MongoDB support can be added later if needed
+  switch (ormType) {
+    case 'typeorm': {
+      const dataSource = await getTypeOrmDataSource();
+      console.log(`📦 Using TypeORM doctor repository with ${dbType}`);
+      return new TypeOrmDoctorRepository(dataSource);
+    }
+
+    case 'native':
+    default: {
+      // For Doctor repository, we only support TypeORM and in-memory
+      // Default to TypeORM for all SQL databases
+      console.log(
+        `📦 Doctor repository only supports TypeORM and in-memory. Using TypeORM with ${dbType}`
+      );
+      const dataSource = await getTypeOrmDataSource();
+      return new TypeOrmDoctorRepository(dataSource);
     }
   }
 }

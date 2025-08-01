@@ -123,6 +123,7 @@ export interface ApiConfiguration {
     health: string;
     todos: string;
     patients: string;
+    doctors: string;
     auth: {
       base: string;
       login: string;

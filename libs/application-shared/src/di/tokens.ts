@@ -9,6 +9,7 @@ export const TOKENS = {
   TodoRepository: 'ITodoRepository',
   UserRepository: 'IUserRepository',
   PatientRepository: 'IPatientRepository',
+  DoctorRepository: 'IDoctorRepository',
 
   // Infrastructure Layer - Services
   PasswordHashingService: 'IPasswordHashingService',
@@ -30,6 +31,7 @@ export const TOKENS = {
   LoginUserUseCase: 'LoginUserUseCase',
   ChangeUserPasswordUseCase: 'ChangeUserPasswordUseCase',
   CreatePatientUseCase: 'CreatePatientUseCase',
+  CreateDoctorProfileCommandHandler: 'CreateDoctorProfileCommandHandler',
 
   // Application Layer - Use Cases (Queries)
   GetAllTodosQueryHandler: 'GetAllTodosQueryHandler',
@@ -42,6 +44,11 @@ export const TOKENS = {
   GetAllPatientsQueryHandler: 'GetAllPatientsQueryHandler',
   GetPatientByIdQueryHandler: 'GetPatientByIdQueryHandler',
   GetPatientStatsQueryHandler: 'GetPatientStatsQueryHandler',
+  GetAllDoctorsQueryHandler: 'GetAllDoctorsQueryHandler',
+  GetDoctorByIdQueryHandler: 'GetDoctorByIdQueryHandler',
+  GetDoctorByUserIdQueryHandler: 'GetDoctorByUserIdQueryHandler',
+  GetDoctorsBySpecializationQueryHandler: 'GetDoctorsBySpecializationQueryHandler',
+  CheckDoctorProfileExistsQueryHandler: 'CheckDoctorProfileExistsQueryHandler',
 
   // Domain Layer - Services
   TodoDomainService: 'TodoDomainService',
@@ -62,6 +69,9 @@ export const TOKENS = {
   CreatePatientValidationService: 'CreatePatientValidationService',
   GetPatientByIdValidationService: 'GetPatientByIdValidationService',
   PatientValidationService: 'PatientValidationService',
+  GetDoctorByIdValidationService: 'GetDoctorByIdValidationService',
+  GetDoctorsBySpecializationValidationService: 'GetDoctorsBySpecializationValidationService',
+  DoctorValidationService: 'DoctorValidationService',
 } as const;
 
 // Type-safe token keys
