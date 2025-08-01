@@ -9,7 +9,7 @@ export interface Patient {
   gender: 'Male' | 'Female' | 'Other';
   phoneNumber: string;
   email?: string;
-  address: {
+  address: string | {
     street: string;
     city: string;
     province: string;
@@ -27,6 +27,29 @@ export interface Patient {
   updatedAt: string; // ISO date string
 }
 
+export interface GuardianDetails {
+  fullName: string;
+  gender: 'Male' | 'Female' | 'Other';
+  relationship: string;
+  contactNumber: string;
+  address: string;
+}
+
+export interface Appointment {
+  id: string;
+  date: string; // YYYY-MM-DD format
+  time: string; // HH:MM format
+  reasonForVisit: string;
+  labTestsDone: string;
+  prescriptions: string;
+  status: 'Confirmed' | 'Pending' | 'Cancelled' | 'Completed';
+}
+
+export interface PatientDetails extends Patient {
+  guardian?: GuardianDetails;
+  appointments?: Appointment[];
+}
+
 export interface PatientFormData {
   firstName: string;
   lastName: string;
@@ -34,10 +57,7 @@ export interface PatientFormData {
   gender: 'Male' | 'Female' | 'Other';
   phoneNumber: string;
   email?: string;
-  street: string;
-  city: string;
-  province: string;
-  zipCode: string;
+  address: string;
   emergencyContactName: string;
   emergencyContactRelationship: string;
   emergencyContactPhone: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, LoadingOverlay, Alert, Button } from '@mantine/core';
+import { Box, Alert, Button } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { PatientsTable } from '../components';
 import { usePatientViewModel } from '../view-models';
@@ -24,8 +24,6 @@ export const PatientsPage: React.FC = () => {
           position: 'relative'
         }}
       >
-        <LoadingOverlay visible={isLoading} />
-        
         {error && (
           <Alert 
             color="red" 
@@ -41,6 +39,7 @@ export const PatientsPage: React.FC = () => {
         <PatientsTable
           patients={patients}
           onAddPatient={handleAddPatient}
+          isLoading={isLoading}
         />
       </Box>
     </MedicalClinicLayout>

@@ -183,7 +183,7 @@ describe('AuthGuard - Logout Related Protection', () => {
       );
 
       // Should show initializing state initially
-      expect(screen.getByText('Initializing...')).toBeInTheDocument();
+      expect(screen.getByTestId('page-loading-indicator')).toBeInTheDocument();
     });
 
     it('should allow access to protected content when authenticated', async () => {
