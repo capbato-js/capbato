@@ -10,3 +10,5 @@ export { PatientApiService } from './PatientApiService';
 export { ApiPatientRepository } from './ApiPatientRepository';
 export { IUserApiService } from './IUserApiService';
 export { UserApiService } from './UserApiService';
+export { IDoctorApiService } from './IDoctorApiService';
+export { DoctorApiService } from './DoctorApiService';
