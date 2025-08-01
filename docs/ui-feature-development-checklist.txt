@@ -1,0 +1,307 @@
+FEATURE DEVELOPMENT CHECKLIST (WEB FRONTEND)
+=============================================
+
+Follow this checklist when implementing new web features to ensure Clean Architecture, 
+SOLID principles, and MVVM patterns are maintained.
+
+DOMAIN LAYER (libs/domain/)
+---------------------------
+
+[ ] Create entity with business logic
+    - File: src/entities/FeatureName.ts
+    - Example: libs/domain/src/entities/Todo.ts
+    - Private readonly fields with public getters
+    - Business methods like toggle(), update(), validate()
+    - Immutable - create new instances for changes
+
+[ ] Create value objects with validation
+    - File: src/value-objects/FeatureNameProperty.ts
+    - Example: libs/domain/src/value-objects/TodoTitle.ts
+    - Self-validating in constructor
+    - Immutable with equals() method
+
+[ ] Define repository interface
+    - File: src/repositories/IFeatureNameRepository.ts
+    - Example: libs/domain/src/repositories/ITodoRepository.ts
+    - Pure interface, no implementation details
+    - Methods: getAll(), create(), update(), delete(), getById()
+
+[ ] Create domain services if needed
+    - File: src/services/FeatureNameDomainService.ts
+    - Example: libs/domain/src/services/TodoDomainService.ts
+
+[ ] Define domain events
+    - File: src/events/FeatureNameEvents.ts
+    - Example: libs/domain/src/events/TodoEvents.ts
+
+[ ] Create specifications for complex queries
+    - File: src/specifications/FeatureNameSpecifications.ts
+    - Example: libs/domain/src/specifications/TodoSpecifications.ts
+
+APPLICATION LAYER (libs/application-shared/)
+--------------------------------------------
+
+[ ] Create use cases for each business operation
+    - File: src/use-cases/commands/ActionFeatureNameUseCase.ts
+    - Example: libs/application-shared/src/use-cases/commands/CreateTodoUseCase.ts
+    - Single responsibility per use case
+    - Inject dependencies via @inject()
+    - Domain validation before persistence
+
+[ ] Define command/query DTOs
+    - File: src/dto/FeatureNameCommands.ts
+    - File: src/dto/FeatureNameQueries.ts
+    - Example: libs/application-shared/src/dto/TodoCommands.ts
+
+[ ] Create validation schemas with Zod
+    - File: src/validation/FeatureNameValidationSchemas.ts
+    - Example: libs/application-shared/src/validation/TodoValidationSchemas.ts
+    - Custom refinement functions for complex validation
+    - Transform data and provide TypeScript types
+
+[ ] Implement CQRS services
+    - File: src/services/FeatureNameCommandService.ts
+    - File: src/services/FeatureNameQueryService.ts
+    - Example: libs/application-shared/src/services/TodoCommandService.ts
+    - Separate read/write operations
+    - Orchestrate use cases
+
+[ ] Create mappers for data transformation
+    - File: src/mappers/FeatureNameMapper.ts
+    - Example: libs/application-shared/src/mappers/TodoMapper.ts
+    - Convert between domain entities and DTOs
+
+[ ] Define service interfaces
+    - File: src/interfaces/IFeatureNameService.ts
+    - Example: libs/application-shared/src/interfaces/ITodoService.ts
+
+APPLICATION WEB LAYER (libs/application-web/)
+---------------------------------------------
+
+[ ] Create web-specific components if needed
+    - File: src/lib/components/FeatureNameComponent.tsx
+    - Example: libs/application-web/src/lib/components/FormTextInput.tsx
+    - Reusable components across web application
+
+[ ] Define web-specific types and interfaces
+    - File: src/lib/types/FeatureNameTypes.ts
+    - Web application specific data structures
+
+WEB INFRASTRUCTURE LAYER (apps/web/src/infrastructure/)
+------------------------------------------------------
+
+[ ] Create API service for HTTP communication
+    - File: api/FeatureNameApiService.ts
+    - Example: apps/web/src/infrastructure/api/TodoApiService.ts
+    - Implement service interface
+    - Handle HTTP requests/responses
+
+[ ] Create state store with Zustand
+    - File: state/FeatureNameStore.ts
+    - Example: apps/web/src/infrastructure/state/TodoStore.ts
+    - CQRS pattern with separate command/query services
+    - Optimistic updates for better UX
+    - Proper error handling and loading states
+
+[ ] Register dependencies in Web DI container
+    - File: apps/web/src/infrastructure/di/container.ts
+    - Register API services, application services
+
+[ ] Define DI tokens
+    - File: libs/application-shared/src/di/tokens.ts
+    - Unique symbols for all injectable services
+
+PRESENTATION LAYER (apps/web/src/presentation/features/)
+-------------------------------------------------------
+
+[ ] Create feature folder structure
+    featurename/
+    ├── components/
+    │   ├── FeatureNameForm.tsx
+    │   ├── FeatureNameItem.tsx
+    │   ├── FeatureNameList.tsx
+    │   └── FeatureNameStats.tsx
+    ├── pages/
+    │   └── FeatureNamePage.tsx
+    ├── view-models/
+    │   ├── interfaces/FeatureNameViewModels.ts
+    │   ├── useFeatureNameFormViewModel.ts
+    │   ├── useFeatureNameItemViewModel.ts
+    │   └── useFeatureNameListViewModel.ts
+    ├── types/FormTypes.ts
+    └── index.ts
+
+[ ] Create view model interfaces
+    - File: view-models/interfaces/FeatureNameViewModels.ts
+    - Example: apps/web/src/presentation/features/todo/view-models/interfaces/TodoViewModels.ts
+    - Define contracts between view models and views
+
+[ ] Implement view models
+    - File: view-models/useFeatureNameFormViewModel.ts
+    - Example: apps/web/src/presentation/features/todo/view-models/useTodoFormViewModel.ts
+    - Handle presentation logic and user interactions
+    - Coordinate with application services
+    - Manage component-specific state
+
+[ ] Create React components using custom UI components
+    - File: components/FeatureNameForm.tsx
+    - Example: apps/web/src/presentation/features/todo/components/TodoForm.tsx
+    - No business logic in components
+    - Use view models for all operations
+    - Use custom UI components (FormTextInput, Button, Card, etc.)
+
+[ ] Create main feature page
+    - File: pages/FeatureNamePage.tsx
+    - Example: apps/web/src/presentation/features/todo/pages/TodoPage.tsx
+
+UI COMPONENTS USAGE (apps/web/src/presentation/components/ui/)
+-------------------------------------------------------------
+
+[ ] Use FormTextInput for form inputs
+    - File: apps/web/src/presentation/components/ui/FormTextInput.tsx
+    - Enhanced TextInput with automatic error handling
+    - Integrates with react-hook-form and Zod validation
+    - Example: <FormTextInput {...register('title')} error={errors.title} />
+
+[ ] Use custom Button components
+    - File: apps/web/src/presentation/components/ui/button.tsx
+    - Consistent styling and behavior
+    - Example: <Button type="submit" disabled={isLoading}>Submit</Button>
+
+[ ] Use custom Card components
+    - File: apps/web/src/presentation/components/ui/card.tsx
+    - Consistent card layouts
+    - Example: <Card><CardContent>Content here</CardContent></Card>
+
+[ ] Use custom Checkbox components
+    - File: apps/web/src/presentation/components/ui/checkbox.tsx
+    - Enhanced checkbox with consistent styling
+    - Example: <Checkbox checked={completed} onCheckedChange={handleToggle} />
+
+[ ] Prefer custom UI components over direct Mantine usage
+    - Always check apps/web/src/presentation/components/ui/ first
+    - Use Mantine components directly only if no custom wrapper exists
+    - Create new custom wrappers for commonly used patterns
+
+FORM HANDLING PATTERNS
+----------------------
+
+[ ] Use react-hook-form with Zod resolver
+    - Import validation schema from libs/application-shared
+    - Example: resolver: zodResolver(CreateTodoCommandSchema)
+
+[ ] Handle form state through view models
+    - Form submission logic in view model
+    - Loading states managed by view model
+    - Error handling through view model
+
+[ ] Example form pattern:
+    const viewModel = useFeatureNameFormViewModel();
+    const { register, handleSubmit, formState: { errors } } = useForm({
+      resolver: zodResolver(ValidationSchema)
+    });
+    
+    const onSubmit = handleSubmit(async (data) => {
+      const success = await viewModel.handleFormSubmit(data);
+      if (success) reset();
+    });
+
+VALIDATION & ERROR HANDLING
+---------------------------
+
+[ ] Implement Zod schemas for all inputs
+    - Custom refinement functions for complex validation
+    - Meaningful error messages
+    - TypeScript type generation
+
+[ ] Create custom domain exceptions
+    - File: libs/domain/src/exceptions/DomainExceptions.ts
+    - Specific exception types for domain rules
+
+[ ] Implement error mapping utilities
+    - File: apps/web/src/infrastructure/utils/ErrorMapping.ts
+    - Map validation errors to field-specific messages
+
+[ ] Add user-friendly error handling in UI
+    - Loading states during operations
+    - Error states with recovery options
+    - Clear error messages for users
+
+QUALITY ASSURANCE
+-----------------
+
+[ ] Code Quality
+    - TypeScript strict mode enabled
+    - No ESLint warnings
+    - Prettier formatting applied
+    - No 'any' types used
+
+[ ] Architecture Compliance
+    - Dependencies flow inward (Clean Architecture)
+    - No cross-layer violations
+    - Interfaces used for external dependencies
+    - SOLID principles applied
+
+[ ] Performance
+    - Optimistic updates where appropriate
+    - Proper loading/error states
+    - Memoization in view models if needed
+
+[ ] Security
+    - Input validation on all user inputs
+    - No sensitive data in client code
+    - Proper authentication/authorization
+
+[ ] Accessibility
+    - ARIA labels on interactive elements
+    - Keyboard navigation support
+    - Screen reader compatibility
+    - Proper color contrast
+
+IMPLEMENTATION PHASES
+--------------------
+
+Phase 1: Domain Layer
+1. Create entity with business logic
+2. Create value objects with validation
+3. Define repository interface
+
+Phase 2: Application Layer
+1. Create use cases
+2. Define DTOs and validation schemas
+3. Implement application services
+
+Phase 3: Web Infrastructure Layer
+1. Create API service
+2. Create state store
+3. Configure DI container
+
+Phase 4: Presentation Layer
+1. Create view model interfaces
+2. Implement view models
+3. Create React components with custom UI components
+4. Create feature page
+
+Phase 5: Quality Assurance
+1. Check architectural compliance
+2. Verify accessibility
+3. Performance testing
+
+REFERENCE EXAMPLES
+------------------
+
+Todo Feature:
+- Domain: libs/domain/src/entities/Todo.ts
+- Use Case: libs/application-shared/src/use-cases/commands/CreateTodoUseCase.ts
+- Component: apps/web/src/presentation/features/todo/components/TodoForm.tsx
+- ViewModel: apps/web/src/presentation/features/todo/view-models/useTodoFormViewModel.ts
+- Store: apps/web/src/infrastructure/state/TodoStore.ts
+
+Login Feature:
+- Component: apps/web/src/presentation/features/login/components/LoginForm.tsx
+- ViewModel: apps/web/src/presentation/features/login/view-models/useLoginFormViewModel.ts
+
+Custom UI Components:
+- FormTextInput: apps/web/src/presentation/components/ui/FormTextInput.tsx
+- Button: apps/web/src/presentation/components/ui/button.tsx
+- Card: apps/web/src/presentation/components/ui/card.tsx
