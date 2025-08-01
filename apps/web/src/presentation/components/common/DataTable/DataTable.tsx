@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Box, TextInput, Table, Text, Loader } from '@mantine/core';
+import { Box, TextInput, Table, Text, Skeleton } from '@mantine/core';
 import { DataTableProps, SearchableItem } from './types';
 
 export function DataTable<T extends SearchableItem>({
@@ -38,18 +38,29 @@ export function DataTable<T extends SearchableItem>({
     });
   }, [data, searchQuery, searchFields, columns, searchable]);
 
-  if (isLoading) {
-    return (
-      <Box style={{ textAlign: 'center', padding: '40px' }}>
-        <Loader size="lg" />
-        <Text mt="md">Loading...</Text>
-      </Box>
-    );
-  }
+  // Create skeleton rows for loading state
+  const skeletonRows = Array.from({ length: 5 }, (_, index) => (
+    <Table.Tr key={`skeleton-${index}`}>
+      {columns.map((column, colIndex) => (
+        <Table.Td
+          key={`skeleton-${index}-${String(column.key)}`}
+          style={{
+            padding: '14px',
+            textAlign: column.align || 'left',
+            paddingLeft: column.align === 'left' ? '20px' : '14px',
+            borderRight: colIndex < columns.length - 1 ? '1px solid #ddd' : 'none',
+            borderBottom: '1px solid #ddd'
+          }}
+        >
+          <Skeleton height={16} radius="sm" />
+        </Table.Td>
+      ))}
+    </Table.Tr>
+  ));
 
   return (
     <Box>
-      {/* Search Bar */}
+      {/* Search Bar - Always visible */}
       {searchable && (
         <TextInput
           placeholder={searchPlaceholder}
@@ -61,7 +72,7 @@ export function DataTable<T extends SearchableItem>({
         />
       )}
 
-      {/* Table */}
+      {/* Table - Always visible with headers */}
       <Box
         style={{
           borderRadius: '10px',
@@ -78,6 +89,7 @@ export function DataTable<T extends SearchableItem>({
             background: 'white'
           }}
         >
+          {/* Table Headers - Always visible */}
           <Table.Thead>
             <Table.Tr
               style={{
@@ -103,8 +115,12 @@ export function DataTable<T extends SearchableItem>({
               ))}
             </Table.Tr>
           </Table.Thead>
+          
+          {/* Table Body - Skeleton rows when loading, actual data when loaded */}
           <Table.Tbody>
-            {filteredData.length === 0 ? (
+            {isLoading ? (
+              skeletonRows
+            ) : filteredData.length === 0 ? (
               <Table.Tr>
                 <Table.Td
                   colSpan={columns.length}

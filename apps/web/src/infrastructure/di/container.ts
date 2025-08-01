@@ -56,7 +56,7 @@ export const configureDI = () => {
   
   // Infrastructure Layer - API Services (always register for potential future use)
   container.registerSingleton<ITodoApiService>(TOKENS.TodoApiService, TodoApiService);
-  container.registerSingleton<IPatientApiService>('IPatientApiService', PatientApiService);
+  container.registerSingleton<IPatientApiService>(TOKENS.PatientApiService, PatientApiService);
   
   // Auth API Service - use mock in development if auth is not enabled
   if (enableAuth && useApiBackend) {

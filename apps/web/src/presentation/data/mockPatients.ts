@@ -1,4 +1,4 @@
-import { Patient } from '../features/patients/types';
+import { Patient, PatientDetails, GuardianDetails, Appointment } from '../features/patients/types';
 
 // Calculate age from date of birth
 const calculateAge = (dateOfBirth: string): number => {
@@ -240,3 +240,203 @@ export const mockPatients: Patient[] = [
     updatedAt: '2024-12-22T10:10:00.000Z'
   }
 ];
+
+// Mock patient details with guardian and appointments data
+export const mockPatientDetails: PatientDetails[] = mockPatients.map((patient, index) => {
+  const guardians: GuardianDetails[] = [
+    {
+      fullName: 'Anjela Depanes',
+      gender: 'Male',
+      relationship: 'Aaa',
+      contactNumber: '9083421788',
+      address: 'Ph 4 Pkg 5 Blk 34 Lot 17'
+    },
+    {
+      fullName: 'Roberto Santos',
+      gender: 'Male',
+      relationship: 'Father',
+      contactNumber: '9171234567',
+      address: '123 Rizal Street, Quezon City'
+    },
+    {
+      fullName: 'Carmen Reyes',
+      gender: 'Female',
+      relationship: 'Mother',
+      contactNumber: '9187654321',
+      address: '456 Bonifacio Avenue, Makati City'
+    },
+    {
+      fullName: 'Pedro Cruz',
+      gender: 'Male',
+      relationship: 'Father',
+      contactNumber: '9198765432',
+      address: '789 Del Pilar Street, Pasig City'
+    },
+    {
+      fullName: 'Maria Garcia',
+      gender: 'Female',
+      relationship: 'Mother',
+      contactNumber: '9263334444',
+      address: '321 Mabini Street, Taguig City'
+    },
+    {
+      fullName: 'Carmen Mendoza',
+      gender: 'Female',
+      relationship: 'Mother',
+      contactNumber: '9187778888',
+      address: '654 Luna Street, Mandaluyong City'
+    },
+    {
+      fullName: 'Luis Fernandez',
+      gender: 'Male',
+      relationship: 'Father',
+      contactNumber: '9231112222',
+      address: '987 Aguinaldo Street, San Juan City'
+    },
+    {
+      fullName: 'Ana Torres',
+      gender: 'Female',
+      relationship: 'Mother',
+      contactNumber: '9145556666',
+      address: '147 Magsaysay Avenue, Caloocan City'
+    }
+  ];
+
+  const appointmentsSets: Appointment[][] = [
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-06-29',
+        time: '11:00',
+        reasonForVisit: 'Consultation',
+        labTestsDone: 'N/A',
+        prescriptions: 'N/A',
+        status: 'Confirmed'
+      },
+      {
+        id: `${patient.id}-apt2`,
+        date: '2025-05-21',
+        time: '08:00',
+        reasonForVisit: 'Consultation',
+        labTestsDone: 'N/A',
+        prescriptions: 'N/A',
+        status: 'Confirmed'
+      },
+      {
+        id: `${patient.id}-apt3`,
+        date: '2025-05-20',
+        time: '08:00',
+        reasonForVisit: 'Consultation',
+        labTestsDone: 'N/A',
+        prescriptions: 'N/A',
+        status: 'Confirmed'
+      }
+    ],
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-07-15',
+        time: '09:30',
+        reasonForVisit: 'Follow-up',
+        labTestsDone: 'Blood Test',
+        prescriptions: 'Antibiotics',
+        status: 'Confirmed'
+      },
+      {
+        id: `${patient.id}-apt2`,
+        date: '2025-06-10',
+        time: '14:00',
+        reasonForVisit: 'Check-up',
+        labTestsDone: 'X-ray',
+        prescriptions: 'Pain Relief',
+        status: 'Completed'
+      }
+    ],
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-08-05',
+        time: '10:15',
+        reasonForVisit: 'Annual Physical',
+        labTestsDone: 'Complete Blood Count',
+        prescriptions: 'Vitamins',
+        status: 'Pending'
+      }
+    ],
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-07-22',
+        time: '16:30',
+        reasonForVisit: 'Cardiac Assessment',
+        labTestsDone: 'ECG, Lipid Profile',
+        prescriptions: 'Statin, Beta Blocker',
+        status: 'Confirmed'
+      },
+      {
+        id: `${patient.id}-apt2`,
+        date: '2025-06-15',
+        time: '11:45',
+        reasonForVisit: 'Follow-up',
+        labTestsDone: 'Blood Pressure',
+        prescriptions: 'ACE Inhibitor',
+        status: 'Completed'
+      }
+    ],
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-09-10',
+        time: '13:20',
+        reasonForVisit: 'Migraine Treatment',
+        labTestsDone: 'MRI',
+        prescriptions: 'Sumatriptan',
+        status: 'Confirmed'
+      }
+    ],
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-08-18',
+        time: '15:00',
+        reasonForVisit: 'Kidney Stone Follow-up',
+        labTestsDone: 'Ultrasound',
+        prescriptions: 'Pain Medication',
+        status: 'Pending'
+      }
+    ],
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-07-30',
+        time: '12:30',
+        reasonForVisit: 'Thyroid Check',
+        labTestsDone: 'TSH, T3, T4',
+        prescriptions: 'Levothyroxine',
+        status: 'Confirmed'
+      }
+    ],
+    [
+      {
+        id: `${patient.id}-apt1`,
+        date: '2025-09-25',
+        time: '09:00',
+        reasonForVisit: 'Arthritis Management',
+        labTestsDone: 'Joint X-ray',
+        prescriptions: 'Anti-inflammatory',
+        status: 'Confirmed'
+      }
+    ]
+  ];
+
+  return {
+    ...patient,
+    guardian: guardians[index % guardians.length],
+    appointments: appointmentsSets[index % appointmentsSets.length]
+  };
+});
+
+// Helper function to get patient details by ID
+export const getPatientDetailsById = (id: string): PatientDetails | undefined => {
+  return mockPatientDetails.find(patient => patient.id === id);
+};
