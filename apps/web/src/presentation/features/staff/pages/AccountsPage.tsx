@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   Box, 
   Button,
-  Modal,
   TextInput,
   Select,
   Stack,
@@ -14,7 +13,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { RegisterUserCommandSchema } from '@nx-starter/application-shared';
-import { Icon } from '../../../components/common';
+import { Icon, Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useAccountsViewModel';
@@ -212,42 +211,16 @@ export const AccountsPage: React.FC = () => {
       <Modal
         opened={opened}
         onClose={handleCloseModal}
-        title={
-          <Text
-            style={{
-              color: '#0b4f6c',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              textAlign: 'center',
-              width: '100%'
-            }}
-          >
-            Create Account
-          </Text>
-        }
-        centered
-        styles={{
-          content: {
-            borderRadius: '16px',
-            padding: '32px 24px'
-          },
-          header: {
-            borderBottom: 'none',
-            paddingBottom: 0
-          },
-          close: {
-            color: '#888',
-            fontSize: '22px'
-          }
-        }}
+        title="Create Account"
       >
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} noValidate>
           <Stack gap="md">
             <TextInput
             label="First Name"
             placeholder="Enter first name"
             error={errors.firstName?.message}
             disabled={isLoading}
+            required
             {...register('firstName')}
           />
           
@@ -256,6 +229,7 @@ export const AccountsPage: React.FC = () => {
             placeholder="Enter last name"
             error={errors.lastName?.message}
             disabled={isLoading}
+            required
             {...register('lastName')}
           />
           
@@ -265,6 +239,7 @@ export const AccountsPage: React.FC = () => {
             placeholder="Enter email"
             error={errors.email?.message}
             disabled={isLoading}
+            required
             {...register('email')}
           />
           
@@ -274,6 +249,7 @@ export const AccountsPage: React.FC = () => {
             placeholder="Enter password"
             error={errors.password?.message}
             disabled={isLoading}
+            required
             {...register('password')}
           />
           
@@ -291,6 +267,7 @@ export const AccountsPage: React.FC = () => {
                   { value: 'doctor', label: 'Doctor' }
                 ]}
                 disabled={isLoading}
+                required
                 {...field}
               />
             )}
@@ -321,86 +298,52 @@ export const AccountsPage: React.FC = () => {
       <Modal
         opened={passwordModalOpened}
         onClose={handleClosePasswordModal}
-        title={
-          <Text
-            style={{
-              color: '#0b4f6c',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              textAlign: 'center',
-              width: '100%'
-            }}
-          >
-            Change Password
-          </Text>
-        }
-        centered
-        styles={{
-          content: {
-            borderRadius: '16px',
-            padding: '32px 24px'
-          },
-          header: {
-            borderBottom: 'none',
-            paddingBottom: 0
-          },
-          close: {
-            color: '#888',
-            fontSize: '22px'
-          }
-        }}
+        title="Change Password"
       >
-        <Stack gap="md">
-          {passwordError && (
-            <Alert color="red" style={{ marginBottom: '10px' }}>
-              {passwordError}
-            </Alert>
-          )}
+        <form onSubmit={(e) => { e.preventDefault(); handlePasswordSubmit(); }} noValidate>
+          <Stack gap="md">
+            {passwordError && (
+              <Alert color="red" style={{ marginBottom: '10px' }}>
+                {passwordError}
+              </Alert>
+            )}
 
-          <Text style={{ marginBottom: '10px', color: '#666' }}>
-            New Password for <strong style={{ color: '#1976d2' }}>{selectedAccount?.firstName} {selectedAccount?.lastName}</strong>
-          </Text>
+            <Text style={{ marginBottom: '10px', color: '#666' }}>
+              New Password for <strong style={{ color: '#1976d2' }}>{selectedAccount?.firstName} {selectedAccount?.lastName}</strong>
+            </Text>
 
-          <TextInput
-            label="New Password"
-            type="password"
-            placeholder="Enter new password"
-            value={passwordData.newPassword}
-            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-            required
-            disabled={isLoading}
-          />
-          
-          <TextInput
-            label="Confirm Password"
-            type="password"
-            placeholder="Confirm new password"
-            value={passwordData.confirmPassword}
-            onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-            required
-            disabled={isLoading}
-          />
-          
-          <Button
-            onClick={handlePasswordSubmit}
-            loading={isLoading}
-            fullWidth
-            mt="md"
-            disabled={!passwordData.newPassword || !passwordData.confirmPassword}
-            style={{
-              backgroundColor: '#4db6ac',
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '10px 20px',
-              fontSize: '15px',
-              fontWeight: 'bold'
-            }}
-          >
-            <Icon icon="fas fa-key" style={{ marginRight: '4px' }} />
-            {isLoading ? 'Changing Password...' : 'Change Password'}
-          </Button>
-        </Stack>
+            <TextInput
+              label="New Password"
+              type="password"
+              placeholder="Enter new password"
+              value={passwordData.newPassword}
+              onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+              disabled={isLoading}
+              required
+            />
+            
+            <TextInput
+              label="Confirm Password"
+              type="password"
+              placeholder="Confirm new password"
+              value={passwordData.confirmPassword}
+              onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+              disabled={isLoading}
+              required
+            />
+            
+            <Button
+              type="submit"
+              loading={isLoading}
+              fullWidth
+              mt="md"
+              disabled={!passwordData.newPassword || !passwordData.confirmPassword}
+            >
+              <Icon icon="fas fa-key" style={{ marginRight: '4px' }} />
+              {isLoading ? 'Changing Password...' : 'Change Password'}
+            </Button>
+          </Stack>
+        </form>
       </Modal>
     </MedicalClinicLayout>
   );
