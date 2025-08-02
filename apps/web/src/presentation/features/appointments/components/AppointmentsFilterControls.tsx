@@ -45,7 +45,7 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
         <DateInput
           value={selectedDate.toISOString().split('T')[0]}
           onChange={onDateChange}
-          placeholder="Pick date"
+          placeholder="Any date format"
           size="sm"
           valueFormat="MM/DD/YYYY"
           rightSection={<Icon icon="fas fa-calendar" size={14} />}

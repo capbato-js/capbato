@@ -160,7 +160,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                         <DateInput
                           {...field}
                           label="Date of Birth"
-                          placeholder="mm/dd/yyyy"
+                          placeholder="Any date format"
                           error={fieldState.error?.message}
                           disabled={isLoading}
                           required
