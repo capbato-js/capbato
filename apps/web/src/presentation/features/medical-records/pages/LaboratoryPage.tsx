@@ -45,17 +45,48 @@ export const LaboratoryPage: React.FC = () => {
     // TODO: Implement view result functionality
   };
 
-  const getStatusColor = (status: LaboratoryResult['status']) => {
-    switch (status) {
-      case 'Completed':
-        return 'green';
-      case 'In Progress':
-        return 'blue';
-      case 'Pending':
-        return 'orange';
-      default:
-        return 'gray';
-    }
+  const getStatusBadge = (status: LaboratoryResult['status']) => {
+    const styles = {
+      'Pending': {
+        background: '#ffcc80',
+        color: '#8c5000',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontWeight: 'bold',
+        display: 'inline-block'
+      },
+      'Completed': {
+        background: '#b9f6ca',
+        color: '#006400',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontWeight: 'bold',
+        display: 'inline-block'
+      },
+      'In Progress': {
+        background: '#bbdefb',
+        color: '#0d47a1',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontWeight: 'bold',
+        display: 'inline-block'
+      }
+    };
+
+    const defaultStyle = {
+      background: '#e0e0e0',
+      color: '#424242',
+      padding: '5px 10px',
+      borderRadius: '5px',
+      fontWeight: 'bold',
+      display: 'inline-block'
+    };
+
+    return (
+      <span style={styles[status] || defaultStyle}>
+        {status}
+      </span>
+    );
   };
 
   // Define columns for the DataTable - matching legacy structure
@@ -80,14 +111,7 @@ export const LaboratoryPage: React.FC = () => {
       width: '20%',
       align: 'center',
       searchable: true,
-      render: (value: LaboratoryResult['status']) => (
-        <span style={{ 
-          fontWeight: 'normal',
-          color: value === 'Completed' ? '#28a745' : value === 'Pending' ? '#ffc107' : '#007bff'
-        }}>
-          {value}
-        </span>
-      )
+      render: (value: LaboratoryResult['status']) => getStatusBadge(value)
     },
     {
       key: 'id',
@@ -95,7 +119,7 @@ export const LaboratoryPage: React.FC = () => {
       width: '20%',
       align: 'center',
       searchable: false,
-      render: (value: any, record: LaboratoryResult) => (
+      render: (value: string, record: LaboratoryResult) => (
         <Button
           size="sm"
           onClick={() => handleViewResult(record)}
