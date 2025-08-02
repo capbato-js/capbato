@@ -28,8 +28,9 @@ export class DoctorMapper {
       id: doctor.stringId || '',
       userId: doctor.userId,
       specialization: doctor.specializationValue,
-      medicalContactNumber: doctor.medicalContactNumberValue,
-      formattedMedicalContactNumber: doctor.formattedMedicalContactNumber,
+      // Contact info comes from User entity
+      contactNumber: user.mobile?.value || '',
+      formattedContactNumber: user.mobile?.value || '',
       licenseNumber: doctor.licenseNumber,
       yearsOfExperience: doctor.yearsOfExperience,
       isActive: doctor.isActive,
@@ -54,7 +55,7 @@ export class DoctorMapper {
       userId: doctor.userId,
       fullName: `${user.firstName.value} ${user.lastName.value}`,
       specialization: doctor.specializationValue,
-      formattedMedicalContactNumber: doctor.formattedMedicalContactNumber,
+      formattedContactNumber: user.mobile?.value || '',
       yearsOfExperience: doctor.yearsOfExperience,
       isActive: doctor.isActive,
     };
@@ -86,8 +87,6 @@ export class DoctorMapper {
     user_id?: string;
     specialization?: string;
     Specialization?: string;
-    medicalContactNumber?: string;
-    ContactNumber?: string; // Legacy field name
     licenseNumber?: string;
     license_number?: string;
     yearsOfExperience?: number;
@@ -99,20 +98,18 @@ export class DoctorMapper {
     const id = data.id || data.doctorId || data.DoctorID;
     const userId = data.userId || data.user_id;
     const specialization = data.specialization || data.Specialization;
-    const medicalContactNumber = data.medicalContactNumber || data.ContactNumber;
     const licenseNumber = data.licenseNumber || data.license_number;
     const yearsOfExperience = data.yearsOfExperience || data.years_of_experience;
     const isActive = data.isActive !== undefined ? data.isActive : 
                      data.is_active !== undefined ? data.is_active : true;
 
-    if (!userId || !specialization || !medicalContactNumber) {
-      throw new Error('Invalid doctor profile data: missing required fields (userId, specialization, medicalContactNumber)');
+    if (!userId || !specialization) {
+      throw new Error('Invalid doctor profile data: missing required fields (userId, specialization)');
     }
 
     return new Doctor(
       userId,
       specialization,
-      medicalContactNumber,
       id,
       licenseNumber,
       yearsOfExperience,
@@ -127,7 +124,6 @@ export class DoctorMapper {
     id?: string;
     userId: string;
     specialization: string;
-    medicalContactNumber: string;
     licenseNumber?: string;
     yearsOfExperience?: number;
     isActive: boolean;
@@ -136,7 +132,6 @@ export class DoctorMapper {
       id: doctor.stringId,
       userId: doctor.userId,
       specialization: doctor.specializationValue,
-      medicalContactNumber: doctor.medicalContactNumberValue,
       licenseNumber: doctor.licenseNumber,
       yearsOfExperience: doctor.yearsOfExperience,
       isActive: doctor.isActive,

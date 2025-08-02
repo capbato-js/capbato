@@ -1,4 +1,4 @@
-import { DoctorDto, DoctorSummaryDto } from '@nx-starter/application-shared';
+import { DoctorDto, DoctorSummaryDto, CreateDoctorProfileCommand, DoctorOperationResponse } from '@nx-starter/application-shared';
 
 /**
  * Interface for Doctor API Service
@@ -31,4 +31,9 @@ export interface IDoctorApiService {
    * Check if user has a doctor profile
    */
   checkDoctorProfileExists(userId: string): Promise<boolean>;
+
+  /**
+   * Create a new doctor profile
+   */
+  createDoctorProfile(command: CreateDoctorProfileCommand): Promise<DoctorOperationResponse>;
 }

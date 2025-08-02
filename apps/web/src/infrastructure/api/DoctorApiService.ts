@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { IDoctorApiService } from './IDoctorApiService';
-import { DoctorDto, DoctorSummaryDto, DoctorListResponse, DoctorSummaryListResponse, DoctorResponse, TOKENS } from '@nx-starter/application-shared';
+import { DoctorDto, DoctorSummaryDto, DoctorListResponse, DoctorSummaryListResponse, DoctorResponse, DoctorOperationResponse, CreateDoctorProfileCommand, TOKENS } from '@nx-starter/application-shared';
 import { IHttpClient } from '../http/IHttpClient';
 import { getApiConfig } from './config/ApiConfig';
 
@@ -120,6 +120,27 @@ export class DoctorApiService implements IDoctorApiService {
       console.error(`Error checking doctor profile existence for user ${userId}:`, error);
       // Return false if there's an error checking existence
       return false;
+    }
+  }
+
+  /**
+   * Create a new doctor profile
+   */
+  async createDoctorProfile(command: CreateDoctorProfileCommand): Promise<DoctorOperationResponse> {
+    try {
+      const response = await this.httpClient.post<DoctorOperationResponse>(
+        this.apiConfig.endpoints.doctors.all,
+        command
+      );
+
+      if (!response.data.success) {
+        throw new Error('Failed to create doctor profile');
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('Error creating doctor profile:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to create doctor profile');
     }
   }
 }

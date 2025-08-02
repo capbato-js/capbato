@@ -7,7 +7,7 @@ import {
   RegisterUserCommand,
   TOKENS,
 } from '@nx-starter/application-shared';
-import { extractErrorMessage } from '../utils/ErrorMapping';
+import { extractErrorMessage, isApiError } from '../utils/ErrorMapping';
 
 /**
  * Authentication Command Service Implementation
@@ -23,7 +23,19 @@ export class AuthCommandService implements IAuthCommandService {
     try {
       return await this.authApiService.login(command);
     } catch (error: unknown) {
-      // Use the unified error extraction utility that handles typed errors
+      // For validation errors, preserve the original error structure
+      // so the UI can extract field-specific validation details
+      if (isApiError(error)) {
+        const apiError = error as any;
+        const backendError = apiError.response?.data;
+        
+        // If it's a validation error with details, preserve the original error
+        if (backendError?.code === 'VALIDATION_ERROR' && backendError.details) {
+          throw error; // Preserve original error with validation details
+        }
+      }
+      
+      // For non-validation errors, use the unified error extraction utility
       const errorMessage = extractErrorMessage(error);
       throw new Error(errorMessage);
     }
@@ -33,7 +45,19 @@ export class AuthCommandService implements IAuthCommandService {
     try {
       return await this.authApiService.register(command);
     } catch (error: unknown) {
-      // Use the unified error extraction utility that handles typed errors
+      // For validation errors, preserve the original error structure
+      // so the UI can extract field-specific validation details
+      if (isApiError(error)) {
+        const apiError = error as any;
+        const backendError = apiError.response?.data;
+        
+        // If it's a validation error with details, preserve the original error
+        if (backendError?.code === 'VALIDATION_ERROR' && backendError.details) {
+          throw error; // Preserve original error with validation details
+        }
+      }
+      
+      // For non-validation errors, use the unified error extraction utility
       const errorMessage = extractErrorMessage(error);
       throw new Error(errorMessage);
     }

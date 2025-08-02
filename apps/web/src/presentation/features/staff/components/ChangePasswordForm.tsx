@@ -10,7 +10,7 @@ import {
 import { ChangePasswordFormSchema } from '@nx-starter/application-shared';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { Icon } from '../../../components/common';
-import type { Account } from '../view-models/useAccountsViewModel';
+import type { Account } from '../view-models/useEnhancedAccountsViewModel';
 
 // Type for change password form
 interface ChangePasswordFormData {
@@ -43,7 +43,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
     formState: { errors },
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(ChangePasswordFormSchema),
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
       newPassword: '',
       confirmPassword: '',

@@ -1,8 +1,9 @@
 import { injectable, inject } from 'tsyringe';
 import { User, IUserRepository, UserDomainService } from '@nx-starter/domain';
 import { generateUUID } from '@nx-starter/utils-core';
-import { RegisterUserCommand, TOKENS } from '@nx-starter/application-shared';
+import { RegisterUserCommand, TOKENS, CreateDoctorProfileCommandSchema, CreateDoctorProfileCommand } from '@nx-starter/application-shared';
 import { IPasswordHashingService } from '../../services/PasswordHashingService';
+import { CreateDoctorProfileCommandHandler } from './CreateDoctorProfileCommandHandler';
 
 /**
  * Register User Use Case
@@ -14,7 +15,8 @@ export class RegisterUserUseCase {
     @inject(TOKENS.UserRepository)
     private userRepository: IUserRepository,
     @inject(TOKENS.PasswordHashingService)
-    private passwordHashingService: IPasswordHashingService
+    private passwordHashingService: IPasswordHashingService,
+    private createDoctorProfileCommandHandler: CreateDoctorProfileCommandHandler
   ) {
     // Domain services are instantiated manually, not injected
     this.userDomainService = new UserDomainService(this.userRepository);
@@ -26,10 +28,13 @@ export class RegisterUserUseCase {
    * Executes user registration
    * 1. Check email uniqueness
    * 2. Generate unique username from email
-   * 3. Hash the password
-   * 4. Create user entity with domain validation
-   * 5. Persist user
-   * 6. Returns created user
+   * 3. Generate UUID early (needed for doctor profile validation)
+   * 4. If role is 'doctor', validate doctor profile data FIRST
+   * 5. Hash the password  
+   * 6. Create user entity with domain validation
+   * 7. Persist user
+   * 8. If role is 'doctor', create doctor profile (already validated)
+   * 9. Returns created user
    */
   async execute(command: RegisterUserCommand): Promise<User> {
     // 1. Check email uniqueness (throws domain exception if exists)
@@ -38,11 +43,29 @@ export class RegisterUserUseCase {
     // 2. Generate unique username from email
     const username = await this.userDomainService.generateUniqueUsername(command.email);
 
-    // 3. Hash the password
+    // 3. Generate UUID early (needed for doctor profile validation)
+    const userId = generateUUID();
+
+    // 4. If role is 'doctor', validate doctor profile data FIRST (before creating user)
+    let validatedDoctorCommand: CreateDoctorProfileCommand | null = null;
+    if (command.role === 'doctor') {
+      // Prepare doctor profile command with required fields
+      const doctorProfileCommand = {
+        userId: userId, // Use the generated UUID for validation
+        specialization: command.specialization || 'General Medicine',
+        licenseNumber: command.licenseNumber || undefined,
+        yearsOfExperience: command.experienceYears || undefined,
+      };
+
+      // Validate doctor profile data using the same validation as the dedicated endpoint
+      // This will throw ZodError if validation fails, preventing user creation
+      validatedDoctorCommand = CreateDoctorProfileCommandSchema.parse(doctorProfileCommand) as CreateDoctorProfileCommand;
+    }
+
+    // 5. Hash the password
     const hashedPassword = await this.passwordHashingService.hash(command.password);
 
-    // 4. Create user entity with domain validation
-    const userId = generateUUID();
+    // 6. Create user entity with domain validation (using pre-generated UUID)
     const user = User.create(
       userId,
       command.firstName,
@@ -54,10 +77,18 @@ export class RegisterUserUseCase {
       command.mobile
     );
 
-    // 5. Persist user
+    // 7. Persist user (only after doctor profile validation passed)
     await this.userRepository.create(user);
 
-    // 6. Return created user
+    // 8. If role is 'doctor', create doctor profile (validation already passed)
+    if (command.role === 'doctor' && validatedDoctorCommand) {
+      // UUID already set during validation, no need to update
+      
+      // Create doctor profile with pre-validated data
+      await this.createDoctorProfileCommandHandler.execute(validatedDoctorCommand);
+    }
+
+    // 9. Return created user
     return user;
   }
 }

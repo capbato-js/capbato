@@ -2,7 +2,31 @@ import { useEffect, useState, useCallback } from 'react';
 import { useUserStore } from '../../../../infrastructure/state/UserStore';
 import { container, TOKENS } from '../../../../infrastructure/di/container';
 import { IAuthCommandService, RegisterUserCommand, UserDto } from '@nx-starter/application-shared';
-import { extractErrorMessage } from '../../../../infrastructure/utils/ErrorMapping';
+import { extractErrorMessage, isApiError } from '../../../../infrastructure/utils/ErrorMapping';
+
+// Utility function to parse validation error details
+const parseValidationErrors = (error: unknown): Record<string, string> => {
+  if (isApiError(error)) {
+    const apiError = error as any;
+    const backendError = apiError.response?.data;
+    
+    // Check if it's a validation error with details
+    if (backendError?.code === 'VALIDATION_ERROR' && backendError.details) {
+      const fieldErrors: Record<string, string> = {};
+      
+      backendError.details.forEach((detail: any) => {
+        if (detail.path && detail.path.length > 0 && detail.message) {
+          const fieldName = detail.path[0]; // Use first path element as field name
+          fieldErrors[fieldName] = detail.message;
+        }
+      });
+      
+      return fieldErrors;
+    }
+  }
+  
+  return {};
+};
 
 // Local Account interface for the view layer
 export interface Account {
@@ -21,6 +45,10 @@ export interface CreateAccountData {
   password: string;
   role: string;
   mobile?: string;
+  // Doctor profile fields (optional, only required when role is 'doctor')
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
 }
 
 /**
@@ -32,6 +60,7 @@ export interface IAccountsViewModel {
   accounts: Account[];
   isLoading: boolean;
   error: string | null;
+  fieldErrors: Record<string, string>;
   
   // Actions
   loadAccounts: () => Promise<void>;
@@ -39,6 +68,7 @@ export interface IAccountsViewModel {
   changeAccountPassword: (accountId: string, newPassword: string) => Promise<boolean>;
   deleteAccount: (accountId: string) => Promise<void>;
   clearError: () => void;
+  clearFieldErrors: () => void;
   refreshAccounts: () => Promise<void>;
 }
 
@@ -50,6 +80,7 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
   const { users, isLoading: storeLoading, error: storeError, fetchUsers, clearError: clearStoreError } = useUserStore();
   const [localLoading, setLocalLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Transform UserDto to Account for the view layer
   const transformUserToAccount = useCallback((user: UserDto): Account => ({
@@ -87,22 +118,27 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
   const createAccount = useCallback(async (data: CreateAccountData): Promise<boolean> => {
     setLocalLoading(true);
     setLocalError(null);
+    setFieldErrors({});
     
     try {
       // Get the auth command service from the container
       const authCommandService = container.resolve<IAuthCommandService>(TOKENS.AuthCommandService);
       
-      // Create the register command
+      // Create the register command with all data (backend handles doctor profile creation)
       const registerCommand: RegisterUserCommand = {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         password: data.password,
         role: data.role,
-        mobile: data.mobile
+        mobile: data.mobile,
+        // Doctor profile fields (backend will handle when role is 'doctor')
+        specialization: data.specialization,
+        licenseNumber: data.licenseNumber,
+        experienceYears: data.experienceYears,
       };
       
-      // Call the API to create the account
+      // Call the API to create the user account (backend handles doctor profile creation)
       await authCommandService.register(registerCommand);
       
       // Refresh the accounts list to show the new account
@@ -110,8 +146,22 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
       
       return true;
     } catch (err) {
-      const errorMessage = extractErrorMessage(err);
-      setLocalError(errorMessage);
+      // Parse validation errors first
+      const validationErrors = parseValidationErrors(err);
+      
+      if (Object.keys(validationErrors).length > 0) {
+        // Set field-specific errors
+        setFieldErrors(validationErrors);
+        // Don't set generic error message when we have field-specific errors
+        setLocalError(null);
+      } else {
+        // For non-validation errors or validation errors without field details
+        const errorMessage = extractErrorMessage(err);
+        setLocalError(errorMessage);
+        // Clear any previous field errors
+        setFieldErrors({});
+      }
+      
       return false;
     } finally {
       setLocalLoading(false);
@@ -162,8 +212,13 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
     setLocalError(null);
   }, []);
 
+  const clearFieldErrors = useCallback(() => {
+    setFieldErrors({});
+  }, []);
+
   const clearError = useCallback(() => {
     clearLocalError();
+    clearFieldErrors();
     clearStoreError();
   }, [clearStoreError]);
 
@@ -171,11 +226,13 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
     accounts,
     isLoading,
     error,
+    fieldErrors,
     loadAccounts,
     createAccount,
     changeAccountPassword,
     deleteAccount,
     clearError,
+    clearFieldErrors,
     refreshAccounts,
   };
 };

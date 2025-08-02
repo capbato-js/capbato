@@ -89,7 +89,38 @@ export const RegisterUserCommandSchema = z.object({
   password: PasswordSchema,
   role: RoleSchema,
   mobile: MobileSchema,
+  // Doctor profile fields (optional for validation, runtime validation handled in use case)
+  specialization: z.string().optional(),
+  licenseNumber: z.string().optional(),
+  experienceYears: z
+    .union([z.string(), z.number(), z.undefined(), z.null()])
+    .optional()
+    .transform((val) => {
+      // Handle empty string, null, or undefined values
+      if (val === '' || val === null || val === undefined) {
+        return undefined;
+      }
+      // Convert string numbers to actual numbers
+      if (typeof val === 'string') {
+        const parsed = parseInt(val, 10);
+        return isNaN(parsed) ? undefined : parsed;
+      }
+      // Handle NaN values from form inputs  
+      if (typeof val === 'number' && isNaN(val)) {
+        return undefined;
+      }
+      return val;
+    })
+    .refine((val) => {
+      // Skip validation if undefined (optional field)
+      if (val === undefined) return true;
+      // Validate that it's a valid number
+      return typeof val === 'number' && !isNaN(val) && Number.isInteger(val) && val >= 0 && val <= 50;
+    }, {
+      message: 'Years of experience must be a number between 0 and 50',
+    }),
 });
+
 
 // Login user command validation schema (matches DTO interface)
 export const LoginUserCommandSchema = z.object({

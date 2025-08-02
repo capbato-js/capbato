@@ -64,7 +64,6 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
     const entity = this.repository.create({
       userId: plainObject.userId,
       specialization: plainObject.specialization,
-      medicalContactNumber: plainObject.medicalContactNumber,
       licenseNumber: plainObject.licenseNumber,
       yearsOfExperience: plainObject.yearsOfExperience,
       isActive: plainObject.isActive,
@@ -82,7 +81,6 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
     const plainObject = DoctorMapper.toPlainObject(doctor);
     await this.repository.update(doctor.stringId, {
       specialization: plainObject.specialization,
-      medicalContactNumber: plainObject.medicalContactNumber,
       licenseNumber: plainObject.licenseNumber,
       yearsOfExperience: plainObject.yearsOfExperience,
       isActive: plainObject.isActive,
@@ -118,7 +116,6 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
       id: entity.id, // Now a string UUID, no need to convert
       userId: entity.userId,
       specialization: entity.specialization,
-      medicalContactNumber: entity.medicalContactNumber,
       licenseNumber: entity.licenseNumber,
       yearsOfExperience: entity.yearsOfExperience,
       isActive: entity.isActive,

@@ -10,6 +10,10 @@ export interface RegisterUserCommand {
   password: string;
   role: string;
   mobile?: string;
+  // Doctor profile fields (optional, only required when role is 'doctor')
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
 }
 
 export interface LoginUserCommand {

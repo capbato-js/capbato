@@ -14,8 +14,8 @@ export interface DoctorDto {
   id: string; // Doctor profile ID
   userId: string; // Reference to User entity
   specialization: string;
-  medicalContactNumber: string;
-  formattedMedicalContactNumber: string;
+  contactNumber: string; // From User.mobile
+  formattedContactNumber: string; // From User.mobile
   licenseNumber?: string;
   yearsOfExperience?: number;
   isActive: boolean;
@@ -36,7 +36,7 @@ export interface DoctorSummaryDto {
   userId: string;
   fullName: string; // Computed from user's first + last name
   specialization: string;
-  formattedMedicalContactNumber: string;
+  formattedContactNumber: string; // From User.mobile
   yearsOfExperience?: number;
   isActive: boolean;
 }
@@ -85,7 +85,6 @@ export type DoctorOperationResponse = ApiSuccessMessageResponse;
 export interface CreateDoctorProfileCommand {
   userId: string;
   specialization: string;
-  medicalContactNumber: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
 }
@@ -93,7 +92,6 @@ export interface CreateDoctorProfileCommand {
 export interface UpdateDoctorProfileCommand {
   id: string;
   specialization?: string;
-  medicalContactNumber?: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
   isActive?: boolean;

@@ -24,8 +24,8 @@ export const DoctorsTable: React.FC = () => {
       searchable: true
     },
     {
-      key: 'formattedMedicalContactNumber',
-      header: 'Medical Contact',
+      key: 'formattedContactNumber',
+      header: 'Contact Number',
       width: '20%',
       align: 'center',
       searchable: true

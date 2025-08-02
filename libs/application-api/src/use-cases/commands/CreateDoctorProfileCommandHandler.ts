@@ -12,7 +12,6 @@ import {
 export interface CreateDoctorProfileCommand {
   userId: string;
   specialization: string;
-  medicalContactNumber: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
 }
@@ -45,7 +44,6 @@ export class CreateDoctorProfileCommandHandler {
     const doctor = new Doctor(
       command.userId,
       command.specialization,
-      command.medicalContactNumber,
       undefined, // id will be generated
       command.licenseNumber,
       command.yearsOfExperience,

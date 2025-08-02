@@ -59,7 +59,6 @@ export class InMemoryDoctorRepository implements IDoctorRepository {
     const newDoctor = new Doctor(
       doctor.userId,
       doctor.specializationValue,
-      doctor.medicalContactNumberValue,
       id,
       doctor.licenseNumber,
       doctor.yearsOfExperience,
@@ -110,11 +109,11 @@ export class InMemoryDoctorRepository implements IDoctorRepository {
    */
   private seedData(): void {
     const sampleDoctors = [
-      new Doctor('user-doctor-1', 'General Practice', '09171234567', randomUUID(), 'MD-12345', 10, true),
-      new Doctor('user-doctor-2', 'Cardiology', '09181234567', randomUUID(), 'MD-23456', 15, true),
-      new Doctor('user-doctor-3', 'Pediatrics', '09191234567', randomUUID(), 'MD-34567', 8, true),
-      new Doctor('user-doctor-4', 'Orthopedics', '09201234567', randomUUID(), 'MD-45678', 12, true),
-      new Doctor('user-doctor-5', 'Neurology', '09211234567', randomUUID(), 'MD-56789', 20, false), // Inactive
+      new Doctor('user-doctor-1', 'General Practice', randomUUID(), 'MD-12345', 10, true),
+      new Doctor('user-doctor-2', 'Cardiology', randomUUID(), 'MD-23456', 15, true),
+      new Doctor('user-doctor-3', 'Pediatrics', randomUUID(), 'MD-34567', 8, true),
+      new Doctor('user-doctor-4', 'Orthopedics', randomUUID(), 'MD-45678', 12, true),
+      new Doctor('user-doctor-5', 'Neurology', randomUUID(), 'MD-56789', 20, false), // Inactive
     ];
 
     sampleDoctors.forEach(doctor => {
