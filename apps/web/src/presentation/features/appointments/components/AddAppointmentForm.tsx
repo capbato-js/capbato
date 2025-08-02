@@ -163,7 +163,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               data={patients}
               error={fieldState.error}
               disabled={isLoading}
-              leftSection={<Icon icon="fas fa-user" size={16} />}
+              // leftSection={<Icon icon="fas fa-user" size={16} />}
               onChange={(value: string | null) => {
                 field.onChange(value);
                 handleInputChange();
@@ -184,7 +184,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               data={reasonsForVisit}
               error={fieldState.error}
               disabled={isLoading}
-              leftSection={<Icon icon="fas fa-stethoscope" size={16} />}
+              // leftSection={<Icon icon="fas fa-stethoscope" size={16} />}
               onChange={(value: string | null) => {
                 field.onChange(value);
                 handleInputChange();
@@ -204,11 +204,10 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               error={fieldState.error?.message}
               disabled={isLoading}
               required
-              valueFormat="MMM D, YYYY"
+              valueFormat="MMMM D, YYYY"
               minDate={today}
               maxDate={new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000)} // 6 months from now
               leftSection={<Icon icon="fas fa-calendar" size={14} />}
-              clearable
               onChange={(value: string | null) => {
                 field.onChange(value);
                 handleInputChange();
@@ -230,7 +229,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               data={timeSlots}
               error={fieldState.error}
               disabled={isLoading}
-              leftSection={<Icon icon="fas fa-clock" size={16} />}
+              // leftSection={<Icon icon="fas fa-clock" size={16} />}
               onChange={(value: string | null) => {
                 field.onChange(value);
                 handleInputChange();
@@ -251,7 +250,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               data={doctors}
               error={fieldState.error}
               disabled={isLoading}
-              leftSection={<Icon icon="fas fa-user-md" size={16} />}
+              // leftSection={<Icon icon="fas fa-user-md" size={16} />}
               onChange={(value: string | null) => {
                 field.onChange(value);
                 handleInputChange();
