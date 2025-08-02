@@ -163,6 +163,31 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   const gender = watch('gender');
   const contactNumber = watch('contactNumber');
 
+  // Calculate age from date of birth
+  const calculateAge = (birthDate: string): number | null => {
+    if (!birthDate) return null;
+    
+    const birth = new Date(birthDate);
+    const today = new Date();
+    
+    // Check if birth date is valid
+    if (isNaN(birth.getTime()) || birth > today) return null;
+    
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    // Adjust age if birthday hasn't occurred this year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return age >= 0 ? age : null;
+  };
+
+  // Compute age based on date of birth
+  const computedAge = calculateAge(dateOfBirth);
+  const ageDisplayValue = computedAge !== null ? computedAge.toString() : '';
+
   // Check if required form fields are empty
   const isFormEmpty = !firstName?.trim() || 
                      !lastName?.trim() || 
@@ -273,9 +298,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                   <Grid.Col span={2}>
                     <FormTextInput
                       label="Age"
-                      placeholder="Calculated"
+                      placeholder="Auto"
                       disabled
-                      value="Auto"
+                      value={ageDisplayValue}
                     />
                   </Grid.Col>
                   <Grid.Col span={3}>
