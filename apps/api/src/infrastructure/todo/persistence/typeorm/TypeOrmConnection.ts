@@ -1,5 +1,10 @@
 import { DataSource } from 'typeorm';
 import { TodoEntity } from './TodoEntity';
+import { UserEntity } from '../../../user/persistence/typeorm/UserEntity';
+import { PatientEntity } from '../../../patient/persistence/typeorm/PatientEntity';
+import { DoctorEntity } from '../../../doctor/persistence/typeorm/DoctorEntity';
+import { ScheduleEntity } from '../../../schedule/persistence/typeorm/ScheduleEntity';
+import { AppointmentEntity } from '../../../appointment/persistence/typeorm/AppointmentEntity';
 import { getDatabaseConfig, getServerConfig } from '../../../../config';
 
 /**
@@ -12,7 +17,7 @@ export const createTypeOrmDataSource = (): DataSource => {
   
   // Base configuration
   const baseConfig = {
-    entities: [TodoEntity],
+    entities: [TodoEntity, UserEntity, PatientEntity, DoctorEntity, ScheduleEntity, AppointmentEntity],
     synchronize: serverConfig.environment === 'development',
     logging: serverConfig.environment === 'development',
   };

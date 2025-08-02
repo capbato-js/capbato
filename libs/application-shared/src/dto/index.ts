@@ -22,3 +22,5 @@ export * from './ScheduleCommands';
 export * from './ScheduleQueries';
 export * from './ScheduleDto';
 export * from './ScheduleRequestDtos';
+export * from './AppointmentCommands';
+export * from './AppointmentQueries';

@@ -82,3 +82,20 @@ export {
   type GetSchedulesByDoctorQuery,
 } from './ScheduleValidationSchemas';
 export * from './ScheduleValidationService';
+
+// Appointment validation
+export * from './AppointmentValidationSchemas';
+export * from './AppointmentValidationService';
+export {
+  type CreateAppointmentCommand,
+  type UpdateAppointmentCommand,
+  type DeleteAppointmentCommand,
+  type ConfirmAppointmentCommand,
+  type CancelAppointmentCommand,
+  type RescheduleAppointmentCommand,
+  type GetAppointmentByIdQuery,
+  type GetAppointmentsByPatientIdQuery,
+  type GetAppointmentsByDateQuery,
+  type GetAppointmentsByDateRangeQuery,
+  AppointmentIdSchema,
+} from './AppointmentValidationSchemas';

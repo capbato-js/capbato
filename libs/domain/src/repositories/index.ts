@@ -9,3 +9,4 @@ export * from './IUserRepository';
 export * from './IDoctorRepository';
 export * from './IAddressRepository';
 export * from './IScheduleRepository';
+export * from './IAppointmentRepository';

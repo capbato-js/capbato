@@ -26,3 +26,6 @@ export * from './BarangayCode';
 export * from './ScheduleId';
 export * from './ScheduleDate';
 export * from './ScheduleTime';
+export * from './AppointmentId';
+export * from './AppointmentStatus';
+export * from './AppointmentTime';
