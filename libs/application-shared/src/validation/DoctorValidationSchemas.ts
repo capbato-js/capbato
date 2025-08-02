@@ -15,9 +15,6 @@ export const DOCTOR_VALIDATION_ERRORS = {
   INVALID_USER_ID: 'User ID can only contain letters, numbers, hyphens and underscores',
   MISSING_SPECIALIZATION: 'Specialization is required',
   INVALID_SPECIALIZATION_LENGTH: 'Specialization cannot exceed 100 characters',
-  MISSING_MEDICAL_CONTACT: 'Medical contact number is required',
-  INVALID_MEDICAL_CONTACT_FORMAT: 'Medical contact number can only contain digits, spaces, hyphens, parentheses, and plus signs',
-  INVALID_MEDICAL_CONTACT: 'Medical contact number must be a valid Philippine mobile number (09xxxxxxxxx) or landline number (02xxxxxxx, 0xxxxxxxxx)',
   INVALID_LICENSE_LENGTH: 'License number cannot exceed 50 characters',
   INVALID_YEARS_EXPERIENCE: 'Years of experience must be between 0 and 50 years',
 } as const;
@@ -38,36 +35,6 @@ export const SpecializationSchema = z.string()
   .max(100, DOCTOR_VALIDATION_ERRORS.INVALID_SPECIALIZATION_LENGTH)
   .transform(str => str.trim());
 
-// Medical contact number validation schema (Philippine mobile format)
-// Supports both personal and clinic contact numbers
-export const MedicalContactNumberSchema = z.string()
-  .min(1, DOCTOR_VALIDATION_ERRORS.MISSING_MEDICAL_CONTACT)
-  .regex(/^[\d\s\-()+-]+$/, DOCTOR_VALIDATION_ERRORS.INVALID_MEDICAL_CONTACT_FORMAT)
-  .transform(str => str.replace(/[\s\-()]/g, '')) // Remove formatting characters, keep digits and +
-  .refine(
-    (phone) => {
-      // Philippine mobile: 09xxxxxxxxx (11 digits) or +639xxxxxxxxx (13 characters)
-      // Philippine landline: (02)xxxxxxx, (032)xxxxxxx, etc. (area code + 7 digits)
-      // International format: +63xxxxxxxxxx
-      
-      // Remove + for easier validation
-      const cleanPhone = phone.replace(/^\+/, '');
-      
-      // Philippine mobile: 09xxxxxxxxx (starts with 09, 11 digits total)
-      if (/^09\d{9}$/.test(phone)) return true;
-      
-      // Philippine mobile international: 639xxxxxxxxx (starts with 639, 12 digits total)
-      if (/^639\d{9}$/.test(cleanPhone)) return true;
-      
-      // Philippine landline: area code (2-4 digits) + 7 digits
-      // Common area codes: 02 (Metro Manila), 032 (Cebu), 033 (Iloilo), 034 (Bacolod), etc.
-      if (/^0[2-9]\d{7}$/.test(phone)) return true; // 02xxxxxxx format
-      if (/^0[3-8]\d{8}$/.test(phone)) return true; // 0xx7digitx format
-      
-      return false;
-    },
-    DOCTOR_VALIDATION_ERRORS.INVALID_MEDICAL_CONTACT
-  );
 
 // License number validation schema
 export const LicenseNumberSchema = z.string()
@@ -108,7 +75,6 @@ export const GetActiveDoctorsQuerySchema = z.object({
 export const CreateDoctorProfileCommandSchema = z.object({
   userId: UserIdSchema,
   specialization: SpecializationSchema,
-  medicalContactNumber: MedicalContactNumberSchema,
   licenseNumber: OptionalLicenseNumberSchema,
   yearsOfExperience: OptionalYearsOfExperienceSchema,
 });
@@ -116,7 +82,6 @@ export const CreateDoctorProfileCommandSchema = z.object({
 export const UpdateDoctorProfileCommandSchema = z.object({
   id: DoctorIdSchema,
   specialization: SpecializationSchema.optional(),
-  medicalContactNumber: MedicalContactNumberSchema.optional(),
   licenseNumber: OptionalLicenseNumberSchema,
   yearsOfExperience: OptionalYearsOfExperienceSchema,
   isActive: z.boolean().optional(),

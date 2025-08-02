@@ -27,7 +27,7 @@ export const LoginForm: React.FC = () => {
     setFocus,
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginFormSchema),
-    mode: 'onChange', // Enable real-time validation
+    mode: 'onBlur', // Enable onBlur validation
     defaultValues: {
       identifier: rememberedCredentials?.identifier || '',
       password: '',

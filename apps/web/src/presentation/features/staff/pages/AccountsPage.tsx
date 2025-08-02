@@ -18,9 +18,11 @@ export const AccountsPage: React.FC = () => {
     accounts,
     isLoading,
     error,
+    fieldErrors,
     createAccount,
     changeAccountPassword,
-    clearError
+    clearError,
+    clearFieldErrors
   } = useAccountsViewModel();
   
   const [opened, { open, close }] = useDisclosure(false);
@@ -28,7 +30,7 @@ export const AccountsPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const handleCreateAccount = async (data: CreateAccountData) => {
+  const handleCreateAccount = async (data: CreateAccountData): Promise<boolean> => {
     const success = await createAccount(data);
     
     if (success) {
@@ -36,6 +38,8 @@ export const AccountsPage: React.FC = () => {
       // Accounts list will refresh automatically via view model
     }
     // Error handling is managed by the view model and displayed via error state
+    
+    return success;
   };
 
   const handleChangePassword = (account: Account) => {
@@ -112,6 +116,7 @@ export const AccountsPage: React.FC = () => {
 
   const handleCloseModal = () => {
     clearError(); // Clear any view model errors
+    clearFieldErrors(); // Clear field-specific errors
     close();
   };
 
@@ -180,6 +185,10 @@ export const AccountsPage: React.FC = () => {
         <CreateAccountForm
           onSubmit={handleCreateAccount}
           isLoading={isLoading}
+          error={error}
+          onClearError={clearError}
+          fieldErrors={fieldErrors}
+          onClearFieldErrors={clearFieldErrors}
         />
       </Modal>
 

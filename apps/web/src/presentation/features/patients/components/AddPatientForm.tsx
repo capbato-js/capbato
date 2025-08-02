@@ -44,7 +44,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
     formState: { errors },
   } = useForm<CreatePatientCommand>({
     resolver: zodResolver(CreatePatientCommandSchema),
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
       firstName: '',
       lastName: '',

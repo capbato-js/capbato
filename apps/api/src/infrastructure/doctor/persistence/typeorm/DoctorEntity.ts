@@ -19,8 +19,6 @@ export class DoctorEntity {
   @Column({ name: 'Specialization', type: 'varchar', length: 100 })
   specialization!: string;
 
-  @Column({ name: 'medical_contact_number', type: 'varchar', length: 20 })
-  medicalContactNumber!: string;
 
   @Column({ name: 'license_number', type: 'varchar', length: 50, nullable: true })
   licenseNumber?: string;
