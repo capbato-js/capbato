@@ -334,12 +334,12 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                         <DateInput
                           {...field}
                           label="Date of Birth"
-                          placeholder="Any date format"
+                          placeholder="Enter date"
                           error={fieldState.error?.message}
                           disabled={isLoading}
                           required
                           valueFormat="MMM D, YYYY"
-                          rightSection={<Icon icon="fas fa-calendar" size={14} />}
+                          leftSection={<Icon icon="fas fa-calendar" size={14} />}
                           style={{ width: '100%' }}
                           onBlur={() => handleFieldBlur('dateOfBirth')}
                         />

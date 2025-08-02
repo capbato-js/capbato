@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { DataTableHeader } from '../../../components/common';
-import { AppointmentsTable, AppointmentsFilterControls, AppointmentCountDisplay } from '../components';
+import { AppointmentsTable, AppointmentsFilterControls, AppointmentCountDisplay, AddAppointmentModal } from '../components';
 import { Appointment } from '../types';
+import { AddAppointmentFormData } from '@nx-starter/application-shared';
 
 // Dummy data for appointments
 const dummyAppointments: Appointment[] = [
@@ -72,10 +73,23 @@ const dummyAppointments: Appointment[] = [
 export const AppointmentsPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showAll, setShowAll] = useState<boolean>(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 
   const handleAddAppointment = () => {
-    console.log('Add appointment clicked');
-    // TODO: Implement add appointment functionality
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const handleSubmitAppointment = async (data: AddAppointmentFormData): Promise<boolean> => {
+    console.log('Appointment submitted:', data);
+    // TODO: Implement actual API call to create appointment
+    
+    // Simulate success
+    setIsAddModalOpen(false);
+    return true;
   };
 
   const handleModifyAppointment = (appointmentId: string) => {
@@ -144,6 +158,13 @@ export const AppointmentsPage: React.FC = () => {
           onReconfirmAppointment={handleReconfirmAppointment}
         />
       </Box>
+
+      {/* Add Appointment Modal */}
+      <AddAppointmentModal
+        isOpen={isAddModalOpen}
+        onClose={handleCloseAddModal}
+        onSubmit={handleSubmitAppointment}
+      />
     </MedicalClinicLayout>
   );
 };
