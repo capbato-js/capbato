@@ -3,8 +3,7 @@ import {
   Box, 
   Button,
   Text,
-  Alert,
-  Loader 
+  Alert
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon, Modal } from '../../../components/common';
@@ -156,24 +155,17 @@ export const AccountsPage: React.FC = () => {
           addButtonIcon="fas fa-user-plus"
         />
 
-        {isLoading && accounts.length === 0 ? (
-          <Box style={{ textAlign: 'center', padding: '50px' }}>
-            <Loader size="lg" />
-            <Text style={{ marginTop: '20px' }}>Loading accounts...</Text>
-          </Box>
-        ) : (
-          <DataTable
-            data={accounts.map(account => ({
-              ...account,
-              name: `${account.firstName} ${account.lastName}`
-            }))}
-            columns={columns}
-            searchable={true}
-            searchPlaceholder="Search accounts by name or role..."
-            emptyStateMessage="No accounts found"
-            isLoading={isLoading && accounts.length === 0}
-          />
-        )}
+        <DataTable
+          data={accounts.map(account => ({
+            ...account,
+            name: `${account.firstName} ${account.lastName}`
+          }))}
+          columns={columns}
+          searchable={true}
+          searchPlaceholder="Search accounts by name or role..."
+          emptyStateMessage="No accounts found"
+          isLoading={isLoading}
+        />
       </Box>
 
       {/* Create Account Modal */}
