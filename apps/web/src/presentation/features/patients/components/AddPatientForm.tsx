@@ -262,7 +262,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                           error={fieldState.error?.message}
                           disabled={isLoading}
                           required
-                          valueFormat="MM/DD/YYYY"
+                          valueFormat="MMM D, YYYY"
                           rightSection={<Icon icon="fas fa-calendar" size={14} />}
                           style={{ width: '100%' }}
                           onBlur={() => handleFieldBlur('dateOfBirth')}
