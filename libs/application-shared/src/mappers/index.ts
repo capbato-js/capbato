@@ -10,3 +10,4 @@ export * from './PatientMapper';
 export * from './DoctorMapper';
 export * from './AddressMapper';
 export * from './ScheduleMapper';
+export * from './AppointmentMapper';

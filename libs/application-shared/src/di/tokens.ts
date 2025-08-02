@@ -16,6 +16,7 @@ export const TOKENS = {
   DoctorRepository: 'IDoctorRepository',
   AddressRepository: 'IAddressRepository',
   ScheduleRepository: 'IScheduleRepository',
+  AppointmentRepository: 'IAppointmentRepository',
 
   // Infrastructure Layer - Services
   PasswordHashingService: 'IPasswordHashingService',
@@ -43,6 +44,12 @@ export const TOKENS = {
   CreateScheduleUseCase: 'CreateScheduleUseCase',
   UpdateScheduleUseCase: 'UpdateScheduleUseCase',
   DeleteScheduleUseCase: 'DeleteScheduleUseCase',
+  CreateAppointmentUseCase: 'CreateAppointmentUseCase',
+  UpdateAppointmentUseCase: 'UpdateAppointmentUseCase',
+  DeleteAppointmentUseCase: 'DeleteAppointmentUseCase',
+  ConfirmAppointmentUseCase: 'ConfirmAppointmentUseCase',
+  CancelAppointmentUseCase: 'CancelAppointmentUseCase',
+  RescheduleAppointmentUseCase: 'RescheduleAppointmentUseCase',
 
   // Application Layer - Use Cases (Queries)
   GetAllTodosQueryHandler: 'GetAllTodosQueryHandler',
@@ -70,6 +77,16 @@ export const TOKENS = {
   GetTodaySchedulesQueryHandler: 'GetTodaySchedulesQueryHandler',
   GetTodayDoctorQueryHandler: 'GetTodayDoctorQueryHandler',
   GetScheduleStatsQueryHandler: 'GetScheduleStatsQueryHandler',
+  GetAllAppointmentsQueryHandler: 'GetAllAppointmentsQueryHandler',
+  GetAppointmentByIdQueryHandler: 'GetAppointmentByIdQueryHandler',
+  GetAppointmentsByPatientIdQueryHandler: 'GetAppointmentsByPatientIdQueryHandler',
+  GetTodayAppointmentsQueryHandler: 'GetTodayAppointmentsQueryHandler',
+  GetTodayConfirmedAppointmentsQueryHandler: 'GetTodayConfirmedAppointmentsQueryHandler',
+  GetConfirmedAppointmentsQueryHandler: 'GetConfirmedAppointmentsQueryHandler',
+  GetAppointmentsByDateQueryHandler: 'GetAppointmentsByDateQueryHandler',
+  GetAppointmentsByDateRangeQueryHandler: 'GetAppointmentsByDateRangeQueryHandler',
+  GetWeeklyAppointmentSummaryQueryHandler: 'GetWeeklyAppointmentSummaryQueryHandler',
+  GetAppointmentStatsQueryHandler: 'GetAppointmentStatsQueryHandler',
 
   // Domain Layer - Services
   TodoDomainService: 'TodoDomainService',
@@ -77,6 +94,7 @@ export const TOKENS = {
   PatientNumberService: 'PatientNumberService',
   PhoneNumberService: 'PhoneNumberService',
   AgeCalculationService: 'AgeCalculationService',
+  AppointmentDomainService: 'AppointmentDomainService',
 
   // Application Layer - Validation Services
   CreateTodoValidationService: 'CreateTodoValidationService',
@@ -103,6 +121,17 @@ export const TOKENS = {
   GetSchedulesByDateValidationService: 'GetSchedulesByDateValidationService',
   GetSchedulesByDoctorValidationService: 'GetSchedulesByDoctorValidationService',
   ScheduleValidationService: 'ScheduleValidationService',
+  CreateAppointmentValidationService: 'CreateAppointmentValidationService',
+  UpdateAppointmentValidationService: 'UpdateAppointmentValidationService',
+  DeleteAppointmentValidationService: 'DeleteAppointmentValidationService',
+  ConfirmAppointmentValidationService: 'ConfirmAppointmentValidationService',
+  CancelAppointmentValidationService: 'CancelAppointmentValidationService',
+  RescheduleAppointmentValidationService: 'RescheduleAppointmentValidationService',
+  GetAppointmentByIdValidationService: 'GetAppointmentByIdValidationService',
+  GetAppointmentsByPatientIdValidationService: 'GetAppointmentsByPatientIdValidationService',
+  GetAppointmentsByDateValidationService: 'GetAppointmentsByDateValidationService',
+  GetAppointmentsByDateRangeValidationService: 'GetAppointmentsByDateRangeValidationService',
+  AppointmentValidationService: 'AppointmentValidationService',
 } as const;
 
 // Type-safe token keys
