@@ -7,6 +7,7 @@ export const TOKENS = {
   PatientApiService: 'IPatientApiService',
   UserApiService: 'IUserApiService',
   DoctorApiService: 'IDoctorApiService',
+  AddressApiService: 'IAddressApiService',
   
   // Infrastructure Layer - Repositories
   TodoRepository: 'ITodoRepository',

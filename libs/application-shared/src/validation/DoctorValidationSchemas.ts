@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { VALIDATION_MESSAGES } from './constants/ValidationMessages';
 
 /**
  * Zod schemas for Doctor validation
@@ -15,6 +16,9 @@ export const DOCTOR_VALIDATION_ERRORS = {
   INVALID_USER_ID: 'User ID can only contain letters, numbers, hyphens and underscores',
   MISSING_SPECIALIZATION: 'Specialization is required',
   INVALID_SPECIALIZATION_LENGTH: 'Specialization cannot exceed 100 characters',
+  MISSING_MEDICAL_CONTACT: 'Medical contact number is required',
+  INVALID_MEDICAL_CONTACT_FORMAT: 'Medical contact number can only contain digits, spaces, hyphens, parentheses, and plus signs',
+  INVALID_MEDICAL_CONTACT: VALIDATION_MESSAGES.PHONE.INVALID_MEDICAL_CONTACT,
   INVALID_LICENSE_LENGTH: 'License number cannot exceed 50 characters',
   INVALID_YEARS_EXPERIENCE: 'Years of experience must be between 0 and 50 years',
 } as const;

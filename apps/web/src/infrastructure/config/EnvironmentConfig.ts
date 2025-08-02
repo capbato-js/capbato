@@ -57,6 +57,12 @@ export function getEnvironmentConfig(): AppConfig {
           bySpecialization: (specialization: string) => `/api/doctors/specialization/${specialization}`,
           check: (userId: string) => `/api/doctors/check/${userId}`,
         },
+        address: {
+          base: '/api/address',
+          provinces: '/api/address/provinces',
+          cities: (provinceCode: string) => `/api/address/cities/${provinceCode}`,
+          barangays: (cityCode: string) => `/api/address/barangays/${cityCode}`,
+        },
       },
     },
     features: {
@@ -72,7 +78,7 @@ export function getEnvironmentConfig(): AppConfig {
       appName: import.meta.env.VITE_APP_NAME || 'Nx Starter',
       version: import.meta.env.VITE_APP_VERSION || '1.0.0',
       debugMode: parseBoolean(import.meta.env.VITE_DEBUG_MODE, import.meta.env.DEV),
-      logLevel: (import.meta.env.VITE_LOG_LEVEL as any) || 'info',
+      logLevel: (import.meta.env.VITE_LOG_LEVEL as 'error' | 'warn' | 'info' | 'debug') || 'info',
     },
     storage: {
       localStoragePrefix: import.meta.env.VITE_STORAGE_PREFIX || 'nx-starter',
@@ -81,7 +87,7 @@ export function getEnvironmentConfig(): AppConfig {
       maxCacheSize: parseInt(import.meta.env.VITE_MAX_CACHE_SIZE, 50), // 50 items
     },
     ui: {
-      defaultTheme: (import.meta.env.VITE_DEFAULT_THEME as any) || 'system',
+      defaultTheme: (import.meta.env.VITE_DEFAULT_THEME as 'light' | 'dark' | 'system') || 'system',
       defaultLanguage: import.meta.env.VITE_DEFAULT_LANGUAGE || 'en',
       animationsEnabled: parseBoolean(import.meta.env.VITE_ANIMATIONS_ENABLED, true),
       compactMode: parseBoolean(import.meta.env.VITE_COMPACT_MODE, false),

@@ -13,8 +13,25 @@ import {
 import { DateInput } from '@mantine/dates';
 import { CreatePatientCommandSchema } from '@nx-starter/application-shared';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
+import { AddressSelector } from '../../../components/ui/AddressSelector';
+import { useAddressSelector } from '../../../hooks';
 import { Icon } from '../../../components/common';
 import type { CreatePatientCommand } from '@nx-starter/application-shared';
+
+// Form data type that matches the schema input before transformation
+type CreatePatientFormData = Omit<CreatePatientCommand, 'contactNumber' | 'guardianContactNumber'> & {
+  contactNumber: string;
+  guardianContactNumber: string;
+};
+
+// Helper function to safely extract error message
+const getErrorMessage = (error: unknown): string | undefined => {
+  if (typeof error === 'string') return error;
+  if (error && typeof error === 'object' && 'message' in error) {
+    return (error as { message: string }).message;
+  }
+  return undefined;
+};
 
 interface AddPatientFormProps {
   onSubmit: (data: CreatePatientCommand) => Promise<boolean>;
@@ -27,6 +44,14 @@ interface AddPatientFormProps {
  * AddPatientForm component handles the creation of new patient records
  * with comprehensive validation and proper TypeScript typing.
  * Layout matches the legacy UI with two-column design.
+ * 
+ * Validation Features:
+ * - Uses onSubmit mode to avoid aggressive validation while typing
+ * - Implements onBlur validation for all fields (required and optional)
+ * - Required fields: firstName, lastName, dateOfBirth, gender, contactNumber
+ * - Optional fields with validation: guardianContactNumber (phone format), 
+ *   address fields (length limits), guardian info (conditional validation)
+ * - Validation only triggers on blur, providing non-aggressive UX
  */
 export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   onSubmit,
@@ -41,6 +66,8 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
     reset,
     control,
     watch,
+    setValue,
+    trigger,
     formState: { errors },
   } = useForm<CreatePatientCommand>({
     resolver: zodResolver(CreatePatientCommandSchema),
@@ -60,7 +87,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
       guardianName: '',
       guardianGender: undefined,
       guardianRelationship: '',
-      guardianContactNumber: '',
+      guardianContactNumber: '', // Set as empty string instead of undefined
       guardianHouseNumber: '',
       guardianStreetName: '',
       guardianProvince: '',
@@ -68,6 +95,66 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
       guardianBarangay: '',
     },
   });
+
+  // Address selector hooks for patient address
+  const patientAddressSelector = useAddressSelector();
+  
+  // Address selector hooks for guardian address
+  const guardianAddressSelector = useAddressSelector();
+
+  // Handle patient address changes
+  const handlePatientProvinceChange = async (value: string | null) => {
+    if (value) {
+      setValue('province', value);
+      await patientAddressSelector.selectProvince(value);
+      // Clear dependent fields
+      setValue('cityMunicipality', '');
+      setValue('barangay', '');
+    }
+  };
+
+  const handlePatientCityChange = async (value: string | null) => {
+    if (value) {
+      setValue('cityMunicipality', value);
+      await patientAddressSelector.selectCity(value);
+      // Clear dependent field
+      setValue('barangay', '');
+    }
+  };
+
+  const handlePatientBarangayChange = (value: string | null) => {
+    if (value) {
+      setValue('barangay', value);
+      patientAddressSelector.selectBarangay(value);
+    }
+  };
+
+  // Handle guardian address changes
+  const handleGuardianProvinceChange = async (value: string | null) => {
+    if (value) {
+      setValue('guardianProvince', value);
+      await guardianAddressSelector.selectProvince(value);
+      // Clear dependent fields
+      setValue('guardianCityMunicipality', '');
+      setValue('guardianBarangay', '');
+    }
+  };
+
+  const handleGuardianCityChange = async (value: string | null) => {
+    if (value) {
+      setValue('guardianCityMunicipality', value);
+      await guardianAddressSelector.selectCity(value);
+      // Clear dependent field
+      setValue('guardianBarangay', '');
+    }
+  };
+
+  const handleGuardianBarangayChange = (value: string | null) => {
+    if (value) {
+      setValue('guardianBarangay', value);
+      guardianAddressSelector.selectBarangay(value);
+    }
+  };
 
   // Watch form values for button state
   const firstName = watch('firstName');
@@ -82,6 +169,11 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                      !dateOfBirth?.trim() || 
                      !gender?.trim() ||
                      !contactNumber?.trim();
+
+  // Handle field blur validation for optional fields with validation rules
+  const handleFieldBlur = async (fieldName: keyof CreatePatientFormData) => {
+    await trigger(fieldName);
+  };
 
   const handleFormSubmit = handleSubmit(async (data) => {
     const success = await onSubmit(data as unknown as CreatePatientCommand);
@@ -119,33 +211,39 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
               <Stack gap="md">
                 {/* Name Fields Row */}
                 <Grid>
-                  <Grid.Col span={4}>
+                                    <Grid.Col span={4}>
                     <FormTextInput
                       label="Last Name"
                       placeholder="Enter last name"
-                      error={errors.lastName}
+                      error={getErrorMessage(errors.lastName)}
                       disabled={isLoading}
                       required
-                      {...register('lastName')}
+                      {...register('lastName', {
+                        onBlur: () => handleFieldBlur('lastName')
+                      })}
                     />
                   </Grid.Col>
                   <Grid.Col span={4}>
                     <FormTextInput
                       label="First Name"
                       placeholder="Enter first name"
-                      error={errors.firstName}
+                      error={getErrorMessage(errors.firstName)}
                       disabled={isLoading}
                       required
-                      {...register('firstName')}
+                      {...register('firstName', {
+                        onBlur: () => handleFieldBlur('firstName')
+                      })}
                     />
                   </Grid.Col>
                   <Grid.Col span={4}>
                     <FormTextInput
                       label="Middle Name"
                       placeholder="Enter middle name"
-                      error={errors.middleName}
+                      error={getErrorMessage(errors.middleName)}
                       disabled={isLoading}
-                      {...register('middleName')}
+                      {...register('middleName', {
+                        onBlur: () => handleFieldBlur('middleName')
+                      })}
                     />
                   </Grid.Col>
                 </Grid>
@@ -167,6 +265,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                           valueFormat="MM/DD/YYYY"
                           rightSection={<Icon icon="fas fa-calendar" size={14} />}
                           style={{ width: '100%' }}
+                          onBlur={() => handleFieldBlur('dateOfBirth')}
                         />
                       )}
                     />
@@ -195,6 +294,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                           ]}
                           disabled={isLoading}
                           required
+                          onBlur={() => handleFieldBlur('gender')}
                         />
                       )}
                     />
@@ -202,12 +302,14 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                   <Grid.Col span={4}>
                     <FormTextInput
                       label="Contact Number"
-                      placeholder="09278479061"
-                      error={errors.contactNumber}
+                      placeholder="09123456789"
+                      error={getErrorMessage(errors.contactNumber)}
                       maxLength={11}
                       disabled={isLoading}
                       required
-                      {...register('contactNumber')}
+                      {...register('contactNumber', {
+                        onBlur: () => handleFieldBlur('contactNumber')
+                      })}
                     />
                   </Grid.Col>
                 </Grid>
@@ -221,47 +323,55 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                         <FormTextInput
                           label="House No."
                           placeholder="e.g., 123"
-                          error={errors.houseNumber}
+                          error={getErrorMessage(errors.houseNumber)}
                           disabled={isLoading}
-                          {...register('houseNumber')}
+                          {...register('houseNumber', {
+                            onBlur: () => handleFieldBlur('houseNumber')
+                          })}
                         />
                       </Grid.Col>
                       <Grid.Col span={6}>
                         <FormTextInput
                           label="Street Name"
                           placeholder="e.g., Rizal Street"
-                          error={errors.streetName}
+                          error={getErrorMessage(errors.streetName)}
                           disabled={isLoading}
-                          {...register('streetName')}
+                          {...register('streetName', {
+                            onBlur: () => handleFieldBlur('streetName')
+                          })}
                         />
                       </Grid.Col>
                     </Grid>
-                    <Grid>
-                      <Grid.Col span={6}>
-                        <FormTextInput
-                          label="Province"
-                          placeholder="Select Province"
-                          error={errors.province}
-                          disabled={isLoading}
-                          {...register('province')}
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={6}>
-                        <FormTextInput
-                          label="City/Municipality"
-                          placeholder="Select province first"
-                          error={errors.cityMunicipality}
-                          disabled={isLoading}
-                          {...register('cityMunicipality')}
-                        />
-                      </Grid.Col>
-                    </Grid>
-                    <FormTextInput
-                      label="Barangay"
-                      placeholder="Select city first"
-                      error={errors.barangay}
-                      disabled={isLoading}
-                      {...register('barangay')}
+                    
+                    {/* Address Selector Component */}
+                    <AddressSelector
+                      provinceProps={{
+                        value: patientAddressSelector.selectedProvince,
+                        onChange: handlePatientProvinceChange,
+                        error: getErrorMessage(errors.province),
+                        disabled: isLoading,
+                      }}
+                      cityProps={{
+                        value: patientAddressSelector.selectedCity,
+                        onChange: handlePatientCityChange,
+                        error: getErrorMessage(errors.cityMunicipality),
+                        disabled: isLoading,
+                      }}
+                      barangayProps={{
+                        value: patientAddressSelector.selectedBarangay,
+                        onChange: handlePatientBarangayChange,
+                        error: getErrorMessage(errors.barangay),
+                        disabled: isLoading,
+                      }}
+                      addressData={{
+                        provinces: patientAddressSelector.provinces,
+                        cities: patientAddressSelector.cities,
+                        barangays: patientAddressSelector.barangays,
+                        isLoadingProvinces: patientAddressSelector.isLoadingProvinces,
+                        isLoadingCities: patientAddressSelector.isLoadingCities,
+                        isLoadingBarangays: patientAddressSelector.isLoadingBarangays,
+                        error: patientAddressSelector.error,
+                      }}
                     />
                   </Stack>
                 </Box>
@@ -289,9 +399,11 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                 <FormTextInput
                   label="Full Name"
                   placeholder="Enter guardian full name"
-                  error={errors.guardianName}
+                  error={getErrorMessage(errors.guardianName)}
                   disabled={isLoading}
-                  {...register('guardianName')}
+                  {...register('guardianName', {
+                    onBlur: () => handleFieldBlur('guardianName')
+                  })}
                 />
 
                 <Grid>
@@ -310,6 +422,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                             { value: 'Female', label: 'Female' }
                           ]}
                           disabled={isLoading}
+                          onBlur={() => handleFieldBlur('guardianGender')}
                         />
                       )}
                     />
@@ -318,19 +431,23 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                     <FormTextInput
                       label="Relationship"
                       placeholder="e.g., Mother, Father"
-                      error={errors.guardianRelationship}
+                      error={getErrorMessage(errors.guardianRelationship)}
                       disabled={isLoading}
-                      {...register('guardianRelationship')}
+                      {...register('guardianRelationship', {
+                        onBlur: () => handleFieldBlur('guardianRelationship')
+                      })}
                     />
                   </Grid.Col>
                   <Grid.Col span={4}>
                     <FormTextInput
                       label="Contact Number"
-                      placeholder="09278479061"
-                      error={errors.guardianContactNumber}
+                      placeholder="09123456789"
+                      error={getErrorMessage(errors.guardianContactNumber)}
                       maxLength={11}
                       disabled={isLoading}
-                      {...register('guardianContactNumber')}
+                      {...register('guardianContactNumber', {
+                        onBlur: () => handleFieldBlur('guardianContactNumber')
+                      })}
                     />
                   </Grid.Col>
                 </Grid>
@@ -344,47 +461,55 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                         <FormTextInput
                           label="House No."
                           placeholder="e.g., 123"
-                          error={errors.guardianHouseNumber}
+                          error={getErrorMessage(errors.guardianHouseNumber)}
                           disabled={isLoading}
-                          {...register('guardianHouseNumber')}
+                          {...register('guardianHouseNumber', {
+                            onBlur: () => handleFieldBlur('guardianHouseNumber')
+                          })}
                         />
                       </Grid.Col>
                       <Grid.Col span={6}>
                         <FormTextInput
                           label="Street Name"
                           placeholder="e.g., Rizal Street"
-                          error={errors.guardianStreetName}
+                          error={getErrorMessage(errors.guardianStreetName)}
                           disabled={isLoading}
-                          {...register('guardianStreetName')}
+                          {...register('guardianStreetName', {
+                            onBlur: () => handleFieldBlur('guardianStreetName')
+                          })}
                         />
                       </Grid.Col>
                     </Grid>
-                    <Grid>
-                      <Grid.Col span={6}>
-                        <FormTextInput
-                          label="Province"
-                          placeholder="Select Province"
-                          error={errors.guardianProvince}
-                          disabled={isLoading}
-                          {...register('guardianProvince')}
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={6}>
-                        <FormTextInput
-                          label="City/Municipality"
-                          placeholder="Select province first"
-                          error={errors.guardianCityMunicipality}
-                          disabled={isLoading}
-                          {...register('guardianCityMunicipality')}
-                        />
-                      </Grid.Col>
-                    </Grid>
-                    <FormTextInput
-                      label="Barangay"
-                      placeholder="Select city first"
-                      error={errors.guardianBarangay}
-                      disabled={isLoading}
-                      {...register('guardianBarangay')}
+                    
+                    {/* Guardian Address Selector Component */}
+                    <AddressSelector
+                      provinceProps={{
+                        value: guardianAddressSelector.selectedProvince,
+                        onChange: handleGuardianProvinceChange,
+                        error: getErrorMessage(errors.guardianProvince),
+                        disabled: isLoading,
+                      }}
+                      cityProps={{
+                        value: guardianAddressSelector.selectedCity,
+                        onChange: handleGuardianCityChange,
+                        error: getErrorMessage(errors.guardianCityMunicipality),
+                        disabled: isLoading,
+                      }}
+                      barangayProps={{
+                        value: guardianAddressSelector.selectedBarangay,
+                        onChange: handleGuardianBarangayChange,
+                        error: getErrorMessage(errors.guardianBarangay),
+                        disabled: isLoading,
+                      }}
+                      addressData={{
+                        provinces: guardianAddressSelector.provinces,
+                        cities: guardianAddressSelector.cities,
+                        barangays: guardianAddressSelector.barangays,
+                        isLoadingProvinces: guardianAddressSelector.isLoadingProvinces,
+                        isLoadingCities: guardianAddressSelector.isLoadingCities,
+                        isLoadingBarangays: guardianAddressSelector.isLoadingBarangays,
+                        error: guardianAddressSelector.error,
+                      }}
                     />
                   </Stack>
                 </Box>
