@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { VALIDATION_MESSAGES } from './constants/ValidationMessages';
 
 /**
  * Zod schemas for Patient command validation
@@ -15,7 +16,7 @@ const validatePhilippineMobile = (phone: string, ctx: z.RefinementCtx) => {
   if (!phoneRegex.test(phoneStr)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Phone number must be 11 digits starting with 09 (e.g., 09278479061)',
+      message: VALIDATION_MESSAGES.PHONE.INVALID_PHILIPPINE_MOBILE,
     });
   }
 };
@@ -82,16 +83,26 @@ const validateName = (fieldName: string) => (name: string, ctx: z.RefinementCtx)
       code: z.ZodIssueCode.custom,
       message: `${fieldName} cannot exceed 50 characters`,
     });
+    return;
+  }
+  
+  // Check if name contains only letters, spaces, hyphens, and apostrophes
+  const nameRegex = /^[a-zA-Z\s\-'.]+$/;
+  if (!nameRegex.test(name)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `${fieldName} can only contain letters, spaces, hyphens, apostrophes, and periods`,
+    });
   }
 };
 
 // Guardian validation - if any guardian field is provided, required fields must be present
-const validateGuardianInfo = (data: any, ctx: z.RefinementCtx) => {
+const validateGuardianInfo = (data: Record<string, unknown>, ctx: z.RefinementCtx) => {
   const { guardianName, guardianGender, guardianRelationship, guardianContactNumber } = data;
   const hasAnyGuardianInfo = guardianName || guardianGender || guardianRelationship || guardianContactNumber;
   
   if (hasAnyGuardianInfo) {
-    if (!guardianName?.trim()) {
+    if (!guardianName || (typeof guardianName === 'string' && !guardianName.trim())) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Guardian name is required when guardian information is provided',
@@ -99,7 +110,7 @@ const validateGuardianInfo = (data: any, ctx: z.RefinementCtx) => {
       });
     }
     
-    if (!guardianRelationship?.trim()) {
+    if (!guardianRelationship || (typeof guardianRelationship === 'string' && !guardianRelationship.trim())) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Guardian relationship is required when guardian information is provided',
@@ -107,7 +118,7 @@ const validateGuardianInfo = (data: any, ctx: z.RefinementCtx) => {
       });
     }
     
-    if (!guardianContactNumber?.trim()) {
+    if (!guardianContactNumber || (typeof guardianContactNumber === 'string' && !guardianContactNumber.trim())) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Guardian contact number is required when guardian information is provided',
@@ -133,10 +144,20 @@ export const CreatePatientCommandSchema = z.object({
   barangay: z.string().max(50, 'Barangay cannot exceed 50 characters').optional(),
   
   // Guardian Information (optional but complete when provided)
-  guardianName: z.string().optional(),
+  guardianName: z.string().optional().superRefine((val, ctx) => {
+    // Only validate if value is present and not just whitespace
+    if (val && val.trim()) {
+      validateName('Guardian name')(val, ctx);
+    }
+  }),
   guardianGender: GenderSchema.optional(),
   guardianRelationship: z.string().optional(),
-  guardianContactNumber: z.string().optional(),
+  guardianContactNumber: z.string().optional().superRefine((val, ctx) => {
+    // Only validate if value is present and not just whitespace
+    if (val && val.trim()) {
+      validatePhilippineMobile(val, ctx);
+    }
+  }),
   
   // Guardian Address Information
   guardianHouseNumber: z.string().max(20, 'Guardian house number cannot exceed 20 characters').optional(),

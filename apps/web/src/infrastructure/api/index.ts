@@ -12,3 +12,5 @@ export { IUserApiService } from './IUserApiService';
 export { UserApiService } from './UserApiService';
 export { IDoctorApiService } from './IDoctorApiService';
 export { DoctorApiService } from './DoctorApiService';
+export { IAddressApiService } from './AddressApiService';
+export { AddressApiService } from './AddressApiService';

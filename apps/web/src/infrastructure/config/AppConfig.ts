@@ -37,6 +37,12 @@ export interface ApiConfiguration {
       bySpecialization: (specialization: string) => string;
       check: (userId: string) => string;
     };
+    address: {
+      base: string;
+      provinces: string;
+      cities: (provinceCode: string) => string;
+      barangays: (cityCode: string) => string;
+    };
   };
 }
 

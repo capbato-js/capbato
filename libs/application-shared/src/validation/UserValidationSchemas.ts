@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { VALIDATION_MESSAGES } from './constants/ValidationMessages';
 
 /**
  * User validation schemas
@@ -17,7 +18,7 @@ export const USER_VALIDATION_ERRORS = {
   REG_INVALID_ROLE: 'Role must be one of: admin, doctor, receptionist',
   REG_EMAIL_EXISTS: 'This email address is already registered',
   REG_INVALID_NAME: 'Names can only contain letters, spaces, and hyphens',
-  REG_INVALID_MOBILE: 'Please provide a valid Philippine mobile number (09xxxxxxxxx or +639xxxxxxxxx)',
+  REG_INVALID_MOBILE: VALIDATION_MESSAGES.PHONE.INVALID_PHILIPPINE_MOBILE,
   AUTH_MISSING_IDENTIFIER: 'Email or username is required',
   AUTH_MISSING_PASSWORD: 'Password is required',
   AUTH_INVALID_EMAIL: 'Please provide a valid email address'
