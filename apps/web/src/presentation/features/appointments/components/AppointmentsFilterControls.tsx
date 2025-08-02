@@ -45,10 +45,10 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
         <DateInput
           value={selectedDate.toISOString().split('T')[0]}
           onChange={onDateChange}
-          placeholder="Any date format"
+          placeholder="Enter date"
           size="sm"
           valueFormat="MMM D, YYYY"
-          rightSection={<Icon icon="fas fa-calendar" size={14} />}
+          leftSection={<Icon icon="fas fa-calendar" size={14} />}
           style={{ width: '140px' }}
         />
       </Box>

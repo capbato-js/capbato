@@ -58,6 +58,10 @@ export * from './DoctorValidationService';
 // Export address validation schemas and services
 export * from './AddressValidationSchemas';
 export * from './AddressValidationService';
+
+// Export appointment validation schemas
+export * from './AppointmentValidationSchemas';
+
 // Export schedule validation schemas and services (excluding DoctorIdSchema to avoid conflict)
 export {
   ScheduleIdSchema,
