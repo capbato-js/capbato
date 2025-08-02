@@ -142,10 +142,8 @@ export const usePatientStore = create<PatientStore>()(
               return newPatient;
             } catch (error) {
               set((state) => {
-                state.createPatientError =
-                  error instanceof Error
-                    ? error.message
-                    : 'Failed to create patient';
+                // Preserve the error object for proper classification
+                state.createPatientError = error;
                 state.createPatientStatus = 'failed';
               });
               return null;

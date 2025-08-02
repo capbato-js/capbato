@@ -1,24 +1,26 @@
+import { DomainException } from '@nx-starter/domain';
+
 /**
  * Domain exceptions for Patient operations
  * These provide specific error types that can be handled appropriately in the presentation layer
  */
 
-export class PatientDomainError extends Error {
-  constructor(message: string, public readonly code: string) {
-    super(message);
+export class PatientDomainError extends DomainException {
+  constructor(message: string, code: string, statusCode = 400) {
+    super(message, code, statusCode);
     this.name = 'PatientDomainError';
   }
 }
 
 export class PatientNotFoundError extends PatientDomainError {
   constructor(patientId: string) {
-    super(`Patient with ID '${patientId}' not found`, 'PATIENT_NOT_FOUND');
+    super(`Patient with ID '${patientId}' not found`, 'PATIENT_NOT_FOUND', 404);
     this.name = 'PatientNotFoundError';
   }
 }
 
 export class InvalidPhoneNumberError extends PatientDomainError {
-  constructor(phoneNumber: string, fieldName: string = 'Contact number') {
+  constructor(phoneNumber: string, fieldName = 'Contact number') {
     super(
       `${fieldName} '${phoneNumber}' is invalid. Must be 11 digits starting with 09 (e.g., 09278479061)`,
       'INVALID_PHONE_NUMBER'
@@ -40,28 +42,28 @@ export class DuplicatePatientError extends PatientDomainError {
       ? `Patient with patient number '${identifier}' already exists`
       : `Patient with contact number '${identifier}' already exists`;
     
-    super(message, 'DUPLICATE_PATIENT');
+    super(message, 'DUPLICATE_PATIENT', 409);
     this.name = 'DuplicatePatientError';
   }
 }
 
 export class InvalidPatientDataError extends PatientDomainError {
   constructor(message: string, public readonly field?: string) {
-    super(message, 'INVALID_PATIENT_DATA');
+    super(message, 'INVALID_PATIENT_DATA', 400);
     this.name = 'InvalidPatientDataError';
   }
 }
 
 export class PatientNumberGenerationError extends PatientDomainError {
   constructor(lastName: string) {
-    super(`Failed to generate patient number for last name '${lastName}'`, 'PATIENT_NUMBER_GENERATION_ERROR');
+    super(`Failed to generate patient number for last name '${lastName}'`, 'PATIENT_NUMBER_GENERATION_ERROR', 500);
     this.name = 'PatientNumberGenerationError';
   }
 }
 
 export class GuardianValidationError extends PatientDomainError {
   constructor(message: string) {
-    super(`Guardian information validation failed: ${message}`, 'GUARDIAN_VALIDATION_ERROR');
+    super(`Guardian information validation failed: ${message}`, 'GUARDIAN_VALIDATION_ERROR', 400);
     this.name = 'GuardianValidationError';
   }
 }

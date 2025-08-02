@@ -10,7 +10,7 @@ import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 export interface IAddPatientFormViewModel {
   // State
   isLoading: boolean;
-  error: string | null;
+  error: unknown; // Changed to support structured errors
   
   // Actions
   handleFormSubmit: (data: CreatePatientCommand) => Promise<boolean>;
@@ -31,7 +31,7 @@ export interface IAddPatientFormViewModel {
  */
 export const useAddPatientFormViewModel = (): IAddPatientFormViewModel => {
   const navigate = useNavigate();
-  const [localError, setLocalError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<unknown>(null);
   
   // Get store actions and state
   const createPatient = usePatientStore((state) => state.createPatient);
@@ -61,9 +61,8 @@ export const useAddPatientFormViewModel = (): IAddPatientFormViewModel => {
         return false;
       }
     } catch (error) {
-      // Handle unexpected errors
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setLocalError(errorMessage);
+      // Handle unexpected errors - preserve error object for classification
+      setLocalError(error);
       return false;
     }
   }, [createPatient, navigate]);

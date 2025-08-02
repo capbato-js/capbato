@@ -8,7 +8,7 @@ export interface PatientStoreState {
   createPatientStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   patientDetailsErrors: Record<string, string | null>; // Errors per patient ID
-  createPatientError: string | null;
+  createPatientError: unknown; // Changed to support structured errors
 }
 
 export interface PatientStoreActions {
@@ -25,7 +25,7 @@ export interface PatientStoreActions {
   getIsCreatingPatient(): boolean;
   getPatientDetailsError(id: string): string | null;
   getPatientDetails(id: string): PatientDto | undefined;
-  getCreatePatientError(): string | null;
+  getCreatePatientError(): unknown;
 }
 
 export interface PatientStore extends PatientStoreState, PatientStoreActions {}

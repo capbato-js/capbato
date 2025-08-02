@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -17,6 +17,7 @@ import { AddressSelector } from '../../../components/ui/AddressSelector';
 import { useAddressSelector } from '../../../hooks';
 import { Icon } from '../../../components/common';
 import type { CreatePatientCommand } from '@nx-starter/application-shared';
+import { classifyError, formatFieldErrorMessage } from '../utils/errorClassification';
 
 // Form data type that matches the schema input before transformation
 type CreatePatientFormData = Omit<CreatePatientCommand, 'contactNumber' | 'guardianContactNumber'> & {
@@ -37,7 +38,7 @@ interface AddPatientFormProps {
   onSubmit: (data: CreatePatientCommand) => Promise<boolean>;
   onCancel: () => void;
   isLoading: boolean;
-  error?: string | null;
+  error?: unknown; // Changed to handle both string and structured errors
 }
 
 /**
@@ -68,6 +69,8 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
     watch,
     setValue,
     trigger,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<CreatePatientCommand>({
     resolver: zodResolver(CreatePatientCommandSchema),
@@ -102,10 +105,41 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   // Address selector hooks for guardian address
   const guardianAddressSelector = useAddressSelector();
 
+  // Error classification state
+  const [generalError, setGeneralError] = React.useState<string | null>(null);
+
+  // Handle error classification and display
+  useEffect(() => {
+    if (!error) {
+      setGeneralError(null);
+      return;
+    }
+
+    const classification = classifyError(error);
+    
+    if (classification.type === 'field' && classification.fieldError) {
+      // Clear general error and set field error
+      setGeneralError(null);
+      const { field, message } = classification.fieldError;
+      const formattedMessage = formatFieldErrorMessage(field, message);
+      
+      setError(field as keyof CreatePatientCommand, {
+        type: 'server',
+        message: formattedMessage
+      });
+    } else {
+      // Clear any field errors and set general error
+      clearErrors();
+      setGeneralError(classification.generalMessage || 'An unexpected error occurred');
+    }
+  }, [error, setError, clearErrors]);
+
   // Handle patient address changes
   const handlePatientProvinceChange = async (value: string | null) => {
     if (value) {
-      setValue('province', value);
+      // Find the province name by its code and store the name instead of code
+      const province = patientAddressSelector.provinces.find(p => p.code === value);
+      setValue('province', province?.name || value);
       await patientAddressSelector.selectProvince(value);
       // Clear dependent fields
       setValue('cityMunicipality', '');
@@ -115,7 +149,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
 
   const handlePatientCityChange = async (value: string | null) => {
     if (value) {
-      setValue('cityMunicipality', value);
+      // Find the city name by its code and store the name instead of code
+      const city = patientAddressSelector.cities.find(c => c.code === value);
+      setValue('cityMunicipality', city?.name || value);
       await patientAddressSelector.selectCity(value);
       // Clear dependent field
       setValue('barangay', '');
@@ -124,7 +160,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
 
   const handlePatientBarangayChange = (value: string | null) => {
     if (value) {
-      setValue('barangay', value);
+      // Find the barangay name by its code and store the name instead of code
+      const barangay = patientAddressSelector.barangays.find(b => b.code === value);
+      setValue('barangay', barangay?.name || value);
       patientAddressSelector.selectBarangay(value);
     }
   };
@@ -132,7 +170,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   // Handle guardian address changes
   const handleGuardianProvinceChange = async (value: string | null) => {
     if (value) {
-      setValue('guardianProvince', value);
+      // Find the province name by its code and store the name instead of code
+      const province = guardianAddressSelector.provinces.find(p => p.code === value);
+      setValue('guardianProvince', province?.name || value);
       await guardianAddressSelector.selectProvince(value);
       // Clear dependent fields
       setValue('guardianCityMunicipality', '');
@@ -142,7 +182,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
 
   const handleGuardianCityChange = async (value: string | null) => {
     if (value) {
-      setValue('guardianCityMunicipality', value);
+      // Find the city name by its code and store the name instead of code
+      const city = guardianAddressSelector.cities.find(c => c.code === value);
+      setValue('guardianCityMunicipality', city?.name || value);
       await guardianAddressSelector.selectCity(value);
       // Clear dependent field
       setValue('guardianBarangay', '');
@@ -151,7 +193,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
 
   const handleGuardianBarangayChange = (value: string | null) => {
     if (value) {
-      setValue('guardianBarangay', value);
+      // Find the barangay name by its code and store the name instead of code
+      const barangay = guardianAddressSelector.barangays.find(b => b.code === value);
+      setValue('guardianBarangay', barangay?.name || value);
       guardianAddressSelector.selectBarangay(value);
     }
   };
@@ -200,6 +244,13 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
     await trigger(fieldName);
   };
 
+  // Clear field error when user starts typing
+  const handleFieldChange = (fieldName: keyof CreatePatientCommand) => {
+    if (errors[fieldName]?.type === 'server') {
+      clearErrors(fieldName);
+    }
+  };
+
   const handleFormSubmit = handleSubmit(async (data) => {
     const success = await onSubmit(data as unknown as CreatePatientCommand);
     if (success) {
@@ -210,9 +261,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   return (
     <form onSubmit={handleFormSubmit} noValidate>
       <Stack gap="lg">
-        {error && (
+        {generalError && (
           <Alert color="red" style={{ marginBottom: '20px' }}>
-            {error}
+            {generalError}
           </Alert>
         )}
 
@@ -333,7 +384,8 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                       disabled={isLoading}
                       required
                       {...register('contactNumber', {
-                        onBlur: () => handleFieldBlur('contactNumber')
+                        onBlur: () => handleFieldBlur('contactNumber'),
+                        onChange: () => handleFieldChange('contactNumber')
                       })}
                     />
                   </Grid.Col>
@@ -471,7 +523,8 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                       maxLength={11}
                       disabled={isLoading}
                       {...register('guardianContactNumber', {
-                        onBlur: () => handleFieldBlur('guardianContactNumber')
+                        onBlur: () => handleFieldBlur('guardianContactNumber'),
+                        onChange: () => handleFieldChange('guardianContactNumber')
                       })}
                     />
                   </Grid.Col>
