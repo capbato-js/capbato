@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Anchor, Text, useMantineTheme } from '@mantine/core';
+import { Box, Text, useMantineTheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common';
 import { PatientListDto } from '@nx-starter/application-shared';
@@ -58,8 +58,9 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
       render: (value) => (
         <Text
           style={{
-            color: theme.colors.blue[7],
-            fontWeight: 500
+            color: theme.colors.customGray[8],
+            fontWeight: 400,
+            fontSize: '16px'
           }}
         >
           {value}
@@ -75,8 +76,9 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
       render: (value) => (
         <Text
           style={{
-            color: '#0F0F0F',
-            fontWeight: 'normal'
+            color: theme.colors.customGray[8],
+            fontWeight: 400,
+            fontSize: '16px'
           }}
         >
           {value}

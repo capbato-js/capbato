@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  Button,
   Text,
   Alert
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Icon, Modal } from '../../../components/common';
+import { Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useEnhancedAccountsViewModel';
@@ -105,7 +104,12 @@ export const AccountsPage: React.FC = () => {
       align: 'center',
       searchable: true,
       render: (value: string) => (
-        <Text style={{ textTransform: 'capitalize' }}>
+        <Text style={{ 
+          textTransform: 'capitalize',
+          fontSize: '16px',
+          fontWeight: 400,
+          color: 'inherit'
+        }}>
           {value}
         </Text>
       )
@@ -124,7 +128,11 @@ export const AccountsPage: React.FC = () => {
       align: 'left',
       searchable: true,
       render: (value: string | undefined) => (
-        <Text>
+        <Text style={{
+          fontSize: '16px',
+          fontWeight: 400,
+          color: 'inherit'
+        }}>
           {value || '-'}
         </Text>
       )

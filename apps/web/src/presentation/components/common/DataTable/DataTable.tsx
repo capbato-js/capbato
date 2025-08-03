@@ -133,8 +133,8 @@ export function DataTable<T extends SearchableItem>({
                     padding: '16px 24px',
                     textAlign: column.align || 'left',
                     fontWeight: 600,
-                    fontSize: '14px',
-                    color: theme.colors.customGray[6],
+                    fontSize: '16px',
+                    color: theme.colors.customGray[8],
                     width: column.width,
                     borderBottom: 'none'
                   }}
@@ -148,8 +148,8 @@ export function DataTable<T extends SearchableItem>({
                     padding: '16px 24px',
                     textAlign: 'center',
                     fontWeight: 600,
-                    fontSize: '14px',
-                    color: theme.colors.customGray[6],
+                    fontSize: '16px',
+                    color: theme.colors.customGray[8],
                     width: '100px',
                     borderBottom: 'none'
                   }}
@@ -171,8 +171,9 @@ export function DataTable<T extends SearchableItem>({
                   style={{
                     padding: '48px 24px',
                     textAlign: 'center',
-                    color: theme.colors.customGray[5],
-                    fontSize: '14px',
+                    color: theme.colors.customGray[8],
+                    fontSize: '16px',
+                    fontWeight: 400,
                     background: theme.colors.customGray[9]
                   }}
                 >
@@ -207,8 +208,9 @@ export function DataTable<T extends SearchableItem>({
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           wordWrap: column.align !== 'center' ? 'break-word' : 'normal',
-                          fontSize: '14px',
-                          color: theme.colors.customGray[6]
+                          fontSize: '16px',
+                          fontWeight: 400,
+                          color: theme.colors.customGray[8]
                         }}
                       >
                         {displayValue}

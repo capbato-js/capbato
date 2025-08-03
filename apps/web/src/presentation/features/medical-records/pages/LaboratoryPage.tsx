@@ -192,7 +192,8 @@ export const LaboratoryPage: React.FC = () => {
         color: '#8c5000',
         padding: '5px 10px',
         borderRadius: '5px',
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontSize: '16px',
         display: 'inline-block'
       },
       'Completed': {
@@ -200,7 +201,8 @@ export const LaboratoryPage: React.FC = () => {
         color: '#006400',
         padding: '5px 10px',
         borderRadius: '5px',
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontSize: '16px',
         display: 'inline-block'
       },
       'In Progress': {
@@ -208,7 +210,8 @@ export const LaboratoryPage: React.FC = () => {
         color: '#0d47a1',
         padding: '5px 10px',
         borderRadius: '5px',
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontSize: '16px',
         display: 'inline-block'
       }
     };
@@ -218,7 +221,8 @@ export const LaboratoryPage: React.FC = () => {
       color: '#424242',
       padding: '5px 10px',
       borderRadius: '5px',
-      fontWeight: 'bold',
+      fontWeight: 600,
+      fontSize: '16px',
       display: 'inline-block'
     };
 

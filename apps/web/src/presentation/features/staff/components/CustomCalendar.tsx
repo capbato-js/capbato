@@ -223,10 +223,10 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                         <ActionIcon
                           size="sm"
                           variant="subtle"
-                          color="blue"
+                          color={theme.colors.customGray[8]}
                           style={{ cursor: 'pointer' }}
                         >
-                          <IconEdit size={14} />
+                          <IconEdit size={18} />
                         </ActionIcon>
                       </Tooltip>
                     </Menu.Target>
