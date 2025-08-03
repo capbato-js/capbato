@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Title } from '@mantine/core';
+import { Box, Button, Title, useMantineTheme } from '@mantine/core';
 import { Icon } from '../../../components/common';
 import { Appointment } from '../types';
 
@@ -21,6 +21,7 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
   onDateSelect,
   selectedDate 
 }) => {
+  const theme = useMantineTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const currentYear = currentDate.getFullYear();
@@ -115,7 +116,7 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
           style={{
             fontWeight: 'bold',
             textAlign: 'center',
-            color: '#0047ab',
+            color: theme.colors.blue[7],
             textTransform: 'uppercase',
             fontSize: '1.25rem',
             flexGrow: 1
@@ -220,7 +221,7 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
                   style={{
                     fontSize: '11px',
                     backgroundColor: 'transparent',
-                    color: '#0047ab',
+                    color: theme.colors.blue[7],
                     fontWeight: 600,
                     lineHeight: 1.2
                   }}

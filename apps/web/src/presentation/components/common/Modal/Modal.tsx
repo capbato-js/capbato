@@ -25,7 +25,7 @@ export const Modal: React.FC<CustomModalProps> = ({
       ...customStyles.header,
     },
     title: {
-      color: '#0b4f6c',
+      color: '#0F0F0F',
       fontSize: '20px',
       fontWeight: 'bold',
       textAlign: 'center' as const,

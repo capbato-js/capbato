@@ -61,7 +61,6 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
             input: {
               width: '18px',
               height: '18px',
-              accentColor: '#4db6ac',
               cursor: 'pointer'
             }
           }}

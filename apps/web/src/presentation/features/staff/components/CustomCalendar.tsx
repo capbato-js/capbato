@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Title, Menu, Text, ActionIcon, Tooltip } from '@mantine/core';
+import { Box, Button, Title, Menu, Text, ActionIcon, Tooltip, useMantineTheme } from '@mantine/core';
 import { IconEdit, IconUser } from '@tabler/icons-react';
 import { Icon } from '../../../components/common';
 import { ScheduleEntry } from '../types';
@@ -22,6 +22,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
   availableDoctors = [],
   onDoctorChange 
 }) => {
+  const theme = useMantineTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [hoveredTile, setHoveredTile] = useState<number | null>(null);
 
@@ -75,7 +76,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
         <Title 
           order={2}
           style={{
-            color: '#0b4f6c',
+            color: '#0F0F0F',
             fontSize: '28px',
             fontWeight: 'bold',
             margin: 0,
@@ -111,7 +112,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
           style={{
             fontWeight: 'bold',
             textAlign: 'center',
-            color: '#0047ab',
+            color: theme.colors.blue[9],
             textTransform: 'uppercase',
             fontSize: '1.25rem',
             flexGrow: 1
@@ -139,8 +140,8 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
           gridTemplateColumns: 'repeat(7, 1fr)',
           textAlign: 'center',
           fontWeight: 'bold',
-          color: '#0047ab',
-          backgroundColor: '#dbe5ff',
+          color: theme.colors.tableBlue[9],
+          backgroundColor: theme.colors.tableBlue[0],
           borderRadius: '12px 12px 0 0',
           overflow: 'hidden'
         }}
@@ -188,7 +189,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
             <Box
               key={day}
               style={{
-                backgroundColor: hoveredTile === tileIndex ? '#d4edff' : '#ecf5ff',
+                backgroundColor: hoveredTile === tileIndex ? theme.colors.tableBlue[1] : theme.colors.tableBlue[0],
                 borderRadius: '12px',
                 padding: '10px',
                 minHeight: '100px',
@@ -284,7 +285,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                     marginTop: '6px',
                     fontSize: '12px',
                     backgroundColor: 'transparent',
-                    color: '#0047ab',
+                    color: theme.colors.blue[7],
                     fontWeight: 600,
                     lineHeight: 1.3,
                     wordBreak: 'break-word'
@@ -296,7 +297,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                       style={{
                         display: 'block',
                         fontSize: '13px',
-                        color: '#0b4f6c'
+                        color: theme.colors.blue[9]
                       }}
                     >
                       {schedule.details}

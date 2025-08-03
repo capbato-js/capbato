@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Box, TextInput, Table, Skeleton } from '@mantine/core';
+import { Box, TextInput, Table, Skeleton, useMantineTheme } from '@mantine/core';
 import { DataTableProps, SearchableItem } from './types';
 
 export function DataTable<T extends SearchableItem>({
@@ -12,6 +12,7 @@ export function DataTable<T extends SearchableItem>({
   emptyStateMessage = 'No data available',
   skeletonRowCount = 5
 }: DataTableProps<T>) {
+  const theme = useMantineTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter data based on search query
@@ -94,8 +95,8 @@ export function DataTable<T extends SearchableItem>({
           <Table.Thead>
             <Table.Tr
               style={{
-                background: '#dbeeff',
-                color: '#0047ab'
+                background: theme.colors.tableBlue[0],
+                color: theme.colors.tableBlue[9]
               }}
             >
               {columns.map((column, index) => (

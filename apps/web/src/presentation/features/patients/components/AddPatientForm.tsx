@@ -9,6 +9,7 @@ import {
   Text,
   Alert,
   Box,
+  useMantineTheme,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { CreatePatientCommandSchema } from '@nx-starter/application-shared';
@@ -60,6 +61,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   isLoading,
   error
 }) => {
+  const theme = useMantineTheme();
   // React Hook Form setup
   const {
     register,
@@ -274,12 +276,12 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
               <Text
                 size="lg"
                 fw={700}
-                c="#004f6e"
-                mb="md"
                 style={{
-                  borderBottom: '2px solid #4db6ac',
+                  color: theme.colors.blue[9],
+                  borderBottom: `2px solid ${theme.colors.blue[9]}`,
                   paddingBottom: '8px'
                 }}
+                mb="md"
               >
                 PATIENT'S INFORMATION
               </Text>
@@ -462,12 +464,12 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
               <Text
                 size="lg"
                 fw={700}
-                c="#004f6e"
-                mb="md"
                 style={{
-                  borderBottom: '2px solid #4db6ac',
+                  color: theme.colors.blue[9],
+                  borderBottom: `2px solid ${theme.colors.blue[9]}`,
                   paddingBottom: '8px'
                 }}
+                mb="md"
               >
                 GUARDIAN INFORMATION
               </Text>
@@ -620,7 +622,6 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
             type="submit"
             disabled={isFormEmpty || isLoading}
             loading={isLoading}
-            color="#17A589"
           >
             <Icon icon="fas fa-save" style={{ marginRight: '4px' }} />
             {isLoading ? 'Submitting...' : 'Submit'}

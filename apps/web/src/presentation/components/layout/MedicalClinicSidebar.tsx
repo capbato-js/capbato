@@ -8,43 +8,51 @@ interface NavigationItem {
   path: string;
   label: string;
   icon: string; // FontAwesome icon class
+  color: string; // Color for the icon
 }
 
 const navigationItems: NavigationItem[] = [
   {
     path: '/dashboard',
     label: 'Dashboard',
-    icon: 'fas fa-tachometer-alt'
+    icon: 'fas fa-tachometer-alt',
+    color: '#4A90E2' // Blue - Overview/analytics
   },
   {
     path: '/appointments',
     label: 'Appointments',
-    icon: 'fas fa-calendar-check'
+    icon: 'fas fa-calendar-check',
+    color: '#F5A623' // Orange - Scheduling/calendar
   },
   {
     path: '/patients',
     label: 'Patients',
-    icon: 'fas fa-users'
+    icon: 'fas fa-users',
+    color: '#7ED321' // Green - Health/people
   },
   {
     path: '/laboratory',
     label: 'Laboratory', 
-    icon: 'fas fa-flask'
+    icon: 'fas fa-flask',
+    color: '#BD10E0' // Purple - Science/testing
   },
   {
     path: '/prescriptions',
     label: 'Prescriptions',
-    icon: 'fas fa-prescription-bottle'
+    icon: 'fas fa-prescription-bottle',
+    color: '#E94B3C' // Red - Medicine/pharmacy
   },
   {
     path: '/doctors',
     label: 'Doctors',
-    icon: 'fas fa-user-md'
+    icon: 'fas fa-user-md',
+    color: '#50E3C2' // Teal - Medical professionals
   },
   {
     path: '/accounts',
     label: 'Accounts',
-    icon: 'fas fa-users-cog'
+    icon: 'fas fa-users-cog',
+    color: '#9013FE' // Violet - Administration/settings
   }
 ];
 
@@ -58,7 +66,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
   return (
     <Box
       component="nav"
-      className={`fixed left-0 w-[240px] h-full bg-white z-[999] ${className || ''}`}
+      className={`fixed left-0 w-[280px] h-full bg-white z-[999] ${className || ''}`}
       style={{
         top: '64px', // Below header
         borderRight: '1px solid #e5e5e5', // Subtle border instead of shadow
@@ -94,14 +102,17 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   position: 'relative'
                 }}
               >
-              <Group gap="sm">
+              <Group gap="md">
                 <Icon 
                   icon={item.icon} 
                   className={styles.navIcon}
                   style={{ 
                     fontSize: '16px',
-                    color: '#0F0F0F',
-                    transition: 'color 0.2s ease'
+                    color: item.color,
+                    transition: 'color 0.2s ease',
+                    width: '20px',
+                    textAlign: 'center',
+                    display: 'inline-block'
                   }} 
                 />
                 <Text 

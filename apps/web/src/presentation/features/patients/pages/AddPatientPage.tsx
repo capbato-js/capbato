@@ -1,11 +1,12 @@
 import React from 'react';
-import { Box, Button, Group, Title } from '@mantine/core';
+import { Box, Button, Group, Title, useMantineTheme } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { AddPatientForm } from '../components';
 import { useAddPatientFormViewModel } from '../view-models/useAddPatientFormViewModel';
 
 export const AddPatientPage: React.FC = () => {
+  const theme = useMantineTheme();
   const viewModel = useAddPatientFormViewModel();
 
   return (
@@ -18,7 +19,7 @@ export const AddPatientPage: React.FC = () => {
           alignItems: 'center',
           marginBottom: '30px',
           paddingBottom: '20px',
-          borderBottom: '2px solid #e9ecef'
+          borderBottom: `2px solid ${theme.colors.gray[3]}`
         }}
       >
           <Group align="center" gap="lg">
@@ -29,7 +30,6 @@ export const AddPatientPage: React.FC = () => {
               onClick={viewModel.handleCancel}
               size="sm"
               style={{
-                backgroundColor: '#6c757d',
                 fontSize: '14px'
               }}
             >

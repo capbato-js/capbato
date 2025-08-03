@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Text, Button, Stack, Paper, Grid, Box, Group, ActionIcon, Popover, Menu, Alert } from '@mantine/core';
+import { Card, Text, Button, Stack, Paper, Grid, Box, Group, ActionIcon, Popover, Menu, Alert, useMantineTheme } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight, IconRefresh, IconEdit, IconAlertCircle } from '@tabler/icons-react';
 import { useDoctorScheduleCalendarViewModel } from '../view-models/useDoctorScheduleCalendarViewModel';
 
@@ -15,6 +15,7 @@ interface DoctorScheduleCalendarProps {
 export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({ 
   className 
 }) => {
+  const theme = useMantineTheme();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [editPopoverOpened, setEditPopoverOpened] = useState<{ [key: string]: boolean }>({});
   const [lastError, setLastError] = useState<string | null>(null);
@@ -234,12 +235,12 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
           {/* Week Day Headers */}
           <Grid gutter="xs" mb="xs">
             {weekDays.map((day) => (
-              <Grid.Col key={day} span={12/7} style={{ minWidth: 0 }}>
+              <Grid.Col key={day} span={12/7} style={{ minWidth: 0, backgroundColor: theme.colors.gray[1]  }}>
                 <Text 
                   ta="center" 
                   fw={600} 
                   size="sm" 
-                  c="blue"
+                  style={{ color: theme.colors.tableBlue[9] }}
                   p="xs"
                 >
                   {day}
@@ -339,10 +340,10 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
                                   lineHeight: 1.2,
                                 }}
                               >
-                                <Text size="xs" fw={500} c="blue" truncate>
+                                <Text size="xs" fw={500} style={{ color: theme.colors.blue[9] }} truncate>
                                   Dr. {appointment.doctorName}
                                 </Text>
-                                <Text size="xs" c="blue" truncate>
+                                <Text size="xs" style={{ color: theme.colors.blue[7] }} truncate>
                                   {appointment.formattedTime}
                                 </Text>
                               </Box>

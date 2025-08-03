@@ -5,17 +5,29 @@ export const mantineTheme = createTheme({
   primaryShade: 7,
   colors: {
     blue: [
-    "#dffaff",
-    "#c9efff",
-    "#98dcff",
-    "#61c8ff",
-    "#37b7ff",
-    "#18acff",
-    "#00a7ff",
-    "#0091e6",
-    "#0081ce",
-    "#0070b7"
-  ],
+      "#dffaff",
+      "#c9efff",
+      "#98dcff",
+      "#61c8ff",
+      "#37b7ff",
+      "#18acff",
+      "#00a7ff",
+      "#0091e6",
+      "#0081ce",
+      "#0070b7"
+    ],
+    tableBlue: [
+      "#ebf3ff",
+      "#d3e3fa",
+      "#a2c4f7",
+      "#6fa4f6",
+      "#4989f5",
+      "#3578f5",
+      "#2b70f7",
+      "#215fdc",
+      "#1754c5",
+      "#0047ab"
+    ],
   },
 
   fontFamily: 'Roboto, Arial, sans-serif',

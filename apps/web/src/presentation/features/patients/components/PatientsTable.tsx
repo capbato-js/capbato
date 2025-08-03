@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Anchor, Text } from '@mantine/core';
+import { Box, Anchor, Text, useMantineTheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common';
 import { PatientListDto } from '@nx-starter/application-shared';
@@ -15,6 +15,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
   onAddPatient,
   isLoading = false
 }) => {
+  const theme = useMantineTheme();
   const navigate = useNavigate();
 
   // Transform patients to include fullName for display
@@ -38,7 +39,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
         <Anchor
           onClick={() => handlePatientClick(record.id)}
           style={{
-            color: '#0047ab',
+            color: theme.colors.blue[7],
             textDecoration: 'none',
             cursor: 'pointer',
             fontWeight: 500

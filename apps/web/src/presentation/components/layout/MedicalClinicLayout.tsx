@@ -34,12 +34,12 @@ export const MedicalClinicLayout: React.FC<MedicalClinicLayoutProps> = ({
       <Box
         component="main"
         style={{
-          marginLeft: '240px', // Wider sidebar
+          marginLeft: '280px', // Wider sidebar
           paddingLeft: '32px', // Add left padding for proper spacing
           paddingRight: '32px',
           paddingTop: '32px',
           paddingBottom: '32px',
-          maxWidth: 'calc(100% - 240px)',
+          maxWidth: 'calc(100% - 280px)',
           boxSizing: 'border-box'
         }}
       >

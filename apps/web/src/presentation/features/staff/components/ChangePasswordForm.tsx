@@ -6,6 +6,7 @@ import {
   Stack,
   Text,
   Alert,
+  useMantineTheme,
 } from '@mantine/core';
 import { ChangePasswordFormSchema } from '@nx-starter/application-shared';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
@@ -35,6 +36,8 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
   isLoading,
   error
 }) => {
+  const theme = useMantineTheme();
+  
   // React Hook Form setup
   const {
     register,
@@ -71,7 +74,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         )}
 
         <Text style={{ marginBottom: '10px', color: '#666' }}>
-          New Password for <strong style={{ color: '#1976d2' }}>{account.firstName} {account.lastName}</strong>
+          New Password for <strong style={{ color: theme.colors.blue[7] }}>{account.firstName} {account.lastName}</strong>
         </Text>
 
         <FormTextInput

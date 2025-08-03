@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Button, Grid, Text, Table, Alert, Skeleton } from '@mantine/core';
+import { Box, Button, Grid, Text, Table, Alert, Skeleton, useMantineTheme } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { usePatientDetailsViewModel } from '../view-models/usePatientDetailsViewModel';
@@ -14,6 +14,7 @@ const CustomTabButton: React.FC<{
   children: React.ReactNode;
   onClick: () => void;
 }> = ({ isActive, icon, children, onClick }) => {
+  const theme = useMantineTheme();
   return (
     <button
       onClick={onClick}
@@ -24,9 +25,9 @@ const CustomTabButton: React.FC<{
         justifyContent: 'center',
         gap: '8px',
         textAlign: 'center',
-        background: isActive ? '#4db6ac' : '#e0f2f1',
-        color: isActive ? 'white' : '#00695c',
-        border: `2px solid ${isActive ? '#4db6ac' : '#e0f2f1'}`,
+        background: isActive ? theme.colors.blue[7] : theme.colors.blue[1],
+        color: isActive ? 'white' : theme.colors.blue[9],
+        border: `2px solid ${isActive ? theme.colors.blue[7] : theme.colors.blue[1]}`,
         padding: '6px 15px',
         fontWeight: 'bold',
         borderRadius: '8px',
@@ -38,14 +39,14 @@ const CustomTabButton: React.FC<{
       }}
       onMouseEnter={(e) => {
         if (!isActive) {
-          e.currentTarget.style.background = '#b2dfdb';
-          e.currentTarget.style.border = '2px solid #b2dfdb';
+          e.currentTarget.style.background = theme.colors.blue[2];
+          e.currentTarget.style.border = `2px solid ${theme.colors.blue[2]}`;
         }
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
-          e.currentTarget.style.background = '#e0f2f1';
-          e.currentTarget.style.border = '2px solid #e0f2f1';
+          e.currentTarget.style.background = theme.colors.blue[1];
+          e.currentTarget.style.border = `2px solid ${theme.colors.blue[1]}`;
         }
       }}
     >
@@ -55,7 +56,9 @@ const CustomTabButton: React.FC<{
   );
 };
 
-const PatientInfoCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+const PatientInfoCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+  const theme = useMantineTheme();
+  return (
   <Box
     style={{
       background: 'transparent',
@@ -69,10 +72,10 @@ const PatientInfoCard: React.FC<{ title: string; children: React.ReactNode }> = 
     <Text
       style={{
         marginBottom: '20px',
-        color: '#004f6e',
+        color: theme.colors.blue[9],
         fontSize: '20px',
         fontWeight: 'bold',
-        borderBottom: '2px solid #4db6ac',
+        borderBottom: `2px solid ${theme.colors.blue[9]}`,
         paddingBottom: '8px'
       }}
     >
@@ -80,7 +83,8 @@ const PatientInfoCard: React.FC<{ title: string; children: React.ReactNode }> = 
     </Text>
     {children}
   </Box>
-);
+  );
+};
 
 const InfoRow: React.FC<{ 
   label: string; 
@@ -211,6 +215,7 @@ const PatientInfoTab: React.FC<{ patient: PatientDetails }> = ({ patient }) => {
 };
 
 const AppointmentsTab: React.FC<{ appointments: Appointment[] }> = ({ appointments }) => {
+  const theme = useMantineTheme();
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
@@ -227,12 +232,12 @@ const AppointmentsTab: React.FC<{ appointments: Appointment[] }> = ({ appointmen
     <Box style={{ padding: '0 20px' }}>
       <Text
         style={{
-          color: '#004f6e',
+          color: theme.colors.blue[9],
           fontSize: '20px',
           fontWeight: 'bold',
           marginBottom: '20px',
           marginTop: 0,
-          borderBottom: '2px solid #4db6ac',
+          borderBottom: `2px solid ${theme.colors.blue[9]}`,
           paddingBottom: '8px'
         }}
       >
@@ -247,14 +252,14 @@ const AppointmentsTab: React.FC<{ appointments: Appointment[] }> = ({ appointmen
           overflow: 'hidden'
         }}
       >
-        <Table.Thead style={{ background: '#dbeeff' }}>
+        <Table.Thead style={{ background: theme.colors.tableBlue[0] }}>
           <Table.Tr>
-            <Table.Th style={{ padding: '12px', textAlign: 'center', color: '#0047ab', fontWeight: 600 }}>Date</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'center', color: '#0047ab', fontWeight: 600 }}>Time</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: '#0047ab', fontWeight: 600 }}>Reason for Visit</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: '#0047ab', fontWeight: 600 }}>Lab Tests Done</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: '#0047ab', fontWeight: 600 }}>Prescriptions</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'center', color: '#0047ab', fontWeight: 600 }}>Status</Table.Th>
+            <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Date</Table.Th>
+            <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Time</Table.Th>
+            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Reason for Visit</Table.Th>
+            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Lab Tests Done</Table.Th>
+            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Prescriptions</Table.Th>
+            <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Status</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -294,16 +299,18 @@ const AppointmentsTab: React.FC<{ appointments: Appointment[] }> = ({ appointmen
   );
 };
 
-const PlaceholderTab: React.FC<{ title: string }> = ({ title }) => (
+const PlaceholderTab: React.FC<{ title: string }> = ({ title }) => {
+  const theme = useMantineTheme();
+  return (
   <Box style={{ padding: '0 20px' }}>
     <Text
       style={{
-        color: '#004f6e',
+        color: theme.colors.blue[9],
         fontSize: '20px',
         fontWeight: 'bold',
         marginBottom: '20px',
         marginTop: 0,
-        borderBottom: '2px solid #4db6ac',
+        borderBottom: `2px solid ${theme.colors.blue[9]}`,
         paddingBottom: '8px'
       }}
     >
@@ -313,13 +320,16 @@ const PlaceholderTab: React.FC<{ title: string }> = ({ title }) => (
       {title} functionality will be implemented in future iterations.
     </Text>
   </Box>
-);
+  );
+};
 
 // Skeleton Loading Component
 const PatientDetailsLoadingSkeleton: React.FC<{ 
   activeTab: string;
   onTabChange: (tabValue: string) => void;
-}> = ({ activeTab, onTabChange }) => (
+}> = ({ activeTab, onTabChange }) => {
+  const theme = useMantineTheme();
+  return (
   <>
     {/* Real Tab Navigation - Always Visible */}
     <Box
@@ -424,12 +434,12 @@ const PatientDetailsLoadingSkeleton: React.FC<{
           {/* Real title, skeleton table */}
           <Text
             style={{
-              color: '#004f6e',
+              color: theme.colors.blue[9],
               fontSize: '20px',
               fontWeight: 'bold',
               marginBottom: '20px',
               marginTop: 0,
-              borderBottom: '2px solid #4db6ac',
+              borderBottom: `2px solid ${theme.colors.blue[9]}`,
               paddingBottom: '8px'
             }}
           >
@@ -445,14 +455,14 @@ const PatientDetailsLoadingSkeleton: React.FC<{
             }}
           >
             {/* Real table headers */}
-            <Table.Thead style={{ background: '#dbeeff' }}>
+            <Table.Thead style={{ background: theme.colors.tableBlue[0] }}>
               <Table.Tr>
-                <Table.Th style={{ padding: '12px', textAlign: 'center', color: '#0047ab', fontWeight: 600 }}>Date</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'center', color: '#0047ab', fontWeight: 600 }}>Time</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: '#0047ab', fontWeight: 600 }}>Reason for Visit</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: '#0047ab', fontWeight: 600 }}>Lab Tests Done</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: '#0047ab', fontWeight: 600 }}>Prescriptions</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'center', color: '#0047ab', fontWeight: 600 }}>Status</Table.Th>
+                <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Date</Table.Th>
+                <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Time</Table.Th>
+                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Reason for Visit</Table.Th>
+                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Lab Tests Done</Table.Th>
+                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Prescriptions</Table.Th>
+                <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Status</Table.Th>
               </Table.Tr>
             </Table.Thead>
             {/* Skeleton table rows */}
@@ -488,12 +498,12 @@ const PatientDetailsLoadingSkeleton: React.FC<{
         <Box>
           <Text
             style={{
-              color: '#004f6e',
+              color: theme.colors.blue[9],
               fontSize: '20px',
               fontWeight: 'bold',
               marginBottom: '20px',
               marginTop: 0,
-              borderBottom: '2px solid #4db6ac',
+              borderBottom: `2px solid ${theme.colors.blue[9]}`,
               paddingBottom: '8px'
             }}
           >
@@ -520,9 +530,11 @@ const PatientDetailsLoadingSkeleton: React.FC<{
       <Skeleton height={40} width={120} radius="md" />
     </Box>
   </>
-);
+  );
+};
 
 export const PatientDetailsPage: React.FC = () => {
+  const theme = useMantineTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { patient, isLoading, error, hasError, clearError } = usePatientDetailsViewModel(id);
@@ -563,7 +575,7 @@ export const PatientDetailsPage: React.FC = () => {
           onClick={handleGoBack}
           style={{
             marginTop: '20px',
-            background: '#4db6ac',
+            background: theme.colors.blue[7],
             color: 'white'
           }}
         >
@@ -643,7 +655,7 @@ export const PatientDetailsPage: React.FC = () => {
             onClick={handleGoBack}
             style={{
               padding: '12px 24px',
-              background: '#4db6ac',
+              background: theme.colors.blue[7],
               color: 'white',
               border: 'none',
               borderRadius: '10px',
@@ -653,10 +665,10 @@ export const PatientDetailsPage: React.FC = () => {
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#26a69a';
+              e.currentTarget.style.background = theme.colors.blue[8];
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#4db6ac';
+              e.currentTarget.style.background = theme.colors.blue[7];
             }}
           >
             Go Back
