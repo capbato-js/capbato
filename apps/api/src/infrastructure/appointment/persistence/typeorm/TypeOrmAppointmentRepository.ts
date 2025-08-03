@@ -4,7 +4,7 @@ import { Appointment } from '@nx-starter/domain';
 import type { IAppointmentRepository } from '@nx-starter/domain';
 import { AppointmentMapper } from '@nx-starter/application-shared';
 import { AppointmentEntity } from './AppointmentEntity';
-import { generateUUID } from '@nx-starter/utils-core';
+import { generateId } from '@nx-starter/utils-core';
 
 /**
  * TypeORM implementation of IAppointmentRepository
@@ -26,7 +26,7 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
   }
 
   async create(appointment: Appointment): Promise<string> {
-    const id = generateUUID();
+    const id = generateId();
     const entity = this.repository.create({
       id,
       patientId: appointment.patientId,

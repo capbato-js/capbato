@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('blood_chem')
 export class BloodChemistryEntity {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryColumn('varchar')
+  id!: string;
 
   @Column({ name: 'patient_id' })
   patientId!: string;

@@ -150,7 +150,7 @@ export const LoginFormSchema = LoginUserCommandSchema.extend({
 
 // Change password command validation schema
 export const ChangeUserPasswordCommandSchema = z.object({
-  userId: z.string().min(1, 'User ID is required').uuid('Invalid user ID format'),
+  userId: z.string().min(1, 'User ID is required').regex(/^[0-9a-fA-F]{32}$/, 'Invalid user ID format - must be dashless UUID'),
   newPassword: PasswordSchema,
 });
 

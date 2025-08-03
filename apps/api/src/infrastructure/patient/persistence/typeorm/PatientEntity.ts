@@ -1,6 +1,6 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
@@ -11,7 +11,7 @@ import {
 @Index(['firstName', 'lastName']) // For name-based searches
 @Index(['dateOfBirth']) // For age-based queries
 export class PatientEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('varchar')
   id!: string;
 
   @Column({ 

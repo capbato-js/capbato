@@ -9,6 +9,7 @@ import {
   LabRequestTests,
   LabRequestStatus 
 } from '@nx-starter/domain';
+import { generateId } from '@nx-starter/utils-core';
 import { LabRequestEntity } from './LabRequestEntity';
 
 @injectable()
@@ -21,13 +22,17 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
 
   async save(labRequest: LabRequest): Promise<LabRequest> {
     const entity = this.domainToEntity(labRequest);
+    // Generate ID if not present (for new entities)
+    if (!entity.id) {
+      entity.id = generateId();
+    }
     const savedEntity = await this.repository.save(entity);
     return this.entityToDomain(savedEntity);
   }
 
   async findById(id: LabRequestId): Promise<LabRequest | null> {
     const entity = await this.repository.findOne({
-      where: { id: parseInt(id.value) }
+      where: { id: id.value }
     });
     return entity ? this.entityToDomain(entity) : null;
   }
@@ -81,10 +86,10 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
     }
 
     const entity = this.domainToEntity(labRequest);
-    await this.repository.update({ id: parseInt(labRequest.id.value) }, entity);
+    await this.repository.update({ id: labRequest.id.value }, entity);
     
     const updatedEntity = await this.repository.findOne({
-      where: { id: parseInt(labRequest.id.value) }
+      where: { id: labRequest.id.value }
     });
     
     if (!updatedEntity) {
@@ -95,7 +100,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
   }
 
   async delete(id: LabRequestId): Promise<void> {
-    await this.repository.delete({ id: parseInt(id.value) });
+    await this.repository.delete({ id: id.value });
   }
 
   private domainToEntity(labRequest: LabRequest): Partial<LabRequestEntity> {
@@ -143,7 +148,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
     entity.tsh = tests.tsh;
 
     if (labRequest.id) {
-      entity.id = parseInt(labRequest.id.value);
+      entity.id = labRequest.id.value;
     }
 
     return entity;
@@ -194,7 +199,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       entity.requestDate,
       tests,
       status,
-      entity.id.toString(),
+      entity.id, // ID is already a string (dashless UUID)
       entity.dateTaken,
       entity.others,
       entity.createdAt,

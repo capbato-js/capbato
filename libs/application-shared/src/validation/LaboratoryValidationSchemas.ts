@@ -262,9 +262,14 @@ export const DeleteBloodChemistryCommandSchema = z.object({
   id: z.string().min(1, 'ID cannot be empty'),
 });
 
-// ID validation schemas
-export const LabRequestIdSchema = z.string().min(1, 'Lab request ID cannot be empty');
-export const BloodChemistryIdSchema = z.string().min(1, 'Blood chemistry ID cannot be empty');
+// ID validation schemas - Dashless UUID format
+export const LabRequestIdSchema = z.string()
+  .min(1, 'Lab request ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Lab request ID must be a valid dashless UUID format (32 hexadecimal characters)');
+
+export const BloodChemistryIdSchema = z.string()
+  .min(1, 'Blood chemistry ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Blood chemistry ID must be a valid dashless UUID format (32 hexadecimal characters)');
 
 // Export inferred types
 export type CreateLabRequestCommand = z.infer<typeof CreateLabRequestCommandSchema>;

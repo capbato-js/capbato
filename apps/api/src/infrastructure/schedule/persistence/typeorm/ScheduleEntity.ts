@@ -1,6 +1,6 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
@@ -11,7 +11,7 @@ import {
 @Index(['doctorId', 'date']) // For querying schedules by doctor and date
 @Index(['date']) // For querying schedules by date
 export class ScheduleEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('varchar')
   id!: string;
 
   @Column({ type: 'varchar', length: 50, name: 'doctor_id' })

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
+import { Entity, PrimaryColumn, Column, Index } from 'typeorm';
 
 /**
  * TypeORM entity for Doctor
@@ -9,7 +9,7 @@ import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
  */
 @Entity('doctors')
 export class DoctorEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('varchar')
   id!: string;
 
   @Column({ name: 'user_id', type: 'varchar', length: 50 })

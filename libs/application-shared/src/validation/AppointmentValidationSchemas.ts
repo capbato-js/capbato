@@ -23,7 +23,10 @@ export const APPOINTMENT_VALIDATION_ERRORS = {
 // Base Appointment validation schemas
 export const AppointmentStatusSchema = z.enum(['scheduled', 'confirmed', 'cancelled', 'completed']);
 
-export const AppointmentIdSchema = z.string().min(1, 'Appointment ID cannot be empty');
+// Appointment ID validation schema - Dashless UUID format  
+export const AppointmentIdSchema = z.string()
+  .min(1, 'Appointment ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Appointment ID must be a valid dashless UUID format (32 hexadecimal characters)');
 
 // Enhanced date validation function
 const validateAppointmentDate = (date: string, ctx: z.RefinementCtx) => {

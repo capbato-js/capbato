@@ -11,7 +11,7 @@ import { VALIDATION_MESSAGES } from './constants/ValidationMessages';
 // Doctor validation error messages
 export const DOCTOR_VALIDATION_ERRORS = {
   MISSING_DOCTOR_ID: 'Doctor profile ID is required',
-  INVALID_DOCTOR_ID: 'Doctor profile ID must be a valid UUID format',
+  INVALID_DOCTOR_ID: 'Doctor profile ID must be a valid dashless UUID format (32 hexadecimal characters)',
   MISSING_USER_ID: 'User ID is required',
   INVALID_USER_ID: 'User ID can only contain letters, numbers, hyphens and underscores',
   MISSING_SPECIALIZATION: 'Specialization is required',
@@ -23,10 +23,10 @@ export const DOCTOR_VALIDATION_ERRORS = {
   INVALID_YEARS_EXPERIENCE: 'Years of experience must be between 0 and 50 years',
 } as const;
 
-// Doctor ID validation schema
+// Doctor ID validation schema - Dashless UUID format
 export const DoctorIdSchema = z.string()
   .min(1, DOCTOR_VALIDATION_ERRORS.MISSING_DOCTOR_ID)
-  .uuid(DOCTOR_VALIDATION_ERRORS.INVALID_DOCTOR_ID);
+  .regex(/^[0-9a-fA-F]{32}$/, DOCTOR_VALIDATION_ERRORS.INVALID_DOCTOR_ID);
 
 // User ID validation schema (for linking to User entity)
 export const UserIdSchema = z.string()

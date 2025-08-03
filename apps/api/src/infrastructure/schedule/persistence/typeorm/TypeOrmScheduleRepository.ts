@@ -3,7 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { Schedule, ScheduleId } from '@nx-starter/domain';
 import type { IScheduleRepository } from '@nx-starter/domain';
 import { ScheduleEntity } from './ScheduleEntity';
-import { generateUUID } from '@nx-starter/utils-core';
+import { generateId } from '@nx-starter/utils-core';
 
 /**
  * TypeORM implementation of IScheduleRepository
@@ -34,7 +34,7 @@ export class TypeOrmScheduleRepository implements IScheduleRepository {
   }
 
   async create(schedule: Schedule): Promise<Schedule> {
-    const id = generateUUID();
+    const id = generateId();
     const entity = this.repository.create({
       id,
       doctorId: schedule.doctorIdString,

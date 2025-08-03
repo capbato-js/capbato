@@ -7,7 +7,10 @@ import { DoctorIdSchema as BaseDoctorIdSchema } from './DoctorValidationSchemas'
  */
 
 // Base Schedule validation schemas
-export const ScheduleIdSchema = z.string().min(1, 'Schedule ID is required');
+// Schedule ID validation schema - Dashless UUID format
+export const ScheduleIdSchema = z.string()
+  .min(1, 'Schedule ID is required')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Schedule ID must be a valid dashless UUID format (32 hexadecimal characters)');
 
 // Enhanced doctor ID validation with specific error messages
 const validateDoctorId = (doctorId: string, ctx: z.RefinementCtx) => {
@@ -38,12 +41,12 @@ const validateDoctorId = (doctorId: string, ctx: z.RefinementCtx) => {
     return;
   }
 
-  // Check UUID format for doctorId (assuming doctor IDs are UUIDs)
-  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  // Check UUID format for doctorId (dashless UUID format)
+  const uuidRegex = /^[0-9a-fA-F]{32}$/;
   if (!uuidRegex.test(doctorId.trim())) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Doctor ID must be a valid UUID format',
+      message: 'Doctor ID must be a valid dashless UUID format (32 hexadecimal characters)',
     });
     return;
   }

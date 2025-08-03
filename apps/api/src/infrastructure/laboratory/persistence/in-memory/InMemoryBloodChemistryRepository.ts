@@ -5,25 +5,25 @@ import {
   BloodChemistry,
   BloodChemistryId 
 } from '@nx-starter/domain';
+import { generateId } from '@nx-starter/utils-core';
 
 @injectable()
 export class InMemoryBloodChemistryRepository implements IBloodChemistryRepository {
   private readonly bloodChemistries: Map<string, BloodChemistry> = new Map();
-  private currentId = 1;
 
   async save(bloodChemistry: BloodChemistry): Promise<BloodChemistry> {
     if (!bloodChemistry.id) {
-      // Create new blood chemistry with generated ID
+      // Create new blood chemistry with generated dashless UUID
+      const newId = generateId();
       const newBloodChemistry = new BloodChemistry(
         bloodChemistry.patientInfo,
         bloodChemistry.dateTaken,
         bloodChemistry.results,
-        this.currentId.toString(),
+        newId,
         bloodChemistry.createdAt,
         new Date()
       );
-      this.bloodChemistries.set(this.currentId.toString(), newBloodChemistry);
-      this.currentId++;
+      this.bloodChemistries.set(newId, newBloodChemistry);
       return newBloodChemistry;
     } else {
       // Update existing blood chemistry
@@ -87,7 +87,6 @@ export class InMemoryBloodChemistryRepository implements IBloodChemistryReposito
   // Test helper methods
   clear(): void {
     this.bloodChemistries.clear();
-    this.currentId = 1;
   }
 
   size(): number {

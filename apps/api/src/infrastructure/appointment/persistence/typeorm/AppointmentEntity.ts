@@ -1,6 +1,6 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
@@ -8,7 +8,7 @@ import {
 
 @Entity('appointments')
 export class AppointmentEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('varchar')
   id!: string;
 
   @Column({ type: 'varchar', length: 36, name: 'patient_id' })

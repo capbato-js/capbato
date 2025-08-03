@@ -5,28 +5,28 @@ import {
   LabRequest,
   LabRequestId 
 } from '@nx-starter/domain';
+import { generateId } from '@nx-starter/utils-core';
 
 @injectable()
 export class InMemoryLabRequestRepository implements ILabRequestRepository {
   private readonly labRequests: Map<string, LabRequest> = new Map();
-  private currentId = 1;
 
   async save(labRequest: LabRequest): Promise<LabRequest> {
     if (!labRequest.id) {
-      // Create new lab request with generated ID
+      // Create new lab request with generated dashless UUID
+      const newId = generateId();
       const newLabRequest = new LabRequest(
         labRequest.patientInfo,
         labRequest.requestDate,
         labRequest.tests,
         labRequest.status,
-        this.currentId.toString(),
+        newId,
         labRequest.dateTaken,
         labRequest.others,
         labRequest.createdAt,
         new Date()
       );
-      this.labRequests.set(this.currentId.toString(), newLabRequest);
-      this.currentId++;
+      this.labRequests.set(newId, newLabRequest);
       return newLabRequest;
     } else {
       // Update existing lab request
@@ -105,7 +105,6 @@ export class InMemoryLabRequestRepository implements ILabRequestRepository {
   // Test helper methods
   clear(): void {
     this.labRequests.clear();
-    this.currentId = 1;
   }
 
   size(): number {

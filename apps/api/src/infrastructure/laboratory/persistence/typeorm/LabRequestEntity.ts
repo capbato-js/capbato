@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('lab_request_entries')
 export class LabRequestEntity {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryColumn('varchar')
+  id!: string;
 
   @Column({ name: 'patient_id' })
   patientId!: string;

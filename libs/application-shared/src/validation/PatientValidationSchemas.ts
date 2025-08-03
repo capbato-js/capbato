@@ -188,8 +188,10 @@ export const GetPatientByIdCommandSchema = z.object({
   id: z.string().min(1, 'Patient ID cannot be empty'),
 });
 
-// Simple ID validation schema for route parameters
-export const PatientIdSchema = z.string().min(1, 'Patient ID cannot be empty');
+// Patient ID validation schema - Dashless UUID format
+export const PatientIdSchema = z.string()
+  .min(1, 'Patient ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Patient ID must be a valid dashless UUID format (32 hexadecimal characters)');
 
 // Inferred TypeScript types from Zod schemas
 export type CreatePatientCommand = z.infer<typeof CreatePatientCommandSchema>;

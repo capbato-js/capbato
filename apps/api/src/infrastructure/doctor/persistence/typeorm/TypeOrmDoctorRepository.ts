@@ -2,6 +2,7 @@ import { injectable } from 'tsyringe';
 import { Repository, DataSource } from 'typeorm';
 import { Doctor, IDoctorRepository } from '@nx-starter/domain';
 import { DoctorMapper } from '@nx-starter/application-shared';
+import { generateId } from '@nx-starter/utils-core';
 import { DoctorEntity } from './DoctorEntity';
 
 /**
@@ -62,6 +63,7 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
   async create(doctor: Doctor): Promise<Doctor> {
     const plainObject = DoctorMapper.toPlainObject(doctor);
     const entity = this.repository.create({
+      id: generateId(), // Generate dashless UUID manually
       userId: plainObject.userId,
       specialization: plainObject.specialization,
       licenseNumber: plainObject.licenseNumber,
@@ -113,7 +115,7 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
    */
   private entityToDomain(entity: DoctorEntity): Doctor {
     return DoctorMapper.fromPlainObject({
-      id: entity.id, // Now a string UUID, no need to convert
+      id: entity.id, // ID is already dashless since we use @PrimaryColumn('varchar') + generateId()
       userId: entity.userId,
       specialization: entity.specialization,
       licenseNumber: entity.licenseNumber,

@@ -3,7 +3,7 @@ import { Repository, DataSource, Like } from 'typeorm';
 import { Patient } from '@nx-starter/application-shared';
 import { IPatientRepository } from '@nx-starter/application-shared';
 import { PatientEntity } from './PatientEntity';
-import { generateUUID } from '@nx-starter/utils-core';
+import { generateId } from '@nx-starter/utils-core';
 import { PatientNotFoundError } from '@nx-starter/application-shared';
 
 /**
@@ -26,7 +26,7 @@ export class TypeOrmPatientRepository implements IPatientRepository {
   }
 
   async create(patient: Patient): Promise<string> {
-    const id = generateUUID();
+    const id = generateId();
     const entity = this.repository.create({
       id,
       patientNumber: patient.patientNumber,
@@ -309,7 +309,7 @@ export class TypeOrmPatientRepository implements IPatientRepository {
         barangay: entity.barangay,
       },
       {
-        id: entity.id,
+        id: entity.id, // ID is already dashless since we use @PrimaryColumn('varchar') + generateId()
         middleName: entity.middleName,
         guardianName: entity.guardianName,
         guardianGender: entity.guardianGender,

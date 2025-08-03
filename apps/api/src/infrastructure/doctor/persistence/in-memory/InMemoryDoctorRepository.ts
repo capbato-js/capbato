@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import { Doctor, IDoctorRepository } from '@nx-starter/domain';
-import { randomUUID } from 'crypto';
+import { generateId } from '@nx-starter/utils-core';
 
 /**
  * In-memory implementation of IDoctorRepository
@@ -49,7 +49,7 @@ export class InMemoryDoctorRepository implements IDoctorRepository {
   }
 
   async create(doctor: Doctor): Promise<Doctor> {
-    const id = randomUUID();
+    const id = generateId();
     
     // Check if user already has a doctor profile
     if (this.userIdIndex.has(doctor.userId)) {
@@ -109,11 +109,11 @@ export class InMemoryDoctorRepository implements IDoctorRepository {
    */
   private seedData(): void {
     const sampleDoctors = [
-      new Doctor('user-doctor-1', 'General Practice', randomUUID(), 'MD-12345', 10, true),
-      new Doctor('user-doctor-2', 'Cardiology', randomUUID(), 'MD-23456', 15, true),
-      new Doctor('user-doctor-3', 'Pediatrics', randomUUID(), 'MD-34567', 8, true),
-      new Doctor('user-doctor-4', 'Orthopedics', randomUUID(), 'MD-45678', 12, true),
-      new Doctor('user-doctor-5', 'Neurology', randomUUID(), 'MD-56789', 20, false), // Inactive
+      new Doctor('user-doctor-1', 'General Practice', generateId(), 'MD-12345', 10, true),
+      new Doctor('user-doctor-2', 'Cardiology', generateId(), 'MD-23456', 15, true),
+      new Doctor('user-doctor-3', 'Pediatrics', generateId(), 'MD-34567', 8, true),
+      new Doctor('user-doctor-4', 'Orthopedics', generateId(), 'MD-45678', 12, true),
+      new Doctor('user-doctor-5', 'Neurology', generateId(), 'MD-56789', 20, false), // Inactive
     ];
 
     sampleDoctors.forEach(doctor => {

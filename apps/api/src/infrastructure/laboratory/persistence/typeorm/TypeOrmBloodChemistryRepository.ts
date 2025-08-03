@@ -8,6 +8,7 @@ import {
   BloodChemistryPatientInfo,
   BloodChemistryResults
 } from '@nx-starter/domain';
+import { generateId } from '@nx-starter/utils-core';
 import { BloodChemistryEntity } from './BloodChemistryEntity';
 
 @injectable()
@@ -20,13 +21,17 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
 
   async save(bloodChemistry: BloodChemistry): Promise<BloodChemistry> {
     const entity = this.domainToEntity(bloodChemistry);
+    // Generate ID if not present (for new entities)
+    if (!entity.id) {
+      entity.id = generateId();
+    }
     const savedEntity = await this.repository.save(entity);
     return this.entityToDomain(savedEntity);
   }
 
   async findById(id: BloodChemistryId): Promise<BloodChemistry | null> {
     const entity = await this.repository.findOne({
-      where: { id: parseInt(id.value) }
+      where: { id: id.value }
     });
     return entity ? this.entityToDomain(entity) : null;
   }
@@ -80,10 +85,10 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
     }
 
     const entity = this.domainToEntity(bloodChemistry);
-    await this.repository.update({ id: parseInt(bloodChemistry.id.value) }, entity);
+    await this.repository.update({ id: bloodChemistry.id.value }, entity);
     
     const updatedEntity = await this.repository.findOne({
-      where: { id: parseInt(bloodChemistry.id.value) }
+      where: { id: bloodChemistry.id.value }
     });
     
     if (!updatedEntity) {
@@ -94,7 +99,7 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
   }
 
   async delete(id: BloodChemistryId): Promise<void> {
-    await this.repository.delete({ id: parseInt(id.value) });
+    await this.repository.delete({ id: id.value });
   }
 
   private domainToEntity(bloodChemistry: BloodChemistry): Partial<BloodChemistryEntity> {
@@ -125,7 +130,7 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
     entity.hbalc = results.hbalc?.toString();
 
     if (bloodChemistry.id) {
-      entity.id = parseInt(bloodChemistry.id.value);
+      entity.id = bloodChemistry.id.value;
     }
 
     return entity;
@@ -156,7 +161,7 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
       patientInfo,
       entity.dateTaken || entity.requestDate,
       results,
-      entity.id.toString(),
+      entity.id, // ID is already a string (dashless UUID)
       entity.createdAt,
       entity.updatedAt
     );
