@@ -1,0 +1,828 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+    "name": "Authentication API",
+    "description": "Authentication and user registration endpoints for healthcare clinic\n\n## Authentication Architecture\nThe API implements a JWT-based authentication system with role-based access control:\n\n**User Registration (POST /api/auth/register):**\n- `firstName`, `lastName`: Personal names (required)\n- `email`: Contact email (required, must be unique)\n- `password`: User password (required, minimum validation applies)\n- `role`: User role - 'admin', 'doctor', or 'receptionist' (required)\n- `mobile`: Personal contact number (optional)\n- **Doctor-specific fields** (required only when role='doctor'):\n  - `specialization`: Medical specialization\n  - `licenseNumber`: Medical license number (optional)\n  - `experienceYears`: Years of practice (optional)\n\n**User Login (POST /api/auth/login):**\n- Accepts either `email` OR `username` + `password`\n- Returns JWT token with user profile information\n- Token contains user role for authorization\n\n**API Response Structure:**\nAll responses follow a consistent format:\n```json\n{\n  \"success\": true,\n  \"data\": { /* response data */ },\n  \"message\": \"Optional message\"\n}\n```\n\n**Error Handling:**\n- Validation errors return detailed field-specific messages\n- Authentication errors use standard HTTP status codes\n- All errors include descriptive error messages\n\n**Role-Based Access:**\n- `admin`: Full system access\n- `doctor`: Medical professional access with doctor profile\n- `receptionist`: Front desk and appointment management access\n\n**Security Features:**\n- Password hashing using bcrypt\n- JWT tokens for stateless authentication\n- Email uniqueness validation\n- Username auto-generation from email prefix\n- Role-based authorization",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 1,
+      "minor": 2,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "User Registration",
+      "item": [
+        {
+          "name": "Register Admin User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"System\",\n  \"lastName\": \"Administrator\",\n  \"email\": \"admin@clinic.com\",\n  \"password\": \"AdminSecure123!\",\n  \"role\": \"admin\",\n  \"mobile\": \"09123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new admin user with full system access"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Doctor User - Full Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Maria\",\n  \"lastName\": \"Santos\",\n  \"email\": \"santos@clinic.com\",\n  \"password\": \"DoctorSecure123!\",\n  \"role\": \"doctor\",\n  \"mobile\": \"09278479061\",\n  \"specialization\": \"Cardiology\",\n  \"licenseNumber\": \"MD-12345\",\n  \"experienceYears\": 15\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new doctor with complete profile information including medical specialization"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Doctor User - Minimal Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Reyes\",\n  \"email\": \"reyes@clinic.com\",\n  \"password\": \"DoctorSecure123!\",\n  \"role\": \"doctor\",\n  \"specialization\": \"General Practice\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a doctor with only required fields (specialization required for doctors)"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Receptionist User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Anna\",\n  \"lastName\": \"Cruz\",\n  \"email\": \"anna.cruz@clinic.com\",\n  \"password\": \"ReceptionSecure123!\",\n  \"role\": \"receptionist\",\n  \"mobile\": \"09987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new receptionist user for front desk operations"
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - No Mobile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"email\": \"jane.doe@clinic.com\",\n  \"password\": \"UserSecure123!\",\n  \"role\": \"receptionist\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register user without mobile number (mobile is optional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Doctor - New Graduate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Patricia\",\n  \"lastName\": \"Lopez\",\n  \"email\": \"lopez@clinic.com\",\n  \"password\": \"DoctorSecure123!\",\n  \"role\": \"doctor\",\n  \"mobile\": \"09456789012\",\n  \"specialization\": \"Family Medicine\",\n  \"licenseNumber\": \"MD-67890\",\n  \"experienceYears\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a newly graduated doctor with minimal experience"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Doctor - Senior Specialist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Roberto\",\n  \"lastName\": \"Fernandez\",\n  \"email\": \"fernandez@clinic.com\",\n  \"password\": \"DoctorSecure123!\",\n  \"role\": \"doctor\",\n  \"mobile\": \"09567890123\",\n  \"specialization\": \"Neurology\",\n  \"licenseNumber\": \"MD-54321\",\n  \"experienceYears\": 25\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a senior medical specialist with extensive experience"
+          },
+          "response": []
+        }
+      ],
+      "description": "User registration endpoints for creating new user accounts with different roles"
+    },
+    {
+      "name": "Registration Validation Tests",
+      "item": [
+        {
+          "name": "Register - Missing Required Fields (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"email\": \"incomplete@clinic.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Test validation error - missing required fields (lastName, password, role)"
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Invalid Email Format (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"invalid-email-format\",\n  \"password\": \"TestPassword123!\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Test validation error - invalid email format"
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Weak Password (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.weak@clinic.com\",\n  \"password\": \"123\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Test validation error - password too short/weak"
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Invalid Role (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.invalidrole@clinic.com\",\n  \"password\": \"TestPassword123!\",\n  \"role\": \"invalid_role\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Test validation error - invalid role (must be admin, doctor, or receptionist)"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Doctor - Missing Specialization (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"incomplete@clinic.com\",\n  \"password\": \"DoctorSecure123!\",\n  \"role\": \"doctor\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Test validation error - doctor role requires specialization field"
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Duplicate Email (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"admin@clinic.com\",\n  \"password\": \"TestPassword123!\",\n  \"role\": \"receptionist\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Test validation error - duplicate email (use email from previous successful registration)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Test cases for registration validation and error handling"
+    },
+    {
+      "name": "User Authentication",
+      "item": [
+        {
+          "name": "Login with Email - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@clinic.com\",\n  \"password\": \"AdminSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login using email address for admin user"
+          },
+          "response": []
+        },
+        {
+          "name": "Login with Email - Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"santos@clinic.com\",\n  \"password\": \"DoctorSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login using email address for doctor user"
+          },
+          "response": []
+        },
+        {
+          "name": "Login with Email - Receptionist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"anna.cruz@clinic.com\",\n  \"password\": \"ReceptionSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login using email address for receptionist user"
+          },
+          "response": []
+        },
+        {
+          "name": "Login with Username - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"AdminSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login using username (auto-generated from email prefix)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login with Username - Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"santos\",\n  \"password\": \"DoctorSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login using username for doctor user"
+          },
+          "response": []
+        }
+      ],
+      "description": "User authentication endpoints for logging in with email or username"
+    },
+    {
+      "name": "Login Validation Tests",
+      "item": [
+        {
+          "name": "Login - Missing Password (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@clinic.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Test validation error - missing password field"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Missing Email/Username (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"AdminSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Test validation error - missing email or username field"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Invalid Email (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nonexistent@clinic.com\",\n  \"password\": \"AdminSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Test authentication error - user not found"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Invalid Username (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nonexistent\",\n  \"password\": \"AdminSecure123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Test authentication error - username not found"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Wrong Password (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@clinic.com\",\n  \"password\": \"WrongPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Test authentication error - invalid password"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Empty Credentials (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"\",\n  \"password\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Test validation error - empty credential fields"
+          },
+          "response": []
+        }
+      ],
+      "description": "Test cases for login validation and authentication error handling"
+    },
+    {
+      "name": "Special Registration Cases",
+      "item": [
+        {
+          "name": "Register User - Unicode Characters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"José\",\n  \"lastName\": \"Müller\",\n  \"email\": \"jose.muller@clinic.com\",\n  \"password\": \"UnicodeSecure123!\",\n  \"role\": \"doctor\",\n  \"mobile\": \"09123456789\",\n  \"specialization\": \"Pediatrics\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register user with Unicode characters in names"
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Special Characters in Names",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Mary-Ann O'Connor\",\n  \"lastName\": \"Smith-Wilson\",\n  \"email\": \"mary.ann@clinic.com\",\n  \"password\": \"SpecialSecure123!\",\n  \"role\": \"receptionist\",\n  \"mobile\": \"09234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register user with hyphens and apostrophes in names"
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Long Email Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Very\",\n  \"lastName\": \"LongEmailUser\",\n  \"email\": \"very.long.email.address.with.many.dots@very-long-domain-name.clinic.com\",\n  \"password\": \"LongEmailSecure123!\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register user with very long email address"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Doctor - All Specializations",
+          "item": [
+            {
+              "name": "Register - Cardiology",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Heart\",\n  \"lastName\": \"Specialist\",\n  \"email\": \"cardiologist@clinic.com\",\n  \"password\": \"CardioSecure123!\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Cardiology\",\n  \"licenseNumber\": \"CARD-001\",\n  \"experienceYears\": 10\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "register"]
+                },
+                "description": "Register cardiologist"
+              }
+            },
+            {
+              "name": "Register - Neurology",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Brain\",\n  \"lastName\": \"Expert\",\n  \"email\": \"neurologist@clinic.com\",\n  \"password\": \"NeuroSecure123!\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Neurology\",\n  \"licenseNumber\": \"NEURO-001\",\n  \"experienceYears\": 20\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "register"]
+                },
+                "description": "Register neurologist"
+              }
+            },
+            {
+              "name": "Register - Pediatrics",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Child\",\n  \"lastName\": \"Care\",\n  \"email\": \"pediatrician@clinic.com\",\n  \"password\": \"PediatricSecure123!\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Pediatrics\",\n  \"licenseNumber\": \"PEDI-001\",\n  \"experienceYears\": 8\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "register"]
+                },
+                "description": "Register pediatrician"
+              }
+            },
+            {
+              "name": "Register - Orthopedics",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Bone\",\n  \"lastName\": \"Surgeon\",\n  \"email\": \"orthopedist@clinic.com\",\n  \"password\": \"OrthoSecure123!\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Orthopedics\",\n  \"licenseNumber\": \"ORTHO-001\",\n  \"experienceYears\": 12\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "register"]
+                },
+                "description": "Register orthopedic surgeon"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Special test cases for edge cases and comprehensive coverage"
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000",
+      "type": "string",
+      "description": "Base URL for the API server"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from login response - set automatically from login requests"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string",
+      "description": "User ID from registration/login response"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@clinic.com",
+      "type": "string",
+      "description": "Admin user email for testing"
+    },
+    {
+      "key": "doctor_email",
+      "value": "santos@clinic.com",
+      "type": "string",
+      "description": "Doctor user email for testing"
+    },
+    {
+      "key": "receptionist_email",
+      "value": "anna.cruz@clinic.com",
+      "type": "string",
+      "description": "Receptionist user email for testing"
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-capture JWT token from login responses",
+          "if (pm.response.code === 200 && pm.request.url.toString().includes('/auth/login')) {",
+          "    const responseJson = pm.response.json();",
+          "    if (responseJson.success && responseJson.data.token) {",
+          "        pm.collectionVariables.set('auth_token', responseJson.data.token);",
+          "        console.log('JWT token captured:', responseJson.data.token.substring(0, 20) + '...');",
+          "    }",
+          "}",
+          "",
+          "// Auto-capture user ID from registration responses",
+          "if (pm.response.code === 201 && pm.request.url.toString().includes('/auth/register')) {",
+          "    const responseJson = pm.response.json();",
+          "    if (responseJson.success && responseJson.data.id) {",
+          "        pm.collectionVariables.set('user_id', responseJson.data.id);",
+          "        console.log('User ID captured:', responseJson.data.id);",
+          "    }",
+          "}",
+          "",
+          "// Log response for debugging",
+          "console.log('Response Status:', pm.response.code);",
+          "console.log('Response Body:', pm.response.text());"
+        ]
+      }
+    }
+  ]
+}
