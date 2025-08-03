@@ -25,6 +25,7 @@ import {
   TOKENS,
   ScheduleValidationService,
   ScheduleIdSchema,
+  ScheduleWithDoctorService,
 } from '@nx-starter/application-shared';
 import {
   ScheduleListResponse,
@@ -66,11 +67,13 @@ export class ScheduleController {
     @inject(TOKENS.GetScheduleStatsQueryHandler)
     private getScheduleStatsQueryHandler: GetScheduleStatsQueryHandler,
     @inject(TOKENS.ScheduleValidationService)
-    private validationService: ScheduleValidationService
+    private validationService: ScheduleValidationService,
+    @inject(TOKENS.ScheduleWithDoctorService)
+    private scheduleWithDoctorService: ScheduleWithDoctorService
   ) {}
 
   /**
-   * GET /api/schedules - Get all schedules
+   * GET /api/schedules - Get all schedules with doctor names
    * Query params:
    * - activeOnly: boolean (default: true) - whether to include only future schedules
    */
@@ -78,10 +81,10 @@ export class ScheduleController {
   async getAllSchedules(
     @QueryParam('activeOnly') activeOnly?: boolean
   ): Promise<ScheduleListResponse> {
-    const schedules = await this.getAllSchedulesQueryHandler.execute({
-      activeOnly: activeOnly !== false // Default to true unless explicitly false
-    });
-    const scheduleDtos = ScheduleMapper.toDtoArray(schedules);
+    const { schedules, doctorNames } = await this.scheduleWithDoctorService.getAllSchedulesWithDoctorNames(
+      activeOnly !== false // Default to true unless explicitly false
+    );
+    const scheduleDtos = ScheduleMapper.toDtoArray(schedules, doctorNames);
 
     return ApiResponseBuilder.success(scheduleDtos);
   }
@@ -113,25 +116,25 @@ export class ScheduleController {
   }
 
   /**
-   * GET /api/schedules/date/:date - Get schedules by date
+   * GET /api/schedules/date/:date - Get schedules by date with doctor names
    */
   @Get('/date/:date')
   async getSchedulesByDate(@Param('date') date: string): Promise<ScheduleListResponse> {
     const validatedData = this.validationService.validateGetByDateQuery({ date });
-    const schedules = await this.getSchedulesByDateQueryHandler.execute(validatedData);
-    const scheduleDtos = ScheduleMapper.toDtoArray(schedules);
+    const { schedules, doctorNames } = await this.scheduleWithDoctorService.getSchedulesByDateWithDoctorNames(validatedData.date);
+    const scheduleDtos = ScheduleMapper.toDtoArray(schedules, doctorNames);
 
     return ApiResponseBuilder.success(scheduleDtos);
   }
 
   /**
-   * GET /api/schedules/doctor/:doctorId - Get schedules by doctor ID
+   * GET /api/schedules/doctor/:doctorId - Get schedules by doctor ID with doctor names
    */
   @Get('/doctor/:doctorId')
   async getSchedulesByDoctor(@Param('doctorId') doctorId: string): Promise<ScheduleListResponse> {
     const validatedData = this.validationService.validateGetByDoctorQuery({ doctorId });
-    const schedules = await this.getSchedulesByDoctorQueryHandler.execute(validatedData);
-    const scheduleDtos = ScheduleMapper.toDtoArray(schedules);
+    const { schedules, doctorNames } = await this.scheduleWithDoctorService.getSchedulesByDoctorWithDoctorNames(validatedData.doctorId);
+    const scheduleDtos = ScheduleMapper.toDtoArray(schedules, doctorNames);
 
     return ApiResponseBuilder.success(scheduleDtos);
   }

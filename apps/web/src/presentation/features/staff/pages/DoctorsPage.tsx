@@ -1,43 +1,30 @@
 import React from 'react';
-import { Box } from '@mantine/core';
+import { Box, LoadingOverlay } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { DoctorsTable, CustomCalendar } from '../components';
-import { ScheduleEntry } from '../types';
-
-// Dummy schedule data for July 2025
-const dummySchedules: ScheduleEntry[] = [
-  {
-    date: '2025-07-02',
-    note: '9:00 AM - 5:00 PM',
-    details: 'Dr. John Doe'
-  },
-  {
-    date: '2025-07-03',
-    note: '8:00 AM - 4:00 PM',
-    details: 'Dr. Alice Smith'
-  },
-  {
-    date: '2025-07-16',
-    note: '9:00 AM - 5:00 PM',
-    details: 'Dr. Alice Smith'
-  },
-  {
-    date: '2025-07-28',
-    note: '9:00 AM - 5:00 PM',
-    details: 'Dr. John Doe'
-  },
-  {
-    date: '2025-07-30',
-    note: '8:30 AM - 4:30 PM',
-    details: 'Dr. Alice Smith'
-  }
-];
+import { useDoctorScheduleCalendarViewModel } from '../view-models/useDoctorScheduleCalendarViewModel';
+import type { ScheduleEntry } from '../types';
 
 export const DoctorsPage: React.FC = () => {
-  const handleEditSchedule = () => {
-    console.log('Edit schedule clicked');
-    // TODO: Implement edit schedule functionality
+  // Use the real API integration for appointment data
+  const {
+    appointments,
+    loading,
+    error,
+    availableDoctors,
+    updateAppointmentDoctor
+  } = useDoctorScheduleCalendarViewModel();
+
+  // Convert API appointment data to CustomCalendar format
+  const convertToScheduleEntries = (): ScheduleEntry[] => {
+    return appointments?.map(appointment => ({
+      date: appointment.date, // Already in YYYY-MM-DD format
+      details: `Dr. ${appointment.doctorName}`,
+      note: appointment.formattedTime || appointment.time
+    })) || [];
   };
+
+  const scheduleEntries = convertToScheduleEntries();
 
   return (
     <MedicalClinicLayout>
@@ -47,16 +34,19 @@ export const DoctorsPage: React.FC = () => {
           borderRadius: '15px',
           padding: '30px',
           boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)'
+          minHeight: 'calc(100vh - 140px)',
+          position: 'relative'
         }}
       >
+
         {/* Doctors Table - Now uses real API data */}
         <DoctorsTable />
         
-        {/* Doctor's Schedule Calendar */}
+        {/* Doctor's Schedule Calendar - Now with edit functionality */}
         <CustomCalendar 
-          schedules={dummySchedules} 
-          onEdit={handleEditSchedule}
+          schedules={error ? [] : scheduleEntries}
+          availableDoctors={availableDoctors}
+          onDoctorChange={updateAppointmentDoctor}
         />
       </Box>
     </MedicalClinicLayout>

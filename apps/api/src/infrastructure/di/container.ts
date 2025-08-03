@@ -100,6 +100,7 @@ import {
   GetScheduleByIdValidationService,
   GetSchedulesByDateValidationService,
   GetSchedulesByDoctorValidationService,
+  ScheduleWithDoctorService,
 } from '@nx-starter/application-shared';
 import {
   CreateAppointmentUseCase,
@@ -246,6 +247,9 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreateScheduleUseCase, CreateScheduleUseCase);
   container.registerSingleton(TOKENS.UpdateScheduleUseCase, UpdateScheduleUseCase);
   container.registerSingleton(TOKENS.DeleteScheduleUseCase, DeleteScheduleUseCase);
+  
+  // Schedule Services
+  container.registerSingleton(TOKENS.ScheduleWithDoctorService, ScheduleWithDoctorService);
 
   // Appointment Use Cases
   container.registerSingleton(TOKENS.CreateAppointmentUseCase, CreateAppointmentUseCase);

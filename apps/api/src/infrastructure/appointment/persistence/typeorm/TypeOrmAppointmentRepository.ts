@@ -20,6 +20,16 @@ export interface AppointmentWithRelations {
 }
 
 /**
+ * Extended appointment data with populated patient and doctor information
+ */
+export interface AppointmentWithRelations {
+  appointment: AppointmentEntity;
+  patient: PatientEntity;
+  doctor: DoctorEntity;
+  doctorUser: UserEntity;
+}
+
+/**
  * TypeORM implementation of IAppointmentRepository
  * Supports MySQL, PostgreSQL, SQLite via TypeORM
  */

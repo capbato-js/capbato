@@ -4,6 +4,7 @@
 export interface ScheduleDto {
   id: string;
   doctorId: string;
+  doctorName?: string; // Doctor's name for calendar display
   date: string; // ISO date string (YYYY-MM-DD)
   time: string; // 24-hour format (HH:MM)
   formattedDate?: string; // Human-readable date

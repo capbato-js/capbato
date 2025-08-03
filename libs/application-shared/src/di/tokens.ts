@@ -32,6 +32,7 @@ export const TOKENS = {
   PatientCommandService: 'IPatientCommandService',
   PatientQueryService: 'IPatientQueryService',
   UserQueryService: 'IUserQueryService',
+  ScheduleWithDoctorService: 'ScheduleWithDoctorService',
 
   // Application Layer - Use Cases (Commands)
   CreateTodoUseCase: 'CreateTodoUseCase',

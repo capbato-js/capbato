@@ -1,16 +1,26 @@
 import { injectable, inject } from 'tsyringe';
-import { Appointment, AppointmentDomainService, type IAppointmentRepository } from '@nx-starter/domain';
+import { 
+  Appointment, 
+  AppointmentDomainService, 
+  type IAppointmentRepository,
+  Schedule,
+  type IScheduleRepository,
+  type IDoctorRepository
+} from '@nx-starter/domain';
 import type { CreateAppointmentCommand } from '../../dto/AppointmentCommands';
 import { TOKENS } from '../../di/tokens';
 
 /**
  * Use case for creating a new appointment
  * Handles all business logic and validation for appointment creation
+ * Automatically creates corresponding schedule entry for doctor's calendar
  */
 @injectable()
 export class CreateAppointmentUseCase {
   constructor(
-    @inject(TOKENS.AppointmentRepository) private appointmentRepository: IAppointmentRepository
+    @inject(TOKENS.AppointmentRepository) private appointmentRepository: IAppointmentRepository,
+    @inject(TOKENS.ScheduleRepository) private scheduleRepository: IScheduleRepository,
+    @inject(TOKENS.DoctorRepository) private doctorRepository: IDoctorRepository
   ) {}
 
   async execute(command: CreateAppointmentCommand): Promise<Appointment> {
@@ -31,8 +41,19 @@ export class CreateAppointmentUseCase {
     const domainService = new AppointmentDomainService(this.appointmentRepository);
     await domainService.validateAppointmentCreation(appointment);
 
-    // Persist using repository
-    const id = await this.appointmentRepository.create(appointment);
+    // Persist appointment using repository
+    const appointmentId = await this.appointmentRepository.create(appointment);
+
+    // Create corresponding schedule entry for doctor's calendar
+    const schedule = new Schedule(
+      command.doctorId,
+      command.appointmentDate,
+      command.appointmentTime
+    );
+
+    // Validate and create schedule
+    schedule.validate();
+    await this.scheduleRepository.create(schedule);
 
     // Return the created appointment with ID
     return new Appointment(
@@ -42,7 +63,7 @@ export class CreateAppointmentUseCase {
       appointment.appointmentTime,
       appointment.doctorId,
       appointment.statusValue,
-      id,
+      appointmentId,
       appointment.createdAt
     );
   }
