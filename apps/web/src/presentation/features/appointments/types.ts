@@ -6,5 +6,5 @@ export interface Appointment {
   date: string; // YYYY-MM-DD format
   time: string; // HH:MM AM/PM format
   doctor: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'confirmed' | 'completed' | 'cancelled';
 }
