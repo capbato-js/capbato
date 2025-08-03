@@ -87,7 +87,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   // margin: '2px 0', // Only vertical margin, no horizontal
                   color: '#0F0F0F',
                   backgroundColor: isActive ? '#f1f1f1' : 'transparent',
-                  fontWeight: 500,
+                  fontWeight: isActive ? 500 : 400,
                   fontSize: '14px',
                   textDecoration: 'none',
                   borderRadius: '8px',
@@ -111,7 +111,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   style={{ 
                     color: '#0F0F0F',
                     fontSize: '14px',
-                    fontWeight: 500,
+                    fontWeight: isActive ? 500 : 400,
                     transition: 'color 0.2s ease'
                   }}
                 >

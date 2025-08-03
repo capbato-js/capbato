@@ -2,7 +2,7 @@ import { createTheme } from '@mantine/core';
 
 export const mantineTheme = createTheme({
   primaryColor: 'blue', // Main theme color from logo is #37b7ff
-  primaryShade: 6,
+  primaryShade: 7,
   colors: {
     blue: [
     "#dffaff",
@@ -18,7 +18,7 @@ export const mantineTheme = createTheme({
   ],
   },
 
-  fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+  fontFamily: 'Roboto, Arial, sans-serif',
   
   radius: {
     xs: '0.25rem',
