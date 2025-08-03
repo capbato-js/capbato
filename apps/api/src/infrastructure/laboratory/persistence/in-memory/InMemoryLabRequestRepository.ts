@@ -50,6 +50,10 @@ export class InMemoryLabRequestRepository implements ILabRequestRepository {
     return this.labRequests.get(id.value) || null;
   }
 
+  async getById(id: string): Promise<LabRequest | null> {
+    return this.labRequests.get(id) || null;
+  }
+
   async findAll(filter?: LabRequestRepositoryFilter): Promise<LabRequest[]> {
     let results = Array.from(this.labRequests.values());
 

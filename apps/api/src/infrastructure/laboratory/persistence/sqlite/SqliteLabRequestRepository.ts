@@ -215,6 +215,12 @@ export class SqliteLabRequestRepository implements ILabRequestRepository {
     return row ? this.recordToDomain(row) : null;
   }
 
+  async getById(id: string): Promise<LabRequest | null> {
+    const stmt = this.db.prepare('SELECT * FROM lab_request_entries WHERE id = ?');
+    const row = stmt.get(parseInt(id)) as LabRequestRecord | undefined;
+    return row ? this.recordToDomain(row) : null;
+  }
+
   async findAll(filter?: LabRequestRepositoryFilter): Promise<LabRequest[]> {
     let query = 'SELECT * FROM lab_request_entries';
     const params: unknown[] = [];

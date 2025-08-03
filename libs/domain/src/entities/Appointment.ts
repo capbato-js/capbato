@@ -143,7 +143,7 @@ export class Appointment implements IAppointment {
     return this.createCopy({
       appointmentDate: newDate,
       appointmentTime,
-      status: new AppointmentStatus('scheduled'),
+      status: new AppointmentStatus('confirmed'),
       updatedAt: new Date()
     });
   }
@@ -206,10 +206,17 @@ export class Appointment implements IAppointment {
   }
 
   /**
+   * Checks if appointment is completed
+   */
+  isCompleted(): boolean {
+    return this._status.value === 'completed';
+  }
+
+  /**
    * Checks if appointment is scheduled (not confirmed or cancelled)
    */
   isScheduled(): boolean {
-    return this._status.value === 'scheduled';
+    return this._status.value === 'confirmed';
   }
 
   /**

@@ -11,6 +11,7 @@ export interface LabRequestRepositoryFilter {
 export interface ILabRequestRepository {
   save(labRequest: LabRequest): Promise<LabRequest>;
   findById(id: LabRequestId): Promise<LabRequest | null>;
+  getById(id: string): Promise<LabRequest | null>;
   findAll(filter?: LabRequestRepositoryFilter): Promise<LabRequest[]>;
   findByPatientId(patientId: string): Promise<LabRequest[]>;
   findCompleted(): Promise<LabRequest[]>;

@@ -37,6 +37,13 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
     return entity ? this.entityToDomain(entity) : null;
   }
 
+  async getById(id: string): Promise<LabRequest | null> {
+    const entity = await this.repository.findOne({
+      where: { id: id }
+    });
+    return entity ? this.entityToDomain(entity) : null;
+  }
+
   async findAll(filter?: LabRequestRepositoryFilter): Promise<LabRequest[]> {
     const queryBuilder = this.repository.createQueryBuilder('lab_request');
 

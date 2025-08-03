@@ -60,7 +60,13 @@ export class BloodChemistryStatus extends ValueObject<BloodChemistryStatusValue>
     return transitions[this.value].includes(newStatus.value);
   }
 
-  public toString(): string {
+  protected validate(value: BloodChemistryStatusValue): void {
+    if (!BloodChemistryStatus.VALID_STATUSES.includes(value)) {
+      throw new Error(`Invalid blood chemistry status: ${value}. Must be one of: ${BloodChemistryStatus.VALID_STATUSES.join(', ')}`);
+    }
+  }
+
+  public override toString(): string {
     return this.value;
   }
 }

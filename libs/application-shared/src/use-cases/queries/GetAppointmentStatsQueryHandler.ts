@@ -20,9 +20,8 @@ export class GetAppointmentStatsQueryHandler {
     return {
       total: stats.total,
       confirmed: stats.confirmed,
-      scheduled: stats.scheduled,
       cancelled: stats.cancelled,
-      completed: 0, // TODO: Add completed status support if needed
+      completed: stats.completed,
       todayTotal: stats.todayTotal,
       todayConfirmed: stats.todayConfirmed,
     };

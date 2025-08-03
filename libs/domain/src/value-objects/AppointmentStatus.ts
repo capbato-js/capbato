@@ -26,7 +26,7 @@ export class AppointmentStatus {
   }
 
   isScheduled(): boolean {
-    return this._value === 'scheduled';
+    return this._value === 'confirmed';
   }
 
   isConfirmed(): boolean {

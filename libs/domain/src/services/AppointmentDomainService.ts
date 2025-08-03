@@ -96,8 +96,8 @@ export class AppointmentDomainService {
   async calculateAppointmentStats(): Promise<{
     total: number;
     confirmed: number;
-    scheduled: number;
     cancelled: number;
+    completed: number;
     todayTotal: number;
     todayConfirmed: number;
   }> {
@@ -112,14 +112,14 @@ export class AppointmentDomainService {
     ]);
 
     const confirmed = allAppointments.filter(apt => apt.isConfirmed()).length;
-    const scheduled = allAppointments.filter(apt => apt.isScheduled()).length;
     const cancelled = allAppointments.filter(apt => apt.isCancelled()).length;
+    const completed = allAppointments.filter(apt => apt.isCompleted()).length;
 
     return {
       total: allAppointments.length,
       confirmed,
-      scheduled,
       cancelled,
+      completed,
       todayTotal: todayAppointments.length,
       todayConfirmed: todayConfirmed.length
     };

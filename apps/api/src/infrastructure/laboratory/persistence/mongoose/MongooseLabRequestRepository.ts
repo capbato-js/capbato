@@ -33,6 +33,11 @@ export class MongooseLabRequestRepository implements ILabRequestRepository {
     return document ? this.documentToDomain(document) : null;
   }
 
+  async getById(id: string): Promise<LabRequest | null> {
+    const document = await LabRequestModel.findById(id);
+    return document ? this.documentToDomain(document) : null;
+  }
+
   async findAll(filter?: LabRequestRepositoryFilter): Promise<LabRequest[]> {
     const query: Record<string, unknown> = {};
 

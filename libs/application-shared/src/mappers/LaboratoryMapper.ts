@@ -57,7 +57,7 @@ export class LaboratoryMapper {
         sex: bloodChemistry.patientInfo.sex,
       },
       dateTaken: bloodChemistry.dateTaken.toISOString(),
-      results: bloodChemistry.results.results,
+      results: bloodChemistry.results.results as Record<string, number | undefined>,
       hasAbnormalValues: bloodChemistry.hasAbnormalResults(),
       criticalValues: bloodChemistry.results.getCriticalValues(),
       createdAt: bloodChemistry.createdAt.toISOString(),

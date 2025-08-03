@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { TOKENS } from '../../di/tokens';
-import { ILabRequestRepository } from '@nx-starter/domain';
+import { ILabRequestRepository, LabRequest } from '@nx-starter/domain';
 import { LabRequestNotFoundException } from '@nx-starter/domain';
 import { UpdateLabRequestCommand } from '../../dto/LaboratoryDto';
 
@@ -22,7 +22,20 @@ export class UpdateLabRequestUseCase {
       throw new LabRequestNotFoundException(command.id);
     }
     
+    // Create updated lab request with new values
+    const updatedLabRequest = new LabRequest(
+      existingLabRequest.patientInfo,
+      command.request_date || existingLabRequest.requestDate,
+      existingLabRequest.tests,
+      existingLabRequest.status,
+      existingLabRequest.id,
+      command.date_taken || existingLabRequest.dateTaken,
+      command.others || existingLabRequest.others,
+      existingLabRequest.createdAt,
+      new Date()
+    );
+    
     // Update the lab request
-    await this.labRequestRepository.update(command.id, command);
+    await this.labRequestRepository.update(updatedLabRequest);
   }
 }
