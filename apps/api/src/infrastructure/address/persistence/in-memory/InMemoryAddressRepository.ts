@@ -23,8 +23,11 @@ export class InMemoryAddressRepository implements IAddressRepository {
 
     try {
       // Load the comprehensive Philippine address data
-      // Use path relative to this file's location for better reliability
-      const dataPath = join(__dirname, '../../../../data/philippines-complete.json');
+      // Handle different working directories: project root vs apps/api
+      const isInProjectRoot = process.cwd().endsWith('capbato-js-cc');
+      const dataPath = isInProjectRoot 
+        ? join(process.cwd(), 'apps/api/src/data/philippines-complete.json')
+        : join(process.cwd(), 'src/data/philippines-complete.json');
       this.philippinesData = JSON.parse(readFileSync(dataPath, 'utf8'));
       
       // Extract and create provinces
