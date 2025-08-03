@@ -11,11 +11,14 @@ import type {
 export class ScheduleMapper {
   /**
    * Maps a Schedule entity to a ScheduleDto
+   * @param schedule The schedule entity
+   * @param doctorName Optional doctor name to include in the DTO
    */
-  static toDto(schedule: Schedule): ScheduleDto {
+  static toDto(schedule: Schedule, doctorName?: string): ScheduleDto {
     return {
       id: schedule.id?.value.toString() || '',
       doctorId: schedule.doctorIdString,
+      doctorName: doctorName,
       date: schedule.dateString,
       time: schedule.timeString,
       formattedDate: schedule.formattedDate,
@@ -27,9 +30,13 @@ export class ScheduleMapper {
 
   /**
    * Maps an array of Schedule entities to ScheduleDtos
+   * @param schedules Array of schedule entities
+   * @param doctorNames Optional map of doctorId to doctorName
    */
-  static toDtoArray(schedules: Schedule[]): ScheduleDto[] {
-    return schedules.map((schedule) => this.toDto(schedule));
+  static toDtoArray(schedules: Schedule[], doctorNames?: Map<string, string>): ScheduleDto[] {
+    return schedules.map((schedule) => 
+      this.toDto(schedule, doctorNames?.get(schedule.doctorIdString))
+    );
   }
 
   /**

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Button, Title } from '@mantine/core';
+import { Box, Button, Title, Menu, Text, ActionIcon, Tooltip } from '@mantine/core';
+import { IconEdit, IconUser } from '@tabler/icons-react';
 import { Icon } from '../../../components/common';
 import { ScheduleEntry } from '../types';
 
 interface CustomCalendarProps {
   schedules: ScheduleEntry[];
-  onEdit?: () => void;
+  availableDoctors?: Array<{ id: string; name: string; }>;
+  onDoctorChange?: (date: string, newDoctorId: string, newDoctorName: string) => void;
 }
 
 const MONTHS = [
@@ -15,8 +17,13 @@ const MONTHS = [
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export const CustomCalendar: React.FC<CustomCalendarProps> = ({ schedules, onEdit }) => {
+export const CustomCalendar: React.FC<CustomCalendarProps> = ({ 
+  schedules, 
+  availableDoctors = [],
+  onDoctorChange 
+}) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [hoveredTile, setHoveredTile] = useState<number | null>(null);
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
@@ -78,22 +85,6 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({ schedules, onEdi
         >
           Doctor's Schedule
         </Title>
-        {onEdit && (
-          <Button
-            size="sm"
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              backgroundColor: '#007bff',
-              border: 'none'
-            }}
-            onClick={onEdit}
-          >
-            <Icon icon="fas fa-edit" style={{ marginRight: '5px' }} />
-            Edit
-          </Button>
-        )}
       </Box>
 
       {/* Second Row: Arrows + Month */}
@@ -190,28 +181,101 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({ schedules, onEdi
           }
 
           const schedule = getScheduleForDate(day);
+          const hasSchedule = !!schedule;
+          const tileIndex = day; // Using day as unique identifier for this month
           
           return (
             <Box
               key={day}
               style={{
-                backgroundColor: '#ecf5ff',
+                backgroundColor: hoveredTile === tileIndex ? '#d4edff' : '#ecf5ff',
                 borderRadius: '12px',
                 padding: '10px',
                 minHeight: '100px',
                 fontWeight: 500,
                 color: '#333',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                position: 'relative'
+                position: 'relative',
+                transition: 'background-color 0.2s ease'
               }}
+              onMouseEnter={() => setHoveredTile(tileIndex)}
+              onMouseLeave={() => setHoveredTile(null)}
             >
               <Box
                 style={{
                   fontSize: '14px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
                 }}
               >
-                {day}
+                <span>{day}</span>
+                {hasSchedule && (hoveredTile === tileIndex) && (
+                  <Menu
+                    position="bottom-end"
+                    withArrow
+                    shadow="md"
+                  >
+                    <Menu.Target>
+                      <Tooltip label="Update Assigned Doctor" position="top">
+                        <ActionIcon
+                          size="sm"
+                          variant="subtle"
+                          color="blue"
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <IconEdit size={14} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Menu.Target>
+                    
+                    <Menu.Dropdown
+                      style={{
+                        background: 'white',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+                        border: '1px solid #e0e7ff',
+                        minWidth: '200px'
+                      }}
+                    >
+                      {availableDoctors.length > 0 && (
+                        <>
+                          <Box style={{ padding: '8px 16px 4px' }}>
+                            <Text size="xs" c="dimmed" fw={600}>
+                              Change to:
+                            </Text>
+                          </Box>
+                          {availableDoctors
+                            .filter(doctor => {
+                              // Compare without "Dr." prefix
+                              const currentDoctorName = schedule?.details?.replace(/^Dr\.\s*/, '') || '';
+                              return doctor.name !== currentDoctorName;
+                            })
+                            .map(doctor => (
+                              <Menu.Item
+                                key={doctor.id}
+                                leftSection={<IconUser size={16} />}
+                                onClick={() => {
+                                  if (onDoctorChange) {
+                                    const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                                    onDoctorChange(dateStr, doctor.id, doctor.name);
+                                  }
+                                }}
+                                style={{
+                                  fontSize: '14px',
+                                  padding: '8px 16px',
+                                  borderRadius: '8px',
+                                }}
+                              >
+                                {doctor.name}
+                              </Menu.Item>
+                            ))}
+                        </>
+                      )}
+                    </Menu.Dropdown>
+                  </Menu>
+                )}
               </Box>
               
               {schedule && (

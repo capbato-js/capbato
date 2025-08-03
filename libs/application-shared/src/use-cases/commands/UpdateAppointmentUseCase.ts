@@ -1,16 +1,25 @@
 import { injectable, inject } from 'tsyringe';
-import { Appointment, AppointmentDomainService, type IAppointmentRepository, AppointmentNotFoundException } from '@nx-starter/domain';
+import { 
+  Appointment, 
+  AppointmentDomainService, 
+  type IAppointmentRepository, 
+  AppointmentNotFoundException,
+  type IScheduleRepository,
+  Schedule
+} from '@nx-starter/domain';
 import type { UpdateAppointmentCommand } from '../../dto/AppointmentCommands';
 import { TOKENS } from '../../di/tokens';
 
 /**
  * Use case for updating an existing appointment
  * Handles all business logic and validation for appointment updates
+ * Automatically updates corresponding schedule entry for doctor's calendar
  */
 @injectable()
 export class UpdateAppointmentUseCase {
   constructor(
-    @inject(TOKENS.AppointmentRepository) private appointmentRepository: IAppointmentRepository
+    @inject(TOKENS.AppointmentRepository) private appointmentRepository: IAppointmentRepository,
+    @inject(TOKENS.ScheduleRepository) private scheduleRepository: IScheduleRepository
   ) {}
 
   async execute(command: UpdateAppointmentCommand): Promise<void> {
@@ -40,7 +49,28 @@ export class UpdateAppointmentUseCase {
     const domainService = new AppointmentDomainService(this.appointmentRepository);
     await domainService.validateAppointmentUpdate(updatedAppointment, command.id);
 
-    // Update using repository
+    // Update appointment using repository
     await this.appointmentRepository.update(command.id, updatedAppointment);
+
+    // Update corresponding schedule entry if date, time, or doctor changed
+    const dateChanged = command.appointmentDate && 
+      command.appointmentDate.getTime() !== existingAppointment.appointmentDate.getTime();
+    const timeChanged = command.appointmentTime && 
+      command.appointmentTime !== existingAppointment.appointmentTime.value;
+    const doctorChanged = command.doctorId && 
+      command.doctorId !== existingAppointment.doctorId;
+
+    if (dateChanged || timeChanged || doctorChanged) {
+      // For simplicity, create a new schedule entry for the updated appointment
+      // The calendar will show the updated information
+      const schedule = new Schedule(
+        updatedAppointment.doctorId,
+        updatedAppointment.appointmentDate,
+        updatedAppointment.appointmentTime.value
+      );
+
+      schedule.validate();
+      await this.scheduleRepository.create(schedule);
+    }
   }
 }
