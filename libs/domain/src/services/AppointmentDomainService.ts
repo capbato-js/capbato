@@ -16,7 +16,7 @@ export class AppointmentDomainService {
   /**
    * Validates business rules before creating an appointment
    */
-  async validateAppointmentCreation(appointment: Appointment): Promise<void> {
+  async validateAppointmentCreation(appointment: Appointment, patientName?: string): Promise<void> {
     await this.validateTimeSlotAvailability(
       appointment.appointmentDate,
       appointment.timeValue
@@ -24,7 +24,9 @@ export class AppointmentDomainService {
 
     await this.validateNoDuplicateAppointment(
       appointment.patientId,
-      appointment.appointmentDate
+      appointment.appointmentDate,
+      undefined,
+      patientName
     );
   }
 
@@ -33,7 +35,8 @@ export class AppointmentDomainService {
    */
   async validateAppointmentUpdate(
     appointment: Appointment,
-    appointmentId: string
+    appointmentId: string,
+    patientName?: string
   ): Promise<void> {
     await this.validateTimeSlotAvailability(
       appointment.appointmentDate,
@@ -44,7 +47,8 @@ export class AppointmentDomainService {
     await this.validateNoDuplicateAppointment(
       appointment.patientId,
       appointment.appointmentDate,
-      appointmentId
+      appointmentId,
+      patientName
     );
   }
 
@@ -75,7 +79,8 @@ export class AppointmentDomainService {
   async validateNoDuplicateAppointment(
     patientId: string,
     date: Date,
-    excludeId?: string
+    excludeId?: string,
+    patientName?: string
   ): Promise<void> {
     const hasDuplicate = await this.appointmentRepository.checkPatientDuplicateAppointment(
       patientId,
@@ -84,8 +89,9 @@ export class AppointmentDomainService {
     );
 
     if (hasDuplicate) {
+      const displayName = patientName || patientId;
       throw new DuplicateAppointmentException(
-        `Patient ${patientId} already has an appointment on ${date.toDateString()}`
+        `Patient ${displayName} already has an appointment on ${date.toDateString()}`
       );
     }
   }

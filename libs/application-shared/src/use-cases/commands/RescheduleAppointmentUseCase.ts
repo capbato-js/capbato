@@ -4,7 +4,8 @@ import {
   type IAppointmentRepository, 
   AppointmentNotFoundException,
   type IScheduleRepository,
-  Schedule
+  Schedule,
+  type IPatientRepository
 } from '@nx-starter/domain';
 import type { RescheduleAppointmentCommand } from '../../dto/AppointmentCommands';
 import { TOKENS } from '../../di/tokens';
@@ -18,7 +19,8 @@ import { TOKENS } from '../../di/tokens';
 export class RescheduleAppointmentUseCase {
   constructor(
     @inject(TOKENS.AppointmentRepository) private appointmentRepository: IAppointmentRepository,
-    @inject(TOKENS.ScheduleRepository) private scheduleRepository: IScheduleRepository
+    @inject(TOKENS.ScheduleRepository) private scheduleRepository: IScheduleRepository,
+    @inject(TOKENS.PatientRepository) private patientRepository: IPatientRepository
   ) {}
 
   async execute(command: RescheduleAppointmentCommand): Promise<void> {
@@ -39,9 +41,13 @@ export class RescheduleAppointmentUseCase {
       command.appointmentTime
     );
 
+    // Fetch patient information for user-friendly error messages
+    const patient = await this.patientRepository.getById(existingAppointment.patientId);
+    const patientName = patient ? patient.fullName : undefined;
+
     // Create domain service for business rule validation
     const domainService = new AppointmentDomainService(this.appointmentRepository);
-    await domainService.validateAppointmentUpdate(rescheduledAppointment, command.id);
+    await domainService.validateAppointmentUpdate(rescheduledAppointment, command.id, patientName);
 
     // Update appointment using repository
     await this.appointmentRepository.update(command.id, rescheduledAppointment);

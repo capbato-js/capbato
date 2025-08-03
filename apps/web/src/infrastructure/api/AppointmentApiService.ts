@@ -26,16 +26,27 @@ export class AppointmentApiService {
     doctorId: string;
     status?: 'confirmed' | 'cancelled' | 'completed';
   }): Promise<AppointmentDto> {
-    const response = await this.httpClient.post<{ success: boolean; data: AppointmentDto }>(
-      this.apiConfig.endpoints.appointments.create,
-      data
-    );
+    try {
+      const response = await this.httpClient.post<{ success: boolean; data: AppointmentDto }>(
+        this.apiConfig.endpoints.appointments.create,
+        data
+      );
 
-    if (!response.data.success || !response.data.data) {
-      throw new Error('Failed to create appointment');
+      if (!response.data.success || !response.data.data) {
+        throw new Error('Failed to create appointment');
+      }
+
+      return response.data.data;
+    } catch (error: any) {
+      // Extract user-friendly error message from API response
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      
+      // Fallback to original error message or generic message
+      const message = error.message || 'Failed to create appointment';
+      throw new Error(message);
     }
-
-    return response.data.data;
   }
 
   /**
@@ -79,13 +90,24 @@ export class AppointmentApiService {
     doctorId?: string;
     status?: 'confirmed' | 'cancelled' | 'completed';
   }): Promise<void> {
-    const response = await this.httpClient.put<{ success: boolean }>(
-      this.apiConfig.endpoints.appointments.update(id),
-      data
-    );
+    try {
+      const response = await this.httpClient.put<{ success: boolean }>(
+        this.apiConfig.endpoints.appointments.update(id),
+        data
+      );
 
-    if (!response.data.success) {
-      throw new Error('Failed to update appointment');
+      if (!response.data.success) {
+        throw new Error('Failed to update appointment');
+      }
+    } catch (error: any) {
+      // Extract user-friendly error message from API response
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      
+      // Fallback to original error message or generic message
+      const message = error.message || 'Failed to update appointment';
+      throw new Error(message);
     }
   }
 

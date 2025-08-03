@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useAppointmentStore } from '../../../../infrastructure/state/AppointmentStore';
+import { AddAppointmentFormData } from '@nx-starter/application-shared';
 import type { IAppointmentListViewModel } from './interfaces/AppointmentViewModels';
 
 /**
@@ -12,6 +13,7 @@ export const useAppointmentListViewModel = (): IAppointmentListViewModel => {
     isLoading,
     error,
     fetchAllAppointments,
+    updateAppointment,
     confirmAppointment,
     cancelAppointment,
     deleteAppointment,
@@ -30,6 +32,14 @@ export const useAppointmentListViewModel = (): IAppointmentListViewModel => {
       console.error('Failed to load appointments:', error);
     }
   }, [fetchAllAppointments]);
+
+  const handleUpdateAppointment = useCallback(async (id: string, data: Partial<AddAppointmentFormData>) => {
+    try {
+      await updateAppointment(id, data);
+    } catch (error) {
+      console.error('Failed to update appointment:', error);
+    }
+  }, [updateAppointment]);
 
   const handleConfirmAppointment = useCallback(async (id: string) => {
     try {
@@ -60,6 +70,7 @@ export const useAppointmentListViewModel = (): IAppointmentListViewModel => {
     isLoading,
     error,
     loadAppointments,
+    updateAppointment: handleUpdateAppointment,
     confirmAppointment: handleConfirmAppointment,
     cancelAppointment: handleCancelAppointment,
     deleteAppointment: handleDeleteAppointment,
