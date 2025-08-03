@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@nx-starter/domain": ["../../dist/libs/domain/src/index.js"],
+      "@nx-starter/application-shared": ["../../dist/libs/application-shared/src/index.js"],
+      "@nx-starter/application-api": ["../../dist/libs/application-api/src/index.js"],
+      "@nx-starter/utils-core": ["../../dist/libs/utils-core/src/index.js"]
+    }
+  },
+  "ts-node": {
+    "esm": false,
+    "compilerOptions": {
+      "module": "commonjs",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true
+    }
+  }
+}
