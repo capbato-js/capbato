@@ -3,12 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginFormSchema } from '@nx-starter/application-shared';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
-import { Button, Paper, Title, Checkbox, Group, Stack } from '@mantine/core';
+import { Button, Title, Checkbox, Group, Stack, useMantineTheme } from '@mantine/core';
 import { IconUser, IconLock, IconLogin } from '@tabler/icons-react';
 import { useLoginFormViewModel } from '../view-models/useLoginFormViewModel';
 import type { LoginFormData } from '../types';
 
 export const LoginForm: React.FC = () => {
+  const theme = useMantineTheme();
   const viewModel = useLoginFormViewModel();
   
   // Get remembered credentials
@@ -79,19 +80,9 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[350px] mx-auto">
-      <Paper 
-        withBorder={false} 
-        p="xl" 
-        className="bg-white"
-        style={{
-          borderRadius: '15px',
-          boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
-          padding: '30px 25px'
-        }}
-      >
-        <Title order={2} ta="center" mb="lg" style={{ color: '#0b4f6c' }}>
-          Login
+    <div style={{ width: '100%' }}>
+        <Title order={2} ta="center" mb="lg" style={{ color: theme.other.titleColor }}>
+          Sign in to MG Amores
         </Title>
         
         {/* Error message */}
@@ -189,7 +180,6 @@ export const LoginForm: React.FC = () => {
             Forgot Password?
           </Button>
         </Group> */}
-      </Paper>
     </div>
   );
 };

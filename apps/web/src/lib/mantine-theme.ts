@@ -31,6 +31,10 @@ export const mantineTheme = createTheme({
   },
 
   fontFamily: 'Roboto, Arial, sans-serif',
+
+  other: {
+    titleColor: '#0F0F0F'
+  },
   
   radius: {
     xs: '0.25rem',

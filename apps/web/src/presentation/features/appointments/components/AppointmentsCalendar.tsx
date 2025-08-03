@@ -81,7 +81,7 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
         <Title
           order={2}
           style={{
-            color: '#0b4f6c',
+            color: theme.colors.blue[9],
             fontSize: '22px',
             fontWeight: 'bold',
             textAlign: 'center',
@@ -256,7 +256,7 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
                       style={{
                         fontSize: '10px',
                         fontWeight: 'bold',
-                        color: '#0b4f6c',
+                        color: theme.colors.blue[9],
                         textAlign: 'center',
                         marginTop: '2px'
                       }}

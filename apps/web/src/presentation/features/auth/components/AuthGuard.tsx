@@ -55,7 +55,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div data-testid="page-loading-indicator" className="w-8 h-8 border-4 border-[#4db6ac] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div data-testid="page-loading-indicator" className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           {/* <div className="text-gray-600 text-sm">Initializing...</div> */}
         </div>
       </div>
@@ -69,7 +69,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-[#4db6ac] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <div className="text-gray-600 text-sm">Redirecting to login...</div>
         </div>
       </div>

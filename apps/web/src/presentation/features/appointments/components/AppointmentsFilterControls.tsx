@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text, Group, Checkbox } from '@mantine/core';
+import { Box, Text, Group, Checkbox, useMantineTheme } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Icon } from '../../../components/common';
 
@@ -16,6 +16,7 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
   showAll,
   onShowAllChange
 }) => {
+  const theme = useMantineTheme();
   return (
     <Box
       style={{
@@ -36,7 +37,7 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
         <Text
           style={{
             fontWeight: 600,
-            color: '#0b4f6c',
+            color: theme.colors.blue[9],
             fontSize: '14px'
           }}
         >
@@ -68,7 +69,7 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
         <Text
           style={{
             fontWeight: 600,
-            color: showAll ? '#4db6ac' : '#0b4f6c',
+            color: showAll ? theme.colors.blue[7] : theme.colors.blue[9],
             fontSize: '14px',
             cursor: 'pointer',
             userSelect: 'none'

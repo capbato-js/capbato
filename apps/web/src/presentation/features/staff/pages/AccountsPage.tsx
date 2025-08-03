@@ -57,7 +57,7 @@ export const AccountsPage: React.FC = () => {
       closePasswordModal();
       setSelectedAccount(null);
       // Show success message - you might want to use a notification system instead
-      alert('Password changed successfully!');
+      // alert('Password changed successfully!');
     } else if (error) {
       setPasswordError(error);
     }

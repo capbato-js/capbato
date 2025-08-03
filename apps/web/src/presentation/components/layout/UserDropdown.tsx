@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box } from '@mantine/core';
+import { Box, useMantineTheme } from '@mantine/core';
 import { Icon } from '../common';
 import { useAuthStore } from '../../../infrastructure/state/AuthStore';
 import { useLogoutViewModel } from '../../features/auth';
@@ -9,6 +9,7 @@ interface UserDropdownProps {
 }
 
 export const UserDropdown: React.FC<UserDropdownProps> = ({ className }) => {
+  const theme = useMantineTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -100,7 +101,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ className }) => {
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
           cursor: 'pointer',
           transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-          backgroundColor: user?.username ? getUserAvatarColor(user.username) : '#4db6ac'
+          backgroundColor: user?.username ? getUserAvatarColor(user.username) : theme.colors.blue[7]
         }}
         onMouseOver={(e) => {
           e.currentTarget.style.transform = 'scale(1.05)';
