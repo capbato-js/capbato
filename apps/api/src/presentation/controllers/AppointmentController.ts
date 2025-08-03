@@ -82,12 +82,19 @@ export class AppointmentController {
   ) {}
 
   /**
-   * GET /api/appointments - Get all appointments
+   * GET /api/appointments - Get all appointments with populated patient and doctor data
    */
   @Get('/')
   async getAllAppointments(): Promise<AppointmentListResponse> {
     const appointments = await this.getAllAppointmentsQueryHandler.execute();
-    const appointmentDtos = AppointmentMapper.toDtoArray(appointments);
+    
+    // Map appointments to DTOs with populated patient and doctor data
+    const appointmentDtos = appointments.map(appointment => {
+      const populatedPatient = (appointment as any)._populatedPatient;
+      const populatedDoctor = (appointment as any)._populatedDoctor;
+      
+      return AppointmentMapper.toDto(appointment, populatedPatient, populatedDoctor);
+    });
 
     return ApiResponseBuilder.success(appointmentDtos);
   }

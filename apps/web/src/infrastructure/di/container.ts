@@ -21,6 +21,7 @@ import { IUserApiService } from '../api/IUserApiService';
 import { UserApiService } from '../api/UserApiService';
 import { IDoctorApiService } from '../api/IDoctorApiService';
 import { DoctorApiService } from '../api/DoctorApiService';
+import { AppointmentApiService } from '../api/AppointmentApiService';
 import { IAddressApiService } from '../api/AddressApiService'; 
 import { AddressApiService } from '../api/AddressApiService';
 import { WebUserQueryService } from '../services/WebUserQueryService';
@@ -72,6 +73,7 @@ export const configureDI = () => {
   container.registerSingleton<IUserApiService>(TOKENS.UserApiService, UserApiService);
   container.registerSingleton<IDoctorApiService>(TOKENS.DoctorApiService, DoctorApiService);
   container.registerSingleton<IAddressApiService>(TOKENS.AddressApiService, AddressApiService);
+  container.registerSingleton(AppointmentApiService, AppointmentApiService);
   
   // Auth API Service - use mock in development if auth is not enabled
   if (enableAuth && useApiBackend) {

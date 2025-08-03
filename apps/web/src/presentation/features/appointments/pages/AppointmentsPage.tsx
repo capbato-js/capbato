@@ -1,95 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { DataTableHeader } from '../../../components/common';
 import { AppointmentsTable, AppointmentsFilterControls, AppointmentCountDisplay, AddAppointmentModal } from '../components';
+import { useAppointmentPageViewModel } from '../view-models/useAppointmentPageViewModel';
 import { Appointment } from '../types';
-import { AddAppointmentFormData } from '@nx-starter/application-shared';
+import { AppointmentDto } from '@nx-starter/application-shared';
 
-// Dummy data for appointments
-const dummyAppointments: Appointment[] = [
-  {
-    id: '1',
-    patientNumber: 'P001',
-    patientName: 'John Doe',
-    reasonForVisit: 'Annual Checkup',
-    date: '2025-07-31',
-    time: '09:00 AM',
-    doctor: 'Dr. Alice Smith',
-    status: 'confirmed'
-  },
-  {
-    id: '2',
-    patientNumber: 'P002',
-    patientName: 'Jane Smith',
-    reasonForVisit: 'Flu Symptoms',
-    date: '2025-07-31',
-    time: '10:30 AM',
-    doctor: 'Dr. John Doe',
-    status: 'pending'
-  },
-  {
-    id: '3',
-    patientNumber: 'P003',
-    patientName: 'Robert Johnson',
-    reasonForVisit: 'Follow-up Consultation',
-    date: '2025-08-01',
-    time: '02:00 PM',
-    doctor: 'Dr. Alice Smith',
-    status: 'confirmed'
-  },
-  {
-    id: '4',
-    patientNumber: 'P004',
-    patientName: 'Emily Davis',
-    reasonForVisit: 'Vaccination',
-    date: '2025-08-01',
-    time: '03:30 PM',
-    doctor: 'Dr. John Doe',
-    status: 'cancelled'
-  },
-  {
-    id: '5',
-    patientNumber: 'P005',
-    patientName: 'Michael Wilson',
-    reasonForVisit: 'Blood Pressure Check',
-    date: '2025-08-02',
-    time: '11:00 AM',
-    doctor: 'Dr. Alice Smith',
-    status: 'pending'
-  },
-  {
-    id: '6',
-    patientNumber: 'P006',
-    patientName: 'Sarah Brown',
-    reasonForVisit: 'Diabetes Management',
-    date: '2025-08-02',
-    time: '01:00 PM',
-    doctor: 'Dr. John Doe',
-    status: 'confirmed'
-  }
-];
+// Helper function to convert AppointmentDto to the component's Appointment type
+const mapAppointmentDtoToAppointment = (dto: AppointmentDto): Appointment => ({
+  id: dto.id,
+  patientNumber: dto.patient?.patientNumber || 'Unknown', // Use nested data only
+  patientName: dto.patient?.fullName || 'Unknown Patient', // Use nested data only  
+  reasonForVisit: dto.reasonForVisit,
+  date: dto.appointmentDate,
+  time: dto.appointmentTime,
+  doctor: dto.doctor?.fullName || 'Unknown Doctor', // Use nested data only
+  status: dto.status === 'confirmed' ? 'confirmed' : dto.status === 'cancelled' ? 'cancelled' : 'confirmed'
+});
 
 export const AppointmentsPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showAll, setShowAll] = useState<boolean>(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  
+  const viewModel = useAppointmentPageViewModel();
+
+  // Load appointments on component mount
+  useEffect(() => {
+    viewModel.loadAppointments();
+  }, []);
 
   const handleAddAppointment = () => {
-    setIsAddModalOpen(true);
+    viewModel.openAddModal();
   };
 
   const handleCloseAddModal = () => {
-    setIsAddModalOpen(false);
+    viewModel.closeAddModal();
   };
 
-  const handleSubmitAppointment = async (data: AddAppointmentFormData): Promise<boolean> => {
-    console.log('Appointment submitted:', data);
-    // TODO: Implement actual API call to create appointment
-    
-    // Simulate success
-    setIsAddModalOpen(false);
-    return true;
+  const handleAppointmentCreated = (appointment: AppointmentDto) => {
+    viewModel.handleAppointmentCreated(appointment);
   };
 
   const handleModifyAppointment = (appointmentId: string) => {
@@ -117,10 +67,11 @@ export const AppointmentsPage: React.FC = () => {
     setShowAll(checked);
   };
 
-  // Filter appointments based on date and showAll flag
+  // Convert DTOs to component format and filter appointments based on date and showAll flag
+  const appointments = viewModel.appointments.map(mapAppointmentDtoToAppointment);
   const filteredAppointments = showAll 
-    ? dummyAppointments 
-    : dummyAppointments.filter(appointment => 
+    ? appointments 
+    : appointments.filter(appointment => 
         appointment.date === selectedDate.toISOString().split('T')[0]
       );
 
@@ -151,6 +102,18 @@ export const AppointmentsPage: React.FC = () => {
 
         <AppointmentCountDisplay count={filteredAppointments.length} />
         
+        {viewModel.error && (
+          <div className="text-red-600 text-sm mb-4 text-center">
+            {viewModel.error}
+            <button 
+              onClick={viewModel.clearError}
+              className="ml-2 text-blue-600 underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+        
         <AppointmentsTable
           appointments={filteredAppointments}
           onModifyAppointment={handleModifyAppointment}
@@ -161,9 +124,9 @@ export const AppointmentsPage: React.FC = () => {
 
       {/* Add Appointment Modal */}
       <AddAppointmentModal
-        isOpen={isAddModalOpen}
+        isOpen={viewModel.isAddModalOpen}
         onClose={handleCloseAddModal}
-        onSubmit={handleSubmitAppointment}
+        onAppointmentCreated={handleAppointmentCreated}
       />
     </MedicalClinicLayout>
   );

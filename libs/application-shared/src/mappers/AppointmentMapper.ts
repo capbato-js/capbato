@@ -7,35 +7,61 @@ import type { AppointmentDto } from '../dto/AppointmentQueries';
  */
 export class AppointmentMapper {
   /**
-   * Converts a single Appointment entity to DTO
+   * Converts a single Appointment entity to DTO with optional populated patient and doctor data
    */
-  static toDto(appointment: Appointment): AppointmentDto {
-    return {
+  static toDto(appointment: Appointment, patientData?: any, doctorData?: any): AppointmentDto {
+    const baseDto: AppointmentDto = {
       id: appointment.stringId!,
-      patientId: appointment.patientId,
+      patient: undefined,
+      doctor: undefined,
       reasonForVisit: appointment.reasonForVisit,
       appointmentDate: appointment.appointmentDate.toISOString(),
       appointmentTime: appointment.timeValue,
       status: appointment.statusValue,
-      doctorId: appointment.doctorId,
       createdAt: appointment.createdAt.toISOString(),
       updatedAt: appointment.updatedAt?.toISOString(),
     };
+
+    // If populated data is available, include it
+    if (patientData && doctorData) {
+      baseDto.patient = {
+        id: patientData.id,
+        patientNumber: patientData.patientNumber,
+        firstName: patientData.firstName,
+        lastName: patientData.lastName,
+        fullName: `${patientData.firstName} ${patientData.lastName}`.trim(),
+      };
+      baseDto.doctor = {
+        id: doctorData.id,
+        firstName: doctorData.firstName,
+        lastName: doctorData.lastName,
+        fullName: `${doctorData.firstName} ${doctorData.lastName}`.trim(),
+        specialization: doctorData.specialization,
+      };
+    }
+    
+    return baseDto;
   }
 
   /**
-   * Converts an array of Appointment entities to DTOs
+   * Converts an array of Appointment entities to DTOs with populated data from repository
    */
   static toDtoArray(appointments: Appointment[]): AppointmentDto[] {
-    return appointments.map(appointment => this.toDto(appointment));
+    return appointments.map(appointment => {
+      // Access populated data if available
+      const patientData = (appointment as any)._populatedPatient;
+      const doctorData = (appointment as any)._populatedDoctor;
+      
+      return this.toDto(appointment, patientData, doctorData);
+    });
   }
 
   /**
    * Converts a plain object to Appointment entity
-   * Used for ORM data mapping
+   * Used for ORM data mapping with optional populated data
    */
   static fromPlainObject(data: Record<string, any>): Appointment {
-    return new Appointment(
+    const appointment = new Appointment(
       data['patientId'] || data['patient_id'],
       data['reasonForVisit'] || data['reason_for_visit'],
       new Date(data['appointmentDate'] || data['appointment_date']),
@@ -46,6 +72,16 @@ export class AppointmentMapper {
       new Date(data['createdAt'] || data['created_at'] || Date.now()),
       data['updatedAt'] || data['updated_at'] ? new Date(data['updatedAt'] || data['updated_at']) : undefined
     );
+
+    // Attach populated data if available (for enhanced DTOs)
+    if (data['patient']) {
+      (appointment as any)._populatedPatient = data['patient'];
+    }
+    if (data['doctor']) {
+      (appointment as any)._populatedDoctor = data['doctor'];
+    }
+
+    return appointment;
   }
 
   /**

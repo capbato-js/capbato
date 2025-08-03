@@ -29,6 +29,16 @@ export interface ApiConfiguration {
       byId: (id: string) => string;
       stats: string;
     };
+    appointments: {
+      base: string;
+      all: string;
+      create: string;
+      byId: (id: string) => string;
+      update: (id: string) => string;
+      delete: (id: string) => string;
+      confirm: (id: string) => string;
+      cancel: (id: string) => string;
+    };
     doctors: {
       base: string;
       all: string;

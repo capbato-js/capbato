@@ -4,11 +4,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   Button,
   Stack,
+  Text,
+  Box,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { AddAppointmentFormSchema, type AddAppointmentFormData } from '@nx-starter/application-shared';
 import { Icon } from '../../../components/common';
 import { FormSelect } from '../../../components/ui/FormSelect';
+import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
+import { useDoctorStore } from '../../../../infrastructure/state/DoctorStore';
 
 export interface AddAppointmentFormProps {
   onSubmit: (data: AddAppointmentFormData) => Promise<boolean>;
@@ -20,6 +24,11 @@ export interface AddAppointmentFormProps {
 /**
  * AddAppointmentForm component handles the creation of new appointments
  * with form validation and proper TypeScript typing.
+ * 
+ * Features:
+ * - Real patient data from backend
+ * - Automatic doctor assignment based on date (MWF = Doctor 1, TTh = Doctor 2)
+ * - Patient number display
  */
 export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   onSubmit,
@@ -27,14 +36,75 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   error,
   onClearError,
 }) => {
-  // Mock data - to be replaced with actual API calls later
-  const [patients] = useState([
-    { value: 'Juan Dela Cruz', label: 'Juan Dela Cruz (P-001)' },
-    { value: 'Maria Santos', label: 'Maria Santos (P-002)' },
-    { value: 'Pedro Garcia', label: 'Pedro Garcia (P-003)' },
-    { value: 'Ana Rodriguez', label: 'Ana Rodriguez (P-004)' },
-    { value: 'Carlos Reyes', label: 'Carlos Reyes (P-005)' },
-  ]);
+  // State for patients and doctors
+  const [patients, setPatients] = useState<Array<{ value: string; label: string; patientNumber: string }>>([]);
+  const [selectedPatientNumber, setSelectedPatientNumber] = useState<string>('');
+  const [assignedDoctor, setAssignedDoctor] = useState<string>('');
+  
+  // Get stores
+  const patientStore = usePatientStore();
+  const doctorStore = useDoctorStore();
+
+  // Load patients and doctors on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load patients
+        await patientStore.loadPatients();
+        
+        // Load doctors
+        await doctorStore.getAllDoctors(true, 'summary');
+      } catch (error) {
+        console.error('Failed to load data:', error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Format patients for select component
+  useEffect(() => {
+    if (patientStore.patients.length > 0) {
+      const formattedPatients = patientStore.patients.map(patient => ({
+        value: patient.id,
+        label: `${patient.firstName} ${patient.lastName}`,
+        patientNumber: patient.patientNumber,
+      }));
+      setPatients(formattedPatients);
+    }
+  }, [patientStore.patients]);
+
+  // Doctor assignment logic based on day of week
+  const getDoctorForDate = (date: Date): string => {
+    // Ensure we have a valid Date object
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      console.error('Invalid date passed to getDoctorForDate:', date);
+      return 'Dr. Smith (General Physician)'; // Default fallback
+    }
+    
+    // Check if doctors are loaded
+    if (doctorStore.doctorSummaries.length === 0) {
+      return 'Loading doctor assignment...';
+    }
+
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    
+    // MWF (Monday=1, Wednesday=3, Friday=5) = Doctor 1
+    // TTh (Tuesday=2, Thursday=4) = Doctor 2
+    if ([1, 3, 5].includes(dayOfWeek)) {
+      // Find first doctor (assuming they are ordered)
+      const doctor1 = doctorStore.doctorSummaries[0];
+      return doctor1 ? `Dr. ${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
+    } else if ([2, 4].includes(dayOfWeek)) {
+      // Find second doctor
+      const doctor2 = doctorStore.doctorSummaries[1];  
+      return doctor2 ? `Dr. ${doctor2.fullName} - ${doctor2.specialization}` : 'Dr. Johnson (General Physician)';
+    } else {
+      // Weekend - default to first doctor
+      const doctor1 = doctorStore.doctorSummaries[0];
+      return doctor1 ? `Dr. ${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
+    }
+  };
 
   const [reasonsForVisit] = useState([
     { value: 'Consultation', label: 'Consultation' },
@@ -48,14 +118,6 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     { value: 'Medical Certificate', label: 'Medical Certificate' },
   ]);
 
-  const [doctors] = useState([
-    { value: 'Dr. Smith', label: 'Dr. Smith (General Medicine)' },
-    { value: 'Dr. Johnson', label: 'Dr. Johnson (Pediatrics)' },
-    { value: 'Dr. Brown', label: 'Dr. Brown (Cardiology)' },
-    { value: 'Dr. Wilson', label: 'Dr. Wilson (Dermatology)' },
-    { value: 'Dr. Davis', label: 'Dr. Davis (Orthopedics)' },
-  ]);
-
   // Helper function to format time to 12-hour format
   const formatTimeLabel = (timeStr: string) => {
     const [hourStr, minuteStr] = timeStr.split(':');
@@ -65,18 +127,37 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     return `${displayHour}:${minuteStr} ${ampm}`;
   };
 
-  // Generate available time slots
-  const [timeSlots] = useState(() => {
+  // Generate available time slots based on selected date
+  const getAvailableTimeSlots = (selectedDate: string) => {
     const slots = [];
+    const now = new Date();
+    const isToday = selectedDate === now.toISOString().split('T')[0];
+    
     for (let hour = 8; hour <= 17; hour++) {
       for (const minute of [0, 15, 30, 45]) {
         const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        
+        // If it's today, only show times that are in the future
+        if (isToday) {
+          const currentHour = now.getHours();
+          const currentMinute = now.getMinutes();
+          
+          // Skip if this time slot is in the past
+          if (hour < currentHour || (hour === currentHour && minute <= currentMinute)) {
+            continue;
+          }
+        }
+        
         const displayTime = formatTimeLabel(timeStr);
         slots.push({ value: timeStr, label: displayTime });
       }
     }
+    
     return slots;
-  });
+  };
+
+  // Generate time slots - will be updated when date changes
+  const [timeSlots, setTimeSlots] = useState(() => getAvailableTimeSlots(''));
 
   // React Hook Form setup
   const {
@@ -84,6 +165,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     reset,
     control,
     watch,
+    setValue,
   } = useForm<AddAppointmentFormData>({
     resolver: zodResolver(AddAppointmentFormSchema),
     mode: 'onBlur',
@@ -96,26 +178,77 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     },
   });
 
-  // Watch form values for button state
+  // Watch form values for button state and logic
   const patientName = watch('patientName');
   const reasonForVisit = watch('reasonForVisit');
   const date = watch('date');
   const time = watch('time');
-  const doctor = watch('doctor');
 
-  // Check if required form fields are empty
-  const isFormEmpty = !patientName?.trim() || 
-                      !reasonForVisit?.trim() || 
-                      !date?.trim() || 
-                      !time?.trim() || 
-                      !doctor?.trim();
+  // Handle patient selection to show patient number
+  const handlePatientChange = (patientId: string) => {
+    const selectedPatient = patients.find(p => p.value === patientId);
+    if (selectedPatient) {
+      setSelectedPatientNumber(selectedPatient.patientNumber);
+      setValue('patientName', patientId);
+    }
+  };
 
-  const handleFormSubmit = handleSubmit(async (data: AddAppointmentFormData) => {
+  // Handle date change to auto-assign doctor
+  const handleDateChange = (selectedDate: Date | null) => {
+    if (selectedDate && selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+      const dateString = selectedDate.toISOString().split('T')[0];
+      
+      // Update available time slots based on selected date
+      const newTimeSlots = getAvailableTimeSlots(dateString);
+      setTimeSlots(newTimeSlots);
+      
+      // Clear the time selection if currently selected time is no longer available
+      const currentTime = watch('time');
+      if (currentTime && !newTimeSlots.some(slot => slot.value === currentTime)) {
+        setValue('time', '');
+      }
+      
+      const doctor = getDoctorForDate(selectedDate);
+      setAssignedDoctor(doctor);
+      
+      // For backend compatibility, we'll use the doctor ID instead of name
+      // Find the actual doctor ID based on the day
+      const dayOfWeek = selectedDate.getDay();
+      let doctorId = '';
+      
+      if ([1, 3, 5].includes(dayOfWeek)) {
+        // MWF - Doctor 1
+        doctorId = doctorStore.doctorSummaries[0]?.id || 'doctor1';
+      } else if ([2, 4].includes(dayOfWeek)) {
+        // TTh - Doctor 2  
+        doctorId = doctorStore.doctorSummaries[1]?.id || 'doctor2';
+      } else {
+        // Weekend - default to first doctor
+        doctorId = doctorStore.doctorSummaries[0]?.id || 'doctor1';
+      }
+      
+      setValue('doctor', doctorId);
+    } else {
+      // Clear doctor assignment if no valid date is selected
+      setAssignedDoctor('');
+      setValue('doctor', '');
+      // Reset time slots to default (empty)
+      setTimeSlots(getAvailableTimeSlots(''));
+    }
+  };
+
+  // Check if form is valid and complete
+  const isFormValid = patientName && reasonForVisit && date && time;
+
+  // Form submission handler
+  const handleFormSubmit = handleSubmit(async (data) => {
+    // Data is already in the correct format (date as string)
     const success = await onSubmit(data);
-    
     // Only reset form on successful submission
     if (success) {
       reset();
+      setSelectedPatientNumber('');
+      setAssignedDoctor('');
     }
   });
 
@@ -128,15 +261,6 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
 
   // Set today as minimum date
   const today = new Date();
-
-  // Set default date to today
-  useEffect(() => {
-    if (!date) {
-      const defaultDate = new Date();
-      defaultDate.setHours(0, 0, 0, 0);
-      // We don't set the default here to avoid form validation issues
-    }
-  }, [date]);
 
   return (
     <form onSubmit={handleFormSubmit} noValidate>
@@ -156,19 +280,28 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           name="patientName"
           control={control}
           render={({ field, fieldState }) => (
-            <FormSelect
-              {...field}
-              label="Patient Name"
-              placeholder="Search and select patient"
-              data={patients}
-              error={fieldState.error}
-              disabled={isLoading}
-              // leftSection={<Icon icon="fas fa-user" size={16} />}
-              onChange={(value: string | null) => {
-                field.onChange(value);
-                handleInputChange();
-              }}
-            />
+            <Box>
+              <FormSelect
+                {...field}
+                label="Patient Name"
+                placeholder="Search and select patient"
+                data={patients}
+                error={fieldState.error}
+                disabled={isLoading || patientStore.getIsLoading()}
+                onChange={(value) => {
+                  field.onChange(value);
+                  if (value) handlePatientChange(value);
+                  handleInputChange();
+                }}
+                leftSection={<Icon icon="fas fa-user" size={16} />}
+              />
+              {/* Patient Number Display */}
+              {selectedPatientNumber && (
+                <Text size="sm" c="dimmed" mt={4}>
+                  Patient #: {selectedPatientNumber}
+                </Text>
+              )}
+            </Box>
           )}
         />
 
@@ -184,38 +317,57 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               data={reasonsForVisit}
               error={fieldState.error}
               disabled={isLoading}
-              // leftSection={<Icon icon="fas fa-stethoscope" size={16} />}
-              onChange={(value: string | null) => {
+              onChange={(value) => {
                 field.onChange(value);
                 handleInputChange();
               }}
+              leftSection={<Icon icon="fas fa-stethoscope" size={16} />}
             />
           )}
         />
 
-        {/* Date */}
+        {/* Appointment Date */}
         <Controller
           name="date"
           control={control}
           render={({ field, fieldState }) => (
             <DateInput
               label="Appointment Date"
-              placeholder={fieldState.error ? '' : "Enter date"}
+              placeholder="Select appointment date"
+              minDate={today}
               error={fieldState.error?.message}
               disabled={isLoading}
-              required
-              valueFormat="MMMM D, YYYY"
-              minDate={today}
-              maxDate={new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000)} // 6 months from now
-              leftSection={<Icon icon="fas fa-calendar" size={14} />}
-              onChange={(value: string | null) => {
-                field.onChange(value);
+              value={field.value ? new Date(field.value) : null}
+              onChange={(value) => {
+                // Handle different types that DateInput might pass
+                let dateString = '';
+                if (value instanceof Date && !isNaN(value.getTime())) {
+                  dateString = value.toISOString().split('T')[0];
+                } else if (typeof value === 'string' && value) {
+                  // If it's already a string, try to parse it
+                  const parsedDate = new Date(value);
+                  if (!isNaN(parsedDate.getTime())) {
+                    dateString = parsedDate.toISOString().split('T')[0];
+                  }
+                }
+                
+                field.onChange(dateString);
+                handleDateChange(value instanceof Date ? value : (value ? new Date(value) : null));
                 handleInputChange();
               }}
-              value={field.value || ''}
+              leftSection={<Icon icon="fas fa-calendar" size={16} />}
             />
           )}
         />
+
+        {/* Assigned Doctor Display */}
+        {assignedDoctor && (
+          <Box>
+            <Text size="sm" c="dimmed" mt={4}>
+              Assigned Doctor: {assignedDoctor}
+            </Text>
+          </Box>
+        )}
 
         {/* Time */}
         <Controller
@@ -229,8 +381,8 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               data={timeSlots}
               error={fieldState.error}
               disabled={isLoading}
-              // leftSection={<Icon icon="fas fa-clock" size={16} />}
-              onChange={(value: string | null) => {
+              leftSection={<Icon icon="fas fa-clock" size={16} />}
+              onChange={(value) => {
                 field.onChange(value);
                 handleInputChange();
               }}
@@ -238,38 +390,19 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           )}
         />
 
-        {/* Select Doctor */}
-        <Controller
-          name="doctor"
-          control={control}
-          render={({ field, fieldState }) => (
-            <FormSelect
-              {...field}
-              label="Select Doctor"
-              placeholder="Choose doctor"
-              data={doctors}
-              error={fieldState.error}
-              disabled={isLoading}
-              // leftSection={<Icon icon="fas fa-user-md" size={16} />}
-              onChange={(value: string | null) => {
-                field.onChange(value);
-                handleInputChange();
-              }}
-            />
-          )}
-        />
-        
-        {/* Action Button */}
+        {/* Submit Button */}
         <Button
           type="submit"
-          disabled={isFormEmpty || isLoading}
+          size="md"
           loading={isLoading}
-          color="#17A589"
-          fullWidth
-          mt="md"
+          disabled={!isFormValid || isLoading}
+          leftSection={<Icon icon="fas fa-calendar-plus" />}
+          style={{
+            marginRight: '4px'
+          }}
+          data-testid="submit-appointment-button"
         >
-          <Icon icon="fas fa-calendar-plus" style={{ marginRight: '4px' }} />
-          {isLoading ? 'Adding Appointment...' : 'Add Appointment'}
+          {isLoading ? 'Creating Appointment...' : 'Create Appointment'}
         </Button>
       </Stack>
     </form>

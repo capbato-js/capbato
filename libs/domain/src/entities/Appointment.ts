@@ -36,7 +36,7 @@ export class Appointment implements IAppointment {
     appointmentDate: Date,
     appointmentTime: string | AppointmentTime,
     doctorId: string,
-    status: AppointmentStatusType = 'scheduled',
+    status: AppointmentStatusType = 'confirmed',
     id?: string | AppointmentId,
     createdAt = new Date(),
     updatedAt?: Date

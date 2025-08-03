@@ -21,7 +21,7 @@ export const APPOINTMENT_VALIDATION_ERRORS = {
 } as const;
 
 // Base Appointment validation schemas
-export const AppointmentStatusSchema = z.enum(['scheduled', 'confirmed', 'cancelled', 'completed']);
+export const AppointmentStatusSchema = z.enum(['confirmed', 'cancelled', 'completed']);
 
 // Appointment ID validation schema - Dashless UUID format  
 export const AppointmentIdSchema = z.string()
@@ -204,7 +204,7 @@ export const CreateAppointmentCommandSchema = z.object({
   reasonForVisit: z.string().superRefine(validateReasonForVisit),
   appointmentDate: ApiAppointmentDateSchema,
   appointmentTime: ApiAppointmentTimeSchema,
-  status: AppointmentStatusSchema.default('scheduled'),
+  status: AppointmentStatusSchema.default('confirmed'),
   doctorId: z.string().min(1, 'Doctor ID is required'),
 });
 

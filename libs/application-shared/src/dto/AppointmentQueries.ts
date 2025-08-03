@@ -30,7 +30,7 @@ export interface CreateAppointmentRequestDto {
   reasonForVisit: string;
   appointmentDate: string; // ISO date string
   appointmentTime: string; // HH:MM format
-  status?: 'scheduled' | 'confirmed' | 'cancelled' | 'completed';
+  status?: 'confirmed' | 'cancelled' | 'completed';
   doctorId: string;
 }
 
@@ -39,7 +39,7 @@ export interface UpdateAppointmentRequestDto {
   reasonForVisit?: string;
   appointmentDate?: string; // ISO date string
   appointmentTime?: string; // HH:MM format
-  status?: 'scheduled' | 'confirmed' | 'cancelled' | 'completed';
+  status?: 'confirmed' | 'cancelled' | 'completed';
   doctorId?: string;
 }
 
@@ -51,20 +51,31 @@ export interface RescheduleAppointmentRequestDto {
 // Response DTOs
 export interface AppointmentDto {
   id: string;
-  patientId: string;
+  patient?: {
+    id: string;
+    patientNumber: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+  };
+  doctor?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    specialization?: string;
+  };
   reasonForVisit: string;
   appointmentDate: string; // ISO date string
   appointmentTime: string; // HH:MM format
-  status: 'scheduled' | 'confirmed' | 'cancelled' | 'completed';
-  doctorId: string;
+  status: 'confirmed' | 'cancelled' | 'completed';
   createdAt: string; // ISO date string
-  updatedAt?: string; // ISO date string
+  updatedAt?: string; // ISO date string;
 }
 
 export interface AppointmentStatsDto {
   total: number;
   confirmed: number;
-  scheduled: number;
   cancelled: number;
   completed: number;
   todayTotal: number;

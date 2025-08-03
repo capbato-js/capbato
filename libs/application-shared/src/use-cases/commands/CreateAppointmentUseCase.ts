@@ -21,7 +21,7 @@ export class CreateAppointmentUseCase {
       command.appointmentDate,
       command.appointmentTime,
       command.doctorId,
-      command.status || 'scheduled'
+      command.status || 'confirmed'
     );
 
     // Validate business invariants

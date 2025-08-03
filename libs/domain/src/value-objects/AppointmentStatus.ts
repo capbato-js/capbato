@@ -1,13 +1,12 @@
 import { InvalidAppointmentStatusException } from '../exceptions/DomainExceptions';
 
-export type AppointmentStatusType = 'scheduled' | 'confirmed' | 'cancelled' | 'completed';
+export type AppointmentStatusType = 'confirmed' | 'completed' | 'cancelled';
 
 export class AppointmentStatus {
   private static readonly VALID_STATUSES: AppointmentStatusType[] = [
-    'scheduled',
     'confirmed', 
-    'cancelled',
-    'completed'
+    'completed',
+    'cancelled'
   ];
 
   constructor(private readonly _value: AppointmentStatusType) {
