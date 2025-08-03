@@ -9,6 +9,7 @@ export interface UserListResponse {
     id: string;
     fullName: string;
     role: string;
+    email: string;
     mobile?: string | null;
   }>;
 }
@@ -37,7 +38,7 @@ export class UserApiService implements IUserApiService {
         id: user.id,
         firstName: user.fullName.split(' ')[0] || '',
         lastName: user.fullName.split(' ').slice(1).join(' ') || '',
-        email: '', // Not provided by API, would need separate endpoint or field
+        email: user.email,
         username: '', // Not provided by API
         role: user.role,
         mobile: user.mobile || undefined,

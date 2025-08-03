@@ -27,11 +27,12 @@ export class UsersController {
   @Get('/')
   async getAllUsers(): Promise<{ success: boolean; data: UserListResponseDto[] }> {
     const users = await this.getAllUsersQueryHandler.execute();
-    // Map to response DTOs (id, fullName, role, mobile)
+    // Map to response DTOs (id, fullName, role, email, mobile)
     const userList: UserListResponseDto[] = users.map(user => ({
       id: user.id,
       fullName: user.fullName,
       role: user.role.value,
+      email: user.email.value,
       mobile: user.mobile?.value || null,
     }));
     return ApiResponseBuilder.success(userList);

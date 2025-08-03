@@ -6,5 +6,6 @@ export interface UserListResponseDto {
   id: string;
   fullName: string;
   role: string;
+  email: string;
   mobile?: string | null;
 }

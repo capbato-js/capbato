@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Anchor, Text, useMantineTheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { DataTable, DataTableHeader, TableColumn } from '../../../components/common';
+import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common';
 import { PatientListDto } from '@nx-starter/application-shared';
 
 interface PatientsTableProps {
@@ -28,6 +28,26 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
     navigate(`/patients/${patientId}`);
   };
 
+  const handleEditPatient = (patient: typeof patientsWithFullName[0]) => {
+    // TODO: Implement edit functionality
+    console.log('Edit patient:', patient);
+  };
+
+  const actions: TableActions<typeof patientsWithFullName[0]> = {
+    buttons: [
+      {
+        icon: 'fas fa-eye',
+        tooltip: 'View Patient Info',
+        onClick: (patient) => handlePatientClick(patient.id)
+      },
+      {
+        icon: 'fas fa-edit',
+        tooltip: 'Update Patient Info',
+        onClick: handleEditPatient
+      }
+    ]
+  };
+
   const columns: TableColumn<typeof patientsWithFullName[0]>[] = [
     {
       key: 'patientNumber',
@@ -35,24 +55,15 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
       width: '40%',
       align: 'center',
       searchable: true,
-      render: (value, record) => (
-        <Anchor
-          onClick={() => handlePatientClick(record.id)}
+      render: (value) => (
+        <Text
           style={{
             color: theme.colors.blue[7],
-            textDecoration: 'none',
-            cursor: 'pointer',
             fontWeight: 500
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.textDecoration = 'underline';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.textDecoration = 'none';
           }}
         >
           {value}
-        </Anchor>
+        </Text>
       )
     },
     {
@@ -61,24 +72,15 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
       width: '60%',
       align: 'left',
       searchable: true,
-      render: (value, record) => (
-        <Anchor
-          onClick={() => handlePatientClick(record.id)}
+      render: (value) => (
+        <Text
           style={{
             color: '#0F0F0F',
-            textDecoration: 'none',
-            cursor: 'pointer',
             fontWeight: 'normal'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.textDecoration = 'underline';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.textDecoration = 'none';
           }}
         >
           {value}
-        </Anchor>
+        </Text>
       )
     }
   ];
@@ -95,11 +97,14 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
       <DataTable
         data={patientsWithFullName}
         columns={columns}
+        actions={actions}
+        onRowClick={(patient) => handlePatientClick(patient.id)}
         searchable={true}
         searchPlaceholder="Search patients..."
         searchFields={['fullName', 'patientNumber']}
         emptyStateMessage="No patients found"
         isLoading={isLoading}
+        cursor="pointer"
       />
     </Box>
   );

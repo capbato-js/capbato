@@ -6,7 +6,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon, Modal } from '../../../components/common';
-import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
+import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useEnhancedAccountsViewModel';
 import { CreateAccountForm, ChangePasswordForm } from '../components';
@@ -46,6 +46,32 @@ export const AccountsPage: React.FC = () => {
     openPasswordModal();
   };
 
+  const handleEditUserDetails = (account: Account) => {
+    // TODO: Implement edit user details functionality
+    console.log('Edit user details:', account);
+  };
+
+  // Transform accounts to include full name for consistency
+  const accountsWithFullName = accounts.map(account => ({
+    ...account,
+    name: `${account.firstName} ${account.lastName}`
+  }));
+
+  const actions: TableActions<typeof accountsWithFullName[0]> = {
+    buttons: [
+      {
+        icon: 'fas fa-edit',
+        tooltip: 'Update User Details',
+        onClick: handleEditUserDetails
+      },
+      {
+        icon: 'fas fa-key',
+        tooltip: 'Change Password',
+        onClick: handleChangePassword
+      }
+    ]
+  };
+
   const handlePasswordSubmit = async (newPassword: string) => {
     setPasswordError(null);
     
@@ -64,18 +90,18 @@ export const AccountsPage: React.FC = () => {
   };
 
   // Define columns for the DataTable
-  const columns: TableColumn<Account>[] = [
+  const columns: TableColumn<typeof accountsWithFullName[0]>[] = [
     {
       key: 'name',
       header: 'Name',
-      width: '40%',
+      width: '25%',
       align: 'left',
       searchable: true
     },
     {
       key: 'role',
       header: 'Role',
-      width: '30%',
+      width: '20%',
       align: 'center',
       searchable: true,
       render: (value: string) => (
@@ -85,29 +111,22 @@ export const AccountsPage: React.FC = () => {
       )
     },
     {
-      key: 'id',
-      header: 'Action',
+      key: 'email',
+      header: 'Email',
       width: '30%',
-      align: 'center',
-      searchable: false,
-      render: (value: string, record: Account) => (
-        <Button
-          size="xs"
-          onClick={() => handleChangePassword(record)}
-          disabled={isLoading}
-          style={{
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '6px 12px',
-            fontSize: '12px',
-            fontWeight: 'normal'
-          }}
-        >
-          <Icon icon="fas fa-key" style={{ marginRight: '4px' }} />
-          Change Password
-        </Button>
+      align: 'left',
+      searchable: true
+    },
+    {
+      key: 'mobile',
+      header: 'Contact Number',
+      width: '25%',
+      align: 'left',
+      searchable: true,
+      render: (value: string | undefined) => (
+        <Text>
+          {value || '-'}
+        </Text>
       )
     }
   ];
@@ -145,13 +164,11 @@ export const AccountsPage: React.FC = () => {
       />
 
       <DataTable
-        data={accounts.map(account => ({
-          ...account,
-          name: `${account.firstName} ${account.lastName}`
-        }))}
+        data={accountsWithFullName}
         columns={columns}
+        actions={actions}
         searchable={true}
-        searchPlaceholder="Search accounts by name or role..."
+        searchPlaceholder="Search accounts by name, role, email, or contact number..."
         emptyStateMessage="No accounts found"
         isLoading={isLoading}
       />

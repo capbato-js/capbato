@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button } from '@mantine/core';
 import { Icon } from '../../../components/common';
-import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
+import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { Prescription } from '../types';
 
@@ -62,33 +62,53 @@ export const PrescriptionsPage: React.FC = () => {
     // TODO: Implement delete prescription functionality
   };
 
+  const actions: TableActions<Prescription> = {
+    buttons: [
+      {
+        icon: 'fas fa-eye',
+        tooltip: 'View Prescription Details',
+        onClick: handleViewPrescription
+      },
+      {
+        icon: 'fas fa-edit',
+        tooltip: 'Update Prescription',
+        onClick: handleEditPrescription
+      },
+      {
+        icon: 'fas fa-trash',
+        tooltip: 'Delete Prescription',
+        onClick: handleDeletePrescription
+      }
+    ]
+  };
+
   // Define columns for the DataTable based on legacy structure
   const columns: TableColumn<Prescription>[] = [
     {
       key: 'patientNumber',
-      header: 'Patient Number',
-      width: '15%',
+      header: 'Patient #',
+      width: '18%',
       align: 'center',
       searchable: true
     },
     {
       key: 'patientName',
-      header: 'Patient Name',
-      width: '20%',
+      header: "Patient's Name",
+      width: '22%',
       align: 'left',
       searchable: true
     },
     {
       key: 'doctor',
-      header: 'Doctor',
-      width: '18%',
+      header: "Doctor's Name",
+      width: '20%',
       align: 'left',
       searchable: true
     },
     {
       key: 'datePrescribed',
       header: 'Date Prescribed',
-      width: '15%',
+      width: '18%',
       align: 'center',
       searchable: true
     },
@@ -98,65 +118,6 @@ export const PrescriptionsPage: React.FC = () => {
       width: '22%',
       align: 'left',
       searchable: true
-    },
-    {
-      key: 'id',
-      header: 'Actions',
-      width: '10%',
-      align: 'center',
-      searchable: false,
-      render: (value: any, record: Prescription) => (
-        <Box style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
-          <Button
-            size="xs"
-            onClick={() => handleViewPrescription(record)}
-            style={{
-              backgroundColor: '#17a2b8',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '6px 12px',
-              fontSize: '11px',
-              fontWeight: 'bold',
-              minWidth: '50px'
-            }}
-          >
-            <Icon icon="fas fa-eye" />
-          </Button>
-          <Button
-            size="xs"
-            onClick={() => handleEditPrescription(record)}
-            style={{
-              backgroundColor: '#ffc107',
-              color: '#212529',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '6px 12px',
-              fontSize: '11px',
-              fontWeight: 'bold',
-              minWidth: '50px'
-            }}
-          >
-            <Icon icon="fas fa-edit" />
-          </Button>
-          <Button
-            size="xs"
-            onClick={() => handleDeletePrescription(record)}
-            style={{
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '6px 12px',
-              fontSize: '11px',
-              fontWeight: 'bold',
-              minWidth: '50px'
-            }}
-          >
-            <Icon icon="fas fa-trash" />
-          </Button>
-        </Box>
-      )
     }
   ];
 
@@ -172,9 +133,12 @@ export const PrescriptionsPage: React.FC = () => {
       <DataTable
         data={dummyPrescriptions}
         columns={columns}
+        actions={actions}
+        onRowClick={handleViewPrescription}
         searchable={true}
         searchPlaceholder="Search prescriptions by patient, doctor, or medications..."
         emptyStateMessage="No prescriptions found"
+        cursor="pointer"
       />
     </MedicalClinicLayout>
   );

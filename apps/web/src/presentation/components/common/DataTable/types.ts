@@ -1,5 +1,11 @@
 import { ReactNode } from 'react';
 
+export interface ActionButton<T> {
+  icon: string;
+  tooltip: string;
+  onClick: (record: T) => void;
+}
+
 export interface TableColumn<T> {
   key: keyof T | string;
   header: string;
@@ -9,15 +15,22 @@ export interface TableColumn<T> {
   searchable?: boolean;
 }
 
+export interface TableActions<T> {
+  buttons: ActionButton<T>[];
+}
+
 export interface DataTableProps<T> {
   data: T[];
   columns: TableColumn<T>[];
+  actions?: TableActions<T>;
+  onRowClick?: (record: T) => void;
   searchable?: boolean;
   searchPlaceholder?: string;
   searchFields?: (keyof T)[];
   isLoading?: boolean;
   emptyStateMessage?: string;
   skeletonRowCount?: number;
+  cursor?: 'default' | 'pointer';
 }
 
 export interface SearchableItem {
