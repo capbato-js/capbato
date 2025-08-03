@@ -267,3 +267,66 @@ export class PatientNotExistsException extends DomainException {
     super(message, 'PATIENT_NOT_EXISTS', 400);
   }
 }
+
+/**
+ * Laboratory-specific domain exceptions
+ */
+export class LabRequestNotFoundException extends DomainException {
+  constructor(identifier: string) {
+    super(`Lab request with identifier ${identifier} not found`, 'LAB_REQUEST_NOT_FOUND', 404);
+  }
+}
+
+export class BloodChemistryNotFoundException extends DomainException {
+  constructor(identifier: string) {
+    super(`Blood chemistry record with identifier ${identifier} not found`, 'BLOOD_CHEMISTRY_NOT_FOUND', 404);
+  }
+}
+
+export class InvalidLabRequestStatusException extends DomainException {
+  constructor(status: string) {
+    super(`Invalid lab request status: ${status}`, 'INVALID_LAB_REQUEST_STATUS');
+  }
+}
+
+export class LabRequestAlreadyCompletedException extends DomainException {
+  constructor() {
+    super('Lab request is already completed', 'LAB_REQUEST_ALREADY_COMPLETED');
+  }
+}
+
+export class LabRequestAlreadyCancelledException extends DomainException {
+  constructor() {
+    super('Lab request is already cancelled', 'LAB_REQUEST_ALREADY_CANCELLED');
+  }
+}
+
+export class InvalidLabTestDataException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid lab test data: ${reason}`, 'INVALID_LAB_TEST_DATA');
+  }
+}
+
+export class InvalidBloodChemistryResultException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid blood chemistry result: ${reason}`, 'INVALID_BLOOD_CHEMISTRY_RESULT');
+  }
+}
+
+export class NoLabTestsSelectedException extends DomainException {
+  constructor() {
+    super('At least one laboratory test must be selected', 'NO_LAB_TESTS_SELECTED');
+  }
+}
+
+export class InvalidPatientLabInfoException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid patient laboratory information: ${reason}`, 'INVALID_PATIENT_LAB_INFO');
+  }
+}
+
+export class CriticalLabValueException extends DomainException {
+  constructor(values: string[]) {
+    super(`Critical laboratory values detected: ${values.join(', ')}`, 'CRITICAL_LAB_VALUE', 422);
+  }
+}

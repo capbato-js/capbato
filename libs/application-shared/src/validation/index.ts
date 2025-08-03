@@ -99,3 +99,7 @@ export {
   type GetAppointmentsByDateRangeQuery,
   AppointmentIdSchema,
 } from './AppointmentValidationSchemas';
+
+// Export laboratory validation schemas and services
+export * from './LaboratoryValidationSchemas'; 
+export * from './LaboratoryValidationService';

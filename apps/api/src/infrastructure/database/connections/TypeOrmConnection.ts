@@ -5,6 +5,8 @@ import { PatientEntity } from '../../patient/persistence/typeorm/PatientEntity';
 import { DoctorEntity } from '../../doctor/persistence/typeorm/DoctorEntity';
 import { ScheduleEntity } from '../../schedule/persistence/typeorm/ScheduleEntity';
 import { AppointmentEntity } from '../../appointment/persistence/typeorm/AppointmentEntity';
+import { LabRequestEntity } from '../../laboratory/persistence/typeorm/LabRequestEntity';
+import { BloodChemistryEntity } from '../../laboratory/persistence/typeorm/BloodChemistryEntity';
 import { getDatabaseConfig, isDevelopment, isProduction } from '../../../config';
 
 /**
@@ -37,7 +39,7 @@ export const createTypeOrmDataSource = (): DataSource => {
   
   // Base configuration
   const baseConfig = {
-    entities: [TodoEntity, UserEntity, PatientEntity, DoctorEntity, ScheduleEntity, AppointmentEntity],
+    entities: [TodoEntity, UserEntity, PatientEntity, DoctorEntity, ScheduleEntity, AppointmentEntity, LabRequestEntity, BloodChemistryEntity],
     synchronize: shouldSynchronize,
     logging: isDevelopment() || (isProduction() && allowProductionAutoMigration), // Extra logging for production debug
   };

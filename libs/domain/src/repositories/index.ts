@@ -10,3 +10,5 @@ export * from './IDoctorRepository';
 export * from './IAddressRepository';
 export * from './IScheduleRepository';
 export * from './IAppointmentRepository';
+export * from './ILabRequestRepository';
+export * from './IBloodChemistryRepository';

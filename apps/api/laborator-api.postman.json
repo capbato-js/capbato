@@ -1,0 +1,1040 @@
+{
+  "info": {
+    "_postman_id": "lab1a2b3-c4d5-6789-efgh-ijkl123456789",
+    "name": "Laboratory API",
+    "description": "Laboratory management endpoints for healthcare clinic\n\n## Laboratory Management Architecture\nThe API manages laboratory requests and blood chemistry results with comprehensive business logic:\n\n**Laboratory Request Information:**\n- `id`: Unique lab request identifier\n- `patient`: Patient information object\n  - `id`: Patient identifier (string)\n  - `name`: Full patient name\n  - `ageGender`: Combined age and gender (e.g., '25 M', '30 F')\n- `requestDate`: Date of lab request in ISO format\n- `status`: Request status ('pending', 'complete', 'cancelled')\n- `dateTaken`: Date when samples were taken (optional)\n- `others`: Additional notes/remarks\n- `selectedTests`: Array of selected test names\n- `createdAt`: Creation timestamp\n- `updatedAt`: Last update timestamp\n\n**Available Laboratory Tests:**\n\n**Basic Tests:**\n- CBC with Platelet Count\n- Pregnancy Test\n- Urinalysis\n- Fecalysis\n- Occult Blood Test\n\n**Hepatitis Tests:**\n- Hepatitis B Screening\n- Hepatitis A Screening\n- Hepatitis Profile\n\n**STD Tests:**\n- VDRL/RPR (Syphilis screening)\n\n**Other Tests:**\n- Dengue NS1\n- CA 125 / CEA / PSA (Cancer markers)\n\n**Blood Chemistry Tests:**\n- FBS (Fasting Blood Sugar)\n- BUN (Blood Urea Nitrogen)\n- Creatinine\n- Blood Uric Acid\n- Lipid Profile\n- SGOT/SGPT (Liver enzymes)\n- ALP (Alkaline Phosphatase)\n- Sodium (Na)\n- Potassium (K+)\n- HBA1C (Glycated Hemoglobin)\n\n**Thyroid Function Tests:**\n- T3, T4, FT3, FT4, TSH\n\n**Other Diagnostic Tests:**\n- ECG (Electrocardiogram)\n\n**Blood Chemistry Results:**\nSeparate entity for detailed blood chemistry with numeric values:\n- `patient`: Patient information object\n  - `name`: Patient name\n  - `age`: Numeric age\n  - `sex`: Gender ('M', 'F', 'Male', 'Female')\n- `dateTaken`: Sample collection date\n- `results`: Object containing all numeric test results\n- `hasAbnormalValues`: Boolean flag for abnormal results\n- `criticalValues`: Array of critical value alerts\n\n**Business Rules Implemented:**\n- **Test Selection**: At least one test must be selected\n- **Status Transitions**: pending → complete/cancelled\n- **Date Validation**: Request dates cannot be in future\n- **Results Validation**: Numeric ranges for blood chemistry values\n- **Critical Value Alerts**: Automatic flagging of dangerous values\n\n**Laboratory Status Flow:**\n1. **pending**: Initial status when request is created\n2. **complete**: All tests completed and results available\n3. **cancelled**: Request cancelled before completion\n\n**API Response Structure:**\nAll responses follow consistent format:\n- `success`: Boolean indicating operation success\n- `data`: Response data (lab request/result object or array)\n- `message`: Success/error message for operations\n\n**Query Capabilities:**\n- Get all lab requests\n- Get completed requests only\n- Get requests by patient ID\n- Filter by date range\n- Update test results\n- Create blood chemistry records\n\n**Test Result Formats:**\nThe API accepts various result formats:\n- **Qualitative**: 'Positive', 'Negative', 'Normal', 'Abnormal'\n- **Quantitative**: Numeric values with units\n- **Descriptive**: Free text descriptions\n\n**Critical Value Management:**\nAutomatic detection and alerting for:\n- FBS > 200 mg/dL (critical high glucose)\n- Creatinine > 3.0 mg/dL (kidney function)\n- SGOT/SGPT > 100 U/L (liver function)\n- BUN > 50 mg/dL (kidney function)\n\n**Integration with Other APIs:**\nLaboratory API integrates with:\n- **Patient API**: Validates patient information\n- **Doctor API**: Associates requests with ordering physicians\n- **Appointment API**: Links lab requests to patient visits",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "🧪 Laboratory Requests",
+      "item": [
+        {
+          "name": "Get All Lab Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests"]
+            },
+            "description": "Get all laboratory requests in the system\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"1\",\n      \"patient\": {\n        \"id\": \"PAT001\",\n        \"name\": \"Juan Dela Cruz\",\n        \"ageGender\": \"35 M\"\n      },\n      \"requestDate\": \"2025-08-03T08:00:00.000Z\",\n      \"status\": \"pending\",\n      \"dateTaken\": null,\n      \"others\": \"Routine checkup\",\n      \"selectedTests\": [\"CBC with Platelet\", \"FBS\", \"Lipid Profile\"],\n      \"createdAt\": \"2025-08-03T08:00:00.000Z\",\n      \"updatedAt\": null\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Laboratory dashboard\n- Request management\n- Workload planning\n- Quality control tracking"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains data array', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Completed Lab Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests/completed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests", "completed"]
+            },
+            "description": "Get all completed laboratory requests\n\n**Response Format:**\nSame as 'Get All Lab Requests' but filtered to status='complete'\n\n**Use Cases:**\n- Results ready for pickup\n- Completed work tracking\n- Performance metrics\n- Billing and reporting"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests/completed",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests", "completed"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains data array', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Lab Request by Patient ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests", "{{patient_id}}"]
+            },
+            "description": "Get the most recent laboratory request for a specific patient\n\n**Path Parameters:**\n- `patient_id`: Patient identifier (string)\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"1\",\n    \"patient_id\": \"PAT001\",\n    \"patient_name\": \"Juan Dela Cruz\",\n    \"age_gender\": \"35 M\",\n    \"request_date\": \"2025-08-03T08:00:00.000Z\",\n    \"status\": \"pending\",\n    \"selected_tests\": [\"CBC with Platelet\", \"FBS\"]\n  }\n}\n```\n\n**Use Cases:**\n- Patient history lookup\n- Follow-up requests\n- Results inquiry\n- Duplicate prevention"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests/PAT001",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests", "PAT001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": null\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains data property', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Lab Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_id\": \"PAT001\",\n  \"patient_name\": \"Juan Dela Cruz\",\n  \"age_gender\": \"35 M\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbc_with_platelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipid_profile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests"]
+            },
+            "description": "Create a new laboratory request\n\n**Required Fields:**\n- `patient_id`: Patient identifier\n- `patient_name`: Full patient name\n- `age_gender`: Age and gender combined\n- `request_date`: ISO date string\n- At least one test must be specified\n\n**Available Test Fields:**\n- `cbc_with_platelet`: CBC with Platelet Count\n- `pregnancy_test`: Pregnancy Test\n- `urinalysis`: Urinalysis\n- `fecalysis`: Fecalysis\n- `fbs`: Fasting Blood Sugar\n- `lipid_profile`: Lipid Profile\n- `bun`: Blood Urea Nitrogen\n- `creatinine`: Creatinine\n- `sgot`: SGOT\n- `sgpt`: SGPT\n- `hbalc`: HBA1C\n- `hepa_b_screening`: Hepatitis B Screening\n- `hepa_a_screening`: Hepatitis A Screening\n- `hepatitis_profile`: Hepatitis Profile\n- `vdrl_rpr`: VDRL/RPR\n- `dengue_ns1`: Dengue NS1\n- `ca_125_cea_psa`: CA 125 / CEA / PSA\n- `t3`: T3\n- `t4`: T4\n- `ft3`: FT3\n- `ft4`: FT4\n- `tsh`: TSH\n- `ecg`: ECG\n\n**Test Field Values:**\n- `\"requested\"`: Test is requested\n- `\"no\"` or empty: Test not requested"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": \"PAT001\",\n  \"patient_name\": \"Juan Dela Cruz\",\n  \"age_gender\": \"35 M\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbc_with_platelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipid_profile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Laboratory request created successfully\",\n  \"data\": {\n    \"id\": \"1\",\n    \"patient_id\": \"PAT001\",\n    \"patient_name\": \"Juan Dela Cruz\",\n    \"status\": \"pending\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains created lab request', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('patient_id');",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Lab Request Results",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"complete\",\n  \"date_taken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": \"95 mg/dL - Normal\",\n  \"lipid_profile\": \"Total Cholesterol: 180 mg/dL - Normal\",\n  \"urinalysis\": \"Normal - No abnormal findings\",\n  \"cbc_with_platelet\": \"WBC: 7,500 cells/uL, RBC: 4.8 M/uL, Platelet: 250,000/uL - Normal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests/{{patient_id}}/{{request_date}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests", "{{patient_id}}", "{{request_date}}"]
+            },
+            "description": "Update laboratory request with test results\n\n**Path Parameters:**\n- `patient_id`: Patient identifier\n- `request_date`: ISO date string of the request\n\n**Update Fields:**\n- `status`: Update status to 'complete' or 'cancelled'\n- `date_taken`: When samples were collected\n- Test result fields (same names as creation)\n\n**Result Format Guidelines:**\n- **Qualitative**: 'Normal', 'Abnormal', 'Positive', 'Negative'\n- **Quantitative**: Include values and units (e.g., '95 mg/dL')\n- **Reference Ranges**: Include normal ranges when applicable\n- **Descriptive**: Free text for complex results"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"complete\",\n  \"date_taken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": \"95 mg/dL - Normal\",\n  \"lipid_profile\": \"Total Cholesterol: 180 mg/dL - Normal\",\n  \"urinalysis\": \"Normal - No abnormal findings\",\n  \"cbc_with_platelet\": \"WBC: 7,500 cells/uL, RBC: 4.8 M/uL, Platelet: 250,000/uL - Normal\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests/PAT001/2025-08-03T08:00:00.000Z",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests", "PAT001", "2025-08-03T08:00:00.000Z"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Laboratory request updated successfully\",\n  \"data\": {\n    \"id\": \"1\",\n    \"status\": \"complete\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains updated lab request', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🩸 Blood Chemistry",
+      "item": [
+        {
+          "name": "Create Blood Chemistry Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_name\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"date_taken\": \"2025-08-03T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uric_acid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "blood-chemistry"]
+            },
+            "description": "Create a detailed blood chemistry record with numeric values\n\n**Required Fields:**\n- `patient_name`: Full patient name\n- `age`: Numeric age\n- `sex`: Gender ('M', 'F', 'Male', 'Female')\n- `date_taken`: Sample collection date\n- At least one numeric result\n\n**Available Blood Chemistry Tests:**\n- `fbs`: Fasting Blood Sugar (mg/dL)\n- `bun`: Blood Urea Nitrogen (mg/dL)\n- `creatinine`: Creatinine (mg/dL)\n- `uric_acid`: Uric Acid (mg/dL)\n- `cholesterol`: Total Cholesterol (mg/dL)\n- `triglycerides`: Triglycerides (mg/dL)\n- `hdl`: HDL Cholesterol (mg/dL)\n- `ldl`: LDL Cholesterol (mg/dL)\n- `sgot`: SGOT/AST (U/L)\n- `sgpt`: SGPT/ALT (U/L)\n- `sodium`: Sodium (mEq/L)\n- `potassium`: Potassium (mEq/L)\n- `hbalc`: HBA1C (%)\n\n**Response:**\n- Status: 201 Created\n- Returns created record with calculated flags\n- `has_abnormal_values`: Boolean\n- `critical_values`: Array of alerts"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_name\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"date_taken\": \"2025-08-03T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uric_acid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "blood-chemistry"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Blood chemistry record created successfully\",\n  \"data\": {\n    \"id\": \"1\",\n    \"patient_name\": \"Maria Santos\",\n    \"has_abnormal_values\": false,\n    \"critical_values\": []\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains blood chemistry record', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('patient_name');",
+                  "});",
+                  "",
+                  "pm.test('Response includes analysis flags', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('has_abnormal_values');",
+                  "    pm.expect(jsonData.data).to.have.property('critical_values');",
+                  "    pm.expect(jsonData.data.critical_values).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🔍 Test Scenarios",
+      "item": [
+        {
+          "name": "Create Lab Request - Basic Tests",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_id\": \"PAT002\",\n  \"patient_name\": \"Anna Garcia\",\n  \"age_gender\": \"42 F\",\n  \"request_date\": \"2025-08-03T08:30:00.000Z\",\n  \"others\": \"Pre-employment medical\",\n  \"cbc_with_platelet\": \"requested\",\n  \"urinalysis\": \"requested\",\n  \"fecalysis\": \"requested\",\n  \"pregnancy_test\": \"requested\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests"]
+            },
+            "description": "Test scenario: Basic laboratory tests for pre-employment medical\n\n**Test Coverage:**\n- Basic health screening tests\n- Female patient with pregnancy test\n- Standard pre-employment package"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": \"PAT002\",\n  \"patient_name\": \"Anna Garcia\",\n  \"age_gender\": \"42 F\",\n  \"request_date\": \"2025-08-03T08:30:00.000Z\",\n  \"others\": \"Pre-employment medical\",\n  \"cbc_with_platelet\": \"requested\",\n  \"urinalysis\": \"requested\",\n  \"fecalysis\": \"requested\",\n  \"pregnancy_test\": \"requested\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Laboratory request created successfully\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Basic test request created successfully', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Lab Request - Comprehensive Panel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_id\": \"PAT003\",\n  \"patient_name\": \"Roberto Martinez\",\n  \"age_gender\": \"55 M\",\n  \"request_date\": \"2025-08-03T09:00:00.000Z\",\n  \"others\": \"Executive health package\",\n  \"cbc_with_platelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipid_profile\": \"requested\",\n  \"bun\": \"requested\",\n  \"creatinine\": \"requested\",\n  \"sgot\": \"requested\",\n  \"sgpt\": \"requested\",\n  \"hbalc\": \"requested\",\n  \"t3\": \"requested\",\n  \"t4\": \"requested\",\n  \"tsh\": \"requested\",\n  \"ecg\": \"requested\",\n  \"hepa_b_screening\": \"requested\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests"]
+            },
+            "description": "Test scenario: Comprehensive health screening for executive package\n\n**Test Coverage:**\n- Multiple test categories\n- Cardiovascular screening (lipids, ECG)\n- Diabetes screening (FBS, HBA1C)\n- Liver function (SGOT, SGPT)\n- Kidney function (BUN, Creatinine)\n- Thyroid function (T3, T4, TSH)\n- Infectious disease screening (Hepatitis B)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": \"PAT003\",\n  \"patient_name\": \"Roberto Martinez\",\n  \"age_gender\": \"55 M\",\n  \"request_date\": \"2025-08-03T09:00:00.000Z\",\n  \"others\": \"Executive health package\",\n  \"cbc_with_platelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipid_profile\": \"requested\",\n  \"bun\": \"requested\",\n  \"creatinine\": \"requested\",\n  \"sgot\": \"requested\",\n  \"sgpt\": \"requested\",\n  \"hbalc\": \"requested\",\n  \"t3\": \"requested\",\n  \"t4\": \"requested\",\n  \"tsh\": \"requested\",\n  \"ecg\": \"requested\",\n  \"hepa_b_screening\": \"requested\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Laboratory request created successfully\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Comprehensive test request created successfully', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Blood Chemistry - Normal Values",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_name\": \"John Smith\",\n  \"age\": 35,\n  \"sex\": \"M\",\n  \"date_taken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": 88,\n  \"cholesterol\": 175,\n  \"triglycerides\": 95,\n  \"hdl\": 48,\n  \"ldl\": 105,\n  \"sgot\": 28,\n  \"sgpt\": 32,\n  \"bun\": 14,\n  \"creatinine\": 1.0,\n  \"uric_acid\": 5.2,\n  \"hbalc\": 5.1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "blood-chemistry"]
+            },
+            "description": "Test scenario: Blood chemistry with normal values\n\n**Expected Results:**\n- `has_abnormal_values`: false\n- `critical_values`: [] (empty array)\n- All values within normal ranges"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_name\": \"John Smith\",\n  \"age\": 35,\n  \"sex\": \"M\",\n  \"date_taken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": 88,\n  \"cholesterol\": 175,\n  \"triglycerides\": 95,\n  \"hdl\": 48,\n  \"ldl\": 105,\n  \"sgot\": 28,\n  \"sgpt\": 32,\n  \"bun\": 14,\n  \"creatinine\": 1.0,\n  \"uric_acid\": 5.2,\n  \"hbalc\": 5.1\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "blood-chemistry"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"has_abnormal_values\": false,\n    \"critical_values\": []\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Normal values processed correctly', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.has_abnormal_values).to.be.false;",
+                  "    pm.expect(jsonData.data.critical_values).to.be.an('array').that.is.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Blood Chemistry - Critical Values",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_name\": \"Emergency Patient\",\n  \"age\": 62,\n  \"sex\": \"M\",\n  \"date_taken\": \"2025-08-03T11:30:00.000Z\",\n  \"fbs\": 450,\n  \"bun\": 85,\n  \"creatinine\": 4.2,\n  \"sgot\": 285,\n  \"sgpt\": 320,\n  \"sodium\": 125,\n  \"potassium\": 6.8\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "blood-chemistry"]
+            },
+            "description": "Test scenario: Blood chemistry with critical/life-threatening values\n\n**Expected Results:**\n- `has_abnormal_values`: true\n- `critical_values`: Multiple critical alerts\n- Immediate medical attention required\n\n**Critical Values:**\n- FBS: 450 mg/dL (diabetic emergency)\n- BUN: 85 mg/dL (severe kidney dysfunction)\n- Creatinine: 4.2 mg/dL (severe kidney dysfunction)\n- SGOT: 285 U/L (severe liver damage)\n- SGPT: 320 U/L (severe liver damage)\n- Sodium: 125 mEq/L (severe hyponatremia)\n- Potassium: 6.8 mEq/L (dangerous hyperkalemia)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_name\": \"Emergency Patient\",\n  \"age\": 62,\n  \"sex\": \"M\",\n  \"date_taken\": \"2025-08-03T11:30:00.000Z\",\n  \"fbs\": 450,\n  \"bun\": 85,\n  \"creatinine\": 4.2,\n  \"sgot\": 285,\n  \"sgpt\": 320,\n  \"sodium\": 125,\n  \"potassium\": 6.8\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "blood-chemistry"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"has_abnormal_values\": true,\n    \"critical_values\": [\n      \"Critically high FBS: 450 mg/dL\",\n      \"Critically high BUN: 85 mg/dL\",\n      \"Critically high Creatinine: 4.2 mg/dL\",\n      \"Critically high SGOT: 285 U/L\",\n      \"Critically high SGPT: 320 U/L\"\n    ]\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Critical values detected correctly', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.has_abnormal_values).to.be.true;",
+                  "    pm.expect(jsonData.data.critical_values).to.be.an('array').with.lengthOf.at.least(1);",
+                  "});",
+                  "",
+                  "pm.test('Critical value alerts contain expected messages', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const criticalValues = jsonData.data.critical_values;",
+                  "    pm.expect(criticalValues.some(value => value.includes('FBS'))).to.be.true;",
+                  "    pm.expect(criticalValues.some(value => value.includes('BUN'))).to.be.true;",
+                  "    pm.expect(criticalValues.some(value => value.includes('Creatinine'))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "❌ Error Handling",
+      "item": [
+        {
+          "name": "Create Lab Request - No Tests Selected (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_id\": \"PAT005\",\n  \"patient_name\": \"Test Patient\",\n  \"age_gender\": \"30 M\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"No tests selected\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests"]
+            },
+            "description": "Test error handling: Lab request without any tests selected\n\n**Expected Response:**\n- Status: 400 Bad Request\n- Error message: 'At least one laboratory test must be selected'\n\n**Business Rule Validation:**\nThe system should prevent creating lab requests without any tests, as this would be clinically meaningless and waste resources."
+          },
+          "response": [
+            {
+              "name": "Error Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": \"PAT005\",\n  \"patient_name\": \"Test Patient\",\n  \"age_gender\": \"30 M\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"No tests selected\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"message\": \"At least one laboratory test must be selected\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error response structure is correct', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates test selection requirement', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message.toLowerCase()).to.include('test');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Lab Request - Missing Required Fields (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_id\": \"\",\n  \"age_gender\": \"25 F\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"cbc_with_platelet\": \"requested\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-requests"]
+            },
+            "description": "Test validation errors: Missing required fields\n\n**Missing Fields:**\n- `patient_id`: Empty string\n- `patient_name`: Not provided\n\n**Expected Response:**\n- Status: 400 Bad Request\n- Validation errors for missing fields"
+          },
+          "response": [
+            {
+              "name": "Error Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": \"\",\n  \"age_gender\": \"25 F\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"cbc_with_platelet\": \"requested\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-requests",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-requests"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Patient ID and patient name are required\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error response structure is correct', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates missing required fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message.toLowerCase()).to.include('required');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Blood Chemistry - Invalid Age (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_name\": \"Test Patient\",\n  \"age\": -5,\n  \"sex\": \"M\",\n  \"date_taken\": \"2025-08-03T10:00:00.000Z\",\n  \"fbs\": 95\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "blood-chemistry"]
+            },
+            "description": "Test validation: Invalid age value\n\n**Validation Issues:**\n- `age`: -5 (negative age not allowed)\n\n**Expected Response:**\n- Status: 400 Bad Request\n- Validation error: 'Age must be positive'"
+          },
+          "response": [
+            {
+              "name": "Error Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_name\": \"Test Patient\",\n  \"age\": -5,\n  \"sex\": \"M\",\n  \"date_taken\": \"2025-08-03T10:00:00.000Z\",\n  \"fbs\": 95\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/blood-chemistry",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "blood-chemistry"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Age must be positive\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error response structure is correct', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates age validation issue', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message.toLowerCase()).to.include('age');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000",
+      "type": "string",
+      "description": "Base URL for the API server"
+    },
+    {
+      "key": "patient_id",
+      "value": "PAT001",
+      "type": "string",
+      "description": "Sample patient ID for testing"
+    },
+    {
+      "key": "request_date",
+      "value": "2025-08-03T08:00:00.000Z",
+      "type": "string",
+      "description": "Sample request date in ISO format"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Laboratory API Pre-request Script",
+          "console.log('🧪 Laboratory API Request:', pm.info.requestName);",
+          "",
+          "// Generate dynamic test data",
+          "const randomAge = Math.floor(Math.random() * 80) + 18;",
+          "const genders = ['M', 'F'];",
+          "const randomGender = genders[Math.floor(Math.random() * genders.length)];",
+          "pm.globals.set('random_age_gender', randomAge + ' ' + randomGender);",
+          "",
+          "const timestamp = Date.now();",
+          "pm.globals.set('random_patient_id', 'PAT' + timestamp.toString().slice(-6));"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Laboratory API Global Test Script",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+          "});",
+          "",
+          "pm.test('Response is JSON', function () {",
+          "    pm.response.to.have.header('content-type');",
+          "    pm.expect(pm.response.headers.get('content-type')).to.include('application/json');",
+          "});",
+          "",
+          "if (pm.response.code >= 200 && pm.response.code < 300) {",
+          "    pm.test('Success response has correct structure', function () {",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData).to.have.property('success');",
+          "        pm.expect(jsonData.success).to.be.true;",
+          "    });",
+          "",
+          "    // Store IDs for request chaining",
+          "    const jsonData = pm.response.json();",
+          "    if (pm.info.requestName.includes('Create Lab Request') && jsonData.data && jsonData.data.id) {",
+          "        pm.collectionVariables.set('lab_request_id', jsonData.data.id);",
+          "    }",
+          "    if (pm.info.requestName.includes('Blood Chemistry') && jsonData.data && jsonData.data.id) {",
+          "        pm.collectionVariables.set('blood-chemistry_id', jsonData.data.id);",
+          "    }",
+          "}",
+          "",
+          "if (pm.response.code >= 400) {",
+          "    pm.test('Error response has proper structure', function () {",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData).to.have.property('success');",
+          "        pm.expect(jsonData.success).to.be.false;",
+          "    });",
+          "}",
+          "",
+          "// Log response summary",
+          "const statusIcon = pm.response.code < 400 ? '✅' : '❌';",
+          "console.log(statusIcon + ' Response:', pm.response.code, pm.response.responseTime + 'ms');"
+        ]
+      }
+    }
+  ]
+}
