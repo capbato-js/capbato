@@ -1,45 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@mantine/core';
 import { Icon, Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { LaboratoryResult } from '../types';
 import { AddLabTestForm } from '../components';
+import { useLaboratoryStore } from '../../../../infrastructure/state/LaboratoryStore';
+import { LabRequestDto, CreateLabRequestCommand } from '@nx-starter/application-shared';
 
-// Dummy data for laboratory results
-const dummyLaboratoryResults: LaboratoryResult[] = [
-  {
-    id: '1',
-    patientNumber: '2025-R3',
-    patientName: 'Raj Va Riego',
-    testType: 'Complete Blood Count (CBC)',
-    datePerformed: '2025-07-28',
-    status: 'Pending'
-  },
-  {
-    id: '2',
-    patientNumber: '2025-R1',
-    patientName: 'Soleil Cervantes Riego',
-    testType: 'Blood Chemistry',
-    datePerformed: '2025-07-27',
-    status: 'Pending'
-  },
-  {
-    id: '3',
-    patientNumber: '2025-R2',
-    patientName: 'Ali Mercadejas Riego',
-    testType: 'Urinalysis',
-    datePerformed: '2025-07-26',
-    status: 'Completed',
-    results: 'Normal ranges'
+// Convert LabRequestDto to LaboratoryResult for the legacy table
+const convertLabRequestToLaboratoryResult = (labRequest: LabRequestDto): LaboratoryResult => {
+  // selectedTests is a string array of test names
+  const testType = labRequest.selectedTests.length > 0 
+    ? labRequest.selectedTests.join(', ')
+    : 'Laboratory Tests';
+
+  // Use enhanced patient data when available
+  let patientNumber = labRequest.patient.patientNumber || labRequest.patient.id;
+  let patientName = labRequest.patient.name;
+  
+  // If we have firstName and lastName, construct full name
+  if (labRequest.patient.firstName && labRequest.patient.lastName) {
+    patientName = `${labRequest.patient.firstName} ${labRequest.patient.lastName}`.trim();
   }
-];
+  
+  // If patientNumber is not available but we have a proper patient ID format, use it
+  if (!labRequest.patient.patientNumber) {
+    // Handle potential data swapping issue in legacy data
+    // If patient.id contains letters/UUIDs and patient.name looks like a number, they might be swapped
+    if (/^[a-f0-9-]{32,36}$/i.test(labRequest.patient.id) && /^[0-9-]+$/.test(labRequest.patient.name)) {
+      // Data appears to be swapped
+      patientNumber = labRequest.patient.name;
+      if (!labRequest.patient.firstName && !labRequest.patient.lastName) {
+        patientName = `Patient ${labRequest.patient.id.substring(0, 8)}...`; // Use part of ID as fallback name
+      }
+    }
+  }
+
+  // Normalize status to match LaboratoryResult type expectations
+  let status: LaboratoryResult['status'] = 'Pending';
+  switch (labRequest.status.toLowerCase()) {
+    case 'pending':
+      status = 'Pending';
+      break;
+    case 'complete':
+    case 'completed':
+      status = 'Completed';
+      break;
+    case 'cancelled':
+      status = 'In Progress'; // Map to available status for now
+      break;
+    default:
+      status = 'Pending';
+  }
+
+  return {
+    id: labRequest.id || labRequest.patient.id,
+    patientNumber,
+    patientName,
+    testType: testType,
+    datePerformed: new Date(labRequest.requestDate).toLocaleDateString(),
+    status,
+    results: status === 'Completed' ? 'Results available' : undefined
+  };
+};
 
 export const LaboratoryPage: React.FC = () => {
   // Modal state
   const [modalOpened, setModalOpened] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Laboratory store
+  const { 
+    labRequests, 
+    fetchAllLabRequests, 
+    createLabRequest,
+    loadingStates, 
+    errorStates 
+  } = useLaboratoryStore();
+
+  // Load laboratory results on component mount
+  useEffect(() => {
+    fetchAllLabRequests();
+  }, [fetchAllLabRequests]);
+
+  // Convert lab requests to legacy format
+  const laboratoryResults: LaboratoryResult[] = Array.isArray(labRequests) 
+    ? labRequests.map(convertLabRequestToLaboratoryResult)
+    : [];
 
   const handleAddTest = () => {
     setModalOpened(true);
@@ -62,17 +111,67 @@ export const LaboratoryPage: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      // Mock submission - replace with actual API call when backend is ready
-      console.log('Lab test request submitted:', data);
+      console.log('🔍 Form data received:', data);
+      console.log('🔍 Selected tests:', data.selectedTests);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Use the real laboratory API through the store
       
-      // Close modal on success
-      setModalOpened(false);
+      // Convert to CreateLabRequestCommand format
+      const command: CreateLabRequestCommand = {
+        patientId: `2025-${Date.now()}`, // Generate temporary ID
+        patientName: data.patientName,
+        ageGender: data.ageGender,
+        requestDate: new Date(data.requestDate),
+        others: data.otherTests || '',
+        
+        // Map selected tests to command fields using the correct test IDs
+        cbcWithPlatelet: data.selectedTests.includes('cbc') ? 'Yes' : undefined,
+        pregnancyTest: data.selectedTests.includes('pregnancy') ? 'Yes' : undefined,
+        urinalysis: data.selectedTests.includes('urinalysis') ? 'Yes' : undefined,
+        fecalysis: data.selectedTests.includes('fecalysis') ? 'Yes' : undefined,
+        occultBloodTest: data.selectedTests.includes('occult_blood') ? 'Yes' : undefined,
+        hepaBScreening: data.selectedTests.includes('hepa_b') ? 'Yes' : undefined,
+        hepaAScreening: data.selectedTests.includes('hepa_a') ? 'Yes' : undefined,
+        hepatitisProfile: data.selectedTests.includes('hepatitis_profile') ? 'Yes' : undefined,
+        vdrlRpr: data.selectedTests.includes('vdrl_rpr') ? 'Yes' : undefined,
+        dengueNs1: data.selectedTests.includes('dengue_ns1') ? 'Yes' : undefined,
+        ca125CeaPsa: data.selectedTests.includes('ca_markers') ? 'Yes' : undefined,
+        fbs: data.selectedTests.includes('fbs') ? 'Yes' : undefined,
+        bun: data.selectedTests.includes('bun') ? 'Yes' : undefined,
+        creatinine: data.selectedTests.includes('creatinine') ? 'Yes' : undefined,
+        bloodUricAcid: data.selectedTests.includes('uric_acid') ? 'Yes' : undefined,
+        lipidProfile: data.selectedTests.includes('lipid_profile') ? 'Yes' : undefined,
+        sgot: data.selectedTests.includes('sgot') ? 'Yes' : undefined,
+        sgpt: data.selectedTests.includes('sgpt') ? 'Yes' : undefined,
+        alp: data.selectedTests.includes('alp') ? 'Yes' : undefined,
+        sodiumNa: data.selectedTests.includes('sodium') ? 'Yes' : undefined,
+        potassiumK: data.selectedTests.includes('potassium') ? 'Yes' : undefined,
+        hbalc: data.selectedTests.includes('hba1c') ? 'Yes' : undefined,
+        ecg: data.selectedTests.includes('ecg') ? 'Yes' : undefined,
+        t3: data.selectedTests.includes('t3') ? 'Yes' : undefined,
+        t4: data.selectedTests.includes('t4') ? 'Yes' : undefined,
+        ft3: data.selectedTests.includes('ft3') ? 'Yes' : undefined,
+        ft4: data.selectedTests.includes('ft4') ? 'Yes' : undefined,
+        tsh: data.selectedTests.includes('tsh') ? 'Yes' : undefined,
+      };
       
-      // TODO: Refresh the lab tests list or show success message
-      console.log('Lab test request submitted successfully!');
+      console.log('🔍 Command to be sent:', command);
+      
+      const success = await createLabRequest(command);
+      
+      console.log('🔍 Create lab request returned:', success);
+      
+      if (success) {
+        // Close modal on success
+        setModalOpened(false);
+        
+        // Refresh the lab tests list
+        await fetchAllLabRequests();
+        
+        console.log('Lab test request submitted successfully!');
+      } else {
+        throw new Error('Failed to submit lab test request');
+      }
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit lab test request');
@@ -182,12 +281,19 @@ export const LaboratoryPage: React.FC = () => {
       />
       
       <DataTable
-        data={dummyLaboratoryResults}
+        data={laboratoryResults}
         columns={columns}
         searchable={true}
         searchPlaceholder="Search laboratory results by patient or status..."
-        emptyStateMessage="No laboratory results found"
+        emptyStateMessage={loadingStates.fetching ? "Loading laboratory results..." : "No laboratory results found"}
       />
+      
+      {/* Display error if any */}
+      {errorStates.fetchError && (
+        <div className="text-red-600 text-center mt-4">
+          Error loading laboratory results: {errorStates.fetchError}
+        </div>
+      )}
 
       {/* Add Lab Test Modal */}
       <Modal

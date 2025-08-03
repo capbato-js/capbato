@@ -228,7 +228,10 @@ export interface LabRequestDto {
   id?: string;
   patient: {
     id: string;
-    name: string;
+    patientNumber?: string; // Optional: Proper patient number from PatientEntity
+    firstName?: string; // Optional: First name from PatientEntity  
+    lastName?: string; // Optional: Last name from PatientEntity
+    name: string; // Required: Full name for backward compatibility
     ageGender: string;
   };
   requestDate: string;

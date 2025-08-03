@@ -25,6 +25,9 @@ export class LaboratoryMapper {
       id: labRequest.id?.value,
       patient: {
         id: labRequest.patientInfo.patientId,
+        patientNumber: labRequest.patientInfo.patientNumber,
+        firstName: labRequest.patientInfo.firstName,
+        lastName: labRequest.patientInfo.lastName,
         name: labRequest.patientInfo.patientName,
         ageGender: labRequest.patientInfo.ageGender,
       },
@@ -77,33 +80,33 @@ export class LaboratoryMapper {
    */
   static fromCreateLabRequestCommand(command: CreateLabRequestCommand): LabRequest {
     const patientInfo = new LabRequestPatientInfo({
-      patientId: command.patient_id,
-      patientName: command.patient_name,
-      ageGender: command.age_gender,
+      patientId: command.patientId,
+      patientName: command.patientName,
+      ageGender: command.ageGender,
     });
 
     const tests = new LabRequestTests({
-      cbcWithPlatelet: command.cbc_with_platelet,
-      pregnancyTest: command.pregnancy_test,
+      cbcWithPlatelet: command.cbcWithPlatelet,
+      pregnancyTest: command.pregnancyTest,
       urinalysis: command.urinalysis,
       fecalysis: command.fecalysis,
-      occultBloodTest: command.occult_blood_test,
-      hepaBScreening: command.hepa_b_screening,
-      hepaAScreening: command.hepa_a_screening,
-      hepatitisProfile: command.hepatitis_profile,
-      vdrlRpr: command.vdrl_rpr,
-      dengueNs1: command.dengue_ns1,
-      ca125CeaPsa: command.ca_125_cea_psa,
+      occultBloodTest: command.occultBloodTest,
+      hepaBScreening: command.hepaBScreening,
+      hepaAScreening: command.hepaAScreening,
+      hepatitisProfile: command.hepatitisProfile,
+      vdrlRpr: command.vdrlRpr,
+      dengueNs1: command.dengueNs1,
+      ca125CeaPsa: command.ca125CeaPsa,
       fbs: command.fbs,
       bun: command.bun,
       creatinine: command.creatinine,
-      bloodUricAcid: command.blood_uric_acid,
-      lipidProfile: command.lipid_profile,
+      bloodUricAcid: command.bloodUricAcid,
+      lipidProfile: command.lipidProfile,
       sgot: command.sgot,
       sgpt: command.sgpt,
       alp: command.alp,
-      sodiumNa: command.sodium_na,
-      potassiumK: command.potassium_k,
+      sodiumNa: command.sodiumNa,
+      potassiumK: command.potassiumK,
       hbalc: command.hbalc,
       ecg: command.ecg,
       t3: command.t3,
@@ -117,7 +120,7 @@ export class LaboratoryMapper {
 
     return new LabRequest(
       patientInfo,
-      command.request_date,
+      command.requestDate,
       tests,
       status,
       undefined, // no ID for new entities
@@ -131,7 +134,7 @@ export class LaboratoryMapper {
    */
   static fromCreateBloodChemistryCommand(command: CreateBloodChemistryCommand): BloodChemistry {
     const patientInfo = new BloodChemistryPatientInfo({
-      patientName: command.patient_name,
+      patientName: command.patientName,
       age: command.age,
       sex: command.sex,
     });
@@ -140,7 +143,7 @@ export class LaboratoryMapper {
       fbs: command.fbs,
       bun: command.bun,
       creatinine: command.creatinine,
-      uricAcid: command.uric_acid,
+      uricAcid: command.uricAcid,
       cholesterol: command.cholesterol,
       triglycerides: command.triglycerides,
       hdl: command.hdl,
@@ -153,27 +156,27 @@ export class LaboratoryMapper {
       sgot: command.sgot,
       sgpt: command.sgpt,
       rbs: command.rbs,
-      alkPhosphatase: command.alk_phosphatase,
-      totalProtein: command.total_protein,
+      alkPhosphatase: command.alkPhosphatase,
+      totalProtein: command.totalProtein,
       albumin: command.albumin,
       globulin: command.globulin,
-      agRatio: command.ag_ratio,
-      totalBilirubin: command.total_bilirubin,
-      directBilirubin: command.direct_bilirubin,
-      indirectBilirubin: command.indirect_bilirubin,
-      ionisedCalcium: command.ionised_calcium,
+      agRatio: command.agRatio,
+      totalBilirubin: command.totalBilirubin,
+      directBilirubin: command.directBilirubin,
+      indirectBilirubin: command.indirectBilirubin,
+      ionisedCalcium: command.ionisedCalcium,
       magnesium: command.magnesium,
       hbalc: command.hbalc,
-      ogtt30min: command.ogtt_30min,
-      ogtt1hr: command.ogtt_1hr,
-      ogtt2hr: command.ogtt_2hr,
-      ppbs2hr: command.ppbs_2hr,
-      inorPhosphorus: command.inor_phosphorus,
+      ogtt30min: command.ogtt30min,
+      ogtt1hr: command.ogtt1hr,
+      ogtt2hr: command.ogtt2hr,
+      ppbs2hr: command.ppbs2hr,
+      inorPhosphorus: command.inorPhosphorus,
     });
 
     return new BloodChemistry(
       patientInfo,
-      command.date_taken,
+      command.dateTaken,
       results
     );
   }

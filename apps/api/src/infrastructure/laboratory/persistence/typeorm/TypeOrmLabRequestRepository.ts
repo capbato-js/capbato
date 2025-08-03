@@ -1,4 +1,4 @@
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import { Repository, DataSource } from 'typeorm';
 import { 
   ILabRequestRepository,
@@ -9,14 +9,19 @@ import {
   LabRequestTests,
   LabRequestStatus 
 } from '@nx-starter/domain';
+import { IPatientRepository } from '@nx-starter/application-shared';
 import { generateId } from '@nx-starter/utils-core';
 import { LabRequestEntity } from './LabRequestEntity';
+import { TOKENS } from '@nx-starter/application-shared';
 
 @injectable()
 export class TypeOrmLabRequestRepository implements ILabRequestRepository {
   private readonly repository: Repository<LabRequestEntity>;
 
-  constructor(private dataSource: DataSource) {
+  constructor(
+    private dataSource: DataSource,
+    @inject(TOKENS.PatientRepository) private patientRepository: IPatientRepository
+  ) {
     this.repository = this.dataSource.getRepository(LabRequestEntity);
   }
 
@@ -27,21 +32,21 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       entity.id = generateId();
     }
     const savedEntity = await this.repository.save(entity);
-    return this.entityToDomain(savedEntity);
+    return await this.entityToDomain(savedEntity);
   }
 
   async findById(id: LabRequestId): Promise<LabRequest | null> {
     const entity = await this.repository.findOne({
       where: { id: id.value }
     });
-    return entity ? this.entityToDomain(entity) : null;
+    return entity ? await this.entityToDomain(entity) : null;
   }
 
   async getById(id: string): Promise<LabRequest | null> {
     const entity = await this.repository.findOne({
       where: { id: id }
     });
-    return entity ? this.entityToDomain(entity) : null;
+    return entity ? await this.entityToDomain(entity) : null;
   }
 
   async findAll(filter?: LabRequestRepositoryFilter): Promise<LabRequest[]> {
@@ -68,7 +73,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       .orderBy('lab_request.requestDate', 'DESC')
       .getMany();
 
-    return entities.map(entity => this.entityToDomain(entity));
+    return Promise.all(entities.map(entity => this.entityToDomain(entity)));
   }
 
   async findByPatientId(patientId: string): Promise<LabRequest[]> {
@@ -76,7 +81,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       where: { patientId },
       order: { requestDate: 'DESC' }
     });
-    return entities.map(entity => this.entityToDomain(entity));
+    return Promise.all(entities.map(entity => this.entityToDomain(entity)));
   }
 
   async findCompleted(): Promise<LabRequest[]> {
@@ -84,7 +89,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       where: { status: 'complete' },
       order: { requestDate: 'DESC' }
     });
-    return entities.map(entity => this.entityToDomain(entity));
+    return Promise.all(entities.map(entity => this.entityToDomain(entity)));
   }
 
   async update(labRequest: LabRequest): Promise<LabRequest> {
@@ -103,7 +108,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       throw new Error('Failed to update lab request');
     }
 
-    return this.entityToDomain(updatedEntity);
+    return await this.entityToDomain(updatedEntity);
   }
 
   async delete(id: LabRequestId): Promise<void> {
@@ -161,12 +166,39 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
     return entity;
   }
 
-  private entityToDomain(entity: LabRequestEntity): LabRequest {
-    const patientInfo = LabRequestPatientInfo.create({
-      patientId: entity.patientId,
-      patientName: entity.patientName,
-      ageGender: entity.ageGender
-    });
+  private async entityToDomain(entity: LabRequestEntity): Promise<LabRequest> {
+    // Try to fetch complete patient information
+    let patientInfo: LabRequestPatientInfo;
+    
+    try {
+      const patient = await this.patientRepository.getById(entity.patientId);
+      if (patient) {
+        // Create enriched patient info with complete data
+        patientInfo = LabRequestPatientInfo.create({
+          patientId: entity.patientId,
+          patientName: entity.patientName,
+          ageGender: entity.ageGender,
+          patientNumber: patient.patientNumber,
+          firstName: patient.firstName,
+          lastName: patient.lastName
+        });
+      } else {
+        // Fallback to basic patient info if patient not found
+        patientInfo = LabRequestPatientInfo.create({
+          patientId: entity.patientId,
+          patientName: entity.patientName,
+          ageGender: entity.ageGender
+        });
+      }
+    } catch (error) {
+      // Fallback to basic patient info if there's an error fetching patient
+      console.warn(`Failed to fetch patient data for ID ${entity.patientId}:`, error);
+      patientInfo = LabRequestPatientInfo.create({
+        patientId: entity.patientId,
+        patientName: entity.patientName,
+        ageGender: entity.ageGender
+      });
+    }
 
     const tests = LabRequestTests.create({
       cbcWithPlatelet: entity.cbcWithPlatelet,
