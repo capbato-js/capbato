@@ -9,6 +9,7 @@ A reusable Modal component built on top of Mantine's Modal with consistent styli
 - **Customizable**: Supports custom styles and properties
 - **TypeScript Support**: Full TypeScript interface support
 - **Responsive**: Works across different screen sizes
+- **Proper Z-Index**: Automatically renders above header and sidebar with z-index 2000
 
 ## Usage
 
