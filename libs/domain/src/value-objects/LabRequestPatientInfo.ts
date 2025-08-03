@@ -2,17 +2,27 @@ export interface LabRequestPatientData {
   patientId: string;
   patientName: string;
   ageGender: string;
+  // Optional extended patient information
+  patientNumber?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export class LabRequestPatientInfo {
   private readonly _patientId: string;
   private readonly _patientName: string;
   private readonly _ageGender: string;
+  private readonly _patientNumber?: string;
+  private readonly _firstName?: string;
+  private readonly _lastName?: string;
 
   constructor(data: LabRequestPatientData) {
     this._patientId = data.patientId;
     this._patientName = data.patientName;
     this._ageGender = data.ageGender;
+    this._patientNumber = data.patientNumber;
+    this._firstName = data.firstName;
+    this._lastName = data.lastName;
     this.validate();
   }
 
@@ -30,6 +40,18 @@ export class LabRequestPatientInfo {
 
   get ageGender(): string {
     return this._ageGender;
+  }
+
+  get patientNumber(): string | undefined {
+    return this._patientNumber;
+  }
+
+  get firstName(): string | undefined {
+    return this._firstName;
+  }
+
+  get lastName(): string | undefined {
+    return this._lastName;
   }
 
   validate(): void {

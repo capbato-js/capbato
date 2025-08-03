@@ -25,6 +25,8 @@ import { AppointmentApiService } from '../api/AppointmentApiService';
 import { ScheduleApiService } from '../api/ScheduleApiService';
 import { IAddressApiService } from '../api/AddressApiService'; 
 import { AddressApiService } from '../api/AddressApiService';
+import { ILaboratoryApiService } from '../api/ILaboratoryApiService';
+import { LaboratoryApiService } from '../api/LaboratoryApiService';
 import { WebUserQueryService } from '../services/WebUserQueryService';
 import { getFeatureFlags, configProvider } from '../config';
 import {
@@ -74,6 +76,7 @@ export const configureDI = () => {
   container.registerSingleton<IUserApiService>(TOKENS.UserApiService, UserApiService);
   container.registerSingleton<IDoctorApiService>(TOKENS.DoctorApiService, DoctorApiService);
   container.registerSingleton<IAddressApiService>(TOKENS.AddressApiService, AddressApiService);
+  container.registerSingleton<ILaboratoryApiService>(TOKENS.LaboratoryApiService, LaboratoryApiService);
   container.registerSingleton(AppointmentApiService, AppointmentApiService);
   container.registerSingleton(ScheduleApiService, ScheduleApiService);
   

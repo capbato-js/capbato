@@ -217,14 +217,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patient_id\": \"PAT001\",\n  \"patient_name\": \"Juan Dela Cruz\",\n  \"age_gender\": \"35 M\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbc_with_platelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipid_profile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
+              "raw": "{\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"ageGender\": \"35 M\",\n  \"requestDate\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbcWithPlatelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipidProfile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/laboratory/lab-requests",
               "host": ["{{base_url}}"],
               "path": ["api", "laboratory", "lab-requests"]
             },
-            "description": "Create a new laboratory request\n\n**Required Fields:**\n- `patient_id`: Patient identifier\n- `patient_name`: Full patient name\n- `age_gender`: Age and gender combined\n- `request_date`: ISO date string\n- At least one test must be specified\n\n**Available Test Fields:**\n- `cbc_with_platelet`: CBC with Platelet Count\n- `pregnancy_test`: Pregnancy Test\n- `urinalysis`: Urinalysis\n- `fecalysis`: Fecalysis\n- `fbs`: Fasting Blood Sugar\n- `lipid_profile`: Lipid Profile\n- `bun`: Blood Urea Nitrogen\n- `creatinine`: Creatinine\n- `sgot`: SGOT\n- `sgpt`: SGPT\n- `hbalc`: HBA1C\n- `hepa_b_screening`: Hepatitis B Screening\n- `hepa_a_screening`: Hepatitis A Screening\n- `hepatitis_profile`: Hepatitis Profile\n- `vdrl_rpr`: VDRL/RPR\n- `dengue_ns1`: Dengue NS1\n- `ca_125_cea_psa`: CA 125 / CEA / PSA\n- `t3`: T3\n- `t4`: T4\n- `ft3`: FT3\n- `ft4`: FT4\n- `tsh`: TSH\n- `ecg`: ECG\n\n**Test Field Values:**\n- `\"requested\"`: Test is requested\n- `\"no\"` or empty: Test not requested"
+            "description": "Create a new laboratory request\n\n**Required Fields:**\n- `patientId`: Patient identifier\n- `patientName`: Full patient name\n- `ageGender`: Age and gender combined\n- `requestDate`: ISO date string\n- At least one test must be specified\n\n**Available Test Fields:**\n- `cbcWithPlatelet`: CBC with Platelet Count\n- `pregnancyTest`: Pregnancy Test\n- `urinalysis`: Urinalysis\n- `fecalysis`: Fecalysis\n- `fbs`: Fasting Blood Sugar\n- `lipidProfile`: Lipid Profile\n- `bun`: Blood Urea Nitrogen\n- `creatinine`: Creatinine\n- `sgot`: SGOT\n- `sgpt`: SGPT\n- `hbalc`: HBA1C\n- `hepaBScreening`: Hepatitis B Screening\n- `hepaAScreening`: Hepatitis A Screening\n- `hepatitisProfile`: Hepatitis Profile\n- `vdrlRpr`: VDRL/RPR\n- `dengueNs1`: Dengue NS1\n- `ca125CeaPsa`: CA 125 / CEA / PSA\n- `t3`: T3\n- `t4`: T4\n- `ft3`: FT3\n- `ft4`: FT4\n- `tsh`: TSH\n- `ecg`: ECG\n\n**Test Field Values:**\n- `\"requested\"`: Test is requested\n- `\"no\"` or empty: Test not requested"
           },
           "response": [
             {
@@ -239,7 +239,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"patient_id\": \"PAT001\",\n  \"patient_name\": \"Juan Dela Cruz\",\n  \"age_gender\": \"35 M\",\n  \"request_date\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbc_with_platelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipid_profile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
+                  "raw": "{\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"ageGender\": \"35 M\",\n  \"requestDate\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbcWithPlatelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipidProfile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/laboratory/lab-requests",
@@ -295,14 +295,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"complete\",\n  \"date_taken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": \"95 mg/dL - Normal\",\n  \"lipid_profile\": \"Total Cholesterol: 180 mg/dL - Normal\",\n  \"urinalysis\": \"Normal - No abnormal findings\",\n  \"cbc_with_platelet\": \"WBC: 7,500 cells/uL, RBC: 4.8 M/uL, Platelet: 250,000/uL - Normal\"\n}"
+              "raw": "{\n  \"status\": \"complete\",\n  \"dateTaken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": \"95 mg/dL - Normal\",\n  \"lipidProfile\": \"Total Cholesterol: 180 mg/dL - Normal\",\n  \"urinalysis\": \"Normal - No abnormal findings\",\n  \"cbcWithPlatelet\": \"WBC: 7,500 cells/uL, RBC: 4.8 M/uL, Platelet: 250,000/uL - Normal\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/laboratory/lab-requests/{{patient_id}}/{{request_date}}",
               "host": ["{{base_url}}"],
               "path": ["api", "laboratory", "lab-requests", "{{patient_id}}", "{{request_date}}"]
             },
-            "description": "Update laboratory request with test results\n\n**Path Parameters:**\n- `patient_id`: Patient identifier\n- `request_date`: ISO date string of the request\n\n**Update Fields:**\n- `status`: Update status to 'complete' or 'cancelled'\n- `date_taken`: When samples were collected\n- Test result fields (same names as creation)\n\n**Result Format Guidelines:**\n- **Qualitative**: 'Normal', 'Abnormal', 'Positive', 'Negative'\n- **Quantitative**: Include values and units (e.g., '95 mg/dL')\n- **Reference Ranges**: Include normal ranges when applicable\n- **Descriptive**: Free text for complex results"
+            "description": "Update laboratory request with test results\n\n**Path Parameters:**\n- `patient_id`: Patient identifier\n- `request_date`: ISO date string of the request\n\n**Update Fields:**\n- `status`: Update status to 'complete' or 'cancelled'\n- `dateTaken`: When samples were collected\n- Test result fields (same names as creation)\n\n**Result Format Guidelines:**\n- **Qualitative**: 'Normal', 'Abnormal', 'Positive', 'Negative'\n- **Quantitative**: Include values and units (e.g., '95 mg/dL')\n- **Reference Ranges**: Include normal ranges when applicable\n- **Descriptive**: Free text for complex results"
           },
           "response": [
             {
@@ -317,7 +317,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"status\": \"complete\",\n  \"date_taken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": \"95 mg/dL - Normal\",\n  \"lipid_profile\": \"Total Cholesterol: 180 mg/dL - Normal\",\n  \"urinalysis\": \"Normal - No abnormal findings\",\n  \"cbc_with_platelet\": \"WBC: 7,500 cells/uL, RBC: 4.8 M/uL, Platelet: 250,000/uL - Normal\"\n}"
+                  "raw": "{\n  \"status\": \"complete\",\n  \"dateTaken\": \"2025-08-03T10:30:00.000Z\",\n  \"fbs\": \"95 mg/dL - Normal\",\n  \"lipidProfile\": \"Total Cholesterol: 180 mg/dL - Normal\",\n  \"urinalysis\": \"Normal - No abnormal findings\",\n  \"cbcWithPlatelet\": \"WBC: 7,500 cells/uL, RBC: 4.8 M/uL, Platelet: 250,000/uL - Normal\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/laboratory/lab-requests/PAT001/2025-08-03T08:00:00.000Z",
@@ -377,14 +377,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patient_name\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"date_taken\": \"2025-08-03T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uric_acid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
+              "raw": "{\n  \"patientName\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"dateTaken\": \"2025-08-03T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uricAcid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/laboratory/blood-chemistry",
               "host": ["{{base_url}}"],
               "path": ["api", "laboratory", "blood-chemistry"]
             },
-            "description": "Create a detailed blood chemistry record with numeric values\n\n**Required Fields:**\n- `patient_name`: Full patient name\n- `age`: Numeric age\n- `sex`: Gender ('M', 'F', 'Male', 'Female')\n- `date_taken`: Sample collection date\n- At least one numeric result\n\n**Available Blood Chemistry Tests:**\n- `fbs`: Fasting Blood Sugar (mg/dL)\n- `bun`: Blood Urea Nitrogen (mg/dL)\n- `creatinine`: Creatinine (mg/dL)\n- `uric_acid`: Uric Acid (mg/dL)\n- `cholesterol`: Total Cholesterol (mg/dL)\n- `triglycerides`: Triglycerides (mg/dL)\n- `hdl`: HDL Cholesterol (mg/dL)\n- `ldl`: LDL Cholesterol (mg/dL)\n- `sgot`: SGOT/AST (U/L)\n- `sgpt`: SGPT/ALT (U/L)\n- `sodium`: Sodium (mEq/L)\n- `potassium`: Potassium (mEq/L)\n- `hbalc`: HBA1C (%)\n\n**Response:**\n- Status: 201 Created\n- Returns created record with calculated flags\n- `has_abnormal_values`: Boolean\n- `critical_values`: Array of alerts"
+            "description": "Create a detailed blood chemistry record with numeric values\n\n**Required Fields:**\n- `patientName`: Full patient name\n- `age`: Numeric age\n- `sex`: Gender ('M', 'F', 'Male', 'Female')\n- `dateTaken`: Sample collection date\n- At least one numeric result\n\n**Available Blood Chemistry Tests:**\n- `fbs`: Fasting Blood Sugar (mg/dL)\n- `bun`: Blood Urea Nitrogen (mg/dL)\n- `creatinine`: Creatinine (mg/dL)\n- `uricAcid`: Uric Acid (mg/dL)\n- `cholesterol`: Total Cholesterol (mg/dL)\n- `triglycerides`: Triglycerides (mg/dL)\n- `hdl`: HDL Cholesterol (mg/dL)\n- `ldl`: LDL Cholesterol (mg/dL)\n- `sgot`: SGOT/AST (U/L)\n- `sgpt`: SGPT/ALT (U/L)\n- `sodium`: Sodium (mEq/L)\n- `potassium`: Potassium (mEq/L)\n- `hbalc`: HBA1C (%)\n\n**Response:**\n- Status: 201 Created\n- Returns created record with calculated flags\n- `has_abnormal_values`: Boolean\n- `critical_values`: Array of alerts"
           },
           "response": [
             {

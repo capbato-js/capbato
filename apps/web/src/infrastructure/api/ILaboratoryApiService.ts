@@ -1,0 +1,47 @@
+import { 
+  CreateLabRequestCommand,
+  LabRequestResponse,
+  LabRequestListResponse,
+  BloodChemistryResponse,
+  LaboratoryOperationResponse,
+  CreateBloodChemistryCommand
+} from '@nx-starter/application-shared';
+
+/**
+ * Interface for Laboratory API operations
+ */
+export interface ILaboratoryApiService {
+  /**
+   * Create a new lab request
+   */
+  createLabRequest(command: CreateLabRequestCommand): Promise<LabRequestResponse>;
+  
+  /**
+   * Get all lab requests
+   */
+  getAllLabRequests(): Promise<LabRequestListResponse>;
+  
+  /**
+   * Get completed lab requests
+   */
+  getCompletedLabRequests(): Promise<LabRequestListResponse>;
+  
+  /**
+   * Get lab request by patient ID
+   */
+  getLabRequestByPatientId(patientId: string): Promise<LabRequestResponse>;
+  
+  /**
+   * Update lab request results
+   */
+  updateLabRequestResults(
+    patientId: string, 
+    requestDate: string, 
+    results: Record<string, string>
+  ): Promise<LaboratoryOperationResponse>;
+  
+  /**
+   * Create blood chemistry results
+   */
+  createBloodChemistry(command: CreateBloodChemistryCommand): Promise<BloodChemistryResponse>;
+}
