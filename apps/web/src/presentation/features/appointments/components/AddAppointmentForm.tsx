@@ -19,22 +19,37 @@ export interface AddAppointmentFormProps {
   isLoading: boolean;
   error?: string | null;
   onClearError?: () => void;
+  // Edit mode props
+  editMode?: boolean;
+  initialData?: {
+    patientId?: string;
+    patientName?: string;
+    patientNumber?: string;
+    reasonForVisit?: string;
+    appointmentDate?: string;
+    appointmentTime?: string;
+    doctorId?: string;
+    doctorName?: string;
+  };
 }
 
 /**
- * AddAppointmentForm component handles the creation of new appointments
+ * AddAppointmentForm component handles the creation and editing of appointments
  * with form validation and proper TypeScript typing.
  * 
  * Features:
  * - Real patient data from backend
  * - Automatic doctor assignment based on date (MWF = Doctor 1, TTh = Doctor 2)
  * - Patient number display
+ * - Edit mode support for modifying existing appointments
  */
 export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   onSubmit,
   isLoading,
   error,
   onClearError,
+  editMode = false,
+  initialData,
 }) => {
   // State for patients and doctors
   const [patients, setPatients] = useState<Array<{ value: string; label: string; patientNumber: string }>>([]);
@@ -170,11 +185,11 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     resolver: zodResolver(AddAppointmentFormSchema),
     mode: 'onBlur',
     defaultValues: {
-      patientName: '',
-      reasonForVisit: '',
-      date: '',
-      time: '',
-      doctor: '',
+      patientName: initialData?.patientId || '',
+      reasonForVisit: initialData?.reasonForVisit || '',
+      date: initialData?.appointmentDate || '',
+      time: initialData?.appointmentTime || '',
+      doctor: initialData?.doctorId || '',
     },
   });
 
@@ -183,6 +198,57 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   const reasonForVisit = watch('reasonForVisit');
   const date = watch('date');
   const time = watch('time');
+
+  // Initialize form in edit mode
+  useEffect(() => {
+    if (editMode && initialData) {
+      // Reset form with initial data
+      reset({
+        patientName: initialData.patientId || '',
+        reasonForVisit: initialData.reasonForVisit || '',
+        date: initialData.appointmentDate || '',
+        time: initialData.appointmentTime || '',
+        doctor: initialData.doctorId || '',
+      });
+      
+      // Set patient number if provided
+      if (initialData.patientNumber) {
+        setSelectedPatientNumber(initialData.patientNumber);
+      }
+      
+      // Set assigned doctor display if provided
+      if (initialData.doctorName) {
+        setAssignedDoctor(initialData.doctorName);
+      }
+      
+      // If we have a date, update time slots
+      if (initialData.appointmentDate) {
+        const newTimeSlots = getAvailableTimeSlots(initialData.appointmentDate);
+        setTimeSlots(newTimeSlots);
+      }
+    }
+  }, [editMode, initialData, reset]);
+
+  // Initialize form in edit mode
+  useEffect(() => {
+    if (editMode && initialData) {
+      // Set patient number if provided
+      if (initialData.patientNumber) {
+        setSelectedPatientNumber(initialData.patientNumber);
+      }
+      
+      // Set assigned doctor display if provided
+      if (initialData.doctorName) {
+        setAssignedDoctor(initialData.doctorName);
+      }
+      
+      // If we have a date, update time slots
+      if (initialData.appointmentDate) {
+        const newTimeSlots = getAvailableTimeSlots(initialData.appointmentDate);
+        setTimeSlots(newTimeSlots);
+      }
+    }
+  }, [editMode, initialData]);
 
   // Handle patient selection to show patient number
   const handlePatientChange = (patientId: string) => {
@@ -341,8 +407,8 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
               onChange={(value) => {
                 // Handle different types that DateInput might pass
                 let dateString = '';
-                if (value instanceof Date && !isNaN(value.getTime())) {
-                  dateString = value.toISOString().split('T')[0];
+                if (value && typeof value === 'object' && 'getTime' in value && !isNaN((value as Date).getTime())) {
+                  dateString = (value as Date).toISOString().split('T')[0];
                 } else if (typeof value === 'string' && value) {
                   // If it's already a string, try to parse it
                   const parsedDate = new Date(value);
@@ -352,7 +418,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
                 }
                 
                 field.onChange(dateString);
-                handleDateChange(value instanceof Date ? value : (value ? new Date(value) : null));
+                handleDateChange(value && typeof value === 'object' && 'getTime' in value ? value as Date : (value ? new Date(value as string) : null));
                 handleInputChange();
               }}
               leftSection={<Icon icon="fas fa-calendar" size={16} />}
@@ -402,7 +468,10 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           }}
           data-testid="submit-appointment-button"
         >
-          {isLoading ? 'Creating Appointment...' : 'Create Appointment'}
+          {isLoading 
+            ? (editMode ? 'Updating Appointment...' : 'Creating Appointment...') 
+            : (editMode ? 'Update Appointment' : 'Create Appointment')
+          }
         </Button>
       </Stack>
     </form>

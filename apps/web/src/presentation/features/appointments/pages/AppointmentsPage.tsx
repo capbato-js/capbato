@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { DataTableHeader } from '../../../components/common';
+import { DataTableHeader, ConfirmationModal } from '../../../components/common';
 import { AppointmentsTable, AppointmentsFilterControls, AppointmentCountDisplay, AddAppointmentModal } from '../components';
 import { useAppointmentPageViewModel } from '../view-models/useAppointmentPageViewModel';
 import { Appointment } from '../types';
@@ -22,6 +22,25 @@ export const AppointmentsPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showAll, setShowAll] = useState<boolean>(false);
   
+  // Modal states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDto | null>(null);
+  
+  // Confirmation modal states
+  const [confirmationModal, setConfirmationModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    confirmText?: string;
+    confirmColor?: string;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => { /* empty */ },
+  });
+  
   const viewModel = useAppointmentPageViewModel();
 
   // Load appointments on component mount
@@ -42,18 +61,75 @@ export const AppointmentsPage: React.FC = () => {
   };
 
   const handleModifyAppointment = (appointmentId: string) => {
-    console.log('Modify appointment:', appointmentId);
-    // TODO: Implement modify appointment functionality
+    const appointment = viewModel.appointments.find(apt => apt.id === appointmentId);
+    if (appointment) {
+      setSelectedAppointment(appointment);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedAppointment(null);
   };
 
   const handleCancelAppointment = (appointmentId: string) => {
-    console.log('Cancel appointment:', appointmentId);
-    // TODO: Implement cancel appointment functionality
+    const appointment = viewModel.appointments.find(apt => apt.id === appointmentId);
+    const appointmentName = appointment?.patient?.fullName || 'this appointment';
+    
+    setConfirmationModal({
+      isOpen: true,
+      title: 'Cancel Appointment',
+      message: `Are you sure you want to cancel the appointment for ${appointmentName}?`,
+      confirmText: 'Cancel',
+      confirmColor: 'red',
+      onConfirm: async () => {
+        try {
+          await viewModel.cancelAppointment(appointmentId);
+          setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+        } catch (error) {
+          console.error('Failed to cancel appointment:', error);
+        }
+      },
+    });
   };
 
   const handleReconfirmAppointment = (appointmentId: string) => {
-    console.log('Reconfirm appointment:', appointmentId);
-    // TODO: Implement reconfirm appointment functionality
+    const appointment = viewModel.appointments.find(apt => apt.id === appointmentId);
+    const appointmentName = appointment?.patient?.fullName || 'this appointment';
+    
+    // Check if there are already 4 confirmed appointments for the same date and time
+    const sameSlotAppointments = viewModel.appointments.filter(apt => 
+      apt.appointmentDate === appointment?.appointmentDate &&
+      apt.appointmentTime === appointment?.appointmentTime &&
+      apt.status === 'confirmed'
+    );
+    
+    if (sameSlotAppointments.length >= 4) {
+      // If slot is full, open edit modal to reschedule
+      handleModifyAppointment(appointmentId);
+    } else {
+      // Otherwise, show confirmation to reconfirm
+      setConfirmationModal({
+        isOpen: true,
+        title: 'Reconfirm Appointment',
+        message: `Reconfirm the appointment for ${appointmentName}?`,
+        confirmText: 'Reconfirm',
+        confirmColor: 'green',
+        onConfirm: async () => {
+          try {
+            await viewModel.confirmAppointment(appointmentId);
+            setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+          } catch (error) {
+            console.error('Failed to reconfirm appointment:', error);
+          }
+        },
+      });
+    }
+  };
+
+  const handleCloseConfirmationModal = () => {
+    setConfirmationModal(prev => ({ ...prev, isOpen: false }));
   };
 
   const handleDateChange = (value: string | null) => {
@@ -76,47 +152,72 @@ export const AppointmentsPage: React.FC = () => {
 
   return (
     <MedicalClinicLayout>
-      {/* No boxing - content flows naturally */}
       <DataTableHeader
         title="Appointments"
-          onAddItem={handleAddAppointment}
-          addButtonText="Add Appointment"
-          addButtonIcon="fas fa-calendar-plus"
-        />
-        
-        <AppointmentsFilterControls
-          selectedDate={selectedDate}
-          onDateChange={handleDateChange}
-          showAll={showAll}
-          onShowAllChange={handleShowAllChange}
-        />
+        onAddItem={handleAddAppointment}
+        addButtonText="Add Appointment"
+        addButtonIcon="fas fa-calendar-plus"
+      />
+      
+      <AppointmentsFilterControls
+        selectedDate={selectedDate}
+        onDateChange={handleDateChange}
+        showAll={showAll}
+        onShowAllChange={handleShowAllChange}
+      />
 
-        <AppointmentCountDisplay count={filteredAppointments.length} />
-        
-        {viewModel.error && (
-          <div className="text-red-600 text-sm mb-4 text-center">
-            {viewModel.error}
-            <button 
-              onClick={viewModel.clearError}
-              className="ml-2 text-blue-600 underline"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-        
-        <AppointmentsTable
-          appointments={filteredAppointments}
-          onModifyAppointment={handleModifyAppointment}
-          onCancelAppointment={handleCancelAppointment}
-          onReconfirmAppointment={handleReconfirmAppointment}
-        />
+      <AppointmentCountDisplay count={filteredAppointments.length} />
+
+      {/* Commented out for future reference */}
+      {/* {viewModel.error && (
+        <div className="text-red-600 text-sm mb-4 text-center">
+          {viewModel.error}
+          <button 
+            onClick={viewModel.clearError}
+            className="ml-2 text-blue-600 underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+       */}
+      <AppointmentsTable
+        appointments={filteredAppointments}
+        onModifyAppointment={handleModifyAppointment}
+        onCancelAppointment={handleCancelAppointment}
+        onReconfirmAppointment={handleReconfirmAppointment}
+      />
 
       {/* Add Appointment Modal */}
       <AddAppointmentModal
         isOpen={viewModel.isAddModalOpen}
         onClose={handleCloseAddModal}
         onAppointmentCreated={handleAppointmentCreated}
+      />
+
+      {/* Edit Appointment Modal */}
+      <AddAppointmentModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        editMode={true}
+        appointment={selectedAppointment}
+        onAppointmentUpdated={() => {
+          // Refresh the appointments list after update
+          viewModel.loadAppointments();
+          handleCloseEditModal();
+        }}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={handleCloseConfirmationModal}
+        onConfirm={confirmationModal.onConfirm}
+        title={confirmationModal.title}
+        message={confirmationModal.message}
+        confirmText={confirmationModal.confirmText}
+        confirmColor={confirmationModal.confirmColor}
+        isLoading={viewModel.isLoading}
       />
     </MedicalClinicLayout>
   );

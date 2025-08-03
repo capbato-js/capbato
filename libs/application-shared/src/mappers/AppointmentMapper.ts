@@ -7,6 +7,17 @@ import type { AppointmentDto } from '../dto/AppointmentQueries';
  */
 export class AppointmentMapper {
   /**
+   * Formats a Date object to YYYY-MM-DD string in local timezone
+   * Avoids UTC conversion issues that can cause date shifts
+   */
+  private static formatDateToLocal(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
    * Converts a single Appointment entity to DTO with optional populated patient and doctor data
    */
   static toDto(appointment: Appointment, patientData?: any, doctorData?: any): AppointmentDto {
@@ -15,7 +26,7 @@ export class AppointmentMapper {
       patient: undefined,
       doctor: undefined,
       reasonForVisit: appointment.reasonForVisit,
-      appointmentDate: appointment.appointmentDate.toISOString(),
+      appointmentDate: this.formatDateToLocal(appointment.appointmentDate), // Return simple YYYY-MM-DD format in local timezone
       appointmentTime: appointment.timeValue,
       status: appointment.statusValue,
       createdAt: appointment.createdAt.toISOString(),

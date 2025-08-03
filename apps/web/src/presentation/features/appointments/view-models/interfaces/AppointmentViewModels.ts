@@ -25,6 +25,7 @@ export interface IAppointmentListViewModel {
   
   // Actions
   loadAppointments: () => Promise<void>;
+  updateAppointment: (id: string, data: Partial<AddAppointmentFormData>) => Promise<void>;
   confirmAppointment: (id: string) => Promise<void>;
   cancelAppointment: (id: string) => Promise<void>;
   deleteAppointment: (id: string) => Promise<void>;
@@ -70,5 +71,8 @@ export interface IAppointmentPageViewModel {
   openAddModal: () => void;
   closeAddModal: () => void;
   handleAppointmentCreated: (appointment: AppointmentDto) => void;
+  updateAppointment: (id: string, data: Partial<AddAppointmentFormData>) => Promise<boolean>;
+  cancelAppointment: (id: string) => Promise<void>;
+  confirmAppointment: (id: string) => Promise<void>;
   clearError: () => void;
 }

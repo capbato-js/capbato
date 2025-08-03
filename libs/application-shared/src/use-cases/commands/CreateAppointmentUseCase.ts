@@ -5,7 +5,8 @@ import {
   type IAppointmentRepository,
   Schedule,
   type IScheduleRepository,
-  type IDoctorRepository
+  type IDoctorRepository,
+  type IPatientRepository
 } from '@nx-starter/domain';
 import type { CreateAppointmentCommand } from '../../dto/AppointmentCommands';
 import { TOKENS } from '../../di/tokens';
@@ -20,10 +21,15 @@ export class CreateAppointmentUseCase {
   constructor(
     @inject(TOKENS.AppointmentRepository) private appointmentRepository: IAppointmentRepository,
     @inject(TOKENS.ScheduleRepository) private scheduleRepository: IScheduleRepository,
-    @inject(TOKENS.DoctorRepository) private doctorRepository: IDoctorRepository
+    @inject(TOKENS.DoctorRepository) private doctorRepository: IDoctorRepository,
+    @inject(TOKENS.PatientRepository) private patientRepository: IPatientRepository
   ) {}
 
   async execute(command: CreateAppointmentCommand): Promise<Appointment> {
+    // Fetch patient information for user-friendly error messages
+    const patient = await this.patientRepository.getById(command.patientId);
+    const patientName = patient ? patient.fullName : undefined;
+
     // Create appointment entity with domain logic
     const appointment = new Appointment(
       command.patientId,
@@ -39,7 +45,7 @@ export class CreateAppointmentUseCase {
 
     // Create domain service for business rule validation
     const domainService = new AppointmentDomainService(this.appointmentRepository);
-    await domainService.validateAppointmentCreation(appointment);
+    await domainService.validateAppointmentCreation(appointment, patientName);
 
     // Persist appointment using repository
     const appointmentId = await this.appointmentRepository.create(appointment);
