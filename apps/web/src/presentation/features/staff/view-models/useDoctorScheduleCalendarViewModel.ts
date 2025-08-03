@@ -49,6 +49,7 @@ interface DoctorScheduleCalendarViewModel {
   refreshData: () => Promise<void>;
   getAppointmentsForDate: (date: Date) => CalendarAppointment[];
   updateAppointmentDoctor: (date: Date | string, newDoctorId: string, newDoctorName: string) => Promise<void>;
+  isUpdatingDate: (date: Date | string) => boolean;
 }
 
 /**
@@ -60,6 +61,7 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [availableDoctors, setAvailableDoctors] = useState<Array<{ id: string; name: string; }>>([]);
+  const [updatingDates, setUpdatingDates] = useState<Set<string>>(new Set());
 
   // Get the API service instances
   const doctorApiService = container.resolve(DoctorApiService);
@@ -85,8 +87,8 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
         return {
           id: `appointment-${appointment.id}`, // Unique calendar ID
           appointmentId: appointment.id, // Actual appointment ID for updates
-          doctorId: appointment.doctor.id,
-          doctorName: appointment.doctor.fullName,
+          doctorId: appointment.doctor?.id || '',
+          doctorName: appointment.doctor?.fullName || 'Unknown Doctor',
           date: dateString,
           time: appointment.appointmentTime,
           formattedTime: formatTimeForDisplay(appointment.appointmentTime),
@@ -157,11 +159,19 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
     }
   }, []);
 
+  // Helper function to check if a date is being updated
+  const isUpdatingDate = useCallback((date: Date | string) => {
+    const dateString = typeof date === 'string' ? date : formatDateToISOString(date);
+    return updatingDates.has(dateString);
+  }, [updatingDates]);
+
   // Update appointment doctor for a specific date
   const updateAppointmentDoctor = useCallback(async (date: Date | string, newDoctorId: string, newDoctorName: string) => {
+    const dateString = typeof date === 'string' ? date : formatDateToISOString(date);
+    
     try {
-      setLoading(true);
-      const dateString = typeof date === 'string' ? date : formatDateToISOString(date);
+      // Set loading state for this specific date
+      setUpdatingDates(prev => new Set(prev).add(dateString));
       console.log('Updating appointment doctor:', { date: dateString, newDoctorId, newDoctorName });
       
       // Find appointment(s) for the given date from our current data
@@ -188,7 +198,7 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
       
       console.log('All appointments updated successfully');
       
-      // Optimistically update the local state while we refresh
+      // Optimistically update the local state for immediate feedback
       setAppointments(prev => prev.map(appointment => {
         if (appointment.date === dateString) {
           return {
@@ -200,16 +210,18 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
         return appointment;
       }));
       
-      // Refresh the data from the server to ensure consistency
-      await fetchAppointments();
-      
     } catch (err) {
       console.error('Error updating appointment doctor:', err);
       setError(err instanceof Error ? err.message : 'Failed to update appointment');
       // Refresh data to revert optimistic update on error
       await fetchAppointments();
     } finally {
-      setLoading(false);
+      // Remove loading state for this specific date
+      setUpdatingDates(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(dateString);
+        return newSet;
+      });
     }
   }, [appointmentApiService, fetchAppointments, getAppointmentsForDate]);
 
@@ -226,6 +238,7 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
     availableDoctors,
     refreshData,
     getAppointmentsForDate,
-    updateAppointmentDoctor
+    updateAppointmentDoctor,
+    isUpdatingDate
   };
 };
