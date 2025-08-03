@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import React from 'react';
 
 // Mock react-router-dom
 export const mockNavigate = vi.fn();

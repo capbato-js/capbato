@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import { IAuthApiService } from './IAuthApiService';
-import { LoginUserCommand, LoginUserResponseDto } from '@nx-starter/application-shared';
+import { LoginUserCommand, LoginUserResponseDto, RegisterUserCommand } from '@nx-starter/application-shared';
 
 /**
  * Mock Authentication API Service for Development
@@ -26,6 +26,7 @@ export class MockAuthApiService implements IAuthApiService {
           lastName: 'Doe',
           email: command.identifier.includes('@') ? command.identifier : 'john.doe@example.com',
           username: command.identifier.includes('@') ? command.identifier.split('@')[0] : command.identifier,
+          role: 'admin'
         }
       };
       
@@ -36,6 +37,21 @@ export class MockAuthApiService implements IAuthApiService {
       console.log('🧪 MockAuthApiService returning error for invalid credentials');
       throw new Error('Invalid email/username or password');
     }
+  }
+
+  async register(command: RegisterUserCommand): Promise<{ id: string }> {
+    console.log('🧪 MockAuthApiService.register called with:', command);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Mock successful registration response
+    const mockResponse = {
+      id: 'user-' + Date.now()
+    };
+    
+    console.log('🧪 MockAuthApiService returning registration success:', mockResponse);
+    return mockResponse;
   }
 
   async validateToken(token: string): Promise<{ valid: boolean; user?: any }> {
@@ -54,6 +70,7 @@ export class MockAuthApiService implements IAuthApiService {
           lastName: 'Doe',
           email: 'john.doe@example.com',
           username: 'johndoe',
+          role: 'admin'
         }
       };
     }

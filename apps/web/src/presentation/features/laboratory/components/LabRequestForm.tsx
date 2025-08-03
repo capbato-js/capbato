@@ -40,9 +40,9 @@ export const LabRequestForm: React.FC<LabRequestFormProps> = ({
     reset,
   } = useForm<LabRequestFormData>({
     resolver: zodResolver(CreateLabRequestCommandSchema.omit({ 
-      request_date: true 
+      requestDate: true 
     }).extend({
-      request_date: CreateLabRequestCommandSchema.shape.request_date.transform((val) => val.toISOString()),
+      requestDate: CreateLabRequestCommandSchema.shape.requestDate.transform((val) => val.toISOString()),
       selectedTests: CreateLabRequestCommandSchema.pick({
         cbc_with_platelet: true,
         pregnancy_test: true,

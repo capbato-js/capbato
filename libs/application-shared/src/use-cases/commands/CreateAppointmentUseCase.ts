@@ -5,9 +5,9 @@ import {
   type IAppointmentRepository,
   Schedule,
   type IScheduleRepository,
-  type IDoctorRepository,
-  type IPatientRepository
+  type IDoctorRepository
 } from '@nx-starter/domain';
+import { type IPatientRepository } from '../../domain/IPatientRepository';
 import type { CreateAppointmentCommand } from '../../dto/AppointmentCommands';
 import { TOKENS } from '../../di/tokens';
 

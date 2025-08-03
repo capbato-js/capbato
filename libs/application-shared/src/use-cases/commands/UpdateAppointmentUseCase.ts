@@ -5,9 +5,9 @@ import {
   type IAppointmentRepository, 
   AppointmentNotFoundException,
   type IScheduleRepository,
-  Schedule,
-  type IPatientRepository
+  Schedule
 } from '@nx-starter/domain';
+import { type IPatientRepository } from '../../domain/IPatientRepository';
 import type { UpdateAppointmentCommand } from '../../dto/AppointmentCommands';
 import { TOKENS } from '../../di/tokens';
 

@@ -33,7 +33,7 @@ export class UpdateLabRequestResultsUseCase {
     // Update status if provided
     if (command.status) {
       if (command.status === 'complete') {
-        updatedLabRequest = updatedLabRequest.complete(command.date_taken || new Date());
+        updatedLabRequest = updatedLabRequest.complete(command.dateTaken || new Date());
       } else if (command.status === 'cancelled') {
         updatedLabRequest = updatedLabRequest.cancel();
       }
@@ -44,13 +44,13 @@ export class UpdateLabRequestResultsUseCase {
     if (command.fbs) testUpdates['fbs'] = command.fbs;
     if (command.bun) testUpdates['bun'] = command.bun;
     if (command.creatinine) testUpdates['creatinine'] = command.creatinine;
-    if (command.blood_uric_acid) testUpdates['bloodUricAcid'] = command.blood_uric_acid;
-    if (command.lipid_profile) testUpdates['lipidProfile'] = command.lipid_profile;
+    if (command.bloodUricAcid) testUpdates['bloodUricAcid'] = command.bloodUricAcid;
+    if (command.lipidProfile) testUpdates['lipidProfile'] = command.lipidProfile;
     if (command.sgot) testUpdates['sgot'] = command.sgot;
     if (command.sgpt) testUpdates['sgpt'] = command.sgpt;
     if (command.alp) testUpdates['alp'] = command.alp;
-    if (command.sodium_na) testUpdates['sodiumNa'] = command.sodium_na;
-    if (command.potassium_k) testUpdates['potassiumK'] = command.potassium_k;
+    if (command.sodiumNa) testUpdates['sodiumNa'] = command.sodiumNa;
+    if (command.potassiumK) testUpdates['potassiumK'] = command.potassiumK;
     if (command.hbalc) testUpdates['hbalc'] = command.hbalc;
     if (command.ecg) testUpdates['ecg'] = command.ecg;
     if (command.t3) testUpdates['t3'] = command.t3;
@@ -61,7 +61,7 @@ export class UpdateLabRequestResultsUseCase {
 
     if (Object.keys(testUpdates).length > 0) {
       const updatedTests = updatedLabRequest.tests.updateResults(testUpdates);
-      updatedLabRequest = updatedLabRequest.updateResults(updatedTests, command.date_taken);
+      updatedLabRequest = updatedLabRequest.updateResults(updatedTests, command.dateTaken);
     }
 
     // Save the updated lab request

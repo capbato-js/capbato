@@ -25,11 +25,11 @@ export class UpdateLabRequestUseCase {
     // Create updated lab request with new values
     const updatedLabRequest = new LabRequest(
       existingLabRequest.patientInfo,
-      command.request_date || existingLabRequest.requestDate,
+      command.requestDate || existingLabRequest.requestDate,
       existingLabRequest.tests,
       existingLabRequest.status,
       existingLabRequest.id,
-      command.date_taken || existingLabRequest.dateTaken,
+      command.dateTaken || existingLabRequest.dateTaken,
       command.others || existingLabRequest.others,
       existingLabRequest.createdAt,
       new Date()

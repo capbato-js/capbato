@@ -6,7 +6,8 @@ import {
   PatientStatsDto,
   IPatientCommandService,
   IPatientQueryService,
-  TOKENS 
+  TOKENS,
+  Patient 
 } from '@nx-starter/application-shared';
 import { IPatientApiService } from '../api/IPatientApiService';
 
@@ -55,10 +56,41 @@ export class PatientQueryService implements IPatientQueryService {
   /**
    * Get all patients
    */
-  async getAllPatients(): Promise<PatientListDto[]> {
+  async getAllPatients(): Promise<Patient[]> {
     try {
       const response = await this.patientApiService.getAllPatients();
-      return response.data;
+      // Convert DTOs to domain entities (simplified approach)
+      return response.data.map(dto => ({
+        id: dto.id,
+        patientNumber: dto.patientNumber || 'N/A',
+        firstName: dto.firstName || 'Unknown',
+        lastName: dto.lastName || 'Unknown',
+        middleName: dto.middleName,
+        dateOfBirth: new Date(dto.dateOfBirth),
+        gender: dto.gender as 'Male' | 'Female',
+        contactNumber: dto.contactNumber || 'N/A',
+        address: dto.address || 'N/A',
+        guardianName: dto.guardianName,
+        guardianGender: dto.guardianGender as 'Male' | 'Female' | undefined,
+        guardianRelationship: dto.guardianRelationship,
+        guardianContactNumber: dto.guardianContactNumber,
+        guardianAddress: dto.guardianAddress,
+        createdAt: new Date(dto.createdAt || Date.now()),
+        updatedAt: new Date(dto.updatedAt || Date.now()),
+        get fullName() { 
+          return [this.firstName, this.middleName, this.lastName].filter(Boolean).join(' ');
+        },
+        get age() {
+          const today = new Date();
+          const birth = this.dateOfBirth;
+          let age = today.getFullYear() - birth.getFullYear();
+          const monthDiff = today.getMonth() - birth.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+          }
+          return age;
+        }
+      } as Patient));
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch patients: ${error.message}`);
@@ -70,10 +102,42 @@ export class PatientQueryService implements IPatientQueryService {
   /**
    * Get patient by ID
    */
-  async getPatientById(id: string): Promise<PatientDto> {
+  async getPatientById(id: string): Promise<Patient> {
     try {
       const response = await this.patientApiService.getPatientById(id);
-      return response.data;
+      const dto = response.data;
+      // Convert DTO to domain entity (simplified approach)
+      return {
+        id: dto.id,
+        patientNumber: dto.patientNumber || 'N/A',
+        firstName: dto.firstName || 'Unknown',
+        lastName: dto.lastName || 'Unknown',
+        middleName: dto.middleName,
+        dateOfBirth: new Date(dto.dateOfBirth),
+        gender: dto.gender as 'Male' | 'Female',
+        contactNumber: dto.contactNumber || 'N/A',
+        address: dto.address || 'N/A',
+        guardianName: dto.guardianName,
+        guardianGender: dto.guardianGender as 'Male' | 'Female' | undefined,
+        guardianRelationship: dto.guardianRelationship,
+        guardianContactNumber: dto.guardianContactNumber,
+        guardianAddress: dto.guardianAddress,
+        createdAt: new Date(dto.createdAt || Date.now()),
+        updatedAt: new Date(dto.updatedAt || Date.now()),
+        get fullName() { 
+          return [this.firstName, this.middleName, this.lastName].filter(Boolean).join(' ');
+        },
+        get age() {
+          const today = new Date();
+          const birth = this.dateOfBirth;
+          let age = today.getFullYear() - birth.getFullYear();
+          const monthDiff = today.getMonth() - birth.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+          }
+          return age;
+        }
+      } as Patient;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch patient: ${error.message}`);

@@ -88,4 +88,13 @@ export interface PatientListDto {
   age: number;
   gender: string;
   dateOfBirth: string;
+  contactNumber?: string;
+  address?: string;
+  guardianName?: string;
+  guardianGender?: string;
+  guardianRelationship?: string;
+  guardianContactNumber?: string;
+  guardianAddress?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

@@ -36,7 +36,7 @@ export class GetAllLabRequestsQueryHandler {
             console.log(`Found patient: ${patient.firstName} ${patient.lastName} (${patient.patientNumber})`);
             // Create enriched patient info with full patient details
             const enrichedPatientInfo = new LabRequestPatientInfo({
-              patientId: patient.id, // Use the correct patient ID
+              patientId: patient.id || labRequest.patientInfo.patientId, // Use the correct patient ID
               patientName: `${patient.firstName} ${patient.lastName}${patient.middleName ? ` ${patient.middleName}` : ''}`,
               ageGender: labRequest.patientInfo.ageGender,
               patientNumber: patient.patientNumber,

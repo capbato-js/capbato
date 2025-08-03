@@ -32,8 +32,8 @@ export class ApiPatientRepository implements IPatientRepository {
       guardianRelationship: dto.guardianRelationship,
       guardianContactNumber: dto.guardianContactNumber,
       guardianAddress: dto.guardianAddress,
-      createdAt: new Date(dto.createdAt),
-      updatedAt: new Date(dto.updatedAt),
+      createdAt: new Date(dto.createdAt || Date.now()),
+      updatedAt: new Date(dto.updatedAt || Date.now()),
       
       // Add computed properties that might be used by the frontend
       get fullName() { 
