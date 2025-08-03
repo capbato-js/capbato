@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  Box, 
   Button,
   Text,
   Alert
@@ -127,46 +126,35 @@ export const AccountsPage: React.FC = () => {
 
   return (
     <MedicalClinicLayout>
-      <Box
-        style={{
-          background: 'white',
-          borderRadius: '16px',
-          padding: '30px 24px 24px 24px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: '300px',
-          marginBottom: '24px'
-        }}
-      >
-        {error && (
-          <Alert
-            color="red"
-            style={{ marginBottom: '20px' }}
-            onClose={clearError}
-            withCloseButton
-          >
-            {error}
-          </Alert>
-        )}
+      {error && (
+        <Alert
+          color="red"
+          style={{ marginBottom: '20px' }}
+          onClose={clearError}
+          withCloseButton
+        >
+          {error}
+        </Alert>
+      )}
 
-        <DataTableHeader 
-          title="Accounts Management"
-          onAddItem={open}
-          addButtonText="Create Account"
-          addButtonIcon="fas fa-user-plus"
-        />
+      <DataTableHeader 
+        title="Accounts Management"
+        onAddItem={open}
+        addButtonText="Create Account"
+        addButtonIcon="fas fa-user-plus"
+      />
 
-        <DataTable
-          data={accounts.map(account => ({
-            ...account,
-            name: `${account.firstName} ${account.lastName}`
-          }))}
-          columns={columns}
-          searchable={true}
-          searchPlaceholder="Search accounts by name or role..."
-          emptyStateMessage="No accounts found"
-          isLoading={isLoading}
-        />
-      </Box>
+      <DataTable
+        data={accounts.map(account => ({
+          ...account,
+          name: `${account.firstName} ${account.lastName}`
+        }))}
+        columns={columns}
+        searchable={true}
+        searchPlaceholder="Search accounts by name or role..."
+        emptyStateMessage="No accounts found"
+        isLoading={isLoading}
+      />
 
       {/* Create Account Modal */}
       <Modal

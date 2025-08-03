@@ -28,7 +28,7 @@ export const DataTableHeader: React.FC<DataTableHeaderProps> = ({
       <Title
         order={1}
         style={{
-          color: '#0b4f6c',
+          color: '#0F0F0F',
           fontSize: '28px',
           fontWeight: 'bold',
           margin: 0,

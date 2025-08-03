@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Box } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { DataTableHeader } from '../../../components/common';
 import { AppointmentsTable, AppointmentsFilterControls, AppointmentCountDisplay, AddAppointmentModal } from '../components';
@@ -77,17 +76,9 @@ export const AppointmentsPage: React.FC = () => {
 
   return (
     <MedicalClinicLayout>
-      <Box
-        style={{
-          background: 'white',
-          borderRadius: '15px',
-          padding: '30px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)'
-        }}
-      >
-        <DataTableHeader
-          title="Appointments"
+      {/* No boxing - content flows naturally */}
+      <DataTableHeader
+        title="Appointments"
           onAddItem={handleAddAppointment}
           addButtonText="Add Appointment"
           addButtonIcon="fas fa-calendar-plus"
@@ -120,7 +111,6 @@ export const AppointmentsPage: React.FC = () => {
           onCancelAppointment={handleCancelAppointment}
           onReconfirmAppointment={handleReconfirmAppointment}
         />
-      </Box>
 
       {/* Add Appointment Modal */}
       <AddAppointmentModal

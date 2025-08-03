@@ -10,27 +10,17 @@ export const AddPatientPage: React.FC = () => {
 
   return (
     <MedicalClinicLayout>
+      {/* Page Header - matching legacy HTML structure */}
       <Box
         style={{
-          background: 'white',
-          borderRadius: '15px',
-          padding: '30px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)',
-          position: 'relative'
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '30px',
+          paddingBottom: '20px',
+          borderBottom: '2px solid #e9ecef'
         }}
       >
-        {/* Page Header - matching legacy HTML structure */}
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '30px',
-            paddingBottom: '20px',
-            borderBottom: '2px solid #e9ecef'
-          }}
-        >
           <Group align="center" gap="lg">
             <Button
               variant="filled"
@@ -50,7 +40,7 @@ export const AddPatientPage: React.FC = () => {
               style={{
                 fontSize: '32px',
                 fontWeight: 700,
-                color: '#333',
+                color: '#0F0F0F',
                 margin: 0
               }}
             >
@@ -65,7 +55,6 @@ export const AddPatientPage: React.FC = () => {
           isLoading={viewModel.isLoading}
           error={viewModel.error}
         />
-      </Box>
     </MedicalClinicLayout>
   );
 };

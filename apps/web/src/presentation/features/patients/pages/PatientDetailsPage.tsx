@@ -539,23 +539,10 @@ export const PatientDetailsPage: React.FC = () => {
   if (isLoading) {
     return (
       <MedicalClinicLayout>
-        <Box
-          style={{
-            background: 'white',
-            borderRadius: '15px',
-            padding: '30px',
-            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-            minHeight: 'calc(100vh - 140px)',
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
-          <PatientDetailsLoadingSkeleton 
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
-        </Box>
+        <PatientDetailsLoadingSkeleton 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
       </MedicalClinicLayout>
     );
   }
@@ -563,62 +550,39 @@ export const PatientDetailsPage: React.FC = () => {
   if (hasError || !patient) {
     return (
       <MedicalClinicLayout>
-        <Box
+        <Alert 
+          color="red" 
+          title="Patient Not Found"
+          onClose={clearError}
+          withCloseButton
+        >
+          {error || `The patient with ID "${id}" could not be found.`}
+        </Alert>
+        <Button 
+          leftSection={<IconArrowLeft size={16} />}
+          onClick={handleGoBack}
           style={{
-            background: 'white',
-            borderRadius: '15px',
-            padding: '30px',
-            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-            minHeight: 'calc(100vh - 140px)',
-            position: 'relative'
+            marginTop: '20px',
+            background: '#4db6ac',
+            color: 'white'
           }}
         >
-          <Alert 
-            color="red" 
-            title="Patient Not Found"
-            onClose={clearError}
-            withCloseButton
-          >
-            {error || `The patient with ID "${id}" could not be found.`}
-          </Alert>
-          <Button 
-            leftSection={<IconArrowLeft size={16} />}
-            onClick={handleGoBack}
-            style={{
-              marginTop: '20px',
-              background: '#4db6ac',
-              color: 'white'
-            }}
-          >
-            Go Back to Patients
-          </Button>
-        </Box>
+          Go Back to Patients
+        </Button>
       </MedicalClinicLayout>
     );
   }
 
   return (
     <MedicalClinicLayout>
+      {/* Custom Tab Navigation */}
       <Box
         style={{
-          background: 'white',
-          borderRadius: '15px',
-          padding: '30px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)',
-          position: 'relative',
           display: 'flex',
-          flexDirection: 'column'
+          gap: '8px',
+          marginBottom: '30px'
         }}
       >
-        {/* Custom Tab Navigation */}
-        <Box
-          style={{
-            display: 'flex',
-            gap: '8px',
-            marginBottom: '30px'
-          }}
-        >
           <CustomTabButton
             isActive={activeTab === 'patient-info'}
             icon="fas fa-user"
@@ -698,7 +662,6 @@ export const PatientDetailsPage: React.FC = () => {
             Go Back
           </Button>
         </Box>
-      </Box>
     </MedicalClinicLayout>
   );
 };

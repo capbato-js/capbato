@@ -18,43 +18,27 @@ export const MedicalClinicLayout: React.FC<MedicalClinicLayoutProps> = ({
       style={{
         minHeight: '100vh',
         position: 'relative',
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        background: 'linear-gradient(to bottom right, rgb(109, 174, 218), #4db6ac)',
-        paddingTop: '100px',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        background: 'white', // Clean white background
+        paddingTop: '64px', // Reduced header height
         margin: 0
       }}
     >
-      {/* Background blur effect */}
-      <Box
-        style={{
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          minHeight: '100%',
-          background: 'inherit',
-          backgroundSize: 'cover',
-          filter: 'blur(10px)',
-          zIndex: -1
-        }}
-      />
-
       {/* Header */}
       <MedicalClinicHeader />
 
       {/* Sidebar */}
       <MedicalClinicSidebar />
 
-      {/* Main Content Area */}
+      {/* Main Content Area - No Boxing */}
       <Box
         component="main"
         style={{
-          marginLeft: '220px', // Sidebar width + margin
-          marginRight: '20px',
-          marginTop: '20px',
-          marginBottom: '20px',
+          marginLeft: '240px', // Wider sidebar
+          paddingLeft: '32px', // Add left padding for proper spacing
+          paddingRight: '32px',
+          paddingTop: '32px',
+          paddingBottom: '32px',
           maxWidth: 'calc(100% - 240px)',
           boxSizing: 'border-box'
         }}

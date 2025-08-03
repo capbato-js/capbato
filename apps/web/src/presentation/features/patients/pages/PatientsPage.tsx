@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Alert, Button } from '@mantine/core';
+import { Alert } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { PatientsTable } from '../components';
@@ -15,19 +15,10 @@ export const PatientsPage: React.FC = () => {
 
   return (
     <MedicalClinicLayout>
-      <Box
-        style={{
-          background: 'white',
-          borderRadius: '15px',
-          padding: '30px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)',
-          position: 'relative'
-        }}
-      >
-        {error && (
-          <Alert 
-            color="red" 
+      {/* No boxing - content flows naturally */}
+      {error && (
+        <Alert 
+          color="red" 
             title="Error"
             mb="md"
             withCloseButton
@@ -42,7 +33,6 @@ export const PatientsPage: React.FC = () => {
           onAddPatient={handleAddPatient}
           isLoading={isLoading}
         />
-      </Box>
     </MedicalClinicLayout>
   );
 };

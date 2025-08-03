@@ -162,30 +162,20 @@ export const PrescriptionsPage: React.FC = () => {
 
   return (
     <MedicalClinicLayout>
-      <Box
-        style={{
-          background: 'white',
-          borderRadius: '15px',
-          padding: '30px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)'
-        }}
-      >
-        <DataTableHeader 
-          title="Prescriptions"
-          onAddItem={handleAddPrescription}
-          addButtonText="Add Prescription"
-          addButtonIcon="fas fa-pills"
-        />
-        
-        <DataTable
-          data={dummyPrescriptions}
-          columns={columns}
-          searchable={true}
-          searchPlaceholder="Search prescriptions by patient, doctor, or medications..."
-          emptyStateMessage="No prescriptions found"
-        />
-      </Box>
+      <DataTableHeader 
+        title="Prescriptions"
+        onAddItem={handleAddPrescription}
+        addButtonText="Add Prescription"
+        addButtonIcon="fas fa-pills"
+      />
+      
+      <DataTable
+        data={dummyPrescriptions}
+        columns={columns}
+        searchable={true}
+        searchPlaceholder="Search prescriptions by patient, doctor, or medications..."
+        emptyStateMessage="No prescriptions found"
+      />
     </MedicalClinicLayout>
   );
 };

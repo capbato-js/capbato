@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { Icon, Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
@@ -174,30 +174,20 @@ export const LaboratoryPage: React.FC = () => {
 
   return (
     <MedicalClinicLayout>
-      <Box
-        style={{
-          background: 'white',
-          borderRadius: '15px',
-          padding: '30px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)'
-        }}
-      >
-        <DataTableHeader 
-          title="Laboratory"
-          onAddItem={handleAddTest}
-          addButtonText="Add Lab Test"
-          addButtonIcon="fas fa-flask"
-        />
-        
-        <DataTable
-          data={dummyLaboratoryResults}
-          columns={columns}
-          searchable={true}
-          searchPlaceholder="Search laboratory results by patient or status..."
-          emptyStateMessage="No laboratory results found"
-        />
-      </Box>
+      <DataTableHeader 
+        title="Laboratory"
+        onAddItem={handleAddTest}
+        addButtonText="Add Lab Test"
+        addButtonIcon="fas fa-flask"
+      />
+      
+      <DataTable
+        data={dummyLaboratoryResults}
+        columns={columns}
+        searchable={true}
+        searchPlaceholder="Search laboratory results by patient or status..."
+        emptyStateMessage="No laboratory results found"
+      />
 
       {/* Add Lab Test Modal */}
       <Modal

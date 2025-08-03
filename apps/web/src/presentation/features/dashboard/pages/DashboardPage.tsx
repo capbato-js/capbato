@@ -5,34 +5,32 @@ import { MedicalClinicLayout } from '../../../components/layout';
 export const DashboardPage: React.FC = () => {
   return (
     <MedicalClinicLayout>
-      <Box
-        style={{
-          background: 'white',
-          borderRadius: '15px',
-          padding: '30px',
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
-          minHeight: 'calc(100vh - 140px)'
-        }}
-      >
-        <Box style={{ textAlign: 'center', marginBottom: '25px' }}>
-          <Title 
-            order={1}
-            style={{
-              color: '#0b4f6c',
-              fontSize: '28px',
-              fontWeight: 'bold',
-              margin: 0
-            }}
-          >
-            Dashboard
-          </Title>
-        </Box>
+      {/* No boxing - content flows naturally */}
+      <Box style={{ marginBottom: '32px' }}>
+        <Title 
+          order={1}
+          style={{
+            color: '#111827',
+            fontSize: '24px',
+            fontWeight: 700,
+            margin: 0,
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          }}
+        >
+          Dashboard
+        </Title>
+        <Text 
+          size="sm" 
+          style={{ color: '#6b7280', marginTop: '4px' }}
+        >
+          Welcome to your medical clinic dashboard
+        </Text>
+      </Box>
 
-        <Box style={{ textAlign: 'center', marginTop: '50px' }}>
-          <Text size="lg" c="dimmed">
-            Dashboard content will be implemented here
-          </Text>
-        </Box>
+      <Box style={{ textAlign: 'center', marginTop: '80px' }}>
+        <Text size="lg" style={{ color: '#9ca3af' }}>
+          Dashboard content will be implemented here
+        </Text>
       </Box>
     </MedicalClinicLayout>
   );

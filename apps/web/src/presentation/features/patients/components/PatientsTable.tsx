@@ -64,7 +64,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
         <Anchor
           onClick={() => handlePatientClick(record.id)}
           style={{
-            color: '#333',
+            color: '#0F0F0F',
             textDecoration: 'none',
             cursor: 'pointer',
             fontWeight: 'normal'

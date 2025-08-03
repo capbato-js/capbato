@@ -58,11 +58,11 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
   return (
     <Box
       component="nav"
-      className={`fixed left-0 w-[200px] h-full bg-white z-[999] ${className || ''}`}
+      className={`fixed left-0 w-[240px] h-full bg-white z-[999] ${className || ''}`}
       style={{
-        top: '90px', // Below header
-        boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)',
-        padding: '20px 0'
+        top: '64px', // Below header
+        borderRight: '1px solid #e5e5e5', // Subtle border instead of shadow
+        padding: '24px 12px 24px 12px' // Add horizontal padding to container instead
       }}
     >
       <Box component="ul" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -83,14 +83,14 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   display: 'flex',
                   alignItems: 'center',
                   width: '100%',
-                  padding: '12px 20px',
-                  color: isActive ? '#4db6ac' : '#666',
-                  backgroundColor: isActive ? '#e8f5e8' : 'transparent',
-                  borderLeft: isActive ? '3px solid #4db6ac' : '3px solid transparent',
-                  fontWeight: isActive ? 600 : 500,
+                  padding: '10px 12px',
+                  // margin: '2px 0', // Only vertical margin, no horizontal
+                  color: '#0F0F0F',
+                  backgroundColor: isActive ? '#f1f1f1' : 'transparent',
+                  fontWeight: 500,
                   fontSize: '14px',
                   textDecoration: 'none',
-                  transition: 'all 0.3s ease',
+                  borderRadius: '8px',
                   position: 'relative'
                 }}
               >
@@ -100,8 +100,8 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   className={styles.navIcon}
                   style={{ 
                     fontSize: '16px',
-                    color: isActive ? '#4db6ac' : '#666',
-                    transition: 'color 0.3s ease'
+                    color: '#0F0F0F',
+                    transition: 'color 0.2s ease'
                   }} 
                 />
                 <Text 
@@ -109,27 +109,15 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   data-text-element="true"
                   className={styles.navText}
                   style={{ 
-                    color: isActive ? '#4db6ac' : '#666',
+                    color: '#0F0F0F',
                     fontSize: '14px',
-                    fontWeight: isActive ? 600 : 500,
-                    transition: 'color 0.3s ease'
+                    fontWeight: 500,
+                    transition: 'color 0.2s ease'
                   }}
                 >
                   {item.label}
                 </Text>
-              </Group>                {/* Active indicator on right side */}
-                {isActive && (
-                  <Box
-                    style={{
-                      position: 'absolute',
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: '3px',
-                      backgroundColor: '#4db6ac'
-                    }}
-                  />
-                )}
+              </Group>
               </UnstyledButton>
             </Box>
           );
