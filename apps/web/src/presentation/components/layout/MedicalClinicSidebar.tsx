@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Box, UnstyledButton, Group, Text } from '@mantine/core';
+import { Box, UnstyledButton, Group, Text, useMantineTheme } from '@mantine/core';
 import { Icon } from '../common';
 import styles from './MedicalClinicSidebar.module.css';
 
@@ -11,42 +11,42 @@ interface NavigationItem {
   color: string; // Color for the icon
 }
 
-const navigationItems: NavigationItem[] = [
+const getNavigationItems = (theme: any): NavigationItem[] => [
   {
     path: '/dashboard',
     label: 'Dashboard',
     icon: 'fas fa-tachometer-alt',
-    color: '#4A90E2' // Blue - Overview/analytics
+    color: theme.colors.navIcons[0] // Blue - Overview/analytics
   },
   {
     path: '/appointments',
     label: 'Appointments',
     icon: 'fas fa-calendar-check',
-    color: '#F5A623' // Orange - Scheduling/calendar
+    color: theme.colors.navIcons[1] // Orange - Scheduling/calendar
   },
   {
     path: '/patients',
     label: 'Patients',
     icon: 'fas fa-users',
-    color: '#7ED321' // Green - Health/people
+    color: theme.colors.navIcons[2] // Green - Health/people
   },
   {
     path: '/laboratory',
     label: 'Laboratory', 
     icon: 'fas fa-flask',
-    color: '#BD10E0' // Purple - Science/testing
+    color: theme.colors.navIcons[3] // Purple - Science/testing
   },
   {
     path: '/prescriptions',
     label: 'Prescriptions',
     icon: 'fas fa-prescription-bottle',
-    color: '#E94B3C' // Red - Medicine/pharmacy
+    color: theme.colors.navIcons[4] // Red - Medicine/pharmacy
   },
   {
     path: '/doctors',
     label: 'Doctors',
     icon: 'fas fa-user-md',
-    color: '#50E3C2' // Teal - Medical professionals
+    color: theme.colors.navIcons[5] // Teal - Medical professionals
   },
   {
     path: '/accounts',
@@ -62,6 +62,8 @@ interface MedicalClinicSidebarProps {
 
 export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ className }) => {
   const location = useLocation();
+  const theme = useMantineTheme();
+  const navigationItems = getNavigationItems(theme);
 
   return (
     <Box
@@ -69,7 +71,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
       className={`fixed left-0 w-[280px] h-full bg-white z-[999] ${className || ''}`}
       style={{
         top: '64px', // Below header
-        borderRight: '1px solid #e5e5e5', // Subtle border instead of shadow
+        borderRight: `1px solid ${theme.colors.customGray[4]}`, // Subtle border instead of shadow
         padding: '24px 12px 24px 12px' // Add horizontal padding to container instead
       }}
     >
@@ -93,7 +95,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   width: '100%',
                   padding: '10px 12px',
                   // margin: '2px 0', // Only vertical margin, no horizontal
-                  color: '#0F0F0F',
+                  color: theme.colors.customGray[8],
                   backgroundColor: isActive ? '#f1f1f1' : 'transparent',
                   fontWeight: isActive ? 500 : 400,
                   fontSize: '14px',
@@ -120,7 +122,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
                   data-text-element="true"
                   className={styles.navText}
                   style={{ 
-                    color: '#0F0F0F',
+                    color: theme.colors.customGray[8],
                     fontSize: '14px',
                     fontWeight: isActive ? 500 : 400,
                     transition: 'color 0.2s ease'

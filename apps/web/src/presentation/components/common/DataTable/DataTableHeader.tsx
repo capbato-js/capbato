@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Title } from '@mantine/core';
+import { Box, Button, Title, useMantineTheme } from '@mantine/core';
 import { Icon } from '../Icon';
 
 export interface DataTableHeaderProps {
@@ -15,6 +15,7 @@ export const DataTableHeader: React.FC<DataTableHeaderProps> = ({
   addButtonText = 'Add New',
   addButtonIcon = 'fas fa-plus'
 }) => {
+  const theme = useMantineTheme();
   return (
     <Box
       style={{
@@ -28,7 +29,7 @@ export const DataTableHeader: React.FC<DataTableHeaderProps> = ({
       <Title
         order={1}
         style={{
-          color: '#0F0F0F',
+          color: theme.colors.customGray[8],
           fontSize: '28px',
           fontWeight: 'bold',
           margin: 0,

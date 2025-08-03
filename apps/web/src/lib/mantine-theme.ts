@@ -28,12 +28,66 @@ export const mantineTheme = createTheme({
       "#1754c5",
       "#0047ab"
     ],
+    // Custom gray scale to match existing hardcoded colors exactly
+    customGray: [
+      "#f8f9fa", // 0 - lightest backgrounds, hover states
+      "#f5f5f5", // 1 - light borders, subtle backgrounds  
+      "#f0f0f0", // 2 - borders
+      "#e9ecef", // 3 - borders, dividers
+      "#e5e5e5", // 4 - borders
+      "#6c757d", // 5 - muted text
+      "#495057", // 6 - dark text, focused borders
+      "#888888", // 7 - muted text alt
+      "#0f0f0f", // 8 - title text, darkest
+      "#fafafa"  // 9 - very light backgrounds
+    ],
+    // Navigation icon colors - exact matches
+    navIcons: [
+      "#4A90E2", // 0 - blue (dashboard)
+      "#F5A623", // 1 - orange (appointments)  
+      "#7ED321", // 2 - green (patients)
+      "#BD10E0", // 3 - purple (laboratory)
+      "#E94B3C", // 4 - red (prescriptions)
+      "#50E3C2", // 5 - teal (doctors)
+      "#4A90E2", // 6 - duplicate for consistency
+      "#4A90E2", // 7 - duplicate for consistency
+      "#4A90E2", // 8 - duplicate for consistency  
+      "#4A90E2"  // 9 - duplicate for consistency
+    ],
   },
 
   fontFamily: 'Roboto, Arial, sans-serif',
 
   other: {
-    titleColor: '#0F0F0F'
+    titleColor: '#0F0F0F',
+    // Semantic color mappings for better maintainability
+    colors: {
+      border: {
+        light: '#f5f5f5',      // customGray.1
+        default: '#e9ecef',    // customGray.3  
+        subtle: '#f0f0f0',     // customGray.2
+        muted: '#e5e5e5'       // customGray.4
+      },
+      background: {
+        hover: '#f8f9fa',      // customGray.0
+        subtle: '#fafafa',     // customGray.9
+        table: '#fafafa'       // customGray.9
+      },
+      text: {
+        primary: '#0f0f0f',    // customGray.8
+        secondary: '#495057',  // customGray.6
+        muted: '#6c757d',      // customGray.5
+        mutedAlt: '#888888'    // customGray.7
+      },
+      navigation: {
+        dashboard: '#4A90E2',    // navIcons.0
+        appointments: '#F5A623', // navIcons.1
+        patients: '#7ED321',     // navIcons.2
+        laboratory: '#BD10E0',   // navIcons.3
+        prescriptions: '#E94B3C', // navIcons.4
+        doctors: '#50E3C2'       // navIcons.5
+      }
+    }
   },
   
   radius: {

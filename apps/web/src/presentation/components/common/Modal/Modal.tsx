@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal as MantineModal } from '@mantine/core';
+import { Modal as MantineModal, useMantineTheme } from '@mantine/core';
 import { CustomModalProps } from './types';
 
 export const Modal: React.FC<CustomModalProps> = ({
@@ -14,6 +14,7 @@ export const Modal: React.FC<CustomModalProps> = ({
   className,
   ...rest
 }) => {
+  const theme = useMantineTheme();
   // Default styles matching the existing modals in AccountsPage
   const defaultStyles = {
     content: {
@@ -25,7 +26,7 @@ export const Modal: React.FC<CustomModalProps> = ({
       ...customStyles.header,
     },
     title: {
-      color: '#0F0F0F',
+      color: theme.colors.customGray[8],
       fontSize: '20px',
       fontWeight: 'bold',
       textAlign: 'center' as const,
@@ -34,7 +35,7 @@ export const Modal: React.FC<CustomModalProps> = ({
       ...customStyles.title,
     },
     close: {
-      color: '#888',
+      color: theme.colors.customGray[7],
       fontSize: '22px',
       ...customStyles.close,
     },

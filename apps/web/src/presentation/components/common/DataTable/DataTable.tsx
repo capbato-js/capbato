@@ -49,7 +49,7 @@ export function DataTable<T extends SearchableItem>({
           style={{
             padding: '16px 24px',
             textAlign: column.align || 'left',
-            borderBottom: index < skeletonRowCount - 1 ? '1px solid #f5f5f5' : 'none'
+            borderBottom: index < skeletonRowCount - 1 ? `1px solid ${theme.colors.customGray[1]}` : 'none'
           }}
         >
           <Skeleton height={16} radius="sm" />
@@ -71,12 +71,12 @@ export function DataTable<T extends SearchableItem>({
           }}
           styles={{
             input: {
-              border: '1px solid #e9ecef',
+              border: `1px solid ${theme.colors.customGray[3]}`,
               borderRadius: '6px',
               fontSize: '14px',
               padding: '10px 12px',
               '&:focus': {
-                borderColor: '#495057',
+                borderColor: theme.colors.customGray[6],
                 boxShadow: 'none'
               }
             }
@@ -90,7 +90,7 @@ export function DataTable<T extends SearchableItem>({
           borderRadius: '8px',
           overflow: 'hidden',
           marginTop: '16px',
-          border: '1px solid #f0f0f0',
+          border: `1px solid ${theme.colors.customGray[2]}`,
           background: 'white'
         }}
       >
@@ -105,8 +105,8 @@ export function DataTable<T extends SearchableItem>({
           <Table.Thead>
             <Table.Tr
               style={{
-                background: '#fafafa',
-                borderBottom: '1px solid #e9ecef'
+                background: theme.colors.customGray[9],
+                borderBottom: `1px solid ${theme.colors.customGray[3]}`
               }}
             >
               {columns.map((column) => (
@@ -117,7 +117,7 @@ export function DataTable<T extends SearchableItem>({
                     textAlign: column.align || 'left',
                     fontWeight: 600,
                     fontSize: '14px',
-                    color: '#495057',
+                    color: theme.colors.customGray[6],
                     width: column.width,
                     borderBottom: 'none'
                   }}
@@ -139,9 +139,9 @@ export function DataTable<T extends SearchableItem>({
                   style={{
                     padding: '48px 24px',
                     textAlign: 'center',
-                    color: '#6c757d',
+                    color: theme.colors.customGray[5],
                     fontSize: '14px',
-                    background: '#fafafa'
+                    background: theme.colors.customGray[9]
                   }}
                 >
                   {emptyStateMessage}
@@ -152,10 +152,10 @@ export function DataTable<T extends SearchableItem>({
                 <Table.Tr
                   key={rowIndex}
                   style={{
-                    borderBottom: rowIndex < filteredData.length - 1 ? '1px solid #f5f5f5' : 'none',
+                    borderBottom: rowIndex < filteredData.length - 1 ? `1px solid ${theme.colors.customGray[1]}` : 'none',
                     transition: 'background-color 0.15s ease',
                     '&:hover': {
-                      backgroundColor: '#f8f9fa'
+                      backgroundColor: theme.colors.customGray[0]
                     }
                   }}
                 >
@@ -174,7 +174,7 @@ export function DataTable<T extends SearchableItem>({
                           textOverflow: 'ellipsis',
                           wordWrap: column.align !== 'center' ? 'break-word' : 'normal',
                           fontSize: '14px',
-                          color: '#495057'
+                          color: theme.colors.customGray[6]
                         }}
                       >
                         {displayValue}
