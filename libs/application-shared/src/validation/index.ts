@@ -47,6 +47,15 @@ export {
 export * from './UserValidationSchemas';
 export * from './UserValidationService';
 
+// Export lab validation schemas
+export {
+  AddLabTestFormSchema,
+  LabTestItemSchema,
+  LabTestResultSchema,
+  LabTestCategory,
+  LabValidationSchemas,
+} from './LabValidationSchemas';
+
 // Export patient validation schemas and services
 export * from './PatientValidationSchemas';
 export * from './PatientValidationService';
