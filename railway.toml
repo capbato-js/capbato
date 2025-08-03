@@ -6,7 +6,7 @@ command = "pnpm build:api"
 
 [deploy]
 # Start the Express server
-startCommand = "node dist/apps/api/main.js"
+startCommand = "node ./dist/apps/api/main.js"
 
 [variables]
 # Set the port for Railway
