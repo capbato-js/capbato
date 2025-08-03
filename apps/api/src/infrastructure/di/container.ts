@@ -16,6 +16,16 @@ import { SqliteScheduleRepository } from '../schedule/persistence/sqlite/SqliteS
 import { MongooseScheduleRepository } from '../schedule/persistence/mongoose/MongooseScheduleRepository';
 import { InMemoryAppointmentRepository } from '../appointment/persistence/in-memory/InMemoryAppointmentRepository';
 import { TypeOrmAppointmentRepository } from '../appointment/persistence/typeorm/TypeOrmAppointmentRepository';
+import { 
+  InMemoryLabRequestRepository, 
+  InMemoryBloodChemistryRepository,
+  TypeOrmLabRequestRepository,
+  TypeOrmBloodChemistryRepository,
+  MongooseLabRequestRepository,
+  MongooseBloodChemistryRepository,
+  SqliteLabRequestRepository,
+  SqliteBloodChemistryRepository
+} from '../laboratory/persistence';
 import {
   CreateTodoUseCase,
   UpdateTodoUseCase,
@@ -54,6 +64,23 @@ import {
   AddressValidationService,
   GetCitiesValidationService,
   GetBarangaysValidationService,
+  // Laboratory Use Cases  
+  CreateLabRequestUseCase,
+  UpdateLabRequestResultsUseCase,
+  CreateBloodChemistryUseCase,
+  // Laboratory Query Handlers
+  GetAllLabRequestsQueryHandler,
+  GetCompletedLabRequestsQueryHandler,
+  GetLabRequestByPatientIdQueryHandler,
+  // Laboratory Validation Services
+  LaboratoryValidationService,
+  CreateLabRequestValidationService,
+  UpdateLabRequestValidationService,
+  DeleteLabRequestValidationService,
+  UpdateLabRequestResultsValidationService,
+  CreateBloodChemistryValidationService,
+  UpdateBloodChemistryValidationService,
+  DeleteBloodChemistryValidationService,
 } from '@nx-starter/application-shared';
 import {
   CreateScheduleUseCase,
@@ -120,7 +147,8 @@ import {
 } from '@nx-starter/application-shared';
 import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
-import { UserDomainService, AppointmentDomainService } from '@nx-starter/domain';
+import type { ILabRequestRepository, IBloodChemistryRepository } from '@nx-starter/domain';
+import { AppointmentDomainService } from '@nx-starter/domain';
 import { getTypeOrmDataSource } from '../database/connections/TypeOrmConnection';
 import { connectMongoDB } from '../database/connections/MongooseConnection';
 import { getDatabaseConfig, getSecurityConfig } from '../../config';
@@ -171,6 +199,18 @@ export const configureDI = async () => {
     appointmentRepositoryImplementation
   );
 
+  const labRequestRepositoryImplementation = await getLabRequestRepositoryImplementation();
+  container.registerInstance<ILabRequestRepository>(
+    TOKENS.LabRequestRepository,
+    labRequestRepositoryImplementation
+  );
+
+  const bloodChemistryRepositoryImplementation = await getBloodChemistryRepositoryImplementation();
+  container.registerInstance<IBloodChemistryRepository>(
+    TOKENS.BloodChemistryRepository,
+    bloodChemistryRepositoryImplementation
+  );
+
   // Infrastructure Layer - Services  
   container.registerSingleton(
     TOKENS.PasswordHashingService,
@@ -214,6 +254,11 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.ConfirmAppointmentUseCase, ConfirmAppointmentUseCase);
   container.registerSingleton(TOKENS.CancelAppointmentUseCase, CancelAppointmentUseCase);
   container.registerSingleton(TOKENS.RescheduleAppointmentUseCase, RescheduleAppointmentUseCase);
+
+  // Laboratory Use Cases
+  container.registerSingleton(TOKENS.CreateLabRequestUseCase, CreateLabRequestUseCase);
+  container.registerSingleton(TOKENS.UpdateLabRequestResultsUseCase, UpdateLabRequestResultsUseCase);
+  container.registerSingleton(TOKENS.CreateBloodChemistryUseCase, CreateBloodChemistryUseCase);
 
   // Application Layer - Use Cases (Queries)
   container.registerSingleton(
@@ -303,6 +348,11 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetConfirmedAppointmentsQueryHandler, GetConfirmedAppointmentsQueryHandler);
   container.registerSingleton(TOKENS.GetWeeklyAppointmentSummaryQueryHandler, GetWeeklyAppointmentSummaryQueryHandler);
   container.registerSingleton(TOKENS.GetAppointmentStatsQueryHandler, GetAppointmentStatsQueryHandler);
+
+  // Laboratory Query Handlers
+  container.registerSingleton(TOKENS.GetAllLabRequestsQueryHandler, GetAllLabRequestsQueryHandler);
+  container.registerSingleton(TOKENS.GetCompletedLabRequestsQueryHandler, GetCompletedLabRequestsQueryHandler);
+  container.registerSingleton(TOKENS.GetLabRequestByPatientIdQueryHandler, GetLabRequestByPatientIdQueryHandler);
 
   // Application Layer - Validation Services
   container.registerSingleton(
@@ -395,6 +445,16 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetAppointmentsByDateValidationService, GetAppointmentsByDateValidationService);
   container.registerSingleton(TOKENS.GetAppointmentsByDateRangeValidationService, GetAppointmentsByDateRangeValidationService);
   container.registerSingleton(TOKENS.AppointmentValidationService, AppointmentValidationService);
+
+  // Laboratory Validation Services
+  container.registerSingleton(TOKENS.LaboratoryValidationService, LaboratoryValidationService);
+  container.registerSingleton(TOKENS.CreateLabRequestValidationService, CreateLabRequestValidationService);
+  container.registerSingleton(TOKENS.UpdateLabRequestValidationService, UpdateLabRequestValidationService);
+  container.registerSingleton(TOKENS.DeleteLabRequestValidationService, DeleteLabRequestValidationService);
+  container.registerSingleton(TOKENS.UpdateLabRequestResultsValidationService, UpdateLabRequestResultsValidationService);
+  container.registerSingleton(TOKENS.CreateBloodChemistryValidationService, CreateBloodChemistryValidationService);
+  container.registerSingleton(TOKENS.UpdateBloodChemistryValidationService, UpdateBloodChemistryValidationService);
+  container.registerSingleton(TOKENS.DeleteBloodChemistryValidationService, DeleteBloodChemistryValidationService);
 
   // Domain Layer - Domain Services
   // UserDomainService is instantiated manually in use cases (Clean Architecture best practice)
@@ -639,6 +699,96 @@ async function getAppointmentRepositoryImplementation(): Promise<IAppointmentRep
     `📦 Unsupported combination ${ormType}+${dbType}, falling back to in-memory appointment repository`
   );
   return new InMemoryAppointmentRepository();
+}
+
+async function getLabRequestRepositoryImplementation(): Promise<ILabRequestRepository> {
+  const dbConfig = getDatabaseConfig();
+  const dbType = dbConfig.type;
+  const ormType = dbConfig.orm || 'native';
+
+  console.log(`📦 Using ${ormType} ORM with ${dbType} database for lab requests`);
+
+  // Handle memory database (always uses in-memory repository)
+  if (dbType === 'memory') {
+    console.log('📦 Using in-memory lab request repository');
+    return new InMemoryLabRequestRepository();
+  }
+
+  // Handle MongoDB (always uses Mongoose)
+  if (dbType === 'mongodb') {
+    await connectMongoDB();
+    console.log('📦 Using Mongoose lab request repository with MongoDB');
+    return new MongooseLabRequestRepository();
+  }
+
+  // Handle SQL databases with different ORMs
+  switch (ormType) {
+    case 'typeorm': {
+      const dataSource = await getTypeOrmDataSource();
+      console.log(`📦 Using TypeORM lab request repository with ${dbType}`);
+      return new TypeOrmLabRequestRepository(dataSource);
+    }
+
+    case 'native':
+    default: {
+      if (dbType === 'sqlite') {
+        console.log('📦 Using native SQLite lab request repository');
+        return new SqliteLabRequestRepository();
+      }
+
+      // For other databases without native support, default to TypeORM
+      console.log(
+        `📦 No native support for ${dbType}, falling back to TypeORM for lab requests`
+      );
+      const dataSource = await getTypeOrmDataSource();
+      return new TypeOrmLabRequestRepository(dataSource);
+    }
+  }
+}
+
+async function getBloodChemistryRepositoryImplementation(): Promise<IBloodChemistryRepository> {
+  const dbConfig = getDatabaseConfig();
+  const dbType = dbConfig.type;
+  const ormType = dbConfig.orm || 'native';
+
+  console.log(`📦 Using ${ormType} ORM with ${dbType} database for blood chemistry`);
+
+  // Handle memory database (always uses in-memory repository)
+  if (dbType === 'memory') {
+    console.log('📦 Using in-memory blood chemistry repository');
+    return new InMemoryBloodChemistryRepository();
+  }
+
+  // Handle MongoDB (always uses Mongoose)
+  if (dbType === 'mongodb') {
+    await connectMongoDB();
+    console.log('📦 Using Mongoose blood chemistry repository with MongoDB');
+    return new MongooseBloodChemistryRepository();
+  }
+
+  // Handle SQL databases with different ORMs
+  switch (ormType) {
+    case 'typeorm': {
+      const dataSource = await getTypeOrmDataSource();
+      console.log(`📦 Using TypeORM blood chemistry repository with ${dbType}`);
+      return new TypeOrmBloodChemistryRepository(dataSource);
+    }
+
+    case 'native':
+    default: {
+      if (dbType === 'sqlite') {
+        console.log('📦 Using native SQLite blood chemistry repository');
+        return new SqliteBloodChemistryRepository();
+      }
+
+      // For other databases without native support, default to TypeORM
+      console.log(
+        `📦 No native support for ${dbType}, falling back to TypeORM for blood chemistry`
+      );
+      const dataSource = await getTypeOrmDataSource();
+      return new TypeOrmBloodChemistryRepository(dataSource);
+    }
+  }
 }
 
 // Export container and tokens for use in controllers

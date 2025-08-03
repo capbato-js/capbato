@@ -15,3 +15,5 @@ export * from './City';
 export * from './Barangay';
 export * from './Schedule';
 export * from './Appointment';
+export * from './LabRequest';
+export * from './BloodChemistry';

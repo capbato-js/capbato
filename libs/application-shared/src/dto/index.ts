@@ -24,3 +24,4 @@ export * from './ScheduleDto';
 export * from './ScheduleRequestDtos';
 export * from './AppointmentCommands';
 export * from './AppointmentQueries';
+export * from './LaboratoryDto';

@@ -17,6 +17,8 @@ export const TOKENS = {
   AddressRepository: 'IAddressRepository',
   ScheduleRepository: 'IScheduleRepository',
   AppointmentRepository: 'IAppointmentRepository',
+  LabRequestRepository: 'ILabRequestRepository',
+  BloodChemistryRepository: 'IBloodChemistryRepository',
 
   // Infrastructure Layer - Services
   PasswordHashingService: 'IPasswordHashingService',
@@ -48,6 +50,15 @@ export const TOKENS = {
   UpdateAppointmentUseCase: 'UpdateAppointmentUseCase',
   DeleteAppointmentUseCase: 'DeleteAppointmentUseCase',
   ConfirmAppointmentUseCase: 'ConfirmAppointmentUseCase',
+
+  // Laboratory Layer - Use Cases (Commands)
+  CreateLabRequestUseCase: 'CreateLabRequestUseCase',
+  UpdateLabRequestUseCase: 'UpdateLabRequestUseCase',
+  DeleteLabRequestUseCase: 'DeleteLabRequestUseCase',
+  UpdateLabRequestResultsUseCase: 'UpdateLabRequestResultsUseCase',
+  CreateBloodChemistryUseCase: 'CreateBloodChemistryUseCase',
+  UpdateBloodChemistryUseCase: 'UpdateBloodChemistryUseCase',
+  DeleteBloodChemistryUseCase: 'DeleteBloodChemistryUseCase',
   CancelAppointmentUseCase: 'CancelAppointmentUseCase',
   RescheduleAppointmentUseCase: 'RescheduleAppointmentUseCase',
 
@@ -67,6 +78,16 @@ export const TOKENS = {
   GetDoctorByUserIdQueryHandler: 'GetDoctorByUserIdQueryHandler',
   GetDoctorsBySpecializationQueryHandler: 'GetDoctorsBySpecializationQueryHandler',
   CheckDoctorProfileExistsQueryHandler: 'CheckDoctorProfileExistsQueryHandler',
+
+  // Laboratory Layer - Query Handlers
+  GetAllLabRequestsQueryHandler: 'GetAllLabRequestsQueryHandler',
+  GetLabRequestByIdQueryHandler: 'GetLabRequestByIdQueryHandler',
+  GetLabRequestByPatientIdQueryHandler: 'GetLabRequestByPatientIdQueryHandler',
+  GetCompletedLabRequestsQueryHandler: 'GetCompletedLabRequestsQueryHandler',
+  GetPendingLabRequestsQueryHandler: 'GetPendingLabRequestsQueryHandler',
+  GetAllBloodChemistryQueryHandler: 'GetAllBloodChemistryQueryHandler',
+  GetBloodChemistryByIdQueryHandler: 'GetBloodChemistryByIdQueryHandler',
+  GetBloodChemistryByPatientNameQueryHandler: 'GetBloodChemistryByPatientNameQueryHandler',
   GetAllProvincesQueryHandler: 'GetAllProvincesQueryHandler',
   GetCitiesByProvinceCodeQueryHandler: 'GetCitiesByProvinceCodeQueryHandler',
   GetBarangaysByCityCodeQueryHandler: 'GetBarangaysByCityCodeQueryHandler',
@@ -132,6 +153,16 @@ export const TOKENS = {
   GetAppointmentsByDateValidationService: 'GetAppointmentsByDateValidationService',
   GetAppointmentsByDateRangeValidationService: 'GetAppointmentsByDateRangeValidationService',
   AppointmentValidationService: 'AppointmentValidationService',
+
+  // Laboratory Layer - Validation Services
+  CreateLabRequestValidationService: 'CreateLabRequestValidationService',
+  UpdateLabRequestValidationService: 'UpdateLabRequestValidationService',
+  DeleteLabRequestValidationService: 'DeleteLabRequestValidationService',
+  UpdateLabRequestResultsValidationService: 'UpdateLabRequestResultsValidationService',
+  CreateBloodChemistryValidationService: 'CreateBloodChemistryValidationService',
+  UpdateBloodChemistryValidationService: 'UpdateBloodChemistryValidationService',
+  DeleteBloodChemistryValidationService: 'DeleteBloodChemistryValidationService',
+  LaboratoryValidationService: 'LaboratoryValidationService',
 } as const;
 
 // Type-safe token keys
