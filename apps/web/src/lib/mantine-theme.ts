@@ -1,20 +1,20 @@
 import { createTheme } from '@mantine/core';
 
 export const mantineTheme = createTheme({
-  primaryColor: 'teal',
-  primaryShade: 9,
+  primaryColor: 'blue', // Main theme color from logo is #37b7ff
+  primaryShade: 6,
   colors: {
-    teal: [
-    "#edfdfa",
-    "#dcf8f2",
-    "#b3f1e4",
-    "#87ebd6",
-    "#67e5ca",
-    "#54e2c2",
-    "#49e0be",
-    "#3bc7a7",
-    "#2eb194",
-    "#16a589"
+    blue: [
+    "#dffaff",
+    "#c9efff",
+    "#98dcff",
+    "#61c8ff",
+    "#37b7ff",
+    "#18acff",
+    "#00a7ff",
+    "#0091e6",
+    "#0081ce",
+    "#0070b7"
   ],
   },
 
@@ -82,7 +82,7 @@ export const darkMantineTheme = createTheme({
   
   colors: {
     ...mantineTheme.colors,
-    teal: [
+    blue: [
       "#e7fefa",
       "#d5f9f2", 
       "#acf2e4",
