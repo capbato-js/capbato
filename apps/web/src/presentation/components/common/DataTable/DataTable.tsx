@@ -43,15 +43,13 @@ export function DataTable<T extends SearchableItem>({
   // Create skeleton rows for loading state
   const skeletonRows = Array.from({ length: skeletonRowCount }, (_, index) => (
     <Table.Tr key={`skeleton-${index}`}>
-      {columns.map((column, colIndex) => (
+      {columns.map((column) => (
         <Table.Td
           key={`skeleton-${index}-${String(column.key)}`}
           style={{
-            padding: '14px',
+            padding: '16px 24px',
             textAlign: column.align || 'left',
-            paddingLeft: column.align === 'left' ? '20px' : '14px',
-            borderRight: colIndex < columns.length - 1 ? '1px solid #ddd' : 'none',
-            borderBottom: '1px solid #ddd'
+            borderBottom: index < skeletonRowCount - 1 ? '1px solid #f5f5f5' : 'none'
           }}
         >
           <Skeleton height={16} radius="sm" />
@@ -69,7 +67,19 @@ export function DataTable<T extends SearchableItem>({
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.currentTarget.value)}
           style={{
-            marginBottom: '15px'
+            marginBottom: '20px'
+          }}
+          styles={{
+            input: {
+              border: '1px solid #e9ecef',
+              borderRadius: '6px',
+              fontSize: '14px',
+              padding: '10px 12px',
+              '&:focus': {
+                borderColor: '#495057',
+                boxShadow: 'none'
+              }
+            }
           }}
         />
       )}
@@ -77,39 +87,39 @@ export function DataTable<T extends SearchableItem>({
       {/* Table - Always visible with headers */}
       <Box
         style={{
-          borderRadius: '10px',
+          borderRadius: '8px',
           overflow: 'hidden',
-          marginTop: '10px',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+          marginTop: '16px',
+          border: '1px solid #f0f0f0',
+          background: 'white'
         }}
       >
         <Table
           style={{
             width: '100%',
             borderCollapse: 'collapse',
-            tableLayout: 'fixed',
-            background: 'white'
+            tableLayout: 'fixed'
           }}
         >
           {/* Table Headers - Always visible */}
           <Table.Thead>
             <Table.Tr
               style={{
-                background: theme.colors.tableBlue[0],
-                color: theme.colors.tableBlue[9]
+                background: '#fafafa',
+                borderBottom: '1px solid #e9ecef'
               }}
             >
-              {columns.map((column, index) => (
+              {columns.map((column) => (
                 <Table.Th
                   key={String(column.key)}
                   style={{
-                    padding: '14px',
+                    padding: '16px 24px',
                     textAlign: column.align || 'left',
-                    paddingLeft: column.align === 'left' ? '20px' : '14px',
-                    borderBottom: '1px solid #ddd',
-                    borderRight: index < columns.length - 1 ? '1px solid #ddd' : 'none',
                     fontWeight: 600,
-                    width: column.width
+                    fontSize: '14px',
+                    color: '#495057',
+                    width: column.width,
+                    borderBottom: 'none'
                   }}
                 >
                   {column.header}
@@ -127,10 +137,11 @@ export function DataTable<T extends SearchableItem>({
                 <Table.Td
                   colSpan={columns.length}
                   style={{
-                    padding: '40px',
+                    padding: '48px 24px',
                     textAlign: 'center',
-                    color: '#666',
-                    fontSize: '16px'
+                    color: '#6c757d',
+                    fontSize: '14px',
+                    background: '#fafafa'
                   }}
                 >
                   {emptyStateMessage}
@@ -141,11 +152,14 @@ export function DataTable<T extends SearchableItem>({
                 <Table.Tr
                   key={rowIndex}
                   style={{
-                    borderBottom: rowIndex < filteredData.length - 1 ? '1px solid #ddd' : 'none',
-                    transition: 'background-color 0.2s ease'
+                    borderBottom: rowIndex < filteredData.length - 1 ? '1px solid #f5f5f5' : 'none',
+                    transition: 'background-color 0.15s ease',
+                    '&:hover': {
+                      backgroundColor: '#f8f9fa'
+                    }
                   }}
                 >
-                  {columns.map((column, colIndex) => {
+                  {columns.map((column) => {
                     const value = item[column.key as keyof T];
                     const displayValue = column.render ? column.render(value, item) : String(value || '');
                     
@@ -153,14 +167,14 @@ export function DataTable<T extends SearchableItem>({
                       <Table.Td
                         key={String(column.key)}
                         style={{
-                          padding: '14px',
+                          padding: '16px 24px',
                           textAlign: column.align || 'left',
-                          paddingLeft: column.align === 'left' ? '20px' : '14px',
-                          borderRight: colIndex < columns.length - 1 ? '1px solid #ddd' : 'none',
                           whiteSpace: column.align === 'center' ? 'nowrap' : 'normal',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          wordWrap: column.align !== 'center' ? 'break-word' : 'normal'
+                          wordWrap: column.align !== 'center' ? 'break-word' : 'normal',
+                          fontSize: '14px',
+                          color: '#495057'
                         }}
                       >
                         {displayValue}
