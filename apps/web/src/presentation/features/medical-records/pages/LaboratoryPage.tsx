@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Button } from '@mantine/core';
-import { Icon } from '../../../components/common';
+import { Icon, Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { LaboratoryResult } from '../types';
+import { AddLabTestForm } from '../components';
 
 // Dummy data for laboratory results
 const dummyLaboratoryResults: LaboratoryResult[] = [
@@ -35,9 +36,49 @@ const dummyLaboratoryResults: LaboratoryResult[] = [
 ];
 
 export const LaboratoryPage: React.FC = () => {
+  // Modal state
+  const [modalOpened, setModalOpened] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const handleAddTest = () => {
-    console.log('Add laboratory test clicked');
-    // TODO: Implement add laboratory test functionality
+    setModalOpened(true);
+    setError(null);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpened(false);
+    setError(null);
+  };
+
+  const handleLabTestSubmit = async (data: {
+    patientName: string;
+    ageGender: string;
+    requestDate: string;
+    selectedTests: string[];
+    otherTests?: string;
+  }) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Mock submission - replace with actual API call when backend is ready
+      console.log('Lab test request submitted:', data);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Close modal on success
+      setModalOpened(false);
+      
+      // TODO: Refresh the lab tests list or show success message
+      console.log('Lab test request submitted successfully!');
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to submit lab test request');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleViewResult = (result: LaboratoryResult) => {
@@ -157,6 +198,25 @@ export const LaboratoryPage: React.FC = () => {
           emptyStateMessage="No laboratory results found"
         />
       </Box>
+
+      {/* Add Lab Test Modal */}
+      <Modal
+        opened={modalOpened}
+        onClose={handleCloseModal}
+        title=""
+        size="xl"
+        customStyles={{
+          body: {
+            padding: '10px 24px 24px', // Reduced top padding to prevent border overlap
+          }
+        }}
+      >
+        <AddLabTestForm
+          onSubmit={handleLabTestSubmit}
+          isLoading={isLoading}
+          error={error}
+        />
+      </Modal>
     </MedicalClinicLayout>
   );
 };
