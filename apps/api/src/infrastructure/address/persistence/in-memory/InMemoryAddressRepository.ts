@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { Province, City, Barangay } from '@nx-starter/domain';
 import type { IAddressRepository } from '@nx-starter/domain';
@@ -23,11 +23,26 @@ export class InMemoryAddressRepository implements IAddressRepository {
 
     try {
       // Load the comprehensive Philippine address data
-      // Handle different working directories: project root vs apps/api
-      const isInProjectRoot = process.cwd().endsWith('capbato-js-cc');
-      const dataPath = isInProjectRoot 
-        ? join(process.cwd(), 'apps/api/src/data/philippines-complete.json')
-        : join(process.cwd(), 'src/data/philippines-complete.json');
+      // Try multiple possible paths to find the data file
+      const possiblePaths = [
+        // From apps/api directory (when running from apps/api)
+        join(process.cwd(), 'src/data/philippines-complete.json'),
+        // From project root (when running from project root)
+        join(process.cwd(), 'apps/api/src/data/philippines-complete.json'),
+      ];
+      
+      let dataPath: string | null = null;
+      for (const path of possiblePaths) {
+        if (existsSync(path)) {
+          dataPath = path;
+          break;
+        }
+      }
+      
+      if (!dataPath) {
+        throw new Error('Could not locate philippines-complete.json data file. Tried paths: ' + possiblePaths.join(', '));
+      }
+      
       this.philippinesData = JSON.parse(readFileSync(dataPath, 'utf8'));
       
       // Extract and create provinces
