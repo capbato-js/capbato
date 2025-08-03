@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Text, Button, Stack, Paper, Grid, Box, Group, ActionIcon, Popover, Menu } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight, IconRefresh, IconEdit } from '@tabler/icons-react';
+import { Card, Text, Button, Stack, Paper, Grid, Box, Group, ActionIcon, Popover, Menu, Alert } from '@mantine/core';
+import { IconChevronLeft, IconChevronRight, IconRefresh, IconEdit, IconAlertCircle } from '@tabler/icons-react';
 import { useDoctorScheduleCalendarViewModel } from '../view-models/useDoctorScheduleCalendarViewModel';
 
 interface DoctorScheduleCalendarProps {
@@ -17,6 +17,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [editPopoverOpened, setEditPopoverOpened] = useState<{ [key: string]: boolean }>({});
+  const [lastError, setLastError] = useState<string | null>(null);
   
   const {
     appointments,
@@ -25,7 +26,8 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
     availableDoctors,
     refreshData,
     getAppointmentsForDate,
-    updateAppointmentDoctor
+    updateAppointmentDoctor,
+    isUpdatingDate
   } = useDoctorScheduleCalendarViewModel();
 
   // Calendar helper functions
@@ -139,6 +141,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
   // Handle doctor assignment change
   const handleDoctorChange = async (dayInfo: any, newDoctorId: string, newDoctorName: string) => {
     try {
+      setLastError(null); // Clear previous errors
       await updateAppointmentDoctor(dayInfo.date, newDoctorId, newDoctorName);
       // Close the popover
       const key = getPopoverKey(dayInfo);
@@ -148,6 +151,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
       }));
     } catch (error) {
       console.error('Failed to update doctor assignment:', error);
+      setLastError('Failed to update doctor assignment. Please try again.');
     }
   };
 
@@ -210,6 +214,21 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
           {formatMonthYear(currentDate)}
         </Text>
 
+        {/* Error Alert */}
+        {(error || lastError) && (
+          <Alert 
+            icon={<IconAlertCircle size={16} />} 
+            color="red" 
+            mb="md"
+            onClose={() => {
+              setLastError(null);
+            }}
+            withCloseButton
+          >
+            {lastError || error}
+          </Alert>
+        )}
+
         {/* Calendar Grid */}
         <Box>
           {/* Week Day Headers */}
@@ -235,6 +254,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
               const dayAppointments = getAppointmentsForDate(dayInfo.date);
               const popoverKey = getPopoverKey(dayInfo);
               const hasAppointments = dayAppointments.length > 0;
+              const isUpdating = isUpdatingDate(dayInfo.date);
               
               return (
                 <Grid.Col key={index} span={12/7} style={{ minWidth: 0 }}>
@@ -335,9 +355,9 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
                           </Stack>
                         )}
 
-                        {loading && dayInfo.isCurrentMonth && (
-                          <Text size="xs" c="dimmed" ta="center" mt="xs">
-                            Loading...
+                        {isUpdating && dayInfo.isCurrentMonth && (
+                          <Text size="xs" c="blue" ta="center" mt="xs" fw={500}>
+                            Updating...
                           </Text>
                         )}
                       </Paper>
@@ -367,7 +387,8 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
                                   variant="light"
                                   size="xs"
                                   onClick={() => handleDoctorChange(dayInfo, doctor.id, doctor.name)}
-                                  disabled={loading}
+                                  disabled={loading || isUpdating}
+                                  loading={isUpdating}
                                 >
                                   Dr. {doctor.name}
                                 </Button>
