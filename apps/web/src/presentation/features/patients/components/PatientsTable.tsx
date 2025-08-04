@@ -179,6 +179,8 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
         emptyStateMessage="No patients found"
         isLoading={isLoading}
         cursor="pointer"
+        useViewportHeight={true}
+        bottomPadding={90}
       />
     </Box>
   );

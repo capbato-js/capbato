@@ -288,6 +288,8 @@ export const LaboratoryPage: React.FC = () => {
         searchable={true}
         searchPlaceholder="Search laboratory results by patient or status..."
         emptyStateMessage={loadingStates.fetching ? "Loading laboratory results..." : "No laboratory results found"}
+        useViewportHeight={true}
+        bottomPadding={90}
       />
       
       {/* Display error if any */}

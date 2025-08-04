@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { ScrollAreaProps } from '@mantine/core';
 
 export interface ActionButton<T> {
   icon: string;
@@ -31,6 +32,10 @@ export interface DataTableProps<T> {
   emptyStateMessage?: string;
   skeletonRowCount?: number;
   cursor?: 'default' | 'pointer';
+  maxHeight?: string | number;
+  scrollAreaProps?: Omit<ScrollAreaProps, 'children'>;
+  useViewportHeight?: boolean;
+  bottomPadding?: number;
 }
 
 export interface SearchableItem {

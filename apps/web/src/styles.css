@@ -2,3 +2,7 @@
 @import 'tw-animate-css';
 @import '@mantine/core/styles.css';
 @import '@mantine/dates/styles.css';
+
+body {
+  overflow: hidden;
+}

@@ -179,6 +179,8 @@ export const AccountsPage: React.FC = () => {
         searchPlaceholder="Search accounts by name, role, email, or contact number..."
         emptyStateMessage="No accounts found"
         isLoading={isLoading}
+        useViewportHeight={true}
+        bottomPadding={90}
       />
 
       {/* Create Account Modal */}

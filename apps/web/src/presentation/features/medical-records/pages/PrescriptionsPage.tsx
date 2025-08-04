@@ -139,6 +139,8 @@ export const PrescriptionsPage: React.FC = () => {
         searchPlaceholder="Search prescriptions by patient, doctor, or medications..."
         emptyStateMessage="No prescriptions found"
         cursor="pointer"
+        useViewportHeight={true}
+        bottomPadding={90}
       />
     </MedicalClinicLayout>
   );

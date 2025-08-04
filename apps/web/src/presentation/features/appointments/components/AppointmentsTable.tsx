@@ -168,6 +168,8 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       data={appointments}
       columns={columns}
       emptyStateMessage="No appointments found"
+      useViewportHeight={true}
+      bottomPadding={90}
     />
   );
 };

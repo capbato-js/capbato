@@ -73,6 +73,8 @@ export const DoctorsTable: React.FC = () => {
         }
         isLoading={viewModel.isLoading}
         skeletonRowCount={2}
+        useViewportHeight={true}
+        bottomPadding={90}
       />
     </Box>
   );
