@@ -517,18 +517,6 @@ const PatientDetailsLoadingSkeleton: React.FC<{
         </Box>
       )}
     </Box>
-
-    {/* Go Back Button Skeleton */}
-    <Box
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        marginTop: 'auto',
-        paddingTop: '30px'
-      }}
-    >
-      <Skeleton height={40} width={120} radius="md" />
-    </Box>
   </>
   );
 };
@@ -551,6 +539,30 @@ export const PatientDetailsPage: React.FC = () => {
   if (isLoading) {
     return (
       <MedicalClinicLayout>
+        {/* Page Header with Back Button */}
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '30px',
+            paddingBottom: '20px',
+            borderBottom: `2px solid ${theme.colors.gray[3]}`
+          }}
+        >
+          <Button
+            variant="filled"
+            color="gray"
+            leftSection={<IconArrowLeft size={16} />}
+            onClick={handleGoBack}
+            size="sm"
+            style={{
+              fontSize: '14px'
+            }}
+          >
+            Back to Patients
+          </Button>
+        </Box>
+
         <PatientDetailsLoadingSkeleton 
           activeTab={activeTab}
           onTabChange={handleTabChange}
@@ -562,6 +574,30 @@ export const PatientDetailsPage: React.FC = () => {
   if (hasError || !patient) {
     return (
       <MedicalClinicLayout>
+        {/* Page Header with Back Button */}
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '30px',
+            paddingBottom: '20px',
+            borderBottom: `2px solid ${theme.colors.gray[3]}`
+          }}
+        >
+          <Button
+            variant="filled"
+            color="gray"
+            leftSection={<IconArrowLeft size={16} />}
+            onClick={handleGoBack}
+            size="sm"
+            style={{
+              fontSize: '14px'
+            }}
+          >
+            Back to Patients
+          </Button>
+        </Box>
+
         <Alert 
           color="red" 
           title="Patient Not Found"
@@ -570,23 +606,36 @@ export const PatientDetailsPage: React.FC = () => {
         >
           {error || `The patient with ID "${id}" could not be found.`}
         </Alert>
-        <Button 
-          leftSection={<IconArrowLeft size={16} />}
-          onClick={handleGoBack}
-          style={{
-            marginTop: '20px',
-            background: theme.colors.blue[7],
-            color: 'white'
-          }}
-        >
-          Go Back to Patients
-        </Button>
       </MedicalClinicLayout>
     );
   }
 
   return (
     <MedicalClinicLayout>
+      {/* Page Header with Back Button */}
+      <Box
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '30px',
+          paddingBottom: '20px',
+          borderBottom: `2px solid ${theme.colors.gray[3]}`
+        }}
+      >
+        <Button
+          variant="filled"
+          color="gray"
+          leftSection={<IconArrowLeft size={16} />}
+          onClick={handleGoBack}
+          size="sm"
+          style={{
+            fontSize: '14px'
+          }}
+        >
+          Back to Patients
+        </Button>
+      </Box>
+
       {/* Custom Tab Navigation */}
       <Box
         style={{
@@ -639,40 +688,6 @@ export const PatientDetailsPage: React.FC = () => {
           {activeTab === 'appointments' && <AppointmentsTab appointments={patient.appointments || []} />}
           {activeTab === 'prescriptions' && <PlaceholderTab title="Prescriptions" />}
           {activeTab === 'laboratories' && <PlaceholderTab title="Laboratory Requests" />}
-        </Box>
-
-        {/* Go Back Button - At the very bottom of main content */}
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: 'auto',
-            paddingTop: '30px'
-          }}
-        >
-          <Button
-            leftSection={<IconArrowLeft size={16} />}
-            onClick={handleGoBack}
-            style={{
-              padding: '12px 24px',
-              background: theme.colors.blue[7],
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s ease',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = theme.colors.blue[8];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = theme.colors.blue[7];
-            }}
-          >
-            Go Back
-          </Button>
         </Box>
     </MedicalClinicLayout>
   );

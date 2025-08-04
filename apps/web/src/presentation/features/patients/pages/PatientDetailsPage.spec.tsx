@@ -126,7 +126,7 @@ describe('PatientDetailsPage', () => {
 
     expect(screen.getByText('Patient Not Found')).toBeInTheDocument();
     expect(screen.getByText('Patient with ID "1" not found')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /go back to patients/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back to patients/i })).toBeInTheDocument();
   });
 
   it('should display patient details when loaded successfully', () => {
@@ -158,7 +158,7 @@ describe('PatientDetailsPage', () => {
 
     renderWithProviders(<PatientDetailsPage />);
 
-    const goBackButton = screen.getByRole('button', { name: /go back/i });
+    const goBackButton = screen.getByRole('button', { name: /back to patients/i });
     expect(goBackButton).toBeInTheDocument();
   });
 
@@ -168,7 +168,7 @@ describe('PatientDetailsPage', () => {
 
     renderWithProviders(<PatientDetailsPage />);
 
-    const goBackButton = screen.getByRole('button', { name: /go back/i });
+    const goBackButton = screen.getByRole('button', { name: /back to patients/i });
     goBackButton.click();
 
     await waitFor(() => {
