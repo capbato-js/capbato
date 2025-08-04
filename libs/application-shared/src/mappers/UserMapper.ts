@@ -58,6 +58,13 @@ export class UserMapper {
   }
 
   /**
+   * Maps User entity to update response DTO (same as regular DTO)
+   */
+  static toUpdateResponseDto(user: User): UserDto {
+    return this.toDto(user);
+  }
+
+  /**
    * Maps array of User entities to array of UserDtos
    */
   static toDtoArray(users: User[]): UserDto[] {

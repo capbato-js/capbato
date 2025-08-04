@@ -21,3 +21,11 @@ export interface LoginUserRequestDto {
   username?: string;
   password: string;
 }
+
+export interface UpdateUserDetailsRequestDto {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  mobile?: string;
+  role?: string;
+}

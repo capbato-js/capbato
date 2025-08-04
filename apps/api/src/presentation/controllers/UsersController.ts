@@ -1,11 +1,14 @@
 import { injectable, inject } from 'tsyringe';
 import { Controller, Get, Put, Param, Body, HttpCode } from 'routing-controllers';
-import { TOKENS, ChangeUserPasswordCommand } from '@nx-starter/application-shared';
+import { TOKENS, ChangeUserPasswordCommand, UserMapper, UserIdSchema } from '@nx-starter/application-shared';
 import { GetAllUsersQueryHandler } from '@nx-starter/application-api';
 import { ChangeUserPasswordUseCase } from '@nx-starter/application-api';
+import { UpdateUserDetailsUseCase } from '@nx-starter/application-shared';
 import { ApiResponseBuilder } from '../dto/ApiResponse';
 import { UserListResponseDto } from '../dto/UserListResponseDto';
 import { ChangePasswordRequestDto } from '../dto/ChangePasswordRequestDto';
+import { UpdateUserDetailsRequestDto } from '@nx-starter/application-shared';
+import { UserValidationService } from '@nx-starter/application-shared';
 
 /**
  * Users Controller
@@ -18,7 +21,11 @@ export class UsersController {
     @inject(TOKENS.GetAllUsersQueryHandler)
     private getAllUsersQueryHandler: GetAllUsersQueryHandler,
     @inject(TOKENS.ChangeUserPasswordUseCase)
-    private changeUserPasswordUseCase: ChangeUserPasswordUseCase
+    private changeUserPasswordUseCase: ChangeUserPasswordUseCase,
+    @inject(TOKENS.UpdateUserDetailsUseCase)
+    private updateUserDetailsUseCase: UpdateUserDetailsUseCase,
+    @inject(TOKENS.UserValidationService)
+    private validationService: UserValidationService
   ) {}
 
   /**
@@ -50,5 +57,29 @@ export class UsersController {
     const command: ChangeUserPasswordCommand = { userId: id, newPassword: body.newPassword };
     await this.changeUserPasswordUseCase.execute(command);
     return ApiResponseBuilder.success({ message: 'Password updated.' });
+  }
+
+  /**
+   * PUT /api/users/:id - Update user details
+   */
+  @Put('/:id')
+  @HttpCode(200)
+  async updateUserDetails(
+    @Param('id') id: string,
+    @Body() body: UpdateUserDetailsRequestDto
+  ) {
+    // Validate the ID parameter
+    const validatedId = UserIdSchema.parse(id);
+    
+    // Validate the combined data (body + id) using the validation service
+    const validatedData = this.validationService.validateUpdateDetailsCommand({
+      ...body,
+      id: validatedId,
+    });
+
+    const user = await this.updateUserDetailsUseCase.execute(validatedData);
+    const userDto = UserMapper.toUpdateResponseDto(user);
+
+    return ApiResponseBuilder.success(userDto);
   }
 }

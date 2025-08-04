@@ -1,7 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import { ValidationService, IValidationService } from './ValidationService';
-import { RegisterUserCommandSchema, LoginUserCommandSchema } from './UserValidationSchemas';
-import { RegisterUserCommand, LoginUserCommand } from '../dto/UserCommands';
+import { RegisterUserCommandSchema, LoginUserCommandSchema, UpdateUserDetailsCommandSchema } from './UserValidationSchemas';
+import { RegisterUserCommand, LoginUserCommand, UpdateUserDetailsCommand } from '../dto/UserCommands';
 import { LoginUserRequestDto } from '../dto/UserRequestDtos';
 import { TOKENS } from '../di/tokens';
 
@@ -23,6 +23,15 @@ export class LoginUserValidationService extends ValidationService<unknown, Login
   protected schema = LoginUserCommandSchema;
 }
 
+/**
+ * Validation service for UpdateUserDetailsCommand
+ * Encapsulates validation logic for updating user details
+ */
+@injectable()
+export class UpdateUserDetailsValidationService extends ValidationService<unknown, UpdateUserDetailsCommand> {
+  protected schema = UpdateUserDetailsCommandSchema;
+}
+
 
 /**
  * Composite validation service that provides all User validation operations
@@ -34,7 +43,9 @@ export class UserValidationService {
     @inject(TOKENS.RegisterUserValidationService)
     private registerValidator: RegisterUserValidationService,
     @inject(TOKENS.LoginUserValidationService)
-    private loginValidator: LoginUserValidationService
+    private loginValidator: LoginUserValidationService,
+    @inject(TOKENS.UpdateUserDetailsValidationService)
+    private updateUserDetailsValidator: UpdateUserDetailsValidationService
   ) {}
 
   /**
@@ -84,6 +95,13 @@ export class UserValidationService {
   }
 
   /**
+   * Validates data for updating user details
+   */
+  validateUpdateDetailsCommand(data: unknown): UpdateUserDetailsCommand {
+    return this.updateUserDetailsValidator.validate(data);
+  }
+
+  /**
    * Safe validation methods that don't throw exceptions
    */
   safeValidateRegisterCommand(data: unknown) {
@@ -93,9 +111,14 @@ export class UserValidationService {
   safeValidateLoginCommand(data: unknown) {
     return this.loginValidator.safeParse(data);
   }
+
+  safeValidateUpdateDetailsCommand(data: unknown) {
+    return this.updateUserDetailsValidator.safeParse(data);
+  }
 }
 
 // Export interfaces for dependency injection
 export type IRegisterUserValidationService = IValidationService<unknown, RegisterUserCommand>;
 export type ILoginUserValidationService = IValidationService<unknown, LoginUserCommand>;
+export type IUpdateUserDetailsValidationService = IValidationService<unknown, UpdateUserDetailsCommand>;
 

@@ -82,6 +82,9 @@ export const RoleSchema = z
     message: USER_VALIDATION_ERRORS.REG_INVALID_ROLE,
   });
 
+// User ID validation schema for URL parameters
+export const UserIdSchema = z.string().min(1, 'User ID cannot be empty');
+
 // Register user command validation schema
 export const RegisterUserCommandSchema = z.object({
   firstName: FirstNameSchema,
@@ -154,6 +157,21 @@ export const ChangeUserPasswordCommandSchema = z.object({
   newPassword: PasswordSchema,
 });
 
+// Update user details command validation schema
+export const UpdateUserDetailsCommandSchema = z.object({
+  id: z.string().min(1, 'User ID is required').regex(/^[0-9a-fA-F]{32}$/, 'Invalid user ID format - must be dashless UUID'),
+  firstName: FirstNameSchema.optional(),
+  lastName: LastNameSchema.optional(), 
+  email: EmailSchema.optional(),
+  mobile: MobileSchema,
+  role: RoleSchema.optional(),
+}).refine((data) => {
+  // At least one field must be provided for update
+  return data.firstName || data.lastName || data.email || data.mobile || data.role;
+}, {
+  message: 'At least one field must be provided for update',
+});
+
 // Change password form validation schema (with confirmation)
 export const ChangePasswordFormSchema = z.object({
   newPassword: PasswordSchema,
@@ -172,6 +190,7 @@ export const UserValidationSchemas = {
   LoginUserCommand: LoginUserCommandSchema,
   LoginForm: LoginFormSchema,
   ChangeUserPasswordCommand: ChangeUserPasswordCommandSchema,
+  UpdateUserDetailsCommand: UpdateUserDetailsCommandSchema,
   ChangePasswordForm: ChangePasswordFormSchema,
   GetAllUsersQuery: GetAllUsersQuerySchema,
   FirstName: FirstNameSchema,
@@ -181,4 +200,5 @@ export const UserValidationSchemas = {
   Name: NameSchema,
   Mobile: MobileSchema,
   Role: RoleSchema,
+  UserId: UserIdSchema,
 } as const;
