@@ -9,7 +9,7 @@ import { PatientsPage, AddPatientPage } from '../presentation/features/patients'
 import { PatientDetailsPage } from '../presentation/features/patients/pages/PatientDetailsPage';
 import { LaboratoryPage, PrescriptionsPage } from '../presentation/features/medical-records';
 import { DoctorsPage, AccountsPage } from '../presentation/features/staff';
-import { AuthGuard } from '../presentation/features/auth';
+import { AuthGuard, RoleGuard } from '../presentation/features/auth';
 import { useAuthStore } from '../infrastructure/state/AuthStore';
 import '../styles.css';
 
@@ -72,7 +72,9 @@ function App() {
         } />
         <Route path="/accounts" element={
           <AuthGuard requireAuth={true}>
-            <AccountsPage />
+            <RoleGuard requiredRoute="/accounts">
+              <AccountsPage />
+            </RoleGuard>
           </AuthGuard>
         } />
 

@@ -2,59 +2,8 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Box, UnstyledButton, Group, Text, useMantineTheme } from '@mantine/core';
 import { Icon } from '../common';
+import { useNavigationAccess } from '../../../infrastructure/auth';
 import styles from './MedicalClinicSidebar.module.css';
-
-interface NavigationItem {
-  path: string;
-  label: string;
-  icon: string; // FontAwesome icon class
-  color: string; // Color for the icon
-}
-
-const getNavigationItems = (theme: any): NavigationItem[] => [
-  {
-    path: '/dashboard',
-    label: 'Dashboard',
-    icon: 'fas fa-tachometer-alt',
-    color: theme.colors.navIcons[0] // Blue - Overview/analytics
-  },
-  {
-    path: '/appointments',
-    label: 'Appointments',
-    icon: 'fas fa-calendar-check',
-    color: theme.colors.navIcons[1] // Orange - Scheduling/calendar
-  },
-  {
-    path: '/patients',
-    label: 'Patients',
-    icon: 'fas fa-users',
-    color: theme.colors.navIcons[2] // Green - Health/people
-  },
-  {
-    path: '/laboratory',
-    label: 'Laboratory', 
-    icon: 'fas fa-flask',
-    color: theme.colors.navIcons[3] // Purple - Science/testing
-  },
-  {
-    path: '/prescriptions',
-    label: 'Prescriptions',
-    icon: 'fas fa-prescription-bottle',
-    color: theme.colors.navIcons[4] // Red - Medicine/pharmacy
-  },
-  {
-    path: '/doctors',
-    label: 'Doctors',
-    icon: 'fas fa-user-md',
-    color: theme.colors.navIcons[5] // Teal - Medical professionals
-  },
-  {
-    path: '/accounts',
-    label: 'Accounts',
-    icon: 'fas fa-users-cog',
-    color: '#9013FE' // Violet - Administration/settings
-  }
-];
 
 interface MedicalClinicSidebarProps {
   className?: string;
@@ -81,12 +30,12 @@ const isNavigationItemActive = (currentPath: string, itemPath: string): boolean 
 export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ className }) => {
   const location = useLocation();
   const theme = useMantineTheme();
-  const navigationItems = getNavigationItems(theme);
+  const navigationItems = useNavigationAccess();
 
   return (
     <Box
       component="nav"
-      className={`fixed left-0 w-[280px] h-full bg-white ${className || ''}`}
+      className={`fixed left-0 w-[280px] h-full bg-white z-10 ${className || ''}`}
       style={{
         top: '64px', // Below header
         borderRight: `1px solid ${theme.colors.customGray[4]}`, // Subtle border instead of shadow
@@ -94,7 +43,9 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
       }}
     >
       <Box component="ul" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-        {navigationItems.map((item) => {
+        {navigationItems
+          .filter(item => item.hasAccess) // Filter out items user doesn't have access to
+          .map((item) => {
           const isActive = isNavigationItemActive(location.pathname, item.path);
           
           return (

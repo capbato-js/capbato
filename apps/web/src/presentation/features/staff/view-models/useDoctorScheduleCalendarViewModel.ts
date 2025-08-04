@@ -2,14 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { container } from 'tsyringe';
 import { DoctorApiService } from '../../../../infrastructure/api/DoctorApiService';
 import { AppointmentApiService } from '../../../../infrastructure/api/AppointmentApiService';
+import { useDoctorAccess } from '../../../../infrastructure/auth';
 import type { DoctorDto } from '@nx-starter/application-shared';
-
-// Helper function to check if two dates are the same day
-const isSameDay = (date1: Date, date2: Date): boolean => {
-  return date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate();
-};
 
 // Helper function to format appointment date to YYYY-MM-DD
 const formatDateToISOString = (date: Date): string => {
@@ -62,10 +56,33 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
   const [error, setError] = useState<string | null>(null);
   const [availableDoctors, setAvailableDoctors] = useState<Array<{ id: string; name: string; }>>([]);
   const [updatingDates, setUpdatingDates] = useState<Set<string>>(new Set());
+  const [doctorProfileId, setDoctorProfileId] = useState<string | null>(null);
+
+  // Get doctor access permissions
+  const { isDoctor, userId, shouldFilterByDoctor, canViewAllDoctorSchedules } = useDoctorAccess();
 
   // Get the API service instances
   const doctorApiService = container.resolve(DoctorApiService);
   const appointmentApiService = container.resolve(AppointmentApiService);
+
+  // Fetch doctor profile ID for the current user (if they are a doctor)
+  const fetchDoctorProfile = useCallback(async () => {
+    if (!shouldFilterByDoctor || !userId) {
+      return;
+    }
+
+    try {
+      console.log(`Fetching doctor profile for user ID: ${userId}`);
+      const doctorProfile = await doctorApiService.getDoctorByUserId(userId);
+      console.log('Doctor profile found:', doctorProfile);
+      setDoctorProfileId(doctorProfile.id);
+    } catch (err) {
+      console.error('Error fetching doctor profile:', err);
+      // If doctor profile doesn't exist, keep doctorProfileId as null
+      // This will result in no appointments being shown, which is correct
+      setDoctorProfileId(null);
+    }
+  }, [shouldFilterByDoctor, userId, doctorApiService]);
 
   // Fetch appointments from the API and transform to calendar format
   const fetchAppointments = useCallback(async () => {
@@ -74,12 +91,14 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
     
     try {
       console.log('Fetching appointments...');
+      console.log('Doctor access info:', { isDoctor, userId, shouldFilterByDoctor, canViewAllDoctorSchedules, doctorProfileId });
+      
       // Get all appointments
       const appointmentsData = await appointmentApiService.getAllAppointments();
       console.log('Raw appointments data:', appointmentsData);
       
       // Transform appointments to calendar format
-      const calendarAppointments: CalendarAppointment[] = appointmentsData.map(appointment => {
+      let calendarAppointments: CalendarAppointment[] = appointmentsData.map(appointment => {
         // Extract date from appointmentDate (handle timezone properly)
         const appointmentDate = new Date(appointment.appointmentDate);
         const dateString = formatDateToISOString(appointmentDate);
@@ -96,8 +115,22 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
           reasonForVisit: appointment.reasonForVisit
         };
       });
+
+      // Filter appointments based on user role
+      if (shouldFilterByDoctor && doctorProfileId) {
+        console.log(`Filtering appointments for doctor profile ID: ${doctorProfileId}`);
+        calendarAppointments = calendarAppointments.filter(appointment => 
+          appointment.doctorId === doctorProfileId
+        );
+        console.log('Filtered appointments for doctor:', calendarAppointments);
+      } else if (shouldFilterByDoctor && !doctorProfileId) {
+        console.log('Doctor user but no profile found - showing no appointments');
+        calendarAppointments = []; // Doctor user but no profile, show nothing
+      } else {
+        console.log('Showing all appointments (admin/receptionist view)');
+      }
       
-      console.log('Transformed calendar appointments:', calendarAppointments);
+      console.log('Final calendar appointments:', calendarAppointments);
       setAppointments(calendarAppointments);
       
     } catch (err) {
@@ -107,7 +140,7 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
     } finally {
       setLoading(false);
     }
-  }, [appointmentApiService]);
+  }, [appointmentApiService, shouldFilterByDoctor, doctorProfileId, isDoctor, canViewAllDoctorSchedules, userId]);
 
   // Get appointments for a specific date
   const getAppointmentsForDate = useCallback((date: Date): CalendarAppointment[] => {
@@ -225,11 +258,24 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
     }
   }, [appointmentApiService, fetchAppointments, getAppointmentsForDate]);
 
-  // Initial load
+  // Effect to fetch doctor profile when user changes
   useEffect(() => {
-    fetchAppointments();
+    fetchDoctorProfile();
+  }, [fetchDoctorProfile]);
+
+  // Effect to fetch appointments when doctor profile is resolved
+  useEffect(() => {
+    // For non-doctors, fetch immediately
+    // For doctors, wait until we have the profile ID (or confirmed it doesn't exist)
+    if (!shouldFilterByDoctor || doctorProfileId !== null) {  
+      fetchAppointments();
+    }
+  }, [fetchAppointments, shouldFilterByDoctor, doctorProfileId]);
+
+  // Initial load for doctors list
+  useEffect(() => {
     fetchDoctors();
-  }, [fetchAppointments, fetchDoctors]);
+  }, [fetchDoctors]);
 
   return {
     appointments,

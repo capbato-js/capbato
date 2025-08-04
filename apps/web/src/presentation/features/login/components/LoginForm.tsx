@@ -82,7 +82,7 @@ export const LoginForm: React.FC = () => {
   return (
     <div style={{ width: '100%' }}>
         <Title order={2} ta="center" mb="lg" style={{ color: theme.other.titleColor }}>
-          Sign in to MG Amores
+          Login
         </Title>
         
         {/* Error message */}
