@@ -211,7 +211,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                   alignItems: 'center'
                 }}
               >
-                <span>{day}</span>
+                <span style={{ height: '24px', fontSize: '16px' }}>{day}</span>
                 {hasSchedule && (hoveredTile === tileIndex) && (
                   <Menu
                     position="bottom-end"
@@ -224,9 +224,9 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                           size="sm"
                           variant="subtle"
                           color={theme.colors.customGray[8]}
-                          style={{ cursor: 'pointer' }}
+                          style={{ cursor: 'pointer', height: '24px' }}
                         >
-                          <IconEdit size={18} />
+                          <IconEdit size={16} />
                         </ActionIcon>
                       </Tooltip>
                     </Menu.Target>
