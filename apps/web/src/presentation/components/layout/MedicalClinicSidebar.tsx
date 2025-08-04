@@ -60,6 +60,24 @@ interface MedicalClinicSidebarProps {
   className?: string;
 }
 
+// Helper function to determine if a navigation item should be active
+const isNavigationItemActive = (currentPath: string, itemPath: string): boolean => {
+  // For exact matches
+  if (currentPath === itemPath) {
+    return true;
+  }
+  
+  // For nested routes, check if current path starts with the item path
+  // This handles cases like /patients/new or /patients/:id under /patients
+  const itemsWithNestedRoutes = ['/patients', '/doctors', '/appointments'];
+  
+  if (itemsWithNestedRoutes.includes(itemPath)) {
+    return currentPath.startsWith(itemPath + '/') || currentPath === itemPath;
+  }
+  
+  return false;
+};
+
 export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ className }) => {
   const location = useLocation();
   const theme = useMantineTheme();
@@ -77,7 +95,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
     >
       <Box component="ul" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {navigationItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = isNavigationItemActive(location.pathname, item.path);
           
           return (
             <Box 
