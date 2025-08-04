@@ -2,13 +2,14 @@ import React from 'react';
 import { Control, FieldErrors, UseFormRegister, Controller } from 'react-hook-form';
 import { Stack, Select } from '@mantine/core';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
+import { RegisterUserCommand } from '@nx-starter/application-shared';
 import type { CreateAccountData } from '../view-models/useEnhancedAccountsViewModel';
 
 interface Step1FieldsProps {
-  control: Control<CreateAccountData>;
-  errors: FieldErrors<CreateAccountData>; 
+  control: Control<RegisterUserCommand>;
+  errors: FieldErrors<RegisterUserCommand>; 
   isLoading: boolean;
-  register: UseFormRegister<CreateAccountData>;
+  register: UseFormRegister<RegisterUserCommand>;
   onInputChange?: () => void;
   fieldErrors?: Record<string, string>;
 }

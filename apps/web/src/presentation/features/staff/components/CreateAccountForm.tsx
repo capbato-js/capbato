@@ -9,14 +9,14 @@ import {
   Box,
   Group,
 } from '@mantine/core';
-import { RegisterUserCommandSchema } from '@nx-starter/application-shared';
+import { RegisterUserCommandSchema, RegisterUserCommand } from '@nx-starter/application-shared';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import type { CreateAccountData } from '../view-models/useEnhancedAccountsViewModel';
 import { Step1Fields } from './Step1Fields';
 import { Step2Fields } from './Step2Fields';
 
 interface CreateAccountFormProps {
-  onSubmit: (data: CreateAccountData) => Promise<boolean>;
+  onSubmit: (data: RegisterUserCommand) => Promise<boolean>;
   isLoading: boolean;
   error?: string | null;
   onClearError?: () => void;
@@ -44,8 +44,8 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     control,
     watch,
     formState: { errors },
-  } = useForm<CreateAccountData>({
-    resolver: zodResolver(RegisterUserCommandSchema),
+  } = useForm<RegisterUserCommand>({
+    resolver: zodResolver(RegisterUserCommandSchema) as any,
     mode: 'onBlur',
     defaultValues: {
       firstName: '',
@@ -98,7 +98,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     ? (currentStep === 1 ? isStep1Empty : isStep1Empty || isStep2Empty)
     : isStep1Empty;
 
-  const handleFormSubmit = handleSubmit(async (data: CreateAccountData) => {
+  const handleFormSubmit = handleSubmit(async (data: RegisterUserCommand) => {
     const success = await onSubmit(data);
     
     // Only reset form on successful submission

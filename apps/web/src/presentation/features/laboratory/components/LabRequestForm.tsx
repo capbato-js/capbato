@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '../../../components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
@@ -39,40 +40,15 @@ export const LabRequestForm: React.FC<LabRequestFormProps> = ({
     formState: { errors },
     reset,
   } = useForm<LabRequestFormData>({
-    resolver: zodResolver(CreateLabRequestCommandSchema.omit({ 
-      requestDate: true 
-    }).extend({
-      requestDate: CreateLabRequestCommandSchema.shape.requestDate.transform((val) => val.toISOString()),
-      selectedTests: CreateLabRequestCommandSchema.pick({
-        cbc_with_platelet: true,
-        pregnancy_test: true,
-        urinalysis: true,
-        fecalysis: true,
-        occult_blood_test: true,
-        hepa_b_screening: true,
-        hepa_a_screening: true,
-        hepatitis_profile: true,
-        vdrl_rpr: true,
-        dengue_ns1: true,
-        ca_125_cea_psa: true,
-        fbs: true,
-        bun: true,
-        creatinine: true,
-        blood_uric_acid: true,
-        lipid_profile: true,
-        sgot: true,
-        sgpt: true,
-        alp: true,
-        sodium_na: true,
-        potassium_k: true,
-        hbalc: true,
-        ecg: true,
-        t3: true,
-        t4: true,
-        ft3: true,
-        ft4: true,
-        tsh: true,
-      }).partial(),
+    resolver: zodResolver(z.object({
+      patient_id: z.string().min(1, 'Patient ID is required'),
+      patient_name: z.string().min(1, 'Patient name is required'),
+      age_gender: z.string().min(1, 'Age and gender is required'),
+      request_date: z.string().min(1, 'Request date is required'),
+      others: z.string().optional(),
+      selectedTests: z.record(z.string(), z.boolean().optional()).refine((tests) => {
+        return Object.values(tests).some(value => value === true);
+      }, 'At least one test must be selected'),
     })),
     defaultValues: {
       patient_id: patientId || '',
@@ -88,7 +64,7 @@ export const LabRequestForm: React.FC<LabRequestFormProps> = ({
   const testCategories = getTestsByCategory();
 
   const onSubmit = handleSubmit(async (data) => {
-    const success = await viewModel.handleFormSubmit(data);
+    const success = await viewModel.handleFormSubmit(data as any);
     if (success) {
       reset();
       onSuccess?.();

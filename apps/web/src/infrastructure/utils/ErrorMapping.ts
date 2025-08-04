@@ -254,7 +254,8 @@ export const extractErrorMessage = (error: unknown): string => {
   
   // Check if it's an HTTP error with response data (for other HTTP clients)
   if (isHttpErrorResponse(error)) {
-    const backendError = error.response?.data;
+    const httpError = error as HttpErrorResponse;
+    const backendError = httpError.response?.data;
     
     if (isAuthErrorResponse(backendError)) {
       // Use backend error message if available, otherwise map by code
@@ -266,7 +267,7 @@ export const extractErrorMessage = (error: unknown): string => {
     }
     
     // Fallback to status-based error mapping
-    const status = error.response?.status;
+    const status = httpError.response?.status;
     if (status === 401) {
       return 'Invalid email/username or password';
     }
@@ -290,8 +291,12 @@ export const extractErrorMessage = (error: unknown): string => {
   }
   
   // Fallback to error message or generic message
-  if (error instanceof Error) {
-    return error.message;
+  // Check if error has a message property (for Error objects)
+  if (error && typeof error === 'object' && 'message' in error) {
+    const errorWithMessage = error as { message: unknown };
+    if (typeof errorWithMessage.message === 'string') {
+      return errorWithMessage.message;
+    }
   }
   
   if (typeof error === 'string') {
