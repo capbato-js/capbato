@@ -7,7 +7,7 @@ export interface CustomModalProps {
   /** Close handler */
   onClose: () => void;
   /** Modal title */
-  title: string;
+  title?: string | null;
   /** Modal content */
   children: ReactNode;
   /** Modal size */
