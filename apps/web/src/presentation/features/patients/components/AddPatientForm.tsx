@@ -351,7 +351,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                   <Grid.Col span={2}>
                     <FormTextInput
                       label="Age"
-                      placeholder="Auto"
+                      placeholder=""
                       disabled
                       value={ageDisplayValue}
                     />
