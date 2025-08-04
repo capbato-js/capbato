@@ -52,7 +52,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
     {
       key: 'patientNumber',
       header: 'Patient #',
-      width: '40%',
+      width: '15%',
       align: 'center',
       searchable: true,
       render: (value) => (
@@ -70,7 +70,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
     {
       key: 'fullName',
       header: "Patient's Name",
-      width: '60%',
+      width: '25%',
       align: 'left',
       searchable: true,
       render: (value) => (
@@ -82,6 +82,78 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
           }}
         >
           {value}
+        </Text>
+      )
+    },
+    {
+      key: 'age',
+      header: 'Age',
+      width: '10%',
+      align: 'center',
+      searchable: false,
+      render: (value) => (
+        <Text
+          style={{
+            color: theme.colors.customGray[8],
+            fontWeight: 400,
+            fontSize: '16px'
+          }}
+        >
+          {value}
+        </Text>
+      )
+    },
+    {
+      key: 'gender',
+      header: 'Gender',
+      width: '10%',
+      align: 'center',
+      searchable: true,
+      render: (value) => (
+        <Text
+          style={{
+            color: theme.colors.customGray[8],
+            fontWeight: 400,
+            fontSize: '16px'
+          }}
+        >
+          {value}
+        </Text>
+      )
+    },
+    {
+      key: 'contactNumber',
+      header: 'Contact Number',
+      width: '20%',
+      align: 'center',
+      searchable: true,
+      render: (value) => (
+        <Text
+          style={{
+            color: theme.colors.customGray[8],
+            fontWeight: 400,
+            fontSize: '16px'
+          }}
+        >
+          {value || 'N/A'}
+        </Text>
+      )
+    },
+    {
+      key: 'guardianName',
+      header: "Guardian's Name",
+      width: '20%',
+      align: 'left',
+      searchable: true,
+      render: (value) => (
+        <Text
+          style={{
+            color: theme.colors.customGray[8],
+            fontWeight: 400,
+            fontSize: '16px'
+          }}
+        >
+          {value || 'N/A'}
         </Text>
       )
     }

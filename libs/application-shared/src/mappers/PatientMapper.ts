@@ -63,6 +63,9 @@ export class PatientMapper {
       age: patient.age, // Computed dynamically
       gender: patient.gender,
       dateOfBirth: patient.dateOfBirth.toISOString().split('T')[0], // YYYY-MM-DD format
+      contactNumber: patient.contactNumber,
+      address: patient.address, // Computed full address
+      guardianName: patient.guardianName,
     };
   }
 
