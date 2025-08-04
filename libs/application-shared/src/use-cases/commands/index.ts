@@ -17,6 +17,7 @@ export * from './UpdateAppointmentUseCase';
 export * from './DeleteAppointmentUseCase';
 export * from './ConfirmAppointmentUseCase';
 export * from './CancelAppointmentUseCase';
+export * from './CompleteAppointmentUseCase';
 export * from './RescheduleAppointmentUseCase';
 export * from './CreateLabRequestUseCase';
 export * from './UpdateLabRequestUseCase';

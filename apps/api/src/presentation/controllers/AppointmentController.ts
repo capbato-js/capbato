@@ -15,6 +15,7 @@ import {
   DeleteAppointmentUseCase,
   ConfirmAppointmentUseCase,
   CancelAppointmentUseCase,
+  CompleteAppointmentUseCase,
   RescheduleAppointmentUseCase,
   GetAllAppointmentsQueryHandler,
   GetAppointmentByIdQueryHandler,
@@ -59,6 +60,8 @@ export class AppointmentController {
     private confirmAppointmentUseCase: ConfirmAppointmentUseCase,
     @inject(TOKENS.CancelAppointmentUseCase)
     private cancelAppointmentUseCase: CancelAppointmentUseCase,
+    @inject(TOKENS.CompleteAppointmentUseCase)
+    private completeAppointmentUseCase: CompleteAppointmentUseCase,
     @inject(TOKENS.RescheduleAppointmentUseCase)
     private rescheduleAppointmentUseCase: RescheduleAppointmentUseCase,
     @inject(TOKENS.GetAllAppointmentsQueryHandler)
@@ -234,6 +237,30 @@ export class AppointmentController {
     await this.cancelAppointmentUseCase.execute(validatedData);
 
     return ApiResponseBuilder.successWithMessage('Appointment cancelled successfully');
+  }
+
+  /**
+   * PUT /api/appointments/:id/complete - Mark an appointment as completed
+   */
+  @Put('/:id/complete')
+  async completeAppointment(@Param('id') id: string): Promise<AppointmentOperationResponse> {
+    const validatedData = this.validationService.validateCompleteCommand({ id });
+
+    await this.completeAppointmentUseCase.execute(validatedData);
+
+    return ApiResponseBuilder.successWithMessage('Appointment marked as completed successfully');
+  }
+
+  /**
+   * PUT /api/appointments/:id/reconfirm - Reconfirm an appointment (set status back to confirmed)
+   */
+  @Put('/:id/reconfirm')
+  async reconfirmAppointment(@Param('id') id: string): Promise<AppointmentOperationResponse> {
+    const validatedData = this.validationService.validateConfirmCommand({ id });
+
+    await this.confirmAppointmentUseCase.execute(validatedData);
+
+    return ApiResponseBuilder.successWithMessage('Appointment reconfirmed successfully');
   }
 
   /**

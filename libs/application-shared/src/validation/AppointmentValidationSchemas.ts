@@ -231,6 +231,10 @@ export const CancelAppointmentCommandSchema = z.object({
   reason: z.string().optional(),
 });
 
+export const CompleteAppointmentCommandSchema = z.object({
+  id: AppointmentIdSchema,
+});
+
 export const RescheduleAppointmentCommandSchema = z.object({
   id: AppointmentIdSchema,
   appointmentDate: ApiAppointmentDateSchema,
@@ -271,6 +275,7 @@ export type UpdateAppointmentCommand = z.infer<typeof UpdateAppointmentCommandSc
 export type DeleteAppointmentCommand = z.infer<typeof DeleteAppointmentCommandSchema>;
 export type ConfirmAppointmentCommand = z.infer<typeof ConfirmAppointmentCommandSchema>;
 export type CancelAppointmentCommand = z.infer<typeof CancelAppointmentCommandSchema>;
+export type CompleteAppointmentCommand = z.infer<typeof CompleteAppointmentCommandSchema>;
 export type RescheduleAppointmentCommand = z.infer<typeof RescheduleAppointmentCommandSchema>;
 export type GetAppointmentByIdQuery = z.infer<typeof GetAppointmentByIdQuerySchema>;
 export type GetAppointmentsByPatientIdQuery = z.infer<typeof GetAppointmentsByPatientIdQuerySchema>;
@@ -293,6 +298,7 @@ export const AppointmentValidationSchemas = {
   DeleteAppointmentCommandSchema,
   ConfirmAppointmentCommandSchema,
   CancelAppointmentCommandSchema,
+  CompleteAppointmentCommandSchema,
   RescheduleAppointmentCommandSchema,
   
   // Query schemas

@@ -32,6 +32,10 @@ interface AppointmentState {
   deleteAppointment: (id: string) => Promise<void>;
   confirmAppointment: (id: string) => Promise<void>;
   cancelAppointment: (id: string) => Promise<void>;
+  completeAppointment: (id: string) => Promise<void>;
+  reconfirmAppointment: (id: string) => Promise<void>;
+  completeAppointment: (id: string) => Promise<void>;
+  reconfirmAppointment: (id: string) => Promise<void>;
   
   // Query Operations
   fetchAllAppointments: () => Promise<void>;
@@ -163,6 +167,52 @@ export const useAppointmentStore = create<AppointmentState>()(
             }));
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to cancel appointment';
+            set({ 
+              error: errorMessage, 
+              isLoading: false 
+            });
+            throw error;
+          }
+        },
+
+        completeAppointment: async (id) => {
+          set({ isLoading: true, error: null });
+          
+          try {
+            await getApiService().completeAppointment(id);
+            
+            // Optimistic update - update status immediately
+            set((state) => ({
+              appointments: state.appointments.map(apt => 
+                apt.id === id ? { ...apt, status: 'completed', updatedAt: new Date().toISOString() } : apt
+              ),
+              isLoading: false,
+            }));
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to complete appointment';
+            set({ 
+              error: errorMessage, 
+              isLoading: false 
+            });
+            throw error;
+          }
+        },
+
+        reconfirmAppointment: async (id) => {
+          set({ isLoading: true, error: null });
+          
+          try {
+            await getApiService().reconfirmAppointment(id);
+            
+            // Optimistic update - update status immediately
+            set((state) => ({
+              appointments: state.appointments.map(apt => 
+                apt.id === id ? { ...apt, status: 'confirmed', updatedAt: new Date().toISOString() } : apt
+              ),
+              isLoading: false,
+            }));
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to reconfirm appointment';
             set({ 
               error: errorMessage, 
               isLoading: false 

@@ -15,7 +15,10 @@ const mapAppointmentDtoToAppointment = (dto: AppointmentDto): Appointment => ({
   date: dto.appointmentDate,
   time: dto.appointmentTime,
   doctor: dto.doctor?.fullName || 'Unknown Doctor', // Use nested data only
-  status: dto.status === 'confirmed' ? 'confirmed' : dto.status === 'cancelled' ? 'cancelled' : 'confirmed'
+  status: dto.status === 'confirmed' ? 'confirmed' 
+    : dto.status === 'cancelled' ? 'cancelled' 
+    : dto.status === 'completed' ? 'completed' 
+    : 'confirmed' // fallback
 });
 
 export const AppointmentsPage: React.FC = () => {
@@ -128,6 +131,27 @@ export const AppointmentsPage: React.FC = () => {
     }
   };
 
+  const handleCompleteAppointment = (appointmentId: string) => {
+    const appointment = viewModel.appointments.find(apt => apt.id === appointmentId);
+    const appointmentName = appointment?.patient?.fullName || 'this appointment';
+    
+    setConfirmationModal({
+      isOpen: true,
+      title: 'Complete Appointment',
+      message: `Mark the appointment for ${appointmentName} as completed?`,
+      confirmText: 'Complete',
+      confirmColor: 'blue',
+      onConfirm: async () => {
+        try {
+          await viewModel.completeAppointment(appointmentId);
+          setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+        } catch (error) {
+          console.error('Failed to complete appointment:', error);
+        }
+      },
+    });
+  };
+
   const handleCloseConfirmationModal = () => {
     setConfirmationModal(prev => ({ ...prev, isOpen: false }));
   };
@@ -186,6 +210,7 @@ export const AppointmentsPage: React.FC = () => {
         onModifyAppointment={handleModifyAppointment}
         onCancelAppointment={handleCancelAppointment}
         onReconfirmAppointment={handleReconfirmAppointment}
+        onCompleteAppointment={handleCompleteAppointment}
       />
 
       {/* Add Appointment Modal */}

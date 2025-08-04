@@ -28,6 +28,8 @@ export interface IAppointmentListViewModel {
   updateAppointment: (id: string, data: Partial<AddAppointmentFormData>) => Promise<void>;
   confirmAppointment: (id: string) => Promise<void>;
   cancelAppointment: (id: string) => Promise<void>;
+  completeAppointment: (id: string) => Promise<void>;
+  reconfirmAppointment: (id: string) => Promise<void>;
   deleteAppointment: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -74,5 +76,6 @@ export interface IAppointmentPageViewModel {
   updateAppointment: (id: string, data: Partial<AddAppointmentFormData>) => Promise<boolean>;
   cancelAppointment: (id: string) => Promise<void>;
   confirmAppointment: (id: string) => Promise<void>;
+  completeAppointment: (id: string) => Promise<void>;
   clearError: () => void;
 }

@@ -16,6 +16,8 @@ export const useAppointmentListViewModel = (): IAppointmentListViewModel => {
     updateAppointment,
     confirmAppointment,
     cancelAppointment,
+    completeAppointment,
+    reconfirmAppointment,
     deleteAppointment,
     clearError,
   } = useAppointmentStore();
@@ -65,6 +67,22 @@ export const useAppointmentListViewModel = (): IAppointmentListViewModel => {
     }
   }, [deleteAppointment]);
 
+  const handleCompleteAppointment = useCallback(async (id: string) => {
+    try {
+      await completeAppointment(id);
+    } catch (error) {
+      console.error('Failed to complete appointment:', error);
+    }
+  }, [completeAppointment]);
+
+  const handleReconfirmAppointment = useCallback(async (id: string) => {
+    try {
+      await reconfirmAppointment(id);
+    } catch (error) {
+      console.error('Failed to reconfirm appointment:', error);
+    }
+  }, [reconfirmAppointment]);
+
   return {
     appointments,
     isLoading,
@@ -73,6 +91,8 @@ export const useAppointmentListViewModel = (): IAppointmentListViewModel => {
     updateAppointment: handleUpdateAppointment,
     confirmAppointment: handleConfirmAppointment,
     cancelAppointment: handleCancelAppointment,
+    completeAppointment: handleCompleteAppointment,
+    reconfirmAppointment: handleReconfirmAppointment,
     deleteAppointment: handleDeleteAppointment,
     clearError,
   };
