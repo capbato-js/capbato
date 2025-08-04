@@ -38,7 +38,7 @@ export class DoctorMapper {
       // User Information
       firstName: user.firstName.value,
       lastName: user.lastName.value,
-      fullName: `${user.firstName.value} ${user.lastName.value}`,
+      fullName: `Dr. ${user.firstName.value} ${user.lastName.value}`,
       email: user.email.value,
       username: user.username.value,
       personalContactNumber: user.mobile?.value,
@@ -53,7 +53,7 @@ export class DoctorMapper {
     return {
       id: doctor.stringId || '',
       userId: doctor.userId,
-      fullName: `${user.firstName.value} ${user.lastName.value}`,
+      fullName: `Dr. ${user.firstName.value} ${user.lastName.value}`,
       specialization: doctor.specializationValue,
       formattedContactNumber: user.mobile?.value || '',
       yearsOfExperience: doctor.yearsOfExperience,

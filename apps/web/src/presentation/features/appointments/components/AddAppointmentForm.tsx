@@ -109,15 +109,15 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     if ([1, 3, 5].includes(dayOfWeek)) {
       // Find first doctor (assuming they are ordered)
       const doctor1 = doctorStore.doctorSummaries[0];
-      return doctor1 ? `Dr. ${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
+      return doctor1 ? `${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
     } else if ([2, 4].includes(dayOfWeek)) {
       // Find second doctor
       const doctor2 = doctorStore.doctorSummaries[1];  
-      return doctor2 ? `Dr. ${doctor2.fullName} - ${doctor2.specialization}` : 'Dr. Johnson (General Physician)';
+      return doctor2 ? `${doctor2.fullName} - ${doctor2.specialization}` : 'Dr. Johnson (General Physician)';
     } else {
       // Weekend - default to first doctor
       const doctor1 = doctorStore.doctorSummaries[0];
-      return doctor1 ? `Dr. ${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
+      return doctor1 ? `${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
     }
   };
 

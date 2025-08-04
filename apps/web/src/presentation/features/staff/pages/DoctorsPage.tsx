@@ -18,7 +18,7 @@ export const DoctorsPage: React.FC = () => {
   const convertToScheduleEntries = (): ScheduleEntry[] => {
     return appointments?.map(appointment => ({
       date: appointment.date, // Already in YYYY-MM-DD format
-      details: `Dr. ${appointment.doctorName}`,
+      details: appointment.doctorName,
       note: appointment.formattedTime || appointment.time
     })) || [];
   };

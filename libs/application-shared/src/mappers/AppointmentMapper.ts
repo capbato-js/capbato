@@ -46,7 +46,7 @@ export class AppointmentMapper {
         id: doctorData.id,
         firstName: doctorData.firstName,
         lastName: doctorData.lastName,
-        fullName: `${doctorData.firstName} ${doctorData.lastName}`.trim(),
+        fullName: `Dr. ${doctorData.firstName} ${doctorData.lastName}`.trim(),
         specialization: doctorData.specialization,
       };
     }
