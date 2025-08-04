@@ -31,6 +31,7 @@ import {
   UpdateTodoUseCase,
   DeleteTodoUseCase,
   ToggleTodoUseCase,
+  UpdateUserDetailsUseCase,
   GetAllTodosQueryHandler,
   GetActiveTodosQueryHandler,
   GetCompletedTodosQueryHandler,
@@ -52,6 +53,7 @@ import {
   UserValidationService,
   RegisterUserValidationService,
   LoginUserValidationService,
+  UpdateUserDetailsValidationService,
   PatientValidationService,
   CreatePatientValidationService,
   GetPatientByIdValidationService,
@@ -240,6 +242,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.RegisterUserUseCase, RegisterUserUseCase);
   container.registerSingleton(TOKENS.LoginUserUseCase, LoginUserUseCase);
   container.registerSingleton(TOKENS.ChangeUserPasswordUseCase, ChangeUserPasswordUseCase);
+  container.registerSingleton(TOKENS.UpdateUserDetailsUseCase, UpdateUserDetailsUseCase);
   container.registerSingleton(TOKENS.CreatePatientUseCase, CreatePatientUseCase);
   container.registerSingleton(TOKENS.CreateDoctorProfileCommandHandler, CreateDoctorProfileCommandHandler);
 
@@ -386,6 +389,10 @@ export const configureDI = async () => {
   container.registerSingleton(
     TOKENS.LoginUserValidationService,
     LoginUserValidationService
+  );
+  container.registerSingleton(
+    TOKENS.UpdateUserDetailsValidationService,
+    UpdateUserDetailsValidationService
   );
   container.registerSingleton(
     TOKENS.UserValidationService,

@@ -60,9 +60,21 @@ export class InMemoryUserRepository implements IUserRepository {
       throw new Error(`User with ID ${id} not found`);
     }
 
-    // For in-memory, we'd need to create a new user instance with changes
-    // This is simplified - in real implementation, we'd handle partial updates properly
-    throw new Error('Update not implemented for in-memory repository');
+    // Create new user with updated fields
+    const updatedUser = User.create(
+      existingUser.id,
+      changes.firstName ? (changes.firstName as any).value : existingUser.firstName.value,
+      changes.lastName ? (changes.lastName as any).value : existingUser.lastName.value,
+      changes.email ? (changes.email as any).value : existingUser.email.value,
+      existingUser.username.value, // Username should not be updated in this operation
+      existingUser.hashedPassword.value,
+      changes.role ? (changes.role as any).value : existingUser.role.value,
+      changes.mobile !== undefined ? 
+        (changes.mobile ? (changes.mobile as any).value : undefined) : 
+        existingUser.mobile?.value
+    );
+
+    this.users.set(id, updatedUser);
   }
 
   async updatePassword(id: string, hashedPassword: string): Promise<void> {

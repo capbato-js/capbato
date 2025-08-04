@@ -28,6 +28,7 @@ export {
   LoginUserCommandSchema,
   LoginFormSchema,
   ChangeUserPasswordCommandSchema,
+  UpdateUserDetailsCommandSchema,
   ChangePasswordFormSchema,
   GetAllUsersQuerySchema,
   FirstNameSchema,
@@ -37,6 +38,7 @@ export {
   NameSchema,
   MobileSchema,
   RoleSchema,
+  UserIdSchema,
   UserValidationSchemas,
   USER_VALIDATION_ERRORS,
 } from './UserValidationSchemas';

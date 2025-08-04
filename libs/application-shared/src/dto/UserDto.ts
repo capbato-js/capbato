@@ -37,3 +37,13 @@ export interface LoginUserResponseDto {
     mobile?: string;
   };
 }
+
+export type UserResponse = {
+  success: boolean;
+  data: UserDto;
+};
+
+export type UserOperationResponse = {
+  success: boolean;
+  data: { message: string };
+};

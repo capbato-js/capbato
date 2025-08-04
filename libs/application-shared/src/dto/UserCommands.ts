@@ -28,3 +28,12 @@ export interface ChangeUserPasswordCommand {
   userId: string;
   newPassword: string;
 }
+
+export interface UpdateUserDetailsCommand {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  mobile?: string;
+  role?: string;
+}
