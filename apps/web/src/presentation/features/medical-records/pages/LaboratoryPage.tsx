@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@mantine/core';
+import { Button, useMantineTheme } from '@mantine/core';
 import { Icon, Modal } from '../../../components/common';
-import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
+import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { LaboratoryResult } from '../types';
 import { AddLabTestForm } from '../components';
@@ -70,6 +70,8 @@ export const LaboratoryPage: React.FC = () => {
   const [modalOpened, setModalOpened] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const theme = useMantineTheme();
   
   // Laboratory store
   const { 
@@ -188,8 +190,8 @@ export const LaboratoryPage: React.FC = () => {
   const getStatusBadge = (status: LaboratoryResult['status']) => {
     const styles = {
       'Pending': {
-        background: '#ffcc80',
-        color: '#8c5000',
+        background: theme.colors.orange[1],
+        color: theme.colors.orange[9],
         padding: '5px 10px',
         borderRadius: '5px',
         fontWeight: 600,
@@ -197,8 +199,8 @@ export const LaboratoryPage: React.FC = () => {
         display: 'inline-block'
       },
       'Completed': {
-        background: '#b9f6ca',
-        color: '#006400',
+        background: theme.colors.green[1],
+        color: theme.colors.green[9],
         padding: '5px 10px',
         borderRadius: '5px',
         fontWeight: 600,
@@ -206,8 +208,8 @@ export const LaboratoryPage: React.FC = () => {
         display: 'inline-block'
       },
       'In Progress': {
-        background: '#bbdefb',
-        color: '#0d47a1',
+        background: theme.colors.blue[1],
+        color: theme.colors.blue[9],
         padding: '5px 10px',
         borderRadius: '5px',
         fontWeight: 600,
@@ -217,8 +219,8 @@ export const LaboratoryPage: React.FC = () => {
     };
 
     const defaultStyle = {
-      background: '#e0e0e0',
-      color: '#424242',
+      background: theme.colors.gray[1],
+      color: theme.colors.gray[9],
       padding: '5px 10px',
       borderRadius: '5px',
       fontWeight: 600,
@@ -238,42 +240,37 @@ export const LaboratoryPage: React.FC = () => {
     {
       key: 'patientNumber',
       header: 'Patient #',
-      width: '25%',
+      width: '30%',
       align: 'center',
       searchable: true
     },
     {
       key: 'patientName',
       header: 'Patient\'s Name',
-      width: '35%',
+      width: '45%',
       align: 'left',
       searchable: true
     },
     {
       key: 'status',
       header: 'Status',
-      width: '20%',
+      width: '25%',
       align: 'center',
       searchable: true,
       render: (value: LaboratoryResult['status']) => getStatusBadge(value)
-    },
-    {
-      key: 'id',
-      header: 'Results',
-      width: '20%',
-      align: 'center',
-      searchable: false,
-      render: (value: string, record: LaboratoryResult) => (
-        <Button
-          size="sm"
-          onClick={() => handleViewResult(record)}
-        >
-          <Icon icon="fas fa-eye" style={{ marginRight: '6px' }} />
-          View
-        </Button>
-      )
     }
   ];
+
+  // Define actions for the DataTable
+  const actions: TableActions<LaboratoryResult> = {
+    buttons: [
+      {
+        icon: 'fas fa-eye',
+        tooltip: 'View Laboratory Results',
+        onClick: handleViewResult
+      }
+    ]
+  };
 
   return (
     <MedicalClinicLayout>
@@ -287,6 +284,7 @@ export const LaboratoryPage: React.FC = () => {
       <DataTable
         data={laboratoryResults}
         columns={columns}
+        actions={actions}
         searchable={true}
         searchPlaceholder="Search laboratory results by patient or status..."
         emptyStateMessage={loadingStates.fetching ? "Loading laboratory results..." : "No laboratory results found"}
