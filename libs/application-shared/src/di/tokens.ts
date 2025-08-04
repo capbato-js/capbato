@@ -53,6 +53,9 @@ export const TOKENS = {
   UpdateAppointmentUseCase: 'UpdateAppointmentUseCase',
   DeleteAppointmentUseCase: 'DeleteAppointmentUseCase',
   ConfirmAppointmentUseCase: 'ConfirmAppointmentUseCase',
+  CancelAppointmentUseCase: 'CancelAppointmentUseCase',
+  CompleteAppointmentUseCase: 'CompleteAppointmentUseCase',
+  RescheduleAppointmentUseCase: 'RescheduleAppointmentUseCase',
 
   // Laboratory Layer - Use Cases (Commands)
   CreateLabRequestUseCase: 'CreateLabRequestUseCase',
@@ -62,8 +65,6 @@ export const TOKENS = {
   CreateBloodChemistryUseCase: 'CreateBloodChemistryUseCase',
   UpdateBloodChemistryUseCase: 'UpdateBloodChemistryUseCase',
   DeleteBloodChemistryUseCase: 'DeleteBloodChemistryUseCase',
-  CancelAppointmentUseCase: 'CancelAppointmentUseCase',
-  RescheduleAppointmentUseCase: 'RescheduleAppointmentUseCase',
 
   // Application Layer - Use Cases (Queries)
   GetAllTodosQueryHandler: 'GetAllTodosQueryHandler',
@@ -151,6 +152,7 @@ export const TOKENS = {
   DeleteAppointmentValidationService: 'DeleteAppointmentValidationService',
   ConfirmAppointmentValidationService: 'ConfirmAppointmentValidationService',
   CancelAppointmentValidationService: 'CancelAppointmentValidationService',
+  CompleteAppointmentValidationService: 'CompleteAppointmentValidationService',
   RescheduleAppointmentValidationService: 'RescheduleAppointmentValidationService',
   GetAppointmentByIdValidationService: 'GetAppointmentByIdValidationService',
   GetAppointmentsByPatientIdValidationService: 'GetAppointmentsByPatientIdValidationService',

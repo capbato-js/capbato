@@ -232,6 +232,12 @@ export class AppointmentAlreadyCancelledException extends DomainException {
   }
 }
 
+export class AppointmentAlreadyCompletedException extends DomainException {
+  constructor(message: string = 'Appointment is already completed') {
+    super(message, 'APPOINTMENT_ALREADY_COMPLETED', 400);
+  }
+}
+
 export class PastAppointmentDateException extends DomainException {
   constructor(message: string = 'Cannot create appointment for past date') {
     super(message, 'PAST_APPOINTMENT_DATE', 400);

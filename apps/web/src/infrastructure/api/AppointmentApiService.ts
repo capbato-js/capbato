@@ -151,4 +151,32 @@ export class AppointmentApiService {
       throw new Error('Failed to cancel appointment');
     }
   }
+
+  /**
+   * Completes an appointment
+   */
+  async completeAppointment(id: string): Promise<void> {
+    const response = await this.httpClient.put<{ success: boolean }>(
+      this.apiConfig.endpoints.appointments.complete(id),
+      {}
+    );
+
+    if (!response.data.success) {
+      throw new Error('Failed to complete appointment');
+    }
+  }
+
+  /**
+   * Reconfirms an appointment (sets status back to confirmed)
+   */
+  async reconfirmAppointment(id: string): Promise<void> {
+    const response = await this.httpClient.put<{ success: boolean }>(
+      this.apiConfig.endpoints.appointments.reconfirm(id),
+      {}
+    );
+
+    if (!response.data.success) {
+      throw new Error('Failed to reconfirm appointment');
+    }
+  }
 }

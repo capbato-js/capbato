@@ -54,6 +54,10 @@ export const useAppointmentPageViewModel = (): IAppointmentPageViewModel => {
     await listViewModel.confirmAppointment(id);
   }, [listViewModel]);
 
+  const completeAppointment = useCallback(async (id: string) => {
+    await listViewModel.completeAppointment(id);
+  }, [listViewModel]);
+
   return {
     // State from list view model
     appointments: listViewModel.appointments,
@@ -71,6 +75,7 @@ export const useAppointmentPageViewModel = (): IAppointmentPageViewModel => {
     updateAppointment,
     cancelAppointment,
     confirmAppointment,
+    completeAppointment,
     clearError: listViewModel.clearError,
   };
 };

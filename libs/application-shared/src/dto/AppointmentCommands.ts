@@ -7,6 +7,7 @@ import {
   DeleteAppointmentCommandSchema,
   ConfirmAppointmentCommandSchema,
   CancelAppointmentCommandSchema,
+  CompleteAppointmentCommandSchema,
   RescheduleAppointmentCommandSchema,
 } from '../validation/AppointmentValidationSchemas';
 
@@ -17,6 +18,7 @@ export type {
   DeleteAppointmentCommand,
   ConfirmAppointmentCommand,
   CancelAppointmentCommand,
+  CompleteAppointmentCommand,
   RescheduleAppointmentCommand,
 } from '../validation/AppointmentValidationSchemas';
 
@@ -27,6 +29,7 @@ export {
   DeleteAppointmentCommandSchema,
   ConfirmAppointmentCommandSchema,
   CancelAppointmentCommandSchema,
+  CompleteAppointmentCommandSchema,
   RescheduleAppointmentCommandSchema,
   AppointmentValidationSchemas,
 } from '../validation/AppointmentValidationSchemas';
@@ -41,6 +44,7 @@ export const createAppointmentCommandValidationSchema = () => {
       DeleteAppointmentCommandSchema,
       ConfirmAppointmentCommandSchema,
       CancelAppointmentCommandSchema,
+      CompleteAppointmentCommandSchema,
       RescheduleAppointmentCommandSchema,
     };
   } catch {

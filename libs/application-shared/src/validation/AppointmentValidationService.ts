@@ -7,6 +7,7 @@ import {
   DeleteAppointmentCommandSchema,
   ConfirmAppointmentCommandSchema,
   CancelAppointmentCommandSchema,
+  CompleteAppointmentCommandSchema,
   RescheduleAppointmentCommandSchema,
   GetAppointmentByIdQuerySchema,
   GetAppointmentsByPatientIdQuerySchema,
@@ -17,6 +18,7 @@ import {
   DeleteAppointmentCommand,
   ConfirmAppointmentCommand,
   CancelAppointmentCommand,
+  CompleteAppointmentCommand,
   RescheduleAppointmentCommand,
   GetAppointmentByIdQuery,
   GetAppointmentsByPatientIdQuery,
@@ -67,6 +69,15 @@ export class ConfirmAppointmentValidationService extends ValidationService<unkno
 @injectable()
 export class CancelAppointmentValidationService extends ValidationService<unknown, CancelAppointmentCommand> {
   protected schema = CancelAppointmentCommandSchema;
+}
+
+/**
+ * Validation service for CompleteAppointmentCommand
+ * Encapsulates validation logic for completing appointments
+ */
+@injectable()
+export class CompleteAppointmentValidationService extends ValidationService<unknown, CompleteAppointmentCommand> {
+  protected schema = CompleteAppointmentCommandSchema;
 }
 
 /**
@@ -131,6 +142,8 @@ export class AppointmentValidationService {
     private confirmValidationService: ConfirmAppointmentValidationService,
     @inject(TOKENS.CancelAppointmentValidationService)
     private cancelValidationService: CancelAppointmentValidationService,
+    @inject(TOKENS.CompleteAppointmentValidationService)
+    private completeValidationService: CompleteAppointmentValidationService,
     @inject(TOKENS.RescheduleAppointmentValidationService)
     private rescheduleValidationService: RescheduleAppointmentValidationService,
     @inject(TOKENS.GetAppointmentByIdValidationService)
@@ -162,6 +175,10 @@ export class AppointmentValidationService {
 
   validateCancelCommand(data: unknown): CancelAppointmentCommand {
     return this.cancelValidationService.validate(data);
+  }
+
+  validateCompleteCommand(data: unknown): CompleteAppointmentCommand {
+    return this.completeValidationService.validate(data);
   }
 
   validateRescheduleCommand(data: unknown): RescheduleAppointmentCommand {

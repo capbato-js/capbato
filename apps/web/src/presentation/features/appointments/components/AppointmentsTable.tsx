@@ -1,6 +1,7 @@
 import React from 'react';
 import { DataTable, TableColumn, TableActionButtons, ActionButtonConfig } from '../../../components/common';
 import { Appointment } from '../types';
+import { useMantineTheme } from '@mantine/core';
 
 interface AppointmentsTableProps {
   appointments: Appointment[];
@@ -17,6 +18,9 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   onReconfirmAppointment,
   onCompleteAppointment,
 }) => {
+
+  const theme = useMantineTheme();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -29,24 +33,24 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const getStatusBadge = (status: Appointment['status']) => {
     const styles = {
       confirmed: {
-        background: '#b9f6ca',
-        color: '#006400',
+        background: theme.colors.green[1],
+        color: theme.colors.green[9],
         padding: '5px 10px',
         borderRadius: '5px',
         fontWeight: 'bold',
         display: 'inline-block'
       },
       completed: {
-        background: '#c8e6c9',
-        color: '#2e7d32',
+        background: theme.colors.tableBlue[1],
+        color: theme.colors.tableBlue[9], 
         padding: '5px 10px',
         borderRadius: '5px',
         fontWeight: 'bold',
         display: 'inline-block'
       },
       cancelled: {
-        background: '#ff8a80',
-        color: '#8b0000',
+        background: theme.colors.red[1],
+        color: theme.colors.red[9],
         padding: '5px 10px',
         borderRadius: '5px',
         fontWeight: 'bold',
@@ -85,12 +89,8 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
         onClick: () => onCancelAppointment(appointment.id)
       });
     } else if (appointment.status === 'completed') {
-      // For completed appointments: Only show "Reconfirm" to go back to confirmed
-      actions.push({
-        icon: 'fas fa-redo',
-        tooltip: 'Reconfirm Appointment',
-        onClick: () => onReconfirmAppointment(appointment.id)
-      });
+      // For completed appointments: No actions - they are done
+      // Completed appointments cannot be reconfirmed as they are already finished
     } else if (appointment.status === 'cancelled') {
       // For cancelled appointments: Only show "Reconfirm"
       actions.push({

@@ -110,6 +110,7 @@ import {
   DeleteAppointmentUseCase,
   ConfirmAppointmentUseCase,
   CancelAppointmentUseCase,
+  CompleteAppointmentUseCase,
   RescheduleAppointmentUseCase,
   GetAllAppointmentsQueryHandler,
   GetAppointmentByIdQueryHandler,
@@ -125,6 +126,7 @@ import {
   DeleteAppointmentValidationService,
   ConfirmAppointmentValidationService,
   CancelAppointmentValidationService,
+  CompleteAppointmentValidationService,
   RescheduleAppointmentValidationService,
   GetAppointmentByIdValidationService,
   GetAppointmentsByPatientIdValidationService,
@@ -260,6 +262,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.DeleteAppointmentUseCase, DeleteAppointmentUseCase);
   container.registerSingleton(TOKENS.ConfirmAppointmentUseCase, ConfirmAppointmentUseCase);
   container.registerSingleton(TOKENS.CancelAppointmentUseCase, CancelAppointmentUseCase);
+  container.registerSingleton(TOKENS.CompleteAppointmentUseCase, CompleteAppointmentUseCase);
   container.registerSingleton(TOKENS.RescheduleAppointmentUseCase, RescheduleAppointmentUseCase);
 
   // Laboratory Use Cases
@@ -450,6 +453,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.DeleteAppointmentValidationService, DeleteAppointmentValidationService);
   container.registerSingleton(TOKENS.ConfirmAppointmentValidationService, ConfirmAppointmentValidationService);
   container.registerSingleton(TOKENS.CancelAppointmentValidationService, CancelAppointmentValidationService);
+  container.registerSingleton(TOKENS.CompleteAppointmentValidationService, CompleteAppointmentValidationService);
   container.registerSingleton(TOKENS.RescheduleAppointmentValidationService, RescheduleAppointmentValidationService);
   container.registerSingleton(TOKENS.GetAppointmentByIdValidationService, GetAppointmentByIdValidationService);
   container.registerSingleton(TOKENS.GetAppointmentsByPatientIdValidationService, GetAppointmentsByPatientIdValidationService);
@@ -736,8 +740,9 @@ async function getLabRequestRepositoryImplementation(): Promise<ILabRequestRepos
   switch (ormType) {
     case 'typeorm': {
       const dataSource = await getTypeOrmDataSource();
+      const patientRepository = await getPatientRepositoryImplementation();
       console.log(`📦 Using TypeORM lab request repository with ${dbType}`);
-      return new TypeOrmLabRequestRepository(dataSource);
+      return new TypeOrmLabRequestRepository(dataSource, patientRepository);
     }
 
     case 'native':
@@ -752,7 +757,8 @@ async function getLabRequestRepositoryImplementation(): Promise<ILabRequestRepos
         `📦 No native support for ${dbType}, falling back to TypeORM for lab requests`
       );
       const dataSource = await getTypeOrmDataSource();
-      return new TypeOrmLabRequestRepository(dataSource);
+      const patientRepository = await getPatientRepositoryImplementation();
+      return new TypeOrmLabRequestRepository(dataSource, patientRepository);
     }
   }
 }

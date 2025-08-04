@@ -4,6 +4,7 @@ import { AppointmentTime } from '../value-objects/AppointmentTime';
 import { 
   AppointmentAlreadyCancelledException,
   AppointmentAlreadyConfirmedException,
+  AppointmentAlreadyCompletedException,
   PastAppointmentDateException
 } from '../exceptions/DomainExceptions';
 
@@ -115,8 +116,10 @@ export class Appointment implements IAppointment {
       throw new AppointmentAlreadyConfirmedException('Appointment is already confirmed');
     }
 
-    if (this._status.value === 'cancelled') {
-      throw new AppointmentAlreadyCancelledException('Cannot confirm a cancelled appointment');
+    // Allow confirming cancelled appointments (for reconfirm functionality)
+    // Only prevent confirming completed appointments as they should stay completed
+    if (this._status.value === 'completed') {
+      throw new AppointmentAlreadyCompletedException('Cannot confirm a completed appointment');
     }
 
     return this.createCopy({ status: new AppointmentStatus('confirmed') });
@@ -128,6 +131,21 @@ export class Appointment implements IAppointment {
     }
 
     return this.createCopy({ status: new AppointmentStatus('cancelled') });
+  }
+
+  complete(): Appointment {
+    if (this._status.value === 'completed') {
+      throw new AppointmentAlreadyCompletedException('Appointment is already completed');
+    }
+
+    if (this._status.value === 'cancelled') {
+      throw new AppointmentAlreadyCancelledException('Cannot complete a cancelled appointment');
+    }
+
+    return this.createCopy({ 
+      status: new AppointmentStatus('completed'),
+      updatedAt: new Date()
+    });
   }
 
   reschedule(newDate: Date, newTime: string | AppointmentTime): Appointment {

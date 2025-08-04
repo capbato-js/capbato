@@ -38,6 +38,8 @@ export interface ApiConfiguration {
       delete: (id: string) => string;
       confirm: (id: string) => string;
       cancel: (id: string) => string;
+      complete: (id: string) => string;
+      reconfirm: (id: string) => string;
     };
     doctors: {
       base: string;
