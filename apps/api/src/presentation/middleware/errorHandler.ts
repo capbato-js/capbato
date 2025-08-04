@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import morgan from 'morgan';
 
 /**
  * Global error handling middleware
@@ -48,21 +49,13 @@ export const notFoundHandler = (req: Request, res: Response): void => {
 };
 
 /**
- * Request logging middleware
+ * Configure custom Morgan format: iso-combined
  */
-export const requestLogger = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  const start = Date.now();
+morgan.format('iso-combined', 
+  ':remote-addr - - [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms'
+);
 
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    console.log(
-      `${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`
-    );
-  });
-
-  next();
-};
+/**
+ * Request logging middleware using Morgan with custom iso-combined format
+ */
+export const requestLogger = morgan('iso-combined');
