@@ -23,7 +23,7 @@ import { classifyError, formatFieldErrorMessage } from '../utils/errorClassifica
 // Form data type that matches the schema input before transformation
 type CreatePatientFormData = Omit<CreatePatientCommand, 'contactNumber' | 'guardianContactNumber'> & {
   contactNumber: string;
-  guardianContactNumber: string;
+  guardianContactNumber: string | undefined;
 };
 
 // Helper function to safely extract error message
@@ -75,7 +75,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
     clearErrors,
     formState: { errors },
   } = useForm<CreatePatientCommand>({
-    resolver: zodResolver(CreatePatientCommandSchema),
+    resolver: zodResolver(CreatePatientCommandSchema) as any,
     mode: 'onBlur',
     defaultValues: {
       firstName: '',
