@@ -55,7 +55,6 @@ export const Modal: React.FC<CustomModalProps> = ({
       withCloseButton={withCloseButton}
       styles={defaultStyles}
       className={className}
-      zIndex={2000} // Higher than header (1000) and sidebar (999)
       {...rest}
     >
       {children}

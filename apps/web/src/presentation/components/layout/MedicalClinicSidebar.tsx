@@ -68,7 +68,7 @@ export const MedicalClinicSidebar: React.FC<MedicalClinicSidebarProps> = ({ clas
   return (
     <Box
       component="nav"
-      className={`fixed left-0 w-[280px] h-full bg-white z-[999] ${className || ''}`}
+      className={`fixed left-0 w-[280px] h-full bg-white ${className || ''}`}
       style={{
         top: '64px', // Below header
         borderRight: `1px solid ${theme.colors.customGray[4]}`, // Subtle border instead of shadow

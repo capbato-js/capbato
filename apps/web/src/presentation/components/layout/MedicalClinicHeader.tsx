@@ -13,7 +13,7 @@ export const MedicalClinicHeader: React.FC<MedicalClinicHeaderProps> = ({ classN
   return (
     <Box
       component="nav"
-      className={`navbar fixed top-0 left-0 w-full bg-white z-[1000] ${className || ''}`}
+      className={`navbar fixed top-0 left-0 w-full bg-white ${className || ''}`}
       style={{ 
         borderBottom: '1px solid #e5e5e5', // Subtle border instead of shadow
         padding: '0 24px',
