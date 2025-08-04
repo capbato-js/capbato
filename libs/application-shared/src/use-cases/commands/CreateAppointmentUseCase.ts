@@ -50,16 +50,16 @@ export class CreateAppointmentUseCase {
     // Persist appointment using repository
     const appointmentId = await this.appointmentRepository.create(appointment);
 
-    // Create corresponding schedule entry for doctor's calendar
-    const schedule = new Schedule(
-      command.doctorId,
-      command.appointmentDate,
-      command.appointmentTime
-    );
+    // // Create corresponding schedule entry for doctor's calendar
+    // const schedule = new Schedule(
+    //   command.doctorId,
+    //   command.appointmentDate,
+    //   command.appointmentTime
+    // );
 
-    // Validate and create schedule
-    schedule.validate();
-    await this.scheduleRepository.create(schedule);
+    // // Validate and create schedule
+    // schedule.validate();
+    // await this.scheduleRepository.create(schedule);
 
     // Return the created appointment with ID
     return new Appointment(
