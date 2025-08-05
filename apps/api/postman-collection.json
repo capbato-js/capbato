@@ -1504,6 +1504,363 @@
             },
             "description": "Test validation error when newPassword field is missing from request"
           }
+        },
+        {
+          "name": "Update User Details - Happy Path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "    pm.expect(responseJson.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('User data has expected structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const userData = responseJson.data;",
+                  "    pm.expect(userData).to.have.property('id');",
+                  "    pm.expect(userData).to.have.property('firstName');",
+                  "    pm.expect(userData).to.have.property('lastName');",
+                  "    pm.expect(userData).to.have.property('email');",
+                  "    pm.expect(userData).to.have.property('username');",
+                  "    pm.expect(userData).to.have.property('role');",
+                  "    pm.expect(userData).to.have.property('createdAt');",
+                  "    // mobile is optional",
+                  "    pm.expect(userData.id).to.be.a('string');",
+                  "    pm.expect(userData.firstName).to.be.a('string');",
+                  "    pm.expect(userData.lastName).to.be.a('string');",
+                  "    pm.expect(userData.email).to.be.a('string');",
+                  "    pm.expect(userData.username).to.be.a('string');",
+                  "    pm.expect(userData.role).to.be.oneOf(['admin', 'doctor', 'receptionist']);",
+                  "});",
+                  "",
+                  "pm.test('Updated data matches request', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const requestBody = JSON.parse(pm.request.body.raw);",
+                  "    const userData = responseJson.data;",
+                  "    ",
+                  "    if (requestBody.firstName) {",
+                  "        pm.expect(userData.firstName).to.equal(requestBody.firstName);",
+                  "    }",
+                  "    if (requestBody.lastName) {",
+                  "        pm.expect(userData.lastName).to.equal(requestBody.lastName);",
+                  "    }",
+                  "    if (requestBody.email) {",
+                  "        pm.expect(userData.email).to.equal(requestBody.email);",
+                  "    }",
+                  "    if (requestBody.mobile) {",
+                  "        pm.expect(userData.mobile).to.equal(requestBody.mobile);",
+                  "    }",
+                  "    if (requestBody.role) {",
+                  "        pm.expect(userData.role).to.equal(requestBody.role);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"UpdatedFirstName\",\n  \"lastName\": \"UpdatedLastName\",\n  \"email\": \"updated.email@example.com\",\n  \"mobile\": \"09876543210\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{testUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{testUserId}}"
+              ]
+            },
+            "description": "Update user details including firstName, lastName, email, mobile, and role"
+          }
+        },
+        {
+          "name": "Update User Details - Partial Update",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "    pm.expect(responseJson.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Only firstName updated', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const requestBody = JSON.parse(pm.request.body.raw);",
+                  "    const userData = responseJson.data;",
+                  "    ",
+                  "    pm.expect(userData.firstName).to.equal(requestBody.firstName);",
+                  "    // Other fields should remain unchanged from previous state",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"PartiallyUpdatedName\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{testUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{testUserId}}"
+              ]
+            },
+            "description": "Test partial update - update only one field (firstName)"
+          }
+        },
+        {
+          "name": "Update User Details - User Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 or 500', function () {",
+                  "    // Could be 500 if user not found, or 400 if ID validation fails",
+                  "    pm.expect([400, 500]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test('Response has error structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates user not found', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.error.toLowerCase()).to.include('not found');",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"SomeFirstName\",\n  \"lastName\": \"SomeLastName\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/nonexistent-user-id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "nonexistent-user-id"
+              ]
+            },
+            "description": "Test error handling when trying to update a non-existent user"
+          }
+        },
+        {
+          "name": "Update User Details - Invalid Email Format",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has error structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});",
+                  "",
+                  "pm.test('Error indicates email validation issue', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const errorMessage = responseJson.error.toLowerCase();",
+                  "    pm.expect(errorMessage).to.satisfy(function(msg) {",
+                  "        return msg.includes('email') && (msg.includes('invalid') || msg.includes('format'));",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invalid-email-format\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{testUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{testUserId}}"
+              ]
+            },
+            "description": "Test validation error when providing invalid email format"
+          }
+        },
+        {
+          "name": "Update User Details - Invalid Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has error structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});",
+                  "",
+                  "pm.test('Error indicates invalid role', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const errorMessage = responseJson.error.toLowerCase();",
+                  "    pm.expect(errorMessage).to.satisfy(function(msg) {",
+                  "        return msg.includes('role') && msg.includes('invalid');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"invalid-role\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{testUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{testUserId}}"
+              ]
+            },
+            "description": "Test validation error when providing invalid role value"
+          }
         }
       ]
     },
