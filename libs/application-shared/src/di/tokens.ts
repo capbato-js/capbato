@@ -20,6 +20,7 @@ export const TOKENS = {
   AppointmentRepository: 'IAppointmentRepository',
   LabRequestRepository: 'ILabRequestRepository',
   BloodChemistryRepository: 'IBloodChemistryRepository',
+  PrescriptionRepository: 'IPrescriptionRepository',
 
   // Infrastructure Layer - Services
   PasswordHashingService: 'IPasswordHashingService',
@@ -65,6 +66,11 @@ export const TOKENS = {
   CreateBloodChemistryUseCase: 'CreateBloodChemistryUseCase',
   UpdateBloodChemistryUseCase: 'UpdateBloodChemistryUseCase',
   DeleteBloodChemistryUseCase: 'DeleteBloodChemistryUseCase',
+
+  // Prescription Layer - Use Cases (Commands)
+  CreatePrescriptionUseCase: 'CreatePrescriptionUseCase',
+  UpdatePrescriptionUseCase: 'UpdatePrescriptionUseCase',
+  DeletePrescriptionUseCase: 'DeletePrescriptionUseCase',
 
   // Application Layer - Use Cases (Queries)
   GetAllTodosQueryHandler: 'GetAllTodosQueryHandler',
@@ -112,6 +118,16 @@ export const TOKENS = {
   GetAppointmentsByDateRangeQueryHandler: 'GetAppointmentsByDateRangeQueryHandler',
   GetWeeklyAppointmentSummaryQueryHandler: 'GetWeeklyAppointmentSummaryQueryHandler',
   GetAppointmentStatsQueryHandler: 'GetAppointmentStatsQueryHandler',
+
+  // Prescription Layer - Query Handlers
+  GetAllPrescriptionsQueryHandler: 'GetAllPrescriptionsQueryHandler',
+  GetPrescriptionByIdQueryHandler: 'GetPrescriptionByIdQueryHandler',
+  GetPrescriptionsByPatientIdQueryHandler: 'GetPrescriptionsByPatientIdQueryHandler',
+  GetPrescriptionsByDoctorIdQueryHandler: 'GetPrescriptionsByDoctorIdQueryHandler',
+  GetActivePrescriptionsQueryHandler: 'GetActivePrescriptionsQueryHandler',
+  GetExpiredPrescriptionsQueryHandler: 'GetExpiredPrescriptionsQueryHandler',
+  GetPrescriptionsByMedicationNameQueryHandler: 'GetPrescriptionsByMedicationNameQueryHandler',
+  GetPrescriptionStatsQueryHandler: 'GetPrescriptionStatsQueryHandler',
 
   // Domain Layer - Services
   TodoDomainService: 'TodoDomainService',
@@ -169,6 +185,12 @@ export const TOKENS = {
   UpdateBloodChemistryValidationService: 'UpdateBloodChemistryValidationService',
   DeleteBloodChemistryValidationService: 'DeleteBloodChemistryValidationService',
   LaboratoryValidationService: 'LaboratoryValidationService',
+
+  // Prescription Layer - Validation Services
+  CreatePrescriptionValidationService: 'CreatePrescriptionValidationService',
+  UpdatePrescriptionValidationService: 'UpdatePrescriptionValidationService',
+  DeletePrescriptionValidationService: 'DeletePrescriptionValidationService',
+  PrescriptionValidationService: 'PrescriptionValidationService',
 } as const;
 
 // Type-safe token keys

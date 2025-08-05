@@ -72,6 +72,31 @@ class SqliteConnectionManager {
       // console.log('Role column already exists or table is new');
     }
 
+    // Initialize prescriptions table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS prescriptions (
+        id TEXT PRIMARY KEY,
+        patientId TEXT NOT NULL,
+        doctorId TEXT NOT NULL,
+        medicationName TEXT NOT NULL,
+        dosage TEXT NOT NULL,
+        instructions TEXT NOT NULL,
+        prescribedDate TEXT NOT NULL,
+        expiryDate TEXT,
+        isActive INTEGER NOT NULL DEFAULT 1,
+        createdAt TEXT NOT NULL
+      )
+    `);
+
+    // Create indexes for better query performance
+    this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_prescriptions_patient ON prescriptions (patientId);
+      CREATE INDEX IF NOT EXISTS idx_prescriptions_doctor ON prescriptions (doctorId);
+      CREATE INDEX IF NOT EXISTS idx_prescriptions_medication ON prescriptions (medicationName);
+      CREATE INDEX IF NOT EXISTS idx_prescriptions_active ON prescriptions (isActive);
+      CREATE INDEX IF NOT EXISTS idx_prescriptions_expiry ON prescriptions (expiryDate, isActive);
+    `);
+
     console.log('📦 SQLite tables initialized');
   }
 

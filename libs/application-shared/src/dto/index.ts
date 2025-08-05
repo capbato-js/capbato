@@ -25,3 +25,7 @@ export * from './ScheduleRequestDtos';
 export * from './AppointmentCommands';
 export * from './AppointmentQueries';
 export * from './LaboratoryDto';
+export * from './PrescriptionCommands';
+export * from './PrescriptionQueries';
+export * from './PrescriptionDto';
+export * from './PrescriptionRequestDtos';

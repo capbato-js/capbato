@@ -17,3 +17,4 @@ export * from './Schedule';
 export * from './Appointment';
 export * from './LabRequest';
 export * from './BloodChemistry';
+export * from './Prescription';

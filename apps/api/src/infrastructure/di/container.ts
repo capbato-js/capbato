@@ -27,6 +27,12 @@ import {
   SqliteBloodChemistryRepository
 } from '../laboratory/persistence';
 import {
+  InMemoryPrescriptionRepository,
+  TypeOrmPrescriptionRepository,
+  MongoosePrescriptionRepository,
+  SqlitePrescriptionRepository
+} from '../prescription/persistence';
+import {
   CreateTodoUseCase,
   UpdateTodoUseCase,
   DeleteTodoUseCase,
@@ -83,6 +89,24 @@ import {
   CreateBloodChemistryValidationService,
   UpdateBloodChemistryValidationService,
   DeleteBloodChemistryValidationService,
+  // Prescription Use Cases
+  CreatePrescriptionUseCase,
+  UpdatePrescriptionUseCase,
+  DeletePrescriptionUseCase,
+  // Prescription Query Handlers
+  GetAllPrescriptionsQueryHandler,
+  GetPrescriptionByIdQueryHandler,
+  GetPrescriptionsByPatientIdQueryHandler,
+  GetPrescriptionsByDoctorIdQueryHandler,
+  GetActivePrescriptionsQueryHandler,
+  GetExpiredPrescriptionsQueryHandler,
+  GetPrescriptionsByMedicationNameQueryHandler,
+  GetPrescriptionStatsQueryHandler,
+  // Prescription Validation Services
+  PrescriptionValidationService,
+  CreatePrescriptionValidationService,
+  UpdatePrescriptionValidationService,
+  DeletePrescriptionValidationService,
 } from '@nx-starter/application-shared';
 import {
   CreateScheduleUseCase,
@@ -150,7 +174,7 @@ import {
   GetDoctorByUserIdQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
 } from '@nx-starter/application-shared';
-import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository } from '@nx-starter/domain';
+import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
 import type { ILabRequestRepository, IBloodChemistryRepository } from '@nx-starter/domain';
 import { AppointmentDomainService } from '@nx-starter/domain';
@@ -216,6 +240,12 @@ export const configureDI = async () => {
     bloodChemistryRepositoryImplementation
   );
 
+  const prescriptionRepositoryImplementation = await getPrescriptionRepositoryImplementation();
+  container.registerInstance<IPrescriptionRepository>(
+    TOKENS.PrescriptionRepository,
+    prescriptionRepositoryImplementation
+  );
+
   // Infrastructure Layer - Services  
   container.registerSingleton(
     TOKENS.PasswordHashingService,
@@ -269,6 +299,11 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreateLabRequestUseCase, CreateLabRequestUseCase);
   container.registerSingleton(TOKENS.UpdateLabRequestResultsUseCase, UpdateLabRequestResultsUseCase);
   container.registerSingleton(TOKENS.CreateBloodChemistryUseCase, CreateBloodChemistryUseCase);
+
+  // Prescription Use Cases (Commands)
+  container.registerSingleton(TOKENS.CreatePrescriptionUseCase, CreatePrescriptionUseCase);
+  container.registerSingleton(TOKENS.UpdatePrescriptionUseCase, UpdatePrescriptionUseCase);
+  container.registerSingleton(TOKENS.DeletePrescriptionUseCase, DeletePrescriptionUseCase);
 
   // Application Layer - Use Cases (Queries)
   container.registerSingleton(
@@ -363,6 +398,16 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetAllLabRequestsQueryHandler, GetAllLabRequestsQueryHandler);
   container.registerSingleton(TOKENS.GetCompletedLabRequestsQueryHandler, GetCompletedLabRequestsQueryHandler);
   container.registerSingleton(TOKENS.GetLabRequestByPatientIdQueryHandler, GetLabRequestByPatientIdQueryHandler);
+
+  // Prescription Query Handlers
+  container.registerSingleton(TOKENS.GetAllPrescriptionsQueryHandler, GetAllPrescriptionsQueryHandler);
+  container.registerSingleton(TOKENS.GetPrescriptionByIdQueryHandler, GetPrescriptionByIdQueryHandler);
+  container.registerSingleton(TOKENS.GetPrescriptionsByPatientIdQueryHandler, GetPrescriptionsByPatientIdQueryHandler);
+  container.registerSingleton(TOKENS.GetPrescriptionsByDoctorIdQueryHandler, GetPrescriptionsByDoctorIdQueryHandler);
+  container.registerSingleton(TOKENS.GetActivePrescriptionsQueryHandler, GetActivePrescriptionsQueryHandler);
+  container.registerSingleton(TOKENS.GetExpiredPrescriptionsQueryHandler, GetExpiredPrescriptionsQueryHandler);
+  container.registerSingleton(TOKENS.GetPrescriptionsByMedicationNameQueryHandler, GetPrescriptionsByMedicationNameQueryHandler);
+  container.registerSingleton(TOKENS.GetPrescriptionStatsQueryHandler, GetPrescriptionStatsQueryHandler);
 
   // Application Layer - Validation Services
   container.registerSingleton(
@@ -470,6 +515,12 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreateBloodChemistryValidationService, CreateBloodChemistryValidationService);
   container.registerSingleton(TOKENS.UpdateBloodChemistryValidationService, UpdateBloodChemistryValidationService);
   container.registerSingleton(TOKENS.DeleteBloodChemistryValidationService, DeleteBloodChemistryValidationService);
+
+  // Prescription Validation Services
+  container.registerSingleton(TOKENS.PrescriptionValidationService, PrescriptionValidationService);
+  container.registerSingleton(TOKENS.CreatePrescriptionValidationService, CreatePrescriptionValidationService);
+  container.registerSingleton(TOKENS.UpdatePrescriptionValidationService, UpdatePrescriptionValidationService);
+  container.registerSingleton(TOKENS.DeletePrescriptionValidationService, DeletePrescriptionValidationService);
 
   // Domain Layer - Domain Services
   // UserDomainService is instantiated manually in use cases (Clean Architecture best practice)
@@ -804,6 +855,51 @@ async function getBloodChemistryRepositoryImplementation(): Promise<IBloodChemis
       );
       const dataSource = await getTypeOrmDataSource();
       return new TypeOrmBloodChemistryRepository(dataSource);
+    }
+  }
+}
+
+async function getPrescriptionRepositoryImplementation(): Promise<IPrescriptionRepository> {
+  const dbConfig = getDatabaseConfig();
+  const dbType = dbConfig.type;
+  const ormType = dbConfig.orm || 'native';
+
+  console.log(`📦 Using ${ormType} ORM with ${dbType} database for prescriptions`);
+
+  // Handle memory database (always uses in-memory repository)
+  if (dbType === 'memory') {
+    console.log('📦 Using in-memory prescription repository');
+    return new InMemoryPrescriptionRepository();
+  }
+
+  // Handle MongoDB (always uses Mongoose)
+  if (dbType === 'mongodb') {
+    await connectMongoDB();
+    console.log('📦 Using Mongoose prescription repository with MongoDB');
+    return new MongoosePrescriptionRepository();
+  }
+
+  // Handle SQL databases with different ORMs
+  switch (ormType) {
+    case 'typeorm': {
+      const dataSource = await getTypeOrmDataSource();
+      console.log(`📦 Using TypeORM prescription repository with ${dbType}`);
+      return new TypeOrmPrescriptionRepository(dataSource);
+    }
+
+    case 'native':
+    default: {
+      if (dbType === 'sqlite') {
+        console.log('📦 Using native SQLite prescription repository');
+        return new SqlitePrescriptionRepository();
+      }
+
+      // For other databases without native support, default to TypeORM
+      console.log(
+        `📦 No native support for ${dbType}, falling back to TypeORM for prescriptions`
+      );
+      const dataSource = await getTypeOrmDataSource();
+      return new TypeOrmPrescriptionRepository(dataSource);
     }
   }
 }

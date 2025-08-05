@@ -37,3 +37,7 @@ export * from './BloodChemistryId';
 export * from './BloodChemistryPatientInfo';
 export * from './BloodChemistryResults';
 export * from './BloodChemistryStatus';
+export * from './PrescriptionId';
+export * from './MedicationName';
+export * from './Dosage';
+export * from './Instructions';

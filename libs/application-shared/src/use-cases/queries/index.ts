@@ -22,3 +22,4 @@ export * from './GetAppointmentStatsQueryHandler';
 export * from './GetAllLabRequestsQueryHandler';
 export * from './GetCompletedLabRequestsQueryHandler';
 export * from './GetLabRequestByPatientIdQueryHandler';
+export * from './PrescriptionQueryHandlers';
