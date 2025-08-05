@@ -128,12 +128,12 @@ export const LaboratoryTestsPage: React.FC = () => {
       return [
         {
           icon: 'fas fa-eye',
-          tooltip: 'View',
+          tooltip: 'View Result',
           onClick: () => handleViewTest(test)
         },
         {
           icon: 'fas fa-edit',
-          tooltip: 'Edit',
+          tooltip: 'Update Result',
           onClick: () => handleEditTest(test)
         }
       ];
@@ -146,7 +146,7 @@ export const LaboratoryTestsPage: React.FC = () => {
         },
         {
           icon: 'fas fa-times',
-          tooltip: 'Cancel',
+          tooltip: 'Cancel Lab Test',
           onClick: () => handleCancelTest(test)
         }
       ];
