@@ -42,8 +42,8 @@ export class Appointment implements IAppointment {
     createdAt = new Date(),
     updatedAt?: Date
   ) {
-    // Validate appointment date is not in the past
-    if (appointmentDate < new Date(new Date().toDateString())) {
+    // Only validate appointment date for NEW appointments (no ID means it's being created)
+    if (!id && appointmentDate < new Date(new Date().toDateString())) {
       throw new PastAppointmentDateException('Cannot create appointment for past date');
     }
 
