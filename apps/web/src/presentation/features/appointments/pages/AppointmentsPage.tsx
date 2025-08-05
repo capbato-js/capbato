@@ -159,11 +159,32 @@ export const AppointmentsPage: React.FC = () => {
   const handleDateChange = (value: string | null) => {
     if (value) {
       setSelectedDate(new Date(value));
+      // Reset "Show All" when date is changed while it's checked
+      if (showAll) {
+        setShowAll(false);
+      }
     }
   };
 
   const handleShowAllChange = (checked: boolean) => {
     setShowAll(checked);
+  };
+
+  // Helper function to sort appointments by date and time
+  const sortAppointments = (appointments: Appointment[], isShowingAll: boolean): Appointment[] => {
+    return [...appointments].sort((a, b) => {
+      // Create date objects for comparison
+      const dateTimeA = new Date(`${a.date} ${a.time}`);
+      const dateTimeB = new Date(`${b.date} ${b.time}`);
+      
+      if (isShowingAll) {
+        // When showing all: latest to oldest (newest first)
+        return dateTimeB.getTime() - dateTimeA.getTime();
+      } else {
+        // When filtering by date: earliest to latest (oldest first)
+        return dateTimeA.getTime() - dateTimeB.getTime();
+      }
+    });
   };
 
   // Convert DTOs to component format and filter appointments based on date and showAll flag
@@ -173,6 +194,9 @@ export const AppointmentsPage: React.FC = () => {
     : appointments.filter(appointment => 
         appointment.date === selectedDate.toISOString().split('T')[0]
       );
+  
+  // Apply sorting based on showAll state
+  const sortedAppointments = sortAppointments(filteredAppointments, showAll);
 
   return (
     <MedicalClinicLayout>
@@ -190,7 +214,7 @@ export const AppointmentsPage: React.FC = () => {
         onShowAllChange={handleShowAllChange}
       />
 
-      <AppointmentCountDisplay count={filteredAppointments.length} />
+      <AppointmentCountDisplay count={sortedAppointments.length} />
 
       {/* Commented out for future reference */}
       {/* {viewModel.error && (
@@ -206,7 +230,7 @@ export const AppointmentsPage: React.FC = () => {
       )}
        */}
       <AppointmentsTable
-        appointments={filteredAppointments}
+        appointments={sortedAppointments}
         onModifyAppointment={handleModifyAppointment}
         onCancelAppointment={handleCancelAppointment}
         onReconfirmAppointment={handleReconfirmAppointment}
