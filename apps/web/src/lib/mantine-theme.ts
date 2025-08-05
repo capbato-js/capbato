@@ -41,18 +41,18 @@ export const mantineTheme = createTheme({
       "#0f0f0f", // 8 - title text, darkest
       "#fafafa"  // 9 - very light backgrounds
     ],
-    // Navigation icon colors - exact matches
+    // Navigation icon colors - unified single color
     navIcons: [
-      "#4A90E2", // 0 - blue (dashboard)
-      "#F5A623", // 1 - orange (appointments)  
-      "#7ED321", // 2 - green (patients)
-      "#BD10E0", // 3 - purple (laboratory)
-      "#E94B3C", // 4 - red (prescriptions)
-      "#50E3C2", // 5 - teal (doctors)
-      "#4A90E2", // 6 - duplicate for consistency
-      "#4A90E2", // 7 - duplicate for consistency
-      "#4A90E2", // 8 - duplicate for consistency  
-      "#4A90E2"  // 9 - duplicate for consistency
+      "#080809", // 0 - unified dark color (dashboard)
+      "#080809", // 1 - unified dark color (appointments)  
+      "#080809", // 2 - unified dark color (patients)
+      "#080809", // 3 - unified dark color (laboratory)
+      "#080809", // 4 - unified dark color (prescriptions)
+      "#080809", // 5 - unified dark color (doctors)
+      "#080809", // 6 - unified dark color for consistency
+      "#080809", // 7 - unified dark color for consistency
+      "#080809", // 8 - unified dark color for consistency  
+      "#080809"  // 9 - unified dark color for consistency
     ],
   },
 
@@ -80,12 +80,12 @@ export const mantineTheme = createTheme({
         mutedAlt: '#888888'    // customGray.7
       },
       navigation: {
-        dashboard: '#4A90E2',    // navIcons.0
-        appointments: '#F5A623', // navIcons.1
-        patients: '#7ED321',     // navIcons.2
-        laboratory: '#BD10E0',   // navIcons.3
-        prescriptions: '#E94B3C', // navIcons.4
-        doctors: '#50E3C2'       // navIcons.5
+        dashboard: '#080809',    // navIcons.0
+        appointments: '#080809', // navIcons.1
+        patients: '#080809',     // navIcons.2
+        laboratory: '#080809',   // navIcons.3
+        prescriptions: '#080809', // navIcons.4
+        doctors: '#080809'       // navIcons.5
       }
     }
   },

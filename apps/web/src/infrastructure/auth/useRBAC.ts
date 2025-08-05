@@ -4,6 +4,7 @@
  */
 
 import { useMemo } from 'react';
+import { useMantineTheme } from '@mantine/core';
 import { useAuthStore } from '../state/AuthStore';
 import { 
   hasRouteAccess, 
@@ -90,6 +91,7 @@ export const usePermissions = () => {
  */
 export const useNavigationAccess = () => {
   const routeAccess = useRouteAccess();
+  const theme = useMantineTheme();
   
   return useMemo(() => {
     const navigationItems = [
@@ -97,49 +99,49 @@ export const useNavigationAccess = () => {
         path: '/dashboard',
         label: 'Dashboard',
         icon: 'fas fa-tachometer-alt',
-        color: '#2563eb', // Blue
+        color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessDashboard(),
       },
       {
         path: '/appointments',
         label: 'Appointments',
         icon: 'fas fa-calendar-check',
-        color: '#ea580c', // Orange
+        color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessAppointments(),
       },
       {
         path: '/patients',
         label: 'Patients',
         icon: 'fas fa-users',
-        color: '#16a34a', // Green
+        color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessPatients(),
       },
       {
         path: '/laboratory',
         label: 'Laboratory',
         icon: 'fas fa-flask',
-        color: '#9333ea', // Purple
+        color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessLaboratory(),
       },
       {
         path: '/prescriptions',
         label: 'Prescriptions',
         icon: 'fas fa-prescription-bottle',
-        color: '#dc2626', // Red
+        color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessPrescriptions(),
       },
       {
         path: '/doctors',
         label: 'Doctors',
         icon: 'fas fa-user-md',
-        color: '#0d9488', // Teal
+        color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessDoctors(),
       },
       {
         path: '/accounts',
         label: 'Accounts',
         icon: 'fas fa-users-cog',
-        color: '#9013FE', // Violet
+        color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessAccounts(),
       },
     ];
