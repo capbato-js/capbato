@@ -1,4 +1,5 @@
 import { ValueObject } from './ValueObject';
+import { NameFormattingService } from '../services/NameFormattingService';
 
 export class Name extends ValueObject<string> {
   protected validate(value: string): void {
@@ -22,6 +23,9 @@ export class Name extends ValueObject<string> {
   }
 
   public static create(value: string): Name {
-    return new Name(value.trim());
+    const trimmedValue = value.trim();
+    // Format the name to proper case using the domain service
+    const formattedValue = NameFormattingService.formatToProperCase(trimmedValue);
+    return new Name(formattedValue);
   }
 }

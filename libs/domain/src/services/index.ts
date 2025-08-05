@@ -7,3 +7,4 @@
 export * from './TodoDomainService';
 export * from './UserDomainService';
 export * from './AppointmentDomainService';
+export * from './NameFormattingService';

@@ -1,3 +1,5 @@
+import { NameFormattingService } from '../services/NameFormattingService';
+
 export class DoctorName {
   private readonly _value: string;
 
@@ -16,13 +18,14 @@ export class DoctorName {
       throw new Error('Doctor name cannot exceed 50 characters');
     }
     
-    // Basic name validation - only letters, spaces, hyphens, and apostrophes
-    const namePattern = /^[a-zA-Z\s\-']+$/;
+    // Basic name validation - only letters, spaces, hyphens, apostrophes, and periods
+    const namePattern = /^[a-zA-Z\s\-'.]+$/;
     if (!namePattern.test(trimmedValue)) {
-      throw new Error('Doctor name can only contain letters, spaces, hyphens, and apostrophes');
+      throw new Error('Doctor name can only contain letters, spaces, hyphens, apostrophes, and periods');
     }
     
-    this._value = trimmedValue;
+    // Format the name to proper case using the domain service
+    this._value = NameFormattingService.formatToProperCase(trimmedValue);
   }
 
   get value(): string {
