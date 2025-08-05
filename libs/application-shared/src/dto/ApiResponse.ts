@@ -1,5 +1,6 @@
 import { TodoDto, TodoStatsDto } from './TodoDto';
 import { LoginUserResponseDto, RegisterUserResponseDto } from './UserDto';
+import { PrescriptionDto, PrescriptionStatsDto } from './PrescriptionDto';
 
 /**
  * API Response Interfaces
@@ -63,6 +64,12 @@ export type TodoResponse = ApiSuccessResponse<TodoDto>;
 export type TodoListResponse = ApiSuccessResponse<TodoDto[]>;
 export type TodoStatsResponse = ApiSuccessResponse<TodoStatsDto>;
 export type TodoOperationResponse = ApiSuccessMessageResponse;
+
+// Specific response types for Prescription endpoints
+export type PrescriptionResponse = ApiSuccessResponse<PrescriptionDto>;
+export type PrescriptionListResponse = ApiSuccessResponse<PrescriptionDto[]>;
+export type PrescriptionStatsResponse = ApiSuccessResponse<PrescriptionStatsDto>;
+export type PrescriptionOperationResponse = ApiSuccessMessageResponse;
 
 // Specific response types for Auth endpoints
 export type LoginResponse = ApiSuccessResponse<LoginUserResponseDto>;

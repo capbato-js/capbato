@@ -114,3 +114,13 @@ export {
 // Export laboratory validation schemas and services
 export * from './LaboratoryValidationSchemas'; 
 export * from './LaboratoryValidationService';
+
+// Export prescription validation schemas and services
+export * from './PrescriptionValidationSchemas';
+export * from './PrescriptionValidationService';
+export {
+  type CreatePrescriptionCommand,
+  type UpdatePrescriptionCommand,
+  type DeletePrescriptionCommand,
+  PrescriptionIdSchema,
+} from './PrescriptionValidationSchemas';

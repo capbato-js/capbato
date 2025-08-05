@@ -11,6 +11,7 @@ import { AddressController } from '../presentation/controllers/AddressController
 import { ScheduleController } from '../presentation/controllers/ScheduleController';
 import { AppointmentController } from '../presentation/controllers/AppointmentController';
 import { LaboratoryController } from '../presentation/controllers/LaboratoryController';
+import { PrescriptionController } from '../presentation/controllers/PrescriptionController';
 import { TestController } from '../presentation/controllers/TestController';
 import { RoutingControllersErrorHandler } from '../shared/middleware/RoutingControllersErrorHandler';
 import { requestLogger } from '../presentation/middleware/errorHandler';
@@ -67,7 +68,7 @@ export const createApp = (): express.Application => {
   });
 
   // Configure controllers based on environment
-  const controllers: any[] = [TodoController, AuthController, UsersController, PatientController, DoctorController, AddressController, ScheduleController, AppointmentController, LaboratoryController];
+  const controllers: any[] = [TodoController, AuthController, UsersController, PatientController, DoctorController, AddressController, ScheduleController, AppointmentController, LaboratoryController, PrescriptionController];
   
   // Only add TestController in non-production environments
   if (!isProduction()) {

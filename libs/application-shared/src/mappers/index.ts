@@ -12,3 +12,4 @@ export * from './AddressMapper';
 export * from './ScheduleMapper';
 export * from './AppointmentMapper';
 export * from './LaboratoryMapper';
+export * from './PrescriptionMapper';

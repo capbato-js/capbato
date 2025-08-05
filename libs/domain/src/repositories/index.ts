@@ -12,3 +12,4 @@ export * from './IScheduleRepository';
 export * from './IAppointmentRepository';
 export * from './ILabRequestRepository';
 export * from './IBloodChemistryRepository';
+export * from './IPrescriptionRepository';

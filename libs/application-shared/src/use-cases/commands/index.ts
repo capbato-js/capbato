@@ -23,3 +23,6 @@ export * from './CreateLabRequestUseCase';
 export * from './UpdateLabRequestUseCase';
 export * from './UpdateLabRequestResultsUseCase';
 export * from './CreateBloodChemistryUseCase';
+export * from './CreatePrescriptionUseCase';
+export * from './UpdatePrescriptionUseCase';
+export * from './DeletePrescriptionUseCase';

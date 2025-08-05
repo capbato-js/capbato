@@ -336,3 +336,42 @@ export class CriticalLabValueException extends DomainException {
     super(`Critical laboratory values detected: ${values.join(', ')}`, 'CRITICAL_LAB_VALUE', 422);
   }
 }
+
+/**
+ * Prescription-specific domain exceptions
+ */
+export class PrescriptionNotFoundException extends DomainException {
+  constructor(id: string) {
+    super(`Prescription with ID ${id} not found`, 'PRESCRIPTION_NOT_FOUND', 404);
+  }
+}
+
+export class InvalidMedicationNameException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid medication name: ${reason}`, 'INVALID_MEDICATION_NAME');
+  }
+}
+
+export class InvalidDosageException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid dosage: ${reason}`, 'INVALID_DOSAGE');
+  }
+}
+
+export class InvalidInstructionsException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid instructions: ${reason}`, 'INVALID_INSTRUCTIONS');
+  }
+}
+
+export class PrescriptionExpiredException extends DomainException {
+  constructor() {
+    super('Prescription has expired', 'PRESCRIPTION_EXPIRED');
+  }
+}
+
+export class InvalidPrescriptionDateException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid prescription date: ${reason}`, 'INVALID_PRESCRIPTION_DATE');
+  }
+}
