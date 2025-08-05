@@ -212,7 +212,7 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
                 {...register('ageGender')}
                 label="Age/Gender:"
                 placeholder="Age / Gender"
-                disabled={isLoading}
+                disabled
                 required
                 error={errors.ageGender}
                 value={selectedPatientAgeGender}

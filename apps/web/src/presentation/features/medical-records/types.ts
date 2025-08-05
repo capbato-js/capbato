@@ -16,3 +16,11 @@ export interface LaboratoryResult {
   status: 'Pending' | 'Completed' | 'In Progress';
   results?: string;
 }
+
+export interface LabTest {
+  id: string;
+  testName: string;
+  date: string;
+  status: 'Complete' | 'Confirmed' | 'Pending' | 'In Progress';
+  results?: string;
+}

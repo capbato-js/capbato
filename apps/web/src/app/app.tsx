@@ -7,7 +7,7 @@ import { DashboardPage } from '../presentation/features/dashboard';
 import { AppointmentsPage } from '../presentation/features/appointments';
 import { PatientsPage, AddPatientPage } from '../presentation/features/patients';
 import { PatientDetailsPage } from '../presentation/features/patients/pages/PatientDetailsPage';
-import { LaboratoryPage, PrescriptionsPage } from '../presentation/features/medical-records';
+import { LaboratoryPage, LaboratoryTestsPage, PrescriptionsPage } from '../presentation/features/medical-records';
 import { DoctorsPage, AccountsPage } from '../presentation/features/staff';
 import { AuthGuard, RoleGuard } from '../presentation/features/auth';
 import { useAuthStore } from '../infrastructure/state/AuthStore';
@@ -58,6 +58,11 @@ function App() {
         <Route path="/laboratory" element={
           <AuthGuard requireAuth={true}>
             <LaboratoryPage />
+          </AuthGuard>
+        } />
+        <Route path="/laboratory/tests/:patientId" element={
+          <AuthGuard requireAuth={true}>
+            <LaboratoryTestsPage />
           </AuthGuard>
         } />
         <Route path="/prescriptions" element={

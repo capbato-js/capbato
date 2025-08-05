@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, useMantineTheme } from '@mantine/core';
-import { Icon, Modal } from '../../../components/common';
+import { useNavigate } from 'react-router-dom';
+import { useMantineTheme } from '@mantine/core';
+import { Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { LaboratoryResult } from '../types';
@@ -72,6 +73,7 @@ export const LaboratoryPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const theme = useMantineTheme();
+  const navigate = useNavigate();
   
   // Laboratory store
   const { 
@@ -183,8 +185,8 @@ export const LaboratoryPage: React.FC = () => {
   };
 
   const handleViewResult = (result: LaboratoryResult) => {
-    console.log('View result:', result);
-    // TODO: Implement view result functionality
+    // Navigate to laboratory tests page with patient ID
+    navigate(`/laboratory/tests/${result.id}`);
   };
 
   const getStatusBadge = (status: LaboratoryResult['status']) => {
@@ -266,7 +268,7 @@ export const LaboratoryPage: React.FC = () => {
     buttons: [
       {
         icon: 'fas fa-eye',
-        tooltip: 'View Laboratory Results',
+        tooltip: 'View Lab Tests',
         onClick: handleViewResult
       }
     ]
