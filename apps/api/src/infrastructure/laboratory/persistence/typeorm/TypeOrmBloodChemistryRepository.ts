@@ -157,11 +157,11 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
       hbalc: entity.hbalc ? parseFloat(entity.hbalc) : undefined
     });
 
-    return new BloodChemistry(
+    return BloodChemistry.reconstruct(
+      entity.id, // ID is already a string (dashless UUID)
       patientInfo,
       entity.dateTaken || entity.requestDate,
       results,
-      entity.id, // ID is already a string (dashless UUID)
       entity.createdAt,
       entity.updatedAt
     );

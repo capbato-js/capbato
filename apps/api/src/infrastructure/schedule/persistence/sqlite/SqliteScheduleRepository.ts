@@ -86,11 +86,11 @@ export class SqliteScheduleRepository implements IScheduleRepository {
     );
 
     // Return the created schedule with ID
-    return new Schedule(
+    return Schedule.reconstruct(
+      id,
       schedule.doctorId,
       schedule.date,
       schedule.time,
-      id,
       schedule.createdAt,
       schedule.updatedAt
     );
@@ -160,11 +160,11 @@ export class SqliteScheduleRepository implements IScheduleRepository {
     }
 
     // Return updated schedule with new updatedAt
-    return new Schedule(
+    return Schedule.reconstruct(
+      schedule.id,
       schedule.doctorId,
       schedule.date,
       schedule.time,
-      schedule.id,
       schedule.createdAt,
       new Date()
     );
@@ -236,11 +236,11 @@ export class SqliteScheduleRepository implements IScheduleRepository {
    * Convert database record to domain entity
    */
   private mapToScheduleEntity(record: ScheduleRecord): Schedule {
-    return new Schedule(
+    return Schedule.reconstruct(
+      record.id,
       record.doctor_id,
       record.date,
       record.time,
-      record.id,
       new Date(record.created_at),
       record.updated_at ? new Date(record.updated_at) : undefined
     );

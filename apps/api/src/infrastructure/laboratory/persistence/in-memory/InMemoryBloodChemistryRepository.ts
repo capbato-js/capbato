@@ -15,11 +15,11 @@ export class InMemoryBloodChemistryRepository implements IBloodChemistryReposito
     if (!bloodChemistry.id) {
       // Create new blood chemistry with generated dashless UUID
       const newId = generateId();
-      const newBloodChemistry = new BloodChemistry(
+      const newBloodChemistry = BloodChemistry.reconstruct(
+        newId,
         bloodChemistry.patientInfo,
         bloodChemistry.dateTaken,
         bloodChemistry.results,
-        newId,
         bloodChemistry.createdAt,
         new Date()
       );
@@ -27,11 +27,11 @@ export class InMemoryBloodChemistryRepository implements IBloodChemistryReposito
       return newBloodChemistry;
     } else {
       // Update existing blood chemistry
-      const updatedBloodChemistry = new BloodChemistry(
+      const updatedBloodChemistry = BloodChemistry.reconstruct(
+        bloodChemistry.id,
         bloodChemistry.patientInfo,
         bloodChemistry.dateTaken,
         bloodChemistry.results,
-        bloodChemistry.id,
         bloodChemistry.createdAt,
         new Date()
       );
