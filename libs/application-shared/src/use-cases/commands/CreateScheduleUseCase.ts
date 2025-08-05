@@ -16,14 +16,11 @@ export class CreateScheduleUseCase {
 
   async execute(command: CreateScheduleCommand): Promise<Schedule> {
     // Create schedule entity with domain logic and validation
-    const schedule = new Schedule(
+    const schedule = Schedule.create(
       command.doctorId,
       command.date,
       command.time
     );
-
-    // Validate business invariants
-    schedule.validate();
 
     // Check for conflicts with existing schedules
     const conflicts = await this.scheduleRepository.findConflicts(schedule);

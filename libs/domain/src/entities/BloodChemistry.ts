@@ -19,7 +19,7 @@ export class BloodChemistry implements IBloodChemistry {
   private readonly _createdAt: Date;
   private readonly _updatedAt?: Date;
 
-  constructor(
+  private constructor(
     patientInfo: BloodChemistryPatientInfo,
     dateTaken: Date,
     results: BloodChemistryResults,
@@ -33,6 +33,43 @@ export class BloodChemistry implements IBloodChemistry {
     this._id = id instanceof BloodChemistryId ? id : id ? new BloodChemistryId(id) : undefined;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
+  }
+
+  /**
+   * Factory method for creating new blood chemistry records with business rule validation
+   */
+  public static create(
+    patientInfo: BloodChemistryPatientInfo,
+    dateTaken: Date,
+    results: BloodChemistryResults
+  ): BloodChemistry {
+    const bloodChemistry = new BloodChemistry(patientInfo, dateTaken, results);
+    
+    // Business rule validation for new records
+    bloodChemistry.validate();
+    
+    return bloodChemistry;
+  }
+
+  /**
+   * Factory method for reconstructing blood chemistry records from persistence without validation
+   */
+  public static reconstruct(
+    id: string | BloodChemistryId,
+    patientInfo: BloodChemistryPatientInfo,
+    dateTaken: Date,
+    results: BloodChemistryResults,
+    createdAt: Date,
+    updatedAt?: Date
+  ): BloodChemistry {
+    return new BloodChemistry(
+      patientInfo,
+      dateTaken,
+      results,
+      id,
+      createdAt,
+      updatedAt
+    );
   }
 
   get id(): BloodChemistryId | undefined {
@@ -61,11 +98,11 @@ export class BloodChemistry implements IBloodChemistry {
 
   // Business methods
   updateResults(newResults: BloodChemistryResults): BloodChemistry {
-    return new BloodChemistry(
+    return BloodChemistry.reconstruct(
+      this._id!,
       this._patientInfo,
       this._dateTaken,
       newResults,
-      this._id,
       this._createdAt,
       new Date()
     );

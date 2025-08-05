@@ -32,7 +32,7 @@ export class Schedule implements ISchedule {
   private readonly _createdAt: Date;
   private readonly _updatedAt?: Date;
 
-  constructor(
+  private constructor(
     doctorId: string | DoctorId,
     date: string | Date | ScheduleDate,
     time: string | ScheduleTime,
@@ -51,9 +51,43 @@ export class Schedule implements ISchedule {
     this._id = id instanceof ScheduleId ? id : id ? new ScheduleId(id) : undefined;
     this._createdAt = createdAt || new Date();
     this._updatedAt = updatedAt;
+  }
 
-    // Validate business rules
-    this.validate();
+  /**
+   * Factory method for creating new schedules with business rule validation
+   */
+  public static create(
+    doctorId: string | DoctorId,
+    date: string | Date | ScheduleDate,
+    time: string | ScheduleTime
+  ): Schedule {
+    const schedule = new Schedule(doctorId, date, time);
+    
+    // Business rule validation for new schedules
+    schedule.validate();
+    
+    return schedule;
+  }
+
+  /**
+   * Factory method for reconstructing schedules from persistence without validation
+   */
+  public static reconstruct(
+    id: string | ScheduleId,
+    doctorId: string | DoctorId,
+    date: string | Date | ScheduleDate,
+    time: string | ScheduleTime,
+    createdAt: Date,
+    updatedAt?: Date
+  ): Schedule {
+    return new Schedule(
+      doctorId,
+      date,
+      time,
+      id,
+      createdAt,
+      updatedAt
+    );
   }
 
   get id(): ScheduleId | undefined {
@@ -213,11 +247,11 @@ export class Schedule implements ISchedule {
     date?: ScheduleDate;
     time?: ScheduleTime;
   }): Schedule {
-    return new Schedule(
+    return Schedule.reconstruct(
+      this._id!,
       updates.doctorId || this._doctorId,
       updates.date || this._date,
       updates.time || this._time,
-      this._id,
       this._createdAt,
       new Date() // Update the updatedAt timestamp
     );

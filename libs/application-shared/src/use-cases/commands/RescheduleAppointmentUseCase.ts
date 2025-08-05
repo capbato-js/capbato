@@ -66,7 +66,7 @@ export class RescheduleAppointmentUseCase {
     }
 
     // Create new schedule entry for the rescheduled appointment
-    const newSchedule = new Schedule(
+    const newSchedule = Schedule.create(
       doctorId,
       command.appointmentDate,
       command.appointmentTime

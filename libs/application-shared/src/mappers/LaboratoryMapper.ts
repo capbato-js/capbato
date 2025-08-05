@@ -174,7 +174,7 @@ export class LaboratoryMapper {
       inorPhosphorus: command.inorPhosphorus,
     });
 
-    return new BloodChemistry(
+    return BloodChemistry.create(
       patientInfo,
       command.dateTaken,
       results

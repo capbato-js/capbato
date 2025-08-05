@@ -31,7 +31,7 @@ export class Appointment implements IAppointment {
   private readonly _createdAt: Date;
   private readonly _updatedAt?: Date;
 
-  constructor(
+  private constructor(
     patientId: string,
     reasonForVisit: string,
     appointmentDate: Date,
@@ -42,11 +42,6 @@ export class Appointment implements IAppointment {
     createdAt = new Date(),
     updatedAt?: Date
   ) {
-    // Only validate appointment date for NEW appointments (no ID means it's being created)
-    if (!id && appointmentDate < new Date(new Date().toDateString())) {
-      throw new PastAppointmentDateException('Cannot create appointment for past date');
-    }
-
     this._id = id instanceof AppointmentId ? id : id ? new AppointmentId(id) : undefined;
     this._patientId = patientId;
     this._reasonForVisit = reasonForVisit;
@@ -58,6 +53,59 @@ export class Appointment implements IAppointment {
     this._doctorId = doctorId;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
+  }
+
+  /**
+   * Factory method for creating new appointments with business rule validation
+   */
+  public static create(
+    patientId: string,
+    reasonForVisit: string,
+    appointmentDate: Date,
+    appointmentTime: string | AppointmentTime,
+    doctorId: string,
+    status: AppointmentStatusType = 'confirmed'
+  ): Appointment {
+    // Business rule validation for new appointments
+    if (appointmentDate < new Date(new Date().toDateString())) {
+      throw new PastAppointmentDateException('Cannot create appointment for past date');
+    }
+
+    return new Appointment(
+      patientId,
+      reasonForVisit,
+      appointmentDate,
+      appointmentTime,
+      doctorId,
+      status
+    );
+  }
+
+  /**
+   * Factory method for reconstructing appointments from persistence without validation
+   */
+  public static reconstruct(
+    id: string | AppointmentId,
+    patientId: string,
+    reasonForVisit: string,
+    appointmentDate: Date,
+    appointmentTime: string | AppointmentTime,
+    doctorId: string,
+    status: AppointmentStatusType,
+    createdAt: Date,
+    updatedAt?: Date
+  ): Appointment {
+    return new Appointment(
+      patientId,
+      reasonForVisit,
+      appointmentDate,
+      appointmentTime,
+      doctorId,
+      status,
+      id,
+      createdAt,
+      updatedAt
+    );
   }
 
   // Getters
@@ -251,14 +299,14 @@ export class Appointment implements IAppointment {
     createdAt?: Date;
     updatedAt?: Date;
   }): Appointment {
-    return new Appointment(
+    return Appointment.reconstruct(
+      updates.id ?? this._id ?? '',
       updates.patientId ?? this._patientId,
       updates.reasonForVisit ?? this._reasonForVisit,
       updates.appointmentDate ?? this._appointmentDate,
       updates.appointmentTime ?? this._appointmentTime,
       updates.doctorId ?? this._doctorId,
       updates.status?.value ?? this._status.value,
-      updates.id ?? this._id,
       updates.createdAt ?? this._createdAt,
       updates.updatedAt ?? this._updatedAt
     );
@@ -282,17 +330,17 @@ export class Appointment implements IAppointment {
   }
 
   /**
-   * Creates an appointment from a plain object
+   * Creates an appointment from a plain object (for reconstruction from persistence)
    */
   static fromPlainObject(data: Record<string, any>): Appointment {
-    return new Appointment(
+    return Appointment.reconstruct(
+      data['id'],
       data['patientId'],
       data['reasonForVisit'],
       data['appointmentDate'],
       data['appointmentTime'],
       data['doctorId'],
       data['status'],
-      data['id'],
       data['createdAt'],
       data['updatedAt']
     );

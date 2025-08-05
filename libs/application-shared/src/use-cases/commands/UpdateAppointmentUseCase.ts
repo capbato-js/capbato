@@ -32,14 +32,14 @@ export class UpdateAppointmentUseCase {
     }
 
     // Create updated appointment entity
-    const updatedAppointment = new Appointment(
+    const updatedAppointment = Appointment.reconstruct(
+      existingAppointment.stringId!,
       command.patientId ?? existingAppointment.patientId,
       command.reasonForVisit ?? existingAppointment.reasonForVisit,
       command.appointmentDate ?? existingAppointment.appointmentDate,
       command.appointmentTime ?? existingAppointment.appointmentTime,
       command.doctorId ?? existingAppointment.doctorId,
       command.status ?? existingAppointment.statusValue,
-      existingAppointment.stringId,
       existingAppointment.createdAt,
       new Date() // updatedAt
     );
@@ -70,7 +70,7 @@ export class UpdateAppointmentUseCase {
     if (dateChanged || timeChanged || doctorChanged) {
       // For simplicity, create a new schedule entry for the updated appointment
       // The calendar will show the updated information
-      const schedule = new Schedule(
+      const schedule = Schedule.create(
         updatedAppointment.doctorId,
         updatedAppointment.appointmentDate,
         updatedAppointment.appointmentTime.value

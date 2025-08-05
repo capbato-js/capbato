@@ -19,14 +19,14 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
 
   async create(appointment: Appointment): Promise<string> {
     const id = generateId();
-    const appointmentWithId = new Appointment(
+    const appointmentWithId = Appointment.reconstruct(
+      id,
       appointment.patientId,
       appointment.reasonForVisit,
       appointment.appointmentDate,
       appointment.appointmentTime,
       appointment.doctorId,
       appointment.statusValue,
-      id,
       appointment.createdAt
     );
 
@@ -41,14 +41,14 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
     }
 
     // Create updated appointment with changes
-    const updatedAppointment = new Appointment(
+    const updatedAppointment = Appointment.reconstruct(
+      id,
       changes.patientId ?? existingAppointment.patientId,
       changes.reasonForVisit ?? existingAppointment.reasonForVisit,
       changes.appointmentDate ?? existingAppointment.appointmentDate,
       changes.appointmentTime ?? existingAppointment.appointmentTime,
       changes.doctorId ?? existingAppointment.doctorId,
       changes.statusValue ?? existingAppointment.statusValue,
-      id,
       existingAppointment.createdAt,
       new Date() // updatedAt
     );

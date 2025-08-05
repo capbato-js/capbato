@@ -43,11 +43,11 @@ export class ScheduleMapper {
    * Maps a ScheduleDto to a Schedule entity
    */
   static toDomain(dto: ScheduleDto): Schedule {
-    return new Schedule(
+    return Schedule.reconstruct(
+      dto.id!,
       dto.doctorId,
       dto.date,
       dto.time,
-      dto.id || undefined,
       new Date(dto.createdAt),
       dto.updatedAt ? new Date(dto.updatedAt) : undefined
     );
@@ -57,7 +57,7 @@ export class ScheduleMapper {
    * Maps a CreateScheduleDto to a Schedule entity
    */
   static createToDomain(dto: CreateScheduleDto): Schedule {
-    return new Schedule(
+    return Schedule.create(
       dto.doctorId,
       dto.date,
       dto.time
@@ -83,12 +83,12 @@ export class ScheduleMapper {
     const createdAtValue = obj['createdAt'] || obj['created_at'];
     const updatedAtValue = obj['updatedAt'] || obj['updated_at'];
     
-    return new Schedule(
+    return Schedule.reconstruct(
+      obj['id'] as string,
       (obj['doctorId'] || obj['doctor_id'] || obj['doctorName'] || obj['doctor_name']) as string,
       obj['date'] as string,
       obj['time'] as string,
-      obj['id'] as string,
-      createdAtValue ? new Date(createdAtValue as string) : undefined,
+      createdAtValue ? new Date(createdAtValue as string) : new Date(),
       updatedAtValue ? new Date(updatedAtValue as string) : undefined
     );
   }

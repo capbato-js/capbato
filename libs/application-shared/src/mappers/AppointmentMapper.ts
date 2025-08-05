@@ -72,14 +72,14 @@ export class AppointmentMapper {
    * Used for ORM data mapping with optional populated data
    */
   static fromPlainObject(data: Record<string, any>): Appointment {
-    const appointment = new Appointment(
+    const appointment = Appointment.reconstruct(
+      data['id'],
       data['patientId'] || data['patient_id'],
       data['reasonForVisit'] || data['reason_for_visit'],
       new Date(data['appointmentDate'] || data['appointment_date']),
       data['appointmentTime'] || data['appointment_time'],
       data['doctorId'] || data['doctor_id'],
       data['status'],
-      data['id'],
       new Date(data['createdAt'] || data['created_at'] || Date.now()),
       data['updatedAt'] || data['updated_at'] ? new Date(data['updatedAt'] || data['updated_at']) : undefined
     );

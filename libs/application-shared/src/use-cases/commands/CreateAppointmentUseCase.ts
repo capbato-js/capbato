@@ -31,7 +31,7 @@ export class CreateAppointmentUseCase {
     const patientName = patient ? patient.fullName : undefined;
 
     // Create appointment entity with domain logic
-    const appointment = new Appointment(
+    const appointment = Appointment.create(
       command.patientId,
       command.reasonForVisit,
       command.appointmentDate,
@@ -62,14 +62,14 @@ export class CreateAppointmentUseCase {
     // await this.scheduleRepository.create(schedule);
 
     // Return the created appointment with ID
-    return new Appointment(
+    return Appointment.reconstruct(
+      appointmentId,
       appointment.patientId,
       appointment.reasonForVisit,
       appointment.appointmentDate,
       appointment.appointmentTime,
       appointment.doctorId,
       appointment.statusValue,
-      appointmentId,
       appointment.createdAt
     );
   }
