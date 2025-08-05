@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   Button,
-  Select,
   Stack,
   Transition,
   Box,
   Group,
 } from '@mantine/core';
 import { RegisterUserCommandSchema, RegisterUserCommand } from '@nx-starter/application-shared';
-import { FormTextInput } from '../../../components/ui/FormTextInput';
-import type { CreateAccountData } from '../view-models/useEnhancedAccountsViewModel';
 import { Step1Fields } from './Step1Fields';
 import { Step2Fields } from './Step2Fields';
 
@@ -45,7 +42,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     watch,
     formState: { errors },
   } = useForm<RegisterUserCommand>({
-    resolver: zodResolver(RegisterUserCommandSchema) as any,
+    resolver: zodResolver(RegisterUserCommandSchema),
     mode: 'onBlur',
     defaultValues: {
       firstName: '',
@@ -70,18 +67,127 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
   // State for multi-step form navigation
   const [currentStep, setCurrentStep] = useState(1);
   const [isMultiStep, setIsMultiStep] = useState(false);
+  
+  // State and refs for dynamic height calculation
+  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const step1Ref = useRef<HTMLDivElement>(null);
+  const step2Ref = useRef<HTMLDivElement>(null);
+  const measurementRef = useRef<HTMLDivElement>(null);
 
   // Watch for role changes and toggle multi-step mode
   useEffect(() => {
     const isDoctorRole = role === 'doctor';
     if (isDoctorRole !== isMultiStep) {
-      setIsMultiStep(isDoctorRole);
-      // Reset to step 1 when changing role type
-      if (!isDoctorRole) {
+      if (isDoctorRole) {
+        // Pre-measure Step1 height by temporarily rendering it
+        setIsTransitioning(true);
+        // Will be calculated in the next effect
+      } else {
+        // Reset when switching away from doctor
         setCurrentStep(1);
+        setContainerHeight(undefined);
+        setIsTransitioning(false);
       }
+      
+      setIsMultiStep(isDoctorRole);
     }
   }, [role, isMultiStep]);
+
+  // Pre-measurement effect for smooth transitions
+  useLayoutEffect(() => {
+    if (isTransitioning && measurementRef.current) {
+      const height = measurementRef.current.scrollHeight;
+      const minHeight = 250;
+      const calculatedHeight = Math.max(height, minHeight);
+      setContainerHeight(calculatedHeight);
+    }
+  }, [isTransitioning]);
+
+  // Dynamic height calculation with comprehensive dependencies
+  useLayoutEffect(() => {
+
+    const measureHeight = () => {
+      if (!isMultiStep || isTransitioning) {
+        return;
+      }
+      
+      const currentRef = currentStep === 1 ? step1Ref : step2Ref;
+      
+      if (currentRef.current) {
+        const height = currentRef.current.scrollHeight;
+        const calculatedHeight = height; // Use actual height, no minimum
+        
+        if (calculatedHeight !== containerHeight) {
+          setContainerHeight(calculatedHeight);
+        }
+      }
+    };
+
+    if (isMultiStep && !isTransitioning) {
+      // Small delay to ensure all DOM updates are complete
+      requestAnimationFrame(() => {
+        measureHeight();
+      });
+    }
+  }, [
+    isMultiStep, 
+    currentStep, 
+    isTransitioning,
+    // Add form field dependencies that affect height
+    firstName,
+    lastName, 
+    email,
+    password,
+    role,
+    watch('mobile'),
+    watch('specialization'),
+    watch('licenseNumber'),
+    watch('experienceYears'),
+    // Add error dependencies (safe stringify)
+    Object.keys(errors).length,
+    Object.keys(fieldErrors).length
+  ]);
+
+  // Complete transition after multi-step form is mounted
+  useLayoutEffect(() => {
+    if (isMultiStep && isTransitioning && step1Ref.current) {
+      setIsTransitioning(false);
+    }
+  }, [isMultiStep, isTransitioning]);
+
+  // Separate effect for step navigation height updates (waits for Mantine transitions)
+  useLayoutEffect(() => {
+    if (!isMultiStep || isTransitioning) {
+      return;
+    }
+
+    // Multiple rapid measurement attempts for immediate height updates
+    let attemptCount = 0;
+    const maxAttempts = 5;
+    const attemptIntervals = [0, 25, 50, 75, 100]; // Progressive delays
+    
+    const tryMeasurement = () => {
+      attemptCount++;
+      const currentRef = currentStep === 1 ? step1Ref : step2Ref;
+
+      if (currentRef.current) {
+        const height = currentRef.current.scrollHeight;
+        const calculatedHeight = height; // Use actual height, no minimum
+
+        if (calculatedHeight !== containerHeight) {
+          setContainerHeight(calculatedHeight);
+        }
+        return; // Success - stop trying
+      } else if (attemptCount < maxAttempts) {
+        // Schedule next attempt
+        setTimeout(tryMeasurement, attemptIntervals[attemptCount]);
+      }
+    };
+
+    // Start first attempt immediately
+    requestAnimationFrame(tryMeasurement);
+  }, [currentStep]); // Only depend on currentStep for step navigation
 
   // Check if required form fields are empty based on current step
   const isStep1Empty = !firstName?.trim() || 
@@ -147,19 +253,30 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
               fieldErrors={fieldErrors}
             />
             
-            <FormTextInput
-              label="Mobile Number"
-              placeholder="09XXXXXXXXX"
-              error={errors.mobile}
-              maxLength={11}
-              disabled={isLoading}
-              {...register('mobile')}
-              onChange={(e) => {
-                register('mobile').onChange(e);
-                handleInputChange();
-              }}
-            />
           </>
+        )}
+
+        {/* Hidden measurement container for pre-calculating heights */}
+        {isTransitioning && (
+          <div 
+            ref={measurementRef}
+            style={{ 
+              position: 'absolute', 
+              top: -9999, 
+              left: -9999, 
+              visibility: 'hidden',
+              width: '100%'
+            }}
+          >
+            <Step1Fields
+              control={control}
+              errors={errors}
+              isLoading={isLoading}
+              register={register}
+              onInputChange={handleInputChange}
+              fieldErrors={fieldErrors}
+            />
+          </div>
         )}
 
         {/* Multi-Step Form (Doctor role) */}
@@ -167,7 +284,8 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
           <Box style={{ 
             position: 'relative', 
             overflow: 'hidden',
-            minHeight: '400px' // Fixed minimum height to prevent jumping
+            height: containerHeight ? `${containerHeight}px` : 'auto',
+            transition: 'height 0.3s ease-in-out'
           }}>
             {/* Step 1 */}
             <Transition
@@ -177,14 +295,17 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
               timingFunction="ease"
             >
               {(styles) => (
-                <Box style={{ 
-                  ...styles, 
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  width: '100%'
-                }}>
+                <Box 
+                  ref={step1Ref}
+                  style={{ 
+                    ...styles, 
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    width: '100%'
+                  }}
+                >
                   <Step1Fields
                     control={control}
                     errors={errors}
@@ -205,14 +326,17 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
               timingFunction="ease"
             >
               {(styles) => (
-                <Box style={{ 
-                  ...styles, 
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  width: '100%'
-                }}>
+                <Box 
+                  ref={step2Ref}
+                  style={{ 
+                    ...styles, 
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    width: '100%'
+                  }}
+                >
                   <Step2Fields
                     control={control}
                     errors={errors}
