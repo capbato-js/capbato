@@ -3,7 +3,6 @@ import { Control, FieldErrors, UseFormRegister, Controller } from 'react-hook-fo
 import { Stack, Select } from '@mantine/core';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { RegisterUserCommand } from '@nx-starter/application-shared';
-import type { CreateAccountData } from '../view-models/useEnhancedAccountsViewModel';
 
 interface Step1FieldsProps {
   control: Control<RegisterUserCommand>;
@@ -74,6 +73,19 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
         {...register('password')}
         onChange={(e) => {
           register('password').onChange(e);
+          onInputChange?.();
+        }}
+      />
+      
+      <FormTextInput
+        label="Mobile Number"
+        placeholder="09XXXXXXXXX"
+        error={errors.mobile || fieldErrors.mobile}
+        maxLength={11}
+        disabled={isLoading}
+        {...register('mobile')}
+        onChange={(e) => {
+          register('mobile').onChange(e);
           onInputChange?.();
         }}
       />
