@@ -4,16 +4,27 @@ import { Title, Group, Box, useMantineTheme, Button } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { DataTable, TableColumn } from '../../../components/common/DataTable';
 import { TableActionButtons, ActionButtonConfig } from '../../../components/common/TableActionButtons';
+import { Modal } from '../../../components/common';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { LabTest } from '../types';
+import { AddLabTestResultForm, AddLabTestResultFormData } from '../components';
 
 export const LaboratoryTestsPage: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
   const theme = useMantineTheme();
+  
+  // Modal state
+  const [addResultModalOpened, setAddResultModalOpened] = useState(false);
+  const [selectedLabTest, setSelectedLabTest] = useState<LabTest | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   const [patientInfo, setPatientInfo] = useState<{
     patientNumber: string;
     patientName: string;
+    age?: number;
+    sex?: string;
   } | null>(null);
 
   // Mock data based on the image - this would come from API
@@ -38,7 +49,9 @@ export const LaboratoryTestsPage: React.FC = () => {
     // In real implementation, fetch patient info based on patientId
     setPatientInfo({
       patientNumber: '2025-R3',
-      patientName: 'Raj Va Riego'
+      patientName: 'Raj Va Riego',
+      age: 12,
+      sex: 'FEMALE'
     });
   }, [patientId]);
 
@@ -57,8 +70,38 @@ export const LaboratoryTestsPage: React.FC = () => {
   };
 
   const handleAddResult = (test: LabTest) => {
-    console.log('Add result for test:', test);
-    // TODO: Implement add result functionality
+    setSelectedLabTest(test);
+    setAddResultModalOpened(true);
+    setError(null);
+  };
+
+  const handleCloseModal = () => {
+    setAddResultModalOpened(false);
+    setSelectedLabTest(null);
+    setError(null);
+  };
+
+  const handleSubmitResult = async (data: AddLabTestResultFormData) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // TODO: Implement API call to save lab test results
+      console.log('Submitting lab test results:', data);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Close modal on success
+      setAddResultModalOpened(false);
+      setSelectedLabTest(null);
+      
+      console.log('Lab test results submitted successfully!');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to submit lab test results');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancelTest = (test: LabTest) => {
@@ -262,6 +305,33 @@ export const LaboratoryTestsPage: React.FC = () => {
         useViewportHeight={true}
         bottomPadding={90}
       />
+
+      {/* Add Lab Test Result Modal */}
+      {selectedLabTest && patientInfo && (
+        <Modal
+          opened={addResultModalOpened}
+          onClose={handleCloseModal}
+          title=""
+          size="xl"
+          customStyles={{
+            body: {
+              padding: '0 24px 24px',
+            }
+          }}
+        >
+          <AddLabTestResultForm
+              patientData={{
+                patientNumber: patientInfo.patientNumber,
+                patientName: patientInfo.patientName,
+                age: patientInfo.age || 0,
+                sex: patientInfo.sex || ''
+              }}
+              onSubmit={handleSubmitResult}
+              isLoading={isLoading}
+              error={error}
+            />
+        </Modal>
+      )}
     </MedicalClinicLayout>
   );
 };

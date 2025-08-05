@@ -376,16 +376,18 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
         )}
 
         {/* Submit Button */}
-        <Button
-          type="submit"
-          disabled={isFormEmpty || isLoading}
-          loading={isLoading}
-          size="md"
-          mt="lg"
-        >
-          <Icon icon="fas fa-paper-plane" style={{ marginRight: '8px' }} />
-          Submit Request
-        </Button>
+        <Box style={{ alignSelf: 'center' }}>
+          <Button
+            type="submit"
+            disabled={isFormEmpty || isLoading}
+            loading={isLoading}
+            size="md"
+            mt="lg"
+          >
+            <Icon icon="fas fa-paper-plane" style={{ marginRight: '8px' }} />
+            Submit Request
+          </Button>
+        </Box>
       </Stack>
     </form>
   );
