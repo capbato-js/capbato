@@ -1,5 +1,6 @@
 // Validation schemas and types
 export * from './TodoValidationSchemas';
+export * from './PrescriptionValidationSchemas';
 
 // Base validation service and utilities
 export * from './ValidationService';
@@ -73,6 +74,9 @@ export * from './AddressValidationService';
 // Export appointment validation schemas
 export * from './AppointmentValidationSchemas';
 
+// Export prescription validation schemas
+export * from './PrescriptionValidationSchemas';
+
 // Export schedule validation schemas and services (excluding DoctorIdSchema to avoid conflict)
 export {
   ScheduleIdSchema,
@@ -110,6 +114,18 @@ export {
   type GetAppointmentsByDateRangeQuery,
   AppointmentIdSchema,
 } from './AppointmentValidationSchemas';
+
+// Prescription validation
+export {
+  AddPrescriptionFormSchema,
+  UpdatePrescriptionFormSchema,
+  PrescriptionIdSchema,
+  MedicationSchema,
+  type AddPrescriptionFormData,
+  type UpdatePrescriptionFormData,
+  type MedicationData,
+  PRESCRIPTION_VALIDATION_ERRORS,
+} from './PrescriptionValidationSchemas';
 
 // Export laboratory validation schemas and services
 export * from './LaboratoryValidationSchemas'; 
