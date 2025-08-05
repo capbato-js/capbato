@@ -120,11 +120,11 @@ export class SqliteBloodChemistryRepository implements IBloodChemistryRepository
       bloodChemistry.updatedAt?.toISOString()
     );
 
-    const newBloodChemistry = new BloodChemistry(
+    const newBloodChemistry = BloodChemistry.reconstruct(
+      result.lastInsertRowid.toString(),
       bloodChemistry.patientInfo,
       bloodChemistry.dateTaken,
       bloodChemistry.results,
-      result.lastInsertRowid.toString(),
       bloodChemistry.createdAt,
       bloodChemistry.updatedAt
     );
@@ -247,11 +247,11 @@ export class SqliteBloodChemistryRepository implements IBloodChemistryRepository
       hbalc: record.hbalc ? parseFloat(record.hbalc) : undefined
     });
 
-    return new BloodChemistry(
+    return BloodChemistry.reconstruct(
+      record.id.toString(),
       patientInfo,
       record.dateTaken ? new Date(record.dateTaken) : new Date(record.requestDate),
       results,
-      record.id.toString(),
       new Date(record.createdAt),
       record.updatedAt ? new Date(record.updatedAt) : undefined
     );

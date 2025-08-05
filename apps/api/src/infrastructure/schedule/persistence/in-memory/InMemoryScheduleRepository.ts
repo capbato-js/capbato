@@ -28,11 +28,11 @@ export class InMemoryScheduleRepository implements IScheduleRepository {
 
   async create(schedule: Schedule): Promise<Schedule> {
     const id = generateId();
-    const scheduleWithId = new Schedule(
+    const scheduleWithId = Schedule.reconstruct(
+      id,
       schedule.doctorId,
       schedule.date,
       schedule.time,
-      id,
       schedule.createdAt,
       schedule.updatedAt
     );
@@ -94,11 +94,11 @@ export class InMemoryScheduleRepository implements IScheduleRepository {
     }
 
     // Create updated schedule with new updatedAt timestamp
-    const updatedSchedule = new Schedule(
+    const updatedSchedule = Schedule.reconstruct(
+      schedule.id,
       schedule.doctorId,
       schedule.date,
       schedule.time,
-      schedule.id,
       schedule.createdAt,
       new Date() // Set updatedAt to current time
     );

@@ -188,11 +188,11 @@ export class TypeOrmScheduleRepository implements IScheduleRepository {
    * Convert TypeORM entity to domain entity
    */
   private toDomain(entity: ScheduleEntity): Schedule {
-    return new Schedule(
+    return Schedule.reconstruct(
+      entity.id,
       entity.doctorId,
       entity.date,
       entity.time,
-      entity.id,
       entity.createdAt,
       entity.updatedAt
     );

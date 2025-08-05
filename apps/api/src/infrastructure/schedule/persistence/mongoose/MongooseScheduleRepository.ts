@@ -38,11 +38,11 @@ export class MongooseScheduleRepository implements IScheduleRepository {
     const saved = await document.save();
     
     // Return the created schedule with the MongoDB ID
-    return new Schedule(
+    return Schedule.reconstruct(
+      saved._id.toString(),
       schedule.doctorId,
       schedule.date,
       schedule.time,
-      saved._id.toString(),
       schedule.createdAt,
       schedule.updatedAt
     );
@@ -201,11 +201,11 @@ export class MongooseScheduleRepository implements IScheduleRepository {
    * Convert MongoDB document to domain entity
    */
   private toDomain(document: IScheduleDocument): Schedule {
-    return new Schedule(
+    return Schedule.reconstruct(
+      document._id.toString(),
       document.doctorId,
       document.date,
       document.time,
-      document._id.toString(),
       new Date(document.createdAt),
       document.updatedAt ? new Date(document.updatedAt) : undefined
     );

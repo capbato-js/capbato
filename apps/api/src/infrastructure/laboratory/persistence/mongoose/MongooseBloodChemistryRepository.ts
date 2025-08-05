@@ -153,11 +153,11 @@ export class MongooseBloodChemistryRepository implements IBloodChemistryReposito
       hbalc: document.hbalc ? parseFloat(document.hbalc) : undefined
     });
 
-    return new BloodChemistry(
+    return BloodChemistry.reconstruct(
+      document._id,
       patientInfo,
       document.dateTaken || document.requestDate,
       results,
-      document._id,
       document.createdAt,
       document.updatedAt
     );
