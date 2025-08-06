@@ -165,12 +165,12 @@ import {
   JwtService,
   JwtConfig,
   GetAllUsersQueryHandler,
-  GetDoctorByIdQueryHandler,
   GetDoctorsBySpecializationQueryHandler,
   CreateDoctorProfileCommandHandler,
 } from '@nx-starter/application-api';
 import {
   GetAllDoctorsQueryHandler,
+  GetDoctorByIdQueryHandler,
   GetDoctorByUserIdQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
 } from '@nx-starter/application-shared';

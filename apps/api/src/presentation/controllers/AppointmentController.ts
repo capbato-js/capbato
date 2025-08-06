@@ -9,6 +9,7 @@ import {
   Body,
   HttpCode,
 } from 'routing-controllers';
+import { DoctorNotFoundException } from '@nx-starter/domain';
 import {
   CreateAppointmentUseCase,
   UpdateAppointmentUseCase,
@@ -25,6 +26,8 @@ import {
   GetConfirmedAppointmentsQueryHandler,
   GetWeeklyAppointmentSummaryQueryHandler,
   GetAppointmentStatsQueryHandler,
+  GetPatientByIdQueryHandler,
+  GetDoctorByIdQueryHandler,
   AppointmentMapper,
   TOKENS,
   AppointmentValidationService,
@@ -80,6 +83,10 @@ export class AppointmentController {
     private getWeeklyAppointmentSummaryQueryHandler: GetWeeklyAppointmentSummaryQueryHandler,
     @inject(TOKENS.GetAppointmentStatsQueryHandler)
     private getAppointmentStatsQueryHandler: GetAppointmentStatsQueryHandler,
+    @inject(TOKENS.GetPatientByIdQueryHandler)
+    private getPatientByIdQueryHandler: GetPatientByIdQueryHandler,
+    @inject(TOKENS.GetDoctorByIdQueryHandler)
+    private getDoctorByIdQueryHandler: GetDoctorByIdQueryHandler,
     @inject(TOKENS.AppointmentValidationService)
     private validationService: AppointmentValidationService
   ) {}
@@ -191,7 +198,20 @@ export class AppointmentController {
   async createAppointment(@Body() body: CreateAppointmentRequestDto): Promise<AppointmentResponse> {
     const validatedData = this.validationService.validateCreateCommand(body);
     const appointment = await this.createAppointmentUseCase.execute(validatedData);
-    const appointmentDto = AppointmentMapper.toDto(appointment);
+    
+    // Fetch patient and doctor data separately to populate the response
+    const [patientData, doctorData] = await Promise.all([
+      this.getPatientByIdQueryHandler.execute({ id: appointment.patientId }),
+      this.getDoctorByIdQueryHandler.execute({ id: appointment.doctorId })
+    ]);
+    
+    // Check if doctor was found
+    if (!doctorData) {
+      throw new DoctorNotFoundException(appointment.doctorId);
+    }
+    
+    // Map appointment to DTO with populated patient and doctor data
+    const appointmentDto = AppointmentMapper.toDto(appointment, patientData, doctorData);
 
     return ApiResponseBuilder.success(appointmentDto);
   }
