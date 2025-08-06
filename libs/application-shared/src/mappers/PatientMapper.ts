@@ -1,5 +1,6 @@
 import { Patient } from '../domain/Patient';
 import { AgeCalculationService } from '../domain/AgeCalculationService';
+import { NameFormattingService } from '@nx-starter/domain';
 import type { PatientDto, CreatePatientDto, PatientListDto } from '../dto/PatientDto';
 
 /**
@@ -89,8 +90,8 @@ export class PatientMapper {
   static toDomain(dto: PatientDto): Patient {
     return new Patient(
       dto.patientNumber,
-      dto.firstName,
-      dto.lastName,
+      NameFormattingService.formatToProperCase(dto.firstName),
+      NameFormattingService.formatToProperCase(dto.lastName),
       new Date(dto.dateOfBirth),
       dto.gender as 'Male' | 'Female',
       dto.contactNumber,
@@ -103,8 +104,8 @@ export class PatientMapper {
       },
       {
         id: dto.id,
-        middleName: dto.middleName,
-        guardianName: dto.guardianName,
+        middleName: dto.middleName ? NameFormattingService.formatToProperCase(dto.middleName) : undefined,
+        guardianName: dto.guardianName ? NameFormattingService.formatToProperCase(dto.guardianName) : undefined,
         guardianGender: dto.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: dto.guardianRelationship,
         guardianContactNumber: dto.guardianContactNumber,
@@ -127,8 +128,8 @@ export class PatientMapper {
   static createToDomain(dto: CreatePatientDto, patientNumber: string): Patient {
     return new Patient(
       patientNumber,
-      dto.firstName,
-      dto.lastName,
+      NameFormattingService.formatToProperCase(dto.firstName),
+      NameFormattingService.formatToProperCase(dto.lastName),
       new Date(dto.dateOfBirth),
       dto.gender as 'Male' | 'Female',
       dto.contactNumber,
@@ -140,8 +141,8 @@ export class PatientMapper {
         barangay: dto.barangay,
       },
       {
-        middleName: dto.middleName,
-        guardianName: dto.guardianName,
+        middleName: dto.middleName ? NameFormattingService.formatToProperCase(dto.middleName) : undefined,
+        guardianName: dto.guardianName ? NameFormattingService.formatToProperCase(dto.guardianName) : undefined,
         guardianGender: dto.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: dto.guardianRelationship,
         guardianContactNumber: dto.guardianContactNumber,
@@ -193,8 +194,8 @@ export class PatientMapper {
   }): Patient {
     return new Patient(
       obj.patientNumber,
-      obj.firstName,
-      obj.lastName,
+      NameFormattingService.formatToProperCase(obj.firstName),
+      NameFormattingService.formatToProperCase(obj.lastName),
       obj.dateOfBirth,
       obj.gender,
       obj.contactNumber,
@@ -207,8 +208,8 @@ export class PatientMapper {
       },
       {
         id: obj.id,
-        middleName: obj.middleName,
-        guardianName: obj.guardianName,
+        middleName: obj.middleName ? NameFormattingService.formatToProperCase(obj.middleName) : undefined,
+        guardianName: obj.guardianName ? NameFormattingService.formatToProperCase(obj.guardianName) : undefined,
         guardianGender: obj.guardianGender,
         guardianRelationship: obj.guardianRelationship,
         guardianContactNumber: obj.guardianContactNumber,

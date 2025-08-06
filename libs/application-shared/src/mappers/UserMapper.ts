@@ -1,4 +1,4 @@
-import { User } from '@nx-starter/domain';
+import { User, NameFormattingService } from '@nx-starter/domain';
 import { UserDto, RegisterUserResponseDto, LoginUserResponseDto } from '../dto/UserDto';
 
 /**
@@ -87,8 +87,8 @@ export class UserMapper {
   }): User {
     return User.create(
       plainObject.id,
-      plainObject.firstName,
-      plainObject.lastName,
+      NameFormattingService.formatToProperCase(plainObject.firstName),
+      NameFormattingService.formatToProperCase(plainObject.lastName),
       plainObject.email,
       plainObject.username,
       plainObject.hashedPassword,

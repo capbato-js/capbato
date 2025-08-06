@@ -3,6 +3,7 @@ import { Patient } from '../../domain/Patient';
 import { IPatientRepository } from '../../domain/IPatientRepository';
 import { PatientNumberService } from '../../domain/PatientNumberService';
 import { PhoneNumberService } from '../../domain/PhoneNumberService';
+import { NameFormattingService } from '@nx-starter/domain';
 import { DuplicatePatientError, PatientNumberGenerationError } from '../../domain/PatientExceptions';
 import type { CreatePatientCommand } from '../../dto/PatientCommands';
 import { TOKENS } from '../../di/tokens';
@@ -35,8 +36,18 @@ export class CreatePatientUseCase {
       throw new DuplicatePatientError(command.contactNumber, 'contactNumber');
     }
 
-    // Generate patient number
-    const patientNumber = await this.generatePatientNumber(command.lastName);
+    // Format names using NameFormattingService (needed for patient number generation)
+    const formattedFirstName = NameFormattingService.formatToProperCase(command.firstName);
+    const formattedLastName = NameFormattingService.formatToProperCase(command.lastName);
+    const formattedMiddleName = command.middleName 
+      ? NameFormattingService.formatToProperCase(command.middleName)
+      : undefined;
+    const formattedGuardianName = command.guardianName 
+      ? NameFormattingService.formatToProperCase(command.guardianName)
+      : undefined;
+
+    // Generate patient number using formatted last name
+    const patientNumber = await this.generatePatientNumber(formattedLastName);
 
     // Sanitize phone numbers
     const sanitizedContactNumber = this.phoneNumberService.validateAndSanitize(command.contactNumber);
@@ -47,8 +58,8 @@ export class CreatePatientUseCase {
     // Create patient entity with domain logic
     const patient = new Patient(
       patientNumber,
-      command.firstName,
-      command.lastName,
+      formattedFirstName,
+      formattedLastName,
       command.dateOfBirth,
       command.gender as 'Male' | 'Female',
       sanitizedContactNumber,
@@ -60,8 +71,8 @@ export class CreatePatientUseCase {
         barangay: command.barangay,
       },
       {
-        middleName: command.middleName,
-        guardianName: command.guardianName,
+        middleName: formattedMiddleName,
+        guardianName: formattedGuardianName,
         guardianGender: command.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: command.guardianRelationship,
         guardianContactNumber: sanitizedGuardianContactNumber,
@@ -86,8 +97,8 @@ export class CreatePatientUseCase {
     // Return the created patient with ID
     return new Patient(
       patientNumber,
-      command.firstName,
-      command.lastName,
+      formattedFirstName,
+      formattedLastName,
       command.dateOfBirth,
       command.gender as 'Male' | 'Female',
       sanitizedContactNumber,
@@ -100,8 +111,8 @@ export class CreatePatientUseCase {
       },
       {
         id,
-        middleName: command.middleName,
-        guardianName: command.guardianName,
+        middleName: formattedMiddleName,
+        guardianName: formattedGuardianName,
         guardianGender: command.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: command.guardianRelationship,
         guardianContactNumber: sanitizedGuardianContactNumber,

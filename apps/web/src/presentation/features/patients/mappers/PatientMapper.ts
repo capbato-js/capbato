@@ -1,5 +1,6 @@
 import { Patient, PatientDetails, GuardianDetails } from '../types';
 import { Patient as DomainPatient, PatientDto } from '@nx-starter/application-shared';
+import { NameFormattingService } from '@nx-starter/domain';
 
 /**
  * Maps domain Patient to frontend Patient type
@@ -8,9 +9,9 @@ export function mapDomainPatientToFrontend(domainPatient: DomainPatient): Patien
   return {
     id: domainPatient.id || '',
     patientNumber: domainPatient.patientNumber,
-    firstName: domainPatient.firstName,
-    lastName: domainPatient.lastName,
-    fullName: `${domainPatient.firstName} ${domainPatient.lastName}`,
+    firstName: NameFormattingService.formatToProperCase(domainPatient.firstName),
+    lastName: NameFormattingService.formatToProperCase(domainPatient.lastName),
+    fullName: `${NameFormattingService.formatToProperCase(domainPatient.firstName)} ${NameFormattingService.formatToProperCase(domainPatient.lastName)}`,
     dateOfBirth: domainPatient.dateOfBirth.toISOString().split('T')[0], // Convert to YYYY-MM-DD
     age: domainPatient.age,
     gender: domainPatient.gender as 'Male' | 'Female' | 'Other',
@@ -23,7 +24,7 @@ export function mapDomainPatientToFrontend(domainPatient: DomainPatient): Patien
       zipCode: ''
     },
     emergencyContact: {
-      name: domainPatient.guardianName || '',
+      name: domainPatient.guardianName ? NameFormattingService.formatToProperCase(domainPatient.guardianName) : '',
       relationship: domainPatient.guardianRelationship || '',
       phoneNumber: domainPatient.guardianContactNumber || ''
     },
@@ -46,10 +47,13 @@ export function mapDomainPatientsToFrontend(domainPatients: DomainPatient[]): Pa
  * Maps API PatientDto to frontend PatientDetails type
  */
 export function mapApiPatientDtoToPatientDetails(dto: PatientDto): PatientDetails {
-  // Build full name considering middleName
-  const fullName = [dto.firstName, dto.middleName, dto.lastName]
-    .filter(Boolean)
-    .join(' ');
+  // Build full name considering middleName with proper formatting
+  const fullName = [
+    NameFormattingService.formatToProperCase(dto.firstName),
+    dto.middleName ? NameFormattingService.formatToProperCase(dto.middleName) : undefined,
+    NameFormattingService.formatToProperCase(dto.lastName)
+  ].filter(Boolean)
+   .join(' ');
 
   // Parse address parts
   const addressParts: string[] = [];
@@ -72,7 +76,7 @@ export function mapApiPatientDtoToPatientDetails(dto: PatientDto): PatientDetail
     if (dto.guardianProvince) guardianAddressParts.push(dto.guardianProvince);
 
     guardian = {
-      fullName: dto.guardianName,
+      fullName: NameFormattingService.formatToProperCase(dto.guardianName),
       gender: dto.guardianGender as 'Male' | 'Female' | 'Other' || 'Other',
       relationship: dto.guardianRelationship || '',
       contactNumber: dto.guardianContactNumber || '',
@@ -83,8 +87,8 @@ export function mapApiPatientDtoToPatientDetails(dto: PatientDto): PatientDetail
   return {
     id: dto.id,
     patientNumber: dto.patientNumber,
-    firstName: dto.firstName,
-    lastName: dto.lastName,
+    firstName: NameFormattingService.formatToProperCase(dto.firstName),
+    lastName: NameFormattingService.formatToProperCase(dto.lastName),
     fullName,
     dateOfBirth: dto.dateOfBirth,
     age: dto.age,
@@ -93,7 +97,7 @@ export function mapApiPatientDtoToPatientDetails(dto: PatientDto): PatientDetail
     email: undefined, // Not available in API DTO
     address: patientAddress,
     emergencyContact: {
-      name: dto.guardianName || '',
+      name: dto.guardianName ? NameFormattingService.formatToProperCase(dto.guardianName) : '',
       relationship: dto.guardianRelationship || '',
       phoneNumber: dto.guardianContactNumber || ''
     },

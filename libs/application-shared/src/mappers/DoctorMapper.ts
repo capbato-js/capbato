@@ -1,4 +1,4 @@
-import { Doctor } from '@nx-starter/domain';
+import { Doctor, NameFormattingService } from '@nx-starter/domain';
 import { DoctorDto, DoctorSummaryDto } from '../dto/DoctorQueries';
 
 // Define a User interface for the mapper (to avoid importing the full User entity)
@@ -36,9 +36,9 @@ export class DoctorMapper {
       isActive: doctor.isActive,
       
       // User Information
-      firstName: user.firstName.value,
-      lastName: user.lastName.value,
-      fullName: `Dr. ${user.firstName.value} ${user.lastName.value}`,
+      firstName: NameFormattingService.formatToProperCase(user.firstName.value),
+      lastName: NameFormattingService.formatToProperCase(user.lastName.value),
+      fullName: `Dr. ${NameFormattingService.formatToProperCase(user.firstName.value)} ${NameFormattingService.formatToProperCase(user.lastName.value)}`,
       email: user.email.value,
       username: user.username.value,
       personalContactNumber: user.mobile?.value,
@@ -53,7 +53,7 @@ export class DoctorMapper {
     return {
       id: doctor.stringId || '',
       userId: doctor.userId,
-      fullName: `Dr. ${user.firstName.value} ${user.lastName.value}`,
+      fullName: `Dr. ${NameFormattingService.formatToProperCase(user.firstName.value)} ${NameFormattingService.formatToProperCase(user.lastName.value)}`,
       specialization: doctor.specializationValue,
       formattedContactNumber: user.mobile?.value || '',
       yearsOfExperience: doctor.yearsOfExperience,
@@ -143,6 +143,6 @@ export class DoctorMapper {
    * This matches the format used in the appointments table: doctor_name column
    */
   static toLegacyDisplayName(doctor: Doctor, user: UserForMapping): string {
-    return `${user.lastName.value}, ${user.firstName.value} (${doctor.specializationValue})`;
+    return `${NameFormattingService.formatToProperCase(user.lastName.value)}, ${NameFormattingService.formatToProperCase(user.firstName.value)} (${doctor.specializationValue})`;
   }
 }
