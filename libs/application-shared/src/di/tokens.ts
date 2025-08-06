@@ -20,6 +20,10 @@ export const TOKENS = {
   AppointmentRepository: 'IAppointmentRepository',
   LabRequestRepository: 'ILabRequestRepository',
   BloodChemistryRepository: 'IBloodChemistryRepository',
+  UrinalysisResultRepository: 'IUrinalysisResultRepository',
+  HematologyResultRepository: 'IHematologyResultRepository',
+  FecalysisResultRepository: 'IFecalysisResultRepository',
+  SerologyResultRepository: 'ISerologyResultRepository',
   PrescriptionRepository: 'IPrescriptionRepository',
 
   // Infrastructure Layer - Services

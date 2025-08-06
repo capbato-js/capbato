@@ -271,6 +271,145 @@ export const BloodChemistryIdSchema = z.string()
   .min(1, 'Blood chemistry ID cannot be empty')
   .regex(/^[0-9a-fA-F]{32}$/, 'Blood chemistry ID must be a valid dashless UUID format (32 hexadecimal characters)');
 
+// Urinalysis Result Validation Schemas
+export const CreateUrinalysisResultCommandSchema = z.object({
+  labRequestId: z.string().min(1, 'Lab request ID is required'),
+  patientId: z.string().min(1, 'Patient ID is required'),
+  patientName: z.string().min(1, 'Patient name is required'),
+  age: z.string().optional(),
+  sex: z.string().optional(),
+  dateTaken: z.string().datetime('Invalid date format').transform((val) => new Date(val)),
+  color: z.string().optional(),
+  transparency: z.string().optional(),
+  specificGravity: z.string().optional(),
+  ph: z.string().optional(),
+  protein: z.string().optional(),
+  glucose: z.string().optional(),
+  epithelialCells: z.string().optional(),
+  redCells: z.string().optional(),
+  pusCells: z.string().optional(),
+  mucusThread: z.string().optional(),
+  amorphousUrates: z.string().optional(),
+  amorphousPhosphate: z.string().optional(),
+  crystals: z.string().optional(),
+  bacteria: z.string().optional(),
+  others: z.string().optional(),
+  pregnancyTest: z.string().optional(),
+});
+
+export const UpdateUrinalysisResultCommandSchema = CreateUrinalysisResultCommandSchema.partial().extend({
+  id: z.string().min(1, 'ID is required for update'),
+});
+
+export const DeleteUrinalysisResultCommandSchema = z.object({
+  id: z.string().min(1, 'ID cannot be empty'),
+});
+
+// Hematology Result Validation Schemas
+export const CreateHematologyResultCommandSchema = z.object({
+  labRequestId: z.string().min(1, 'Lab request ID is required'),
+  patientId: z.string().min(1, 'Patient ID is required'),
+  patientName: z.string().min(1, 'Patient name is required'),
+  age: z.string().optional(),
+  sex: z.string().optional(),
+  dateTaken: z.string().datetime('Invalid date format').transform((val) => new Date(val)),
+  hemoglobin: z.string().optional(),
+  hematocrit: z.string().optional(),
+  rbc: z.string().optional(),
+  wbc: z.string().optional(),
+  plateletCount: z.string().optional(),
+  neutrophils: z.string().optional(),
+  lymphocytes: z.string().optional(),
+  monocytes: z.string().optional(),
+  eosinophils: z.string().optional(),
+  basophils: z.string().optional(),
+  mcv: z.string().optional(),
+  mch: z.string().optional(),
+  mchc: z.string().optional(),
+  esr: z.string().optional(),
+});
+
+export const UpdateHematologyResultCommandSchema = CreateHematologyResultCommandSchema.partial().extend({
+  id: z.string().min(1, 'ID is required for update'),
+});
+
+export const DeleteHematologyResultCommandSchema = z.object({
+  id: z.string().min(1, 'ID cannot be empty'),
+});
+
+// Fecalysis Result Validation Schemas
+export const CreateFecalysisResultCommandSchema = z.object({
+  labRequestId: z.string().min(1, 'Lab request ID is required'),
+  patientId: z.string().min(1, 'Patient ID is required'),
+  patientName: z.string().min(1, 'Patient name is required'),
+  age: z.string().optional(),
+  sex: z.string().optional(),
+  dateTaken: z.string().datetime('Invalid date format').transform((val) => new Date(val)),
+  color: z.string().optional(),
+  consistency: z.string().optional(),
+  rbc: z.string().optional(),
+  wbc: z.string().optional(),
+  occultBlood: z.string().optional(),
+  urobilinogen: z.string().optional(),
+  others: z.string().optional(),
+});
+
+export const UpdateFecalysisResultCommandSchema = CreateFecalysisResultCommandSchema.partial().extend({
+  id: z.string().min(1, 'ID is required for update'),
+});
+
+export const DeleteFecalysisResultCommandSchema = z.object({
+  id: z.string().min(1, 'ID cannot be empty'),
+});
+
+// Serology Result Validation Schemas
+export const CreateSerologyResultCommandSchema = z.object({
+  labRequestId: z.string().min(1, 'Lab request ID is required'),
+  patientId: z.string().min(1, 'Patient ID is required'),
+  patientName: z.string().min(1, 'Patient name is required'),
+  age: z.string().optional(),
+  sex: z.string().optional(),
+  dateTaken: z.string().datetime('Invalid date format').transform((val) => new Date(val)),
+  vdrl: z.string().optional(),
+  rpr: z.string().optional(),
+  hbsag: z.string().optional(),
+  antiHcv: z.string().optional(),
+  hivTest: z.string().optional(),
+  pregnancyTest: z.string().optional(),
+  dengueNs1: z.string().optional(),
+  dengueTourniquet: z.string().optional(),
+  weilFelix: z.string().optional(),
+  typhidot: z.string().optional(),
+  bloodType: z.string().optional(),
+  rhFactor: z.string().optional(),
+  others: z.string().optional(),
+});
+
+export const UpdateSerologyResultCommandSchema = CreateSerologyResultCommandSchema.partial().extend({
+  id: z.string().min(1, 'ID is required for update'),
+});
+
+export const DeleteSerologyResultCommandSchema = z.object({
+  id: z.string().min(1, 'ID cannot be empty'),
+});
+
+// ID validation schemas for new entities
+export const UrinalysisResultIdSchema = z.string()
+  .min(1, 'Urinalysis result ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Urinalysis result ID must be a valid dashless UUID format (32 hexadecimal characters)');
+
+export const HematologyResultIdSchema = z.string()
+  .min(1, 'Hematology result ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Hematology result ID must be a valid dashless UUID format (32 hexadecimal characters)');
+
+export const FecalysisResultIdSchema = z.string()
+  .min(1, 'Fecalysis result ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Fecalysis result ID must be a valid dashless UUID format (32 hexadecimal characters)');
+
+export const SerologyResultIdSchema = z.string()
+  .min(1, 'Serology result ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Serology result ID must be a valid dashless UUID format (32 hexadecimal characters)');
+
 // Export inferred types
 export type CreateLabRequestCommand = z.infer<typeof CreateLabRequestCommandSchema>;
 export type UpdateLabRequestCommand = z.infer<typeof UpdateLabRequestCommandSchema>;
@@ -279,6 +418,18 @@ export type UpdateLabRequestResultsCommand = z.infer<typeof UpdateLabRequestResu
 export type CreateBloodChemistryCommand = z.infer<typeof CreateBloodChemistryCommandSchema>;
 export type UpdateBloodChemistryCommand = z.infer<typeof UpdateBloodChemistryCommandSchema>;
 export type DeleteBloodChemistryCommand = z.infer<typeof DeleteBloodChemistryCommandSchema>;
+export type CreateUrinalysisResultCommand = z.infer<typeof CreateUrinalysisResultCommandSchema>;
+export type UpdateUrinalysisResultCommand = z.infer<typeof UpdateUrinalysisResultCommandSchema>;
+export type DeleteUrinalysisResultCommand = z.infer<typeof DeleteUrinalysisResultCommandSchema>;
+export type CreateHematologyResultCommand = z.infer<typeof CreateHematologyResultCommandSchema>;
+export type UpdateHematologyResultCommand = z.infer<typeof UpdateHematologyResultCommandSchema>;
+export type DeleteHematologyResultCommand = z.infer<typeof DeleteHematologyResultCommandSchema>;
+export type CreateFecalysisResultCommand = z.infer<typeof CreateFecalysisResultCommandSchema>;
+export type UpdateFecalysisResultCommand = z.infer<typeof UpdateFecalysisResultCommandSchema>;
+export type DeleteFecalysisResultCommand = z.infer<typeof DeleteFecalysisResultCommandSchema>;
+export type CreateSerologyResultCommand = z.infer<typeof CreateSerologyResultCommandSchema>;
+export type UpdateSerologyResultCommand = z.infer<typeof UpdateSerologyResultCommandSchema>;
+export type DeleteSerologyResultCommand = z.infer<typeof DeleteSerologyResultCommandSchema>;
 
 // Validation schema collection
 export const LaboratoryValidationSchemas = {
@@ -289,6 +440,22 @@ export const LaboratoryValidationSchemas = {
   CreateBloodChemistryCommandSchema,
   UpdateBloodChemistryCommandSchema,
   DeleteBloodChemistryCommandSchema,
+  CreateUrinalysisResultCommandSchema,
+  UpdateUrinalysisResultCommandSchema,
+  DeleteUrinalysisResultCommandSchema,
+  CreateHematologyResultCommandSchema,
+  UpdateHematologyResultCommandSchema,
+  DeleteHematologyResultCommandSchema,
+  CreateFecalysisResultCommandSchema,
+  UpdateFecalysisResultCommandSchema,
+  DeleteFecalysisResultCommandSchema,
+  CreateSerologyResultCommandSchema,
+  UpdateSerologyResultCommandSchema,
+  DeleteSerologyResultCommandSchema,
   LabRequestIdSchema,
   BloodChemistryIdSchema,
+  UrinalysisResultIdSchema,
+  HematologyResultIdSchema,
+  FecalysisResultIdSchema,
+  SerologyResultIdSchema,
 } as const;

@@ -10,6 +10,18 @@ export type {
   CreateBloodChemistryCommand,
   UpdateBloodChemistryCommand,
   DeleteBloodChemistryCommand,
+  CreateUrinalysisResultCommand,
+  UpdateUrinalysisResultCommand,
+  DeleteUrinalysisResultCommand,
+  CreateHematologyResultCommand,
+  UpdateHematologyResultCommand,
+  DeleteHematologyResultCommand,
+  CreateFecalysisResultCommand,
+  UpdateFecalysisResultCommand,
+  DeleteFecalysisResultCommand,
+  CreateSerologyResultCommand,
+  UpdateSerologyResultCommand,
+  DeleteSerologyResultCommand,
 } from '../validation/LaboratoryValidationSchemas';
 
 // Re-export validation schemas for backward compatibility
@@ -21,6 +33,18 @@ export {
   CreateBloodChemistryCommandSchema,
   UpdateBloodChemistryCommandSchema,
   DeleteBloodChemistryCommandSchema,
+  CreateUrinalysisResultCommandSchema,
+  UpdateUrinalysisResultCommandSchema,
+  DeleteUrinalysisResultCommandSchema,
+  CreateHematologyResultCommandSchema,
+  UpdateHematologyResultCommandSchema,
+  DeleteHematologyResultCommandSchema,
+  CreateFecalysisResultCommandSchema,
+  UpdateFecalysisResultCommandSchema,
+  DeleteFecalysisResultCommandSchema,
+  CreateSerologyResultCommandSchema,
+  UpdateSerologyResultCommandSchema,
+  DeleteSerologyResultCommandSchema,
   LaboratoryValidationSchemas,
 } from '../validation/LaboratoryValidationSchemas';
 

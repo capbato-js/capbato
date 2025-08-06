@@ -12,4 +12,8 @@ export * from './IScheduleRepository';
 export * from './IAppointmentRepository';
 export * from './ILabRequestRepository';
 export * from './IBloodChemistryRepository';
+export * from './IUrinalysisResultRepository';
+export * from './IHematologyResultRepository';
+export * from './IFecalysisResultRepository';
+export * from './ISerologyResultRepository';
 export * from './IPrescriptionRepository';

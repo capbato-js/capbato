@@ -17,4 +17,8 @@ export * from './Schedule';
 export * from './Appointment';
 export * from './LabRequest';
 export * from './BloodChemistry';
+export * from './UrinalysisResult';
+export * from './HematologyResult';
+export * from './FecalysisResult';
+export * from './SerologyResult';
 export * from './Prescription';

@@ -1,8 +1,13 @@
 import { LabRequest } from '@nx-starter/domain';
 import { BloodChemistry } from '@nx-starter/domain';
+import { UrinalysisResult } from '@nx-starter/domain';
+import { HematologyResult } from '@nx-starter/domain';
+import { FecalysisResult } from '@nx-starter/domain';
+import { SerologyResult } from '@nx-starter/domain';
 import { LabRequestPatientInfo } from '@nx-starter/domain';
 import { LabRequestTests } from '@nx-starter/domain';
 import { LabRequestStatus } from '@nx-starter/domain';
+import { LabRequestId } from '@nx-starter/domain';
 import { BloodChemistryPatientInfo } from '@nx-starter/domain';
 import { BloodChemistryResults } from '@nx-starter/domain';
 import {
@@ -11,6 +16,14 @@ import {
   LabTestDto,
   CreateLabRequestCommand,
   CreateBloodChemistryCommand,
+  CreateUrinalysisResultCommand,
+  UpdateUrinalysisResultCommand,
+  CreateHematologyResultCommand,
+  UpdateHematologyResultCommand,
+  CreateFecalysisResultCommand,
+  UpdateFecalysisResultCommand,
+  CreateSerologyResultCommand,
+  UpdateSerologyResultCommand,
 } from '../dto/LaboratoryDto';
 
 /**
@@ -458,5 +471,189 @@ export class LaboratoryMapper {
       created_at: labRequest.createdAt,
       updated_at: labRequest.updatedAt,
     };
+  }
+
+  // Urinalysis Result Mappers
+  static fromCreateUrinalysisResultCommand(command: CreateUrinalysisResultCommand): UrinalysisResult {
+    return UrinalysisResult.create(
+      new LabRequestId(command.labRequestId),
+      command.patientId,
+      command.patientName,
+      command.dateTaken,
+      {
+        age: command.age,
+        sex: command.sex,
+        color: command.color,
+        transparency: command.transparency,
+        specificGravity: command.specificGravity,
+        ph: command.ph,
+        protein: command.protein,
+        glucose: command.glucose,
+        epithelialCells: command.epithelialCells,
+        redCells: command.redCells,
+        pusCells: command.pusCells,
+        mucusThread: command.mucusThread,
+        amorphousUrates: command.amorphousUrates,
+        amorphousPhosphate: command.amorphousPhosphate,
+        crystals: command.crystals,
+        bacteria: command.bacteria,
+        others: command.others,
+        pregnancyTest: command.pregnancyTest,
+      }
+    );
+  }
+
+  static updateUrinalysisResultFromCommand(existing: UrinalysisResult, command: UpdateUrinalysisResultCommand): UrinalysisResult {
+    return existing.update({
+      age: command.age,
+      sex: command.sex,
+      color: command.color,
+      transparency: command.transparency,
+      specificGravity: command.specificGravity,
+      ph: command.ph,
+      protein: command.protein,
+      glucose: command.glucose,
+      epithelialCells: command.epithelialCells,
+      redCells: command.redCells,
+      pusCells: command.pusCells,
+      mucusThread: command.mucusThread,
+      amorphousUrates: command.amorphousUrates,
+      amorphousPhosphate: command.amorphousPhosphate,
+      crystals: command.crystals,
+      bacteria: command.bacteria,
+      others: command.others,
+      pregnancyTest: command.pregnancyTest,
+    });
+  }
+
+  // Hematology Result Mappers
+  static fromCreateHematologyResultCommand(command: CreateHematologyResultCommand): HematologyResult {
+    return HematologyResult.create(
+      new LabRequestId(command.labRequestId),
+      command.patientId,
+      command.patientName,
+      command.dateTaken,
+      {
+        age: command.age,
+        sex: command.sex,
+        hemoglobin: command.hemoglobin,
+        hematocrit: command.hematocrit,
+        rbc: command.rbc,
+        wbc: command.wbc,
+        plateletCount: command.plateletCount,
+        neutrophils: command.neutrophils,
+        lymphocytes: command.lymphocytes,
+        monocytes: command.monocytes,
+        eosinophils: command.eosinophils,
+        basophils: command.basophils,
+        mcv: command.mcv,
+        mch: command.mch,
+        mchc: command.mchc,
+        esr: command.esr,
+      }
+    );
+  }
+
+  static updateHematologyResultFromCommand(existing: HematologyResult, command: UpdateHematologyResultCommand): HematologyResult {
+    return existing.update({
+      age: command.age,
+      sex: command.sex,
+      hemoglobin: command.hemoglobin,
+      hematocrit: command.hematocrit,
+      rbc: command.rbc,
+      wbc: command.wbc,
+      plateletCount: command.plateletCount,
+      neutrophils: command.neutrophils,
+      lymphocytes: command.lymphocytes,
+      monocytes: command.monocytes,
+      eosinophils: command.eosinophils,
+      basophils: command.basophils,
+      mcv: command.mcv,
+      mch: command.mch,
+      mchc: command.mchc,
+      esr: command.esr,
+    });
+  }
+
+  // Fecalysis Result Mappers
+  static fromCreateFecalysisResultCommand(command: CreateFecalysisResultCommand): FecalysisResult {
+    return FecalysisResult.create(
+      new LabRequestId(command.labRequestId),
+      command.patientId,
+      command.patientName,
+      command.dateTaken,
+      {
+        age: command.age,
+        sex: command.sex,
+        color: command.color,
+        consistency: command.consistency,
+        rbc: command.rbc,
+        wbc: command.wbc,
+        occultBlood: command.occultBlood,
+        urobilinogen: command.urobilinogen,
+        others: command.others,
+      }
+    );
+  }
+
+  static updateFecalysisResultFromCommand(existing: FecalysisResult, command: UpdateFecalysisResultCommand): FecalysisResult {
+    return existing.update({
+      age: command.age,
+      sex: command.sex,
+      color: command.color,
+      consistency: command.consistency,
+      rbc: command.rbc,
+      wbc: command.wbc,
+      occultBlood: command.occultBlood,
+      urobilinogen: command.urobilinogen,
+      others: command.others,
+    });
+  }
+
+  // Serology Result Mappers
+  static fromCreateSerologyResultCommand(command: CreateSerologyResultCommand): SerologyResult {
+    return SerologyResult.create(
+      new LabRequestId(command.labRequestId),
+      command.patientId,
+      command.patientName,
+      command.dateTaken,
+      {
+        age: command.age,
+        sex: command.sex,
+        vdrl: command.vdrl,
+        rpr: command.rpr,
+        hbsag: command.hbsag,
+        antiHcv: command.antiHcv,
+        hivTest: command.hivTest,
+        pregnancyTest: command.pregnancyTest,
+        dengueNs1: command.dengueNs1,
+        dengueTourniquet: command.dengueTourniquet,
+        weilFelix: command.weilFelix,
+        typhidot: command.typhidot,
+        bloodType: command.bloodType,
+        rhFactor: command.rhFactor,
+        others: command.others,
+      }
+    );
+  }
+
+  static updateSerologyResultFromCommand(existing: SerologyResult, command: UpdateSerologyResultCommand): SerologyResult {
+    return existing.update({
+      age: command.age,
+      sex: command.sex,
+      vdrl: command.vdrl,
+      rpr: command.rpr,
+      hbsag: command.hbsag,
+      antiHcv: command.antiHcv,
+      hivTest: command.hivTest,
+      pregnancyTest: command.pregnancyTest,
+      dengueNs1: command.dengueNs1,
+      dengueTourniquet: command.dengueTourniquet,
+      weilFelix: command.weilFelix,
+      typhidot: command.typhidot,
+      bloodType: command.bloodType,
+      rhFactor: command.rhFactor,
+      others: command.others,
+    });
   }
 }
