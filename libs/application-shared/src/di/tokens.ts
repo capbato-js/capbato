@@ -128,6 +128,7 @@ export const TOKENS = {
   GetPendingLabRequestsQueryHandler: 'GetPendingLabRequestsQueryHandler',
   GetAllBloodChemistryQueryHandler: 'GetAllBloodChemistryQueryHandler',
   GetBloodChemistryByIdQueryHandler: 'GetBloodChemistryByIdQueryHandler',
+  GetBloodChemistryByPatientIdQueryHandler: 'GetBloodChemistryByPatientIdQueryHandler',
   GetBloodChemistryByPatientNameQueryHandler: 'GetBloodChemistryByPatientNameQueryHandler',
   GetAllProvincesQueryHandler: 'GetAllProvincesQueryHandler',
   GetCitiesByProvinceCodeQueryHandler: 'GetCitiesByProvinceCodeQueryHandler',

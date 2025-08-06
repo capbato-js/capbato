@@ -108,6 +108,82 @@ export class LaboratoryMapper {
   }
 
   /**
+   * Convert array of BloodChemistry domain entities to LabTestDto format for frontend
+   */
+  static bloodChemistryToLabTestDtoArray(bloodChemistryResults: BloodChemistry[]): LabTestDto[] {
+    return bloodChemistryResults.map(result => this.bloodChemistryToLabTestDto(result));
+  }
+
+  /**
+   * Convert BloodChemistry to LabTestDto format for frontend
+   */
+  static bloodChemistryToLabTestDto(bloodChemistry: BloodChemistry): LabTestDto {
+    // Extract test names from blood chemistry results
+    const results = bloodChemistry.results;
+    const availableTests: string[] = [];
+    const displayNames: string[] = [];
+
+    // Check which tests have values and build test names
+    if (results.fbs !== undefined) {
+      availableTests.push('fbs');
+      displayNames.push('FBS');
+    }
+    if (results.bun !== undefined) {
+      availableTests.push('bun');
+      displayNames.push('BUN');
+    }
+    if (results.creatinine !== undefined) {
+      availableTests.push('creatinine');
+      displayNames.push('Creatinine');
+    }
+    if (results.uricAcid !== undefined) {
+      availableTests.push('bloodUricAcid');
+      displayNames.push('Uric Acid');
+    }
+    if (results.cholesterol !== undefined) {
+      availableTests.push('cholesterol');
+      displayNames.push('Cholesterol');
+    }
+    if (results.triglycerides !== undefined) {
+      availableTests.push('triglycerides');
+      displayNames.push('Triglycerides');
+    }
+    if (results.hdl !== undefined) {
+      availableTests.push('hdl');
+      displayNames.push('HDL');
+    }
+    if (results.ldl !== undefined) {
+      availableTests.push('ldl');
+      displayNames.push('LDL');
+    }
+    if (results.sgot !== undefined) {
+      availableTests.push('sgot');
+      displayNames.push('SGOT');
+    }
+    if (results.sgpt !== undefined) {
+      availableTests.push('sgpt');
+      displayNames.push('SGPT');
+    }
+
+    // Create test name
+    const testName = displayNames.length > 0 
+      ? `BLOOD CHEMISTRY: ${displayNames.join(', ')}`
+      : 'BLOOD CHEMISTRY';
+
+    return {
+      id: bloodChemistry.id?.value || '',
+      testCategory: 'BLOOD_CHEMISTRY',
+      tests: availableTests,
+      testDisplayNames: displayNames,
+      date: bloodChemistry.dateTaken.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      status: 'Complete', // Blood chemistry results are always complete once created
+      results: 'Available',
+      patientId: bloodChemistry.patient.name, // Use patient name as ID for now
+      testName,
+    };
+  }
+
+  /**
    * Generate a human-readable test name from selected tests
    */
   private static generateTestName(selectedTests: string[], tests: LabRequestTests): string {

@@ -108,6 +108,7 @@ import {
   GetAllSerologyResultsQueryHandler,
   GetSerologyResultByIdQueryHandler,
   GetSerologyResultsByPatientIdQueryHandler,
+  GetBloodChemistryByPatientIdQueryHandler,
   // Laboratory Validation Services
   LaboratoryValidationService,
   CreateLabRequestValidationService,
@@ -482,6 +483,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetAllSerologyResultsQueryHandler, GetAllSerologyResultsQueryHandler);
   container.registerSingleton(TOKENS.GetSerologyResultByIdQueryHandler, GetSerologyResultByIdQueryHandler);
   container.registerSingleton(TOKENS.GetSerologyResultsByPatientIdQueryHandler, GetSerologyResultsByPatientIdQueryHandler);
+  container.registerSingleton(TOKENS.GetBloodChemistryByPatientIdQueryHandler, GetBloodChemistryByPatientIdQueryHandler);
 
   // Prescription Query Handlers
   container.registerSingleton(TOKENS.GetAllPrescriptionsQueryHandler, GetAllPrescriptionsQueryHandler);

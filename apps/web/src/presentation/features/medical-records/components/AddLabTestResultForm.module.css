@@ -12,9 +12,10 @@
 }
 
 .nativeInput:focus {
-  border-color: #339af0;
-  border: 1px;
-  box-shadow: 0 0 0 1px #339af0;
+  /* border-color: #339af0; */
+  /* border: 1px; */
+  border: none;
+  /* box-shadow: 0 0 0 1px #339af0; */
 }
 
 .nativeInput::placeholder {

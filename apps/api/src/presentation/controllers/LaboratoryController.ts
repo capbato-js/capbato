@@ -40,6 +40,7 @@ import {
   GetAllSerologyResultsQueryHandler,
   GetSerologyResultByIdQueryHandler,
   GetSerologyResultsByPatientIdQueryHandler,
+  GetBloodChemistryByPatientIdQueryHandler,
   LaboratoryMapper,
   TOKENS,
   LaboratoryValidationService,
@@ -146,7 +147,10 @@ export class LaboratoryController {
     @inject(TOKENS.GetSerologyResultByIdQueryHandler)
     private getSerologyResultByIdQueryHandler: GetSerologyResultByIdQueryHandler,
     @inject(TOKENS.GetSerologyResultsByPatientIdQueryHandler)
-    private getSerologyResultsByPatientIdQueryHandler: GetSerologyResultsByPatientIdQueryHandler
+    private getSerologyResultsByPatientIdQueryHandler: GetSerologyResultsByPatientIdQueryHandler,
+    // Blood Chemistry Query Handler
+    @inject(TOKENS.GetBloodChemistryByPatientIdQueryHandler)
+    private getBloodChemistryByPatientIdQueryHandler: GetBloodChemistryByPatientIdQueryHandler
   ) {}
 
   /**
@@ -190,14 +194,18 @@ export class LaboratoryController {
   async getLabTestsByPatientId(@Param('patientId') patientId: string): Promise<LabTestListResponse> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     
-    // For now, get all lab requests and transform them to lab tests format
-    // In a real scenario, you might want a specific query handler for this
+    // Get lab requests and transform them to lab tests format
     const labRequests = await this.getAllLabRequestsQueryHandler.execute();
+    const labRequestDtos = LaboratoryMapper.toLabTestDtoArray(labRequests, validatedPatientId);
     
-    // Filter by patient and transform to LabTestDto format
-    const labTestDtos = LaboratoryMapper.toLabTestDtoArray(labRequests, validatedPatientId);
+    // Get blood chemistry results for the patient
+    const bloodChemistryResults = await this.getBloodChemistryByPatientIdQueryHandler.execute(validatedPatientId);
+    const bloodChemistryDtos = LaboratoryMapper.bloodChemistryToLabTestDtoArray(bloodChemistryResults);
+    
+    // Combine both types of lab tests
+    const allLabTestDtos = [...labRequestDtos, ...bloodChemistryDtos];
 
-    return ApiResponseBuilder.success(labTestDtos);
+    return ApiResponseBuilder.success(allLabTestDtos);
   }
 
   /**
