@@ -138,7 +138,8 @@ export function DataTable<T extends SearchableItem>({
           key={`skeleton-${index}-${String(column.key)}`}
           style={{
             padding: '16px 24px',
-            textAlign: column.align || 'left',
+            // textAlign: column.align || 'left',
+            textAlign: 'center',
             borderBottom: index < skeletonRowCount - 1 ? `1px solid ${theme.colors.customGray[1]}` : 'none'
           }}
         >
@@ -150,7 +151,7 @@ export function DataTable<T extends SearchableItem>({
           key={`skeleton-${index}-actions`}
           style={{
             padding: '16px 24px',
-            textAlign: 'right',
+            textAlign: 'center',
             borderBottom: index < skeletonRowCount - 1 ? `1px solid ${theme.colors.customGray[1]}` : 'none',
             width: '100px'
           }}
@@ -218,7 +219,8 @@ export function DataTable<T extends SearchableItem>({
                   key={String(column.key)}
                   style={{
                     padding: '16px 24px',
-                    textAlign: column.align || 'left',
+                    // textAlign: column.align || 'left',
+                    textAlign: 'center',
                     fontWeight: 600,
                     fontSize: '16px',
                     color: theme.colors.customGray[8],
@@ -306,7 +308,8 @@ export function DataTable<T extends SearchableItem>({
                             key={String(column.key)}
                             style={{
                               padding: '16px 24px',
-                              textAlign: column.align || 'left',
+                              // textAlign: column.align || 'left',
+                            textAlign: 'center',
                               whiteSpace: column.align === 'center' ? 'nowrap' : 'normal',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -431,7 +434,8 @@ export function DataTable<T extends SearchableItem>({
                           key={String(column.key)}
                           style={{
                             padding: '16px 24px',
-                            textAlign: column.align || 'left',
+                            // textAlign: column.align || 'left',
+                            textAlign: 'center',
                             whiteSpace: column.align === 'center' ? 'nowrap' : 'normal',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
