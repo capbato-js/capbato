@@ -13,6 +13,7 @@ import { Icon } from '../../../components/common';
 import { FormSelect } from '../../../components/ui/FormSelect';
 import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 import { useDoctorStore } from '../../../../infrastructure/state/DoctorStore';
+import { useAppointmentStore } from '../../../../infrastructure/state/AppointmentStore';
 
 export interface AddAppointmentFormProps {
   onSubmit: (data: AddAppointmentFormData) => Promise<boolean>;
@@ -21,6 +22,7 @@ export interface AddAppointmentFormProps {
   onClearError?: () => void;
   // Edit mode props
   editMode?: boolean;
+  currentAppointmentId?: string;
   initialData?: {
     patientId?: string;
     patientName?: string;
@@ -49,6 +51,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   error,
   onClearError,
   editMode = false,
+  currentAppointmentId,
   initialData,
 }) => {
   // State for patients and doctors
@@ -59,6 +62,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   // Get stores
   const patientStore = usePatientStore();
   const doctorStore = useDoctorStore();
+  const appointmentStore = useAppointmentStore();
 
   // Load patients and doctors on component mount
   useEffect(() => {
@@ -69,6 +73,9 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
         
         // Load doctors
         await doctorStore.getAllDoctors(true, 'summary');
+        
+        // Load appointments for filtering time slots
+        await appointmentStore.fetchAllAppointments();
       } catch (error) {
         console.error('Failed to load data:', error);
       }
@@ -142,11 +149,20 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     return `${displayHour}:${minuteStr} ${ampm}`;
   };
 
-  // Generate available time slots based on selected date
-  const getAvailableTimeSlots = (selectedDate: string) => {
+  // Generate available time slots based on selected date, filtering out booked times
+  const getAvailableTimeSlots = (selectedDate: string, excludeCurrentAppointmentId?: string) => {
     const slots = [];
     const now = new Date();
     const isToday = selectedDate === now.toISOString().split('T')[0];
+    
+    // Get existing appointments for the selected date
+    const existingAppointments = selectedDate ? appointmentStore.getAppointmentsByDate(selectedDate) : [];
+    const bookedTimes = existingAppointments
+      .filter(apt => {
+        // In edit mode, exclude the current appointment being edited
+        return excludeCurrentAppointmentId ? apt.id !== excludeCurrentAppointmentId : true;
+      })
+      .map(apt => apt.appointmentTime);
     
     for (let hour = 8; hour <= 17; hour++) {
       for (const minute of [0, 15, 30, 45]) {
@@ -163,6 +179,11 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           }
         }
         
+        // Skip if this time slot is already booked
+        if (bookedTimes.includes(timeStr)) {
+          continue;
+        }
+        
         const displayTime = formatTimeLabel(timeStr);
         slots.push({ value: timeStr, label: displayTime });
       }
@@ -172,7 +193,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   };
 
   // Generate time slots - will be updated when date changes
-  const [timeSlots, setTimeSlots] = useState(() => getAvailableTimeSlots(''));
+  const [timeSlots, setTimeSlots] = useState(() => getAvailableTimeSlots('', currentAppointmentId));
 
   // React Hook Form setup
   const {
@@ -223,7 +244,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
       
       // If we have a date, update time slots
       if (initialData.appointmentDate) {
-        const newTimeSlots = getAvailableTimeSlots(initialData.appointmentDate);
+        const newTimeSlots = getAvailableTimeSlots(initialData.appointmentDate, currentAppointmentId);
         setTimeSlots(newTimeSlots);
       }
     }
@@ -244,7 +265,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
       
       // If we have a date, update time slots
       if (initialData.appointmentDate) {
-        const newTimeSlots = getAvailableTimeSlots(initialData.appointmentDate);
+        const newTimeSlots = getAvailableTimeSlots(initialData.appointmentDate, currentAppointmentId);
         setTimeSlots(newTimeSlots);
       }
     }
@@ -265,7 +286,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
       const dateString = selectedDate.toISOString().split('T')[0];
       
       // Update available time slots based on selected date
-      const newTimeSlots = getAvailableTimeSlots(dateString);
+      const newTimeSlots = getAvailableTimeSlots(dateString, currentAppointmentId);
       setTimeSlots(newTimeSlots);
       
       // Clear the time selection if currently selected time is no longer available
@@ -299,7 +320,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
       setAssignedDoctor('');
       setValue('doctor', '');
       // Reset time slots to default (empty)
-      setTimeSlots(getAvailableTimeSlots(''));
+      setTimeSlots(getAvailableTimeSlots('', currentAppointmentId));
     }
   };
 

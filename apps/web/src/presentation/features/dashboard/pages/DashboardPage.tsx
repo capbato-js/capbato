@@ -1,43 +1,106 @@
 import React, { useEffect } from 'react';
-import { Box, Title, Text } from '@mantine/core';
+import { Box, Title, Grid } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
+import { DashboardStatCard, DashboardAppointmentsTable } from '../../../components/common';
+import { useDashboardViewModel } from '../view-models';
+import { useNavigate } from 'react-router-dom';
+import { useMantineTheme } from '@mantine/core';
 
 export const DashboardPage: React.FC = () => {
+  const { stats, todayAppointments, isLoading, loadDashboardData } = useDashboardViewModel();
+  const navigate = useNavigate();
+  const theme = useMantineTheme();
+
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
+    loadDashboardData();
   }, []);
+
+  const handleSeeAllAppointments = () => {
+    navigate('/appointments');
+  };
 
   return (
     <MedicalClinicLayout>
-      {/* No boxing - content flows naturally */}
-      <Box style={{ marginBottom: '32px' }}>
+      {/* Stats Cards Section */}
+      <Grid style={{ marginBottom: '32px' }}>
+        <Grid.Col span={4}>
+          <DashboardStatCard
+            icon="👨‍⚕️"
+            title="Doctor"
+            value={stats.doctorName}
+            iconColor="#fff"
+            backgroundColor="#4263EB"
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <DashboardStatCard
+            icon="👥"
+            title="Current Patient"
+            value={stats.currentPatient}
+            subtitle="Ongoing Now"
+            iconColor="#fff"
+            backgroundColor="#51CF66"
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <DashboardStatCard
+            icon="📅"
+            title="Total Appointments"
+            value={stats.totalAppointments.toString()}
+            subtitle={stats.totalAppointmentsDate}
+            iconColor="#fff"
+            backgroundColor="#4DABF7"
+          />
+        </Grid.Col>
+      </Grid>
+
+      {/* Today's Appointments Section */}
+      <Box style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        marginBottom: '0',
+        position: 'relative'
+      }}>
         <Title 
-          order={1}
+          order={2}
           style={{
-            color: '#111827',
-            fontSize: '24px',
-            fontWeight: 700,
+            color: theme.colors.customGray[8],
+            fontSize: '18px',
+            fontWeight: 600,
             margin: 0,
-            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            textAlign: 'center'
           }}
         >
-          Dashboard
+          Today's Appointments
         </Title>
-        <Text 
-          size="sm" 
-          style={{ color: '#6b7280', marginTop: '4px' }}
+        <Box
+          onClick={handleSeeAllAppointments}
+          style={{
+            color: theme.colors.blue[7],
+            fontSize: '14px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            position: 'absolute',
+            right: 0
+          }}
         >
-          Welcome to your medical clinic dashboard
-        </Text>
+          See All
+        </Box>
       </Box>
-
-      <Box style={{ textAlign: 'center', marginTop: '80px' }}>
-        <Text size="lg" style={{ color: '#9ca3af' }}>
-          Dashboard content will be implemented here
-        </Text>
+      
+      {/* Today's Appointments Section - Now scrollable */}
+      <Box style={{ marginBottom: '24px' }}>
+        {isLoading ? (
+          <Box style={{ textAlign: 'center', marginTop: '40px', color: '#9ca3af' }}>
+            Loading appointments...
+          </Box>
+        ) : (
+          <DashboardAppointmentsTable
+            appointments={todayAppointments}
+            maxRows={10}
+          />
+        )}
       </Box>
     </MedicalClinicLayout>
   );

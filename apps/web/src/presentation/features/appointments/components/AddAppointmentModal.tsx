@@ -90,6 +90,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         error={viewModel.error}
         onClearError={viewModel.clearError}
         editMode={editMode}
+        currentAppointmentId={stableAppointmentId}
         initialData={initialData}
       />
     </Modal>
