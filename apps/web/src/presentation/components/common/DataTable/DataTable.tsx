@@ -138,8 +138,7 @@ export function DataTable<T extends SearchableItem>({
           key={`skeleton-${index}-${String(column.key)}`}
           style={{
             padding: '16px 24px',
-            // textAlign: column.align || 'left',
-            textAlign: 'center',
+            textAlign: column.align || 'left',
             borderBottom: index < skeletonRowCount - 1 ? `1px solid ${theme.colors.customGray[1]}` : 'none'
           }}
         >
@@ -307,8 +306,7 @@ export function DataTable<T extends SearchableItem>({
                             key={String(column.key)}
                             style={{
                               padding: '16px 24px',
-                              // textAlign: column.align || 'left',
-                            textAlign: 'center',
+                              textAlign: column.align || 'left',
                               whiteSpace: column.align === 'center' ? 'nowrap' : 'normal',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -433,8 +431,7 @@ export function DataTable<T extends SearchableItem>({
                           key={String(column.key)}
                           style={{
                             padding: '16px 24px',
-                            // textAlign: column.align || 'left',
-                            textAlign: 'center',
+                            textAlign: column.align || 'left',
                             whiteSpace: column.align === 'center' ? 'nowrap' : 'normal',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
