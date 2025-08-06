@@ -24,6 +24,7 @@ export type AddLabTestResultFormData = Record<string, string | undefined>;
 
 interface AddLabTestResultFormProps {
   testType?: LabTestType;
+  enabledFields?: string[]; // Array of field IDs that should be enabled (e.g., ['fbs', 'bun'])
   patientData?: {
     patientNumber?: string;
     patientName?: string;
@@ -43,6 +44,7 @@ interface AddLabTestResultFormProps {
 
 export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   testType = 'BLOOD_CHEMISTRY',
+  enabledFields, // Array of field IDs that should be enabled
   patientData,
   onSubmit,
   onCancel,
@@ -54,6 +56,12 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   const schema = generateLabTestSchema(testType);
   const leftFields = getFieldsByColumn(testType, 'left');
   const rightFields = getFieldsByColumn(testType, 'right');
+
+  // Debug logging for enabled fields
+  console.log('🧪 AddLabTestResultForm - Test Type:', testType);
+  console.log('🧪 AddLabTestResultForm - Enabled Fields:', enabledFields);
+  console.log('🧪 AddLabTestResultForm - Available Left Fields:', leftFields.map(f => ({ id: f.id, label: f.label })));
+  console.log('🧪 AddLabTestResultForm - Available Right Fields:', rightFields.map(f => ({ id: f.id, label: f.label })));
 
   const {
     register,
@@ -67,31 +75,58 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   };
 
   // Reusable field component
-  const renderField = (field: LabTestFieldConfig) => (
-    <Box 
-      key={field.id}
-      component="label" 
-      style={{ 
-        display: 'grid', 
-        gridTemplateColumns: '1fr auto 1fr', 
-        alignItems: 'center', 
-        marginBottom: '5px', 
-        fontSize: '14px', 
-        fontWeight: 'bold', 
-        gap: '10px' 
-      }}
-    >
-      <Text size="sm" fw={500}>{field.label}</Text>
-      <input
-        {...register(field.id)}
-        type="text"
-        className={classes.nativeInput}
-      />
-      <Text size="sm" style={{ fontSize: '14px' }}>
-        {field.normalRange ? ` ${field.normalRange} ` : ''}
-      </Text>
-    </Box>
-  );
+  const renderField = (field: LabTestFieldConfig) => {
+    // Determine if this field should be enabled
+    // Handle case-insensitive matching and various formats
+    const isFieldEnabled = !enabledFields || enabledFields.length === 0 || 
+      enabledFields.some(enabledField => {
+        const normalizedEnabledField = enabledField.toLowerCase().trim();
+        const normalizedFieldId = field.id.toLowerCase().trim();
+        const normalizedFieldLabel = field.label.toLowerCase().trim();
+        
+        // Match by ID, label, or if enabled field is part of label
+        return normalizedEnabledField === normalizedFieldId ||
+               normalizedEnabledField === normalizedFieldLabel ||
+               normalizedFieldLabel.includes(normalizedEnabledField) ||
+               normalizedFieldId.includes(normalizedEnabledField);
+      });
+    
+    return (
+      <Box 
+        key={field.id}
+        component="label" 
+        style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '1fr auto 1fr', 
+          alignItems: 'center', 
+          marginBottom: '5px', 
+          fontSize: '14px', 
+          fontWeight: 'bold', 
+          gap: '10px',
+          opacity: isFieldEnabled ? 1 : 0.5 // Visual indication of disabled state
+        }}
+      >
+        <Text size="sm" fw={500} style={{ color: isFieldEnabled ? 'inherit' : '#999' }}>
+          {field.label}
+        </Text>
+        <input
+          {...register(field.id)}
+          type="text"
+          className={classes.nativeInput}
+          disabled={!isFieldEnabled}
+          style={{
+            backgroundColor: isFieldEnabled ? 'white' : '#f5f5f5',
+            color: isFieldEnabled ? 'inherit' : '#999',
+            cursor: isFieldEnabled ? 'text' : 'not-allowed',
+            border: isFieldEnabled ? '1px solid #007bff' : '1px solid #e9ecef', // Blue border for enabled fields
+          }}
+        />
+        <Text size="sm" style={{ fontSize: '14px', color: isFieldEnabled ? 'inherit' : '#999' }}>
+          {field.normalRange ? ` ${field.normalRange} ` : ''}
+        </Text>
+      </Box>
+    );
+  };
 
   return (
     <Box p="sm" data-id="add-lab" style={{ background: 'white', maxWidth: '850px', margin: 'auto', paddingTop: 0}}>

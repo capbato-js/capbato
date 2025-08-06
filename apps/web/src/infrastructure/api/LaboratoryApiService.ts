@@ -106,6 +106,12 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       
       const response = await this.httpClient.get<LabTestListResponse>(`/api/laboratory/lab-tests/${patientId}`);
       
+      console.log('🔍 Raw API response:', response.data);
+      console.log('🔍 Lab tests data array:', response.data?.data);
+      if (response.data?.data && response.data.data.length > 0) {
+        console.log('🔍 First lab test item:', response.data.data[0]);
+      }
+      
       console.log('✅ Lab tests fetched successfully for patient:', patientId, '- Found', response.data?.data?.length || 0, 'tests');
       return response.data;
     } catch (error) {

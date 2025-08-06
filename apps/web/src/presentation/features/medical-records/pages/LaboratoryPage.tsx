@@ -56,7 +56,8 @@ const convertLabRequestToLaboratoryResult = (labRequest: LabRequestDto): Laborat
   }
 
   return {
-    id: labRequest.id || labRequest.patient.id,
+    id: labRequest.id || `lab-${Date.now()}`, // Lab request ID for table operations
+    patientId: labRequest.patient.id, // Store the actual patient ID for navigation to tests page
     patientNumber,
     patientName,
     testType: testType,
@@ -192,8 +193,8 @@ export const LaboratoryPage: React.FC = () => {
   };
 
   const handleViewResult = (result: LaboratoryResult) => {
-    // Navigate to laboratory tests page with patient ID
-    navigate(`/laboratory/tests/${result.id}`);
+    // Navigate to laboratory tests page with patient ID (not lab request ID)
+    navigate(`/laboratory/tests/${result.patientId}`);
   };
 
   const getStatusBadge = (status: LaboratoryResult['status']) => {

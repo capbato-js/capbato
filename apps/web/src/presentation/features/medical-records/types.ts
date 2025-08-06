@@ -21,6 +21,7 @@ export interface Prescription {
 
 export interface LaboratoryResult {
   id: string;
+  patientId: string; // Add patient ID field
   patientNumber: string;
   patientName: string;
   testType: string;

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { 
   CreateLabRequestCommand,
   LabRequestDto,
+  LabTestDto,
   BloodChemistryDto,
   CreateBloodChemistryCommand,
   TOKENS
@@ -25,6 +26,7 @@ interface LaboratoryStore {
   // State
   labRequests: LabRequestDto[];
   completedLabRequests: LabRequestDto[];
+  labTests: LabTestDto[];
   bloodChemistryResults: BloodChemistryDto[];
   loadingStates: LoadingStates;
   errorStates: ErrorStates;
@@ -34,6 +36,8 @@ interface LaboratoryStore {
   fetchAllLabRequests: () => Promise<void>;
   fetchCompletedLabRequests: () => Promise<void>;
   fetchLabRequestByPatientId: (patientId: string) => Promise<LabRequestDto | null>;
+  fetchLabRequestById: (labRequestId: string) => Promise<LabRequestDto | null>;
+  fetchLabTestsByPatientId: (patientId: string) => Promise<LabTestDto[]>;
   updateLabRequestResults: (
     patientId: string, 
     requestDate: string, 
@@ -47,6 +51,7 @@ interface LaboratoryStore {
 const initialState = {
   labRequests: [],
   completedLabRequests: [],
+  labTests: [],
   bloodChemistryResults: [],
   loadingStates: {
     creating: false,
@@ -234,6 +239,82 @@ export const useLaboratoryStore = create<LaboratoryStore>((set, get) => {
           errorStates: { ...state.errorStates, fetchError: errorMessage }
         }));
         return null;
+      }
+    },
+
+    fetchLabRequestById: async (labRequestId: string): Promise<LabRequestDto | null> => {
+      set(state => ({
+        ...state,
+        loadingStates: { ...state.loadingStates, fetching: true },
+        errorStates: { ...state.errorStates, fetchError: null }
+      }));
+
+      try {
+        const laboratoryApiService = getLaboratoryApiService();
+        const response = await laboratoryApiService.getLabRequestById(labRequestId);
+        
+        if (response.success && response.data) {
+          set(state => ({
+            ...state,
+            loadingStates: { ...state.loadingStates, fetching: false }
+          }));
+          return response.data;
+        } else {
+          throw new Error(`Failed to fetch lab request with ID: ${labRequestId}`);
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, fetching: false },
+          errorStates: { ...state.errorStates, fetchError: errorMessage }
+        }));
+        return null;
+      }
+    },
+
+    fetchLabTestsByPatientId: async (patientId: string): Promise<LabTestDto[]> => {
+      set(state => ({
+        ...state,
+        loadingStates: { ...state.loadingStates, fetching: true },
+        errorStates: { ...state.errorStates, fetchError: null }
+      }));
+
+      try {
+        const laboratoryApiService = getLaboratoryApiService();
+        const response = await laboratoryApiService.getLabTestsByPatientId(patientId);
+        
+        console.log('🧪 Store received lab tests response:', response);
+        
+        if (response.success && response.data) {
+          console.log('✅ Setting lab tests in store:', response.data?.length || 0, 'tests');
+          set(state => ({
+            ...state,
+            labTests: response.data || [],
+            loadingStates: { ...state.loadingStates, fetching: false }
+          }));
+          return response.data || [];
+        } else {
+          console.error('❌ API response not successful:', response);
+          const errorMessage = response.message || 'Failed to fetch lab tests';
+          set(state => ({
+            ...state,
+            labTests: [],
+            loadingStates: { ...state.loadingStates, fetching: false },
+            errorStates: { ...state.errorStates, fetchError: errorMessage }
+          }));
+          return [];
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        console.error('❌ Error fetching lab tests:', error);
+        set(state => ({
+          ...state,
+          labTests: [],
+          loadingStates: { ...state.loadingStates, fetching: false },
+          errorStates: { ...state.errorStates, fetchError: errorMessage }
+        }));
+        return [];
       }
     },
 

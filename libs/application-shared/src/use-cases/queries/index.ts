@@ -34,4 +34,5 @@ export * from './GetFecalysisResultsByPatientIdQueryHandler';
 export * from './GetAllSerologyResultsQueryHandler';
 export * from './GetSerologyResultByIdQueryHandler';
 export * from './GetSerologyResultsByPatientIdQueryHandler';
+export * from './GetBloodChemistryByPatientIdQueryHandler';
 export * from './PrescriptionQueryHandlers';

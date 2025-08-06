@@ -8,9 +8,11 @@ import { Modal } from '../../../components/common';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { LabTest } from '../types';
 import { AddLabTestResultForm, AddLabTestResultFormData } from '../components';
+import { useLaboratoryStore } from '../../../../infrastructure/state/LaboratoryStore';
+import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 
 export const LaboratoryTestsPage: React.FC = () => {
-  const { patientId } = useParams<{ patientId: string }>();
+  const { patientId } = useParams<{ patientId: string }>(); // Now correctly receives the patient ID
   const navigate = useNavigate();
   const theme = useMantineTheme();
   
@@ -22,9 +24,6 @@ export const LaboratoryTestsPage: React.FC = () => {
   
   // Lab tests data state
   const [labTests, setLabTests] = useState<LabTest[]>([]);
-  const [labTestsLoading, setLabTestsLoading] = useState(true);
-  const [labTestsError, setLabTestsError] = useState<string | null>(null);
-  
   const [patientInfo, setPatientInfo] = useState<{
     patientNumber: string;
     patientName: string;
@@ -32,146 +31,148 @@ export const LaboratoryTestsPage: React.FC = () => {
     sex?: string;
   } | null>(null);
 
+  // Laboratory store
+  const { 
+    fetchLabTestsByPatientId,
+    fetchLabRequestByPatientId,
+    createBloodChemistry,
+    loadingStates, 
+    errorStates 
+  } = useLaboratoryStore();
+
+  // Patient store  
+  const { 
+    loadPatientById,
+    getPatientDetails
+  } = usePatientStore();
+
   // Fetch lab tests from API
   useEffect(() => {
     const fetchLabTests = async () => {
       if (!patientId) return;
       
-      setLabTestsLoading(true);
-      setLabTestsError(null);
-      
       try {
-        // TODO: Replace with actual API call once lab service is integrated
-        // For now, simulate API response with the diverse test data
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
+        console.log('🧪 Fetching lab data for patient:', patientId);
         
-        const mockLabTests: LabTest[] = [
-          // Blood Chemistry Tests
-          { 
-            id: '1', 
-            testCategory: 'BLOOD_CHEMISTRY',
-            tests: ['fbs', 'bun'],
-            testDisplayNames: ['FBS', 'BUN'],
-            date: 'Jun 30, 2025', 
-            status: 'Confirmed', 
-            results: 'Available',
-            testName: 'BLOOD CHEMISTRY: FBS, BUN' // Legacy compatibility
-          },
-          { 
-            id: '2', 
-            testCategory: 'BLOOD_CHEMISTRY',
-            tests: ['fbs'],
-            testDisplayNames: ['FBS'],
-            date: 'Jul 1, 2025', 
-            status: 'Pending',
-            testName: 'BLOOD CHEMISTRY: FBS' // Legacy compatibility
-          },
-          { 
-            id: '3', 
-            testCategory: 'BLOOD_CHEMISTRY',
-            tests: ['lipidProfile'],
-            testDisplayNames: ['Lipid Profile'],
-            date: 'Jul 2, 2025', 
-            status: 'Complete', 
-            results: 'Available',
-            testName: 'BLOOD CHEMISTRY: Lipid Profile' // Legacy compatibility
-          },
-          { 
-            id: '4', 
-            testCategory: 'BLOOD_CHEMISTRY',
-            tests: ['hbalc', 'sgot', 'sgpt'],
-            testDisplayNames: ['HBA1C', 'SGOT', 'SGPT'],
-            date: 'Jul 3, 2025', 
-            status: 'In Progress',
-            testName: 'BLOOD CHEMISTRY: HBA1C, SGOT, SGPT' // Legacy compatibility
-          },
-          
-          // Urinalysis Tests  
-          { 
-            id: '5', 
-            testCategory: 'URINALYSIS',
-            tests: ['urinalysis'],
-            testDisplayNames: ['URINALYSIS'],
-            date: 'Jun 28, 2025', 
-            status: 'Pending',
-            testName: 'URINALYSIS' // Legacy compatibility
-          },
-          { 
-            id: '6', 
-            testCategory: 'URINALYSIS',
-            tests: ['urinalysis', 'urine_color', 'protein_urine'],
-            testDisplayNames: ['URINALYSIS', 'Color', 'Protein'],
-            date: 'Jun 29, 2025', 
-            status: 'Confirmed', 
-            results: 'Available',
-            testName: 'URINALYSIS: Complete Panel' // Legacy compatibility
-          },
-          
-          // Fecalysis Tests
-          { 
-            id: '7', 
-            testCategory: 'FECALYSIS',
-            tests: ['fecalysis'],
-            testDisplayNames: ['FECALYSIS'],
-            date: 'Jul 4, 2025', 
-            status: 'Pending',
-            testName: 'FECALYSIS' // Legacy compatibility
-          },
-          { 
-            id: '8', 
-            testCategory: 'FECALYSIS',
-            tests: ['fecalysis', 'fecal_color', 'parasites'],
-            testDisplayNames: ['FECALYSIS', 'Color', 'Parasites'],
-            date: 'Jul 5, 2025', 
-            status: 'Complete', 
-            results: 'Available',
-            testName: 'FECALYSIS: Comprehensive' // Legacy compatibility
-          },
-          
-          // Other Tests
-          { 
-            id: '9', 
-            testCategory: 'CBC',
-            tests: ['cbcWithPlatelet'],
-            testDisplayNames: ['CBC with Platelet'],
-            date: 'Jul 6, 2025', 
-            status: 'Confirmed', 
-            results: 'Available',
-            testName: 'CBC: CBC with Platelet' // Legacy compatibility
-          },
-          { 
-            id: '10', 
-            testCategory: 'BLOOD_CHEMISTRY', // Fallback for unknown tests
-            tests: ['pregnancyTest'],
-            testDisplayNames: ['Pregnancy Test'],
-            date: 'Jul 7, 2025', 
-            status: 'Complete', 
-            results: 'Available',
-            testName: 'BLOOD CHEMISTRY: Pregnancy Test' // Legacy compatibility
+        // First, try to fetch lab request to get patient information
+        let patientData = null;
+        try {
+          const labRequest = await fetchLabRequestByPatientId(patientId);
+          if (labRequest) {
+            console.log('📋 Retrieved lab request with patient info:', labRequest);
+            patientData = labRequest.patient;
           }
-        ];
+        } catch (requestError) {
+          console.warn('⚠️ Could not fetch lab request for patient info:', requestError);
+        }
         
-        setLabTests(mockLabTests);
+        // Then fetch lab tests
+        const fetchedLabTests = await fetchLabTestsByPatientId(patientId);
+        console.log('✅ Received lab tests from store:', fetchedLabTests);
+        
+        // Convert LabTestDto[] to LabTest[] (they should be compatible)
+        const convertedLabTests: LabTest[] = fetchedLabTests.map((dto, index) => {
+          console.log(`🔍 Processing lab test ${index}:`, {
+            id: dto.id,
+            testCategory: dto.testCategory,
+            tests: dto.tests,
+            testDisplayNames: dto.testDisplayNames,
+            testName: dto.testName,
+            date: dto.date,
+            status: dto.status
+          });
+          
+          const converted = {
+            id: dto.id || `test-${Date.now()}`,
+            testCategory: dto.testCategory || 'BLOOD_CHEMISTRY',
+            tests: dto.tests || [],
+            testDisplayNames: dto.testDisplayNames || [],
+            date: dto.date || new Date().toISOString(),
+            status: dto.status || 'Pending',
+            results: dto.results,
+            patientId: dto.patientId,
+            testName: dto.testName
+          };
+          
+          console.log(`🔄 Converted lab test ${index}:`, converted);
+          return converted;
+        });
+        
+        console.log('📋 Final converted lab tests:', convertedLabTests);
+        setLabTests(convertedLabTests);
+        
+        // Set patient information from lab request data or fallback
+        if (patientData) {
+          // Extract age and sex from ageGender field (e.g., "35/M" or "28/F")
+          let age: number | undefined;
+          let sex: string | undefined;
+          
+          if (patientData.ageGender) {
+            const ageGenderParts = patientData.ageGender.split('/');
+            if (ageGenderParts.length >= 2) {
+              age = parseInt(ageGenderParts[0]);
+              sex = ageGenderParts[1];
+            }
+          }
+          
+          // Use proper patient name
+          let patientName = patientData.name;
+          if (!patientName && patientData.firstName && patientData.lastName) {
+            patientName = `${patientData.firstName} ${patientData.lastName}`.trim();
+          }
+          
+          setPatientInfo({
+            patientNumber: patientData.patientNumber || patientData.id,
+            patientName: patientName || `Patient ${patientData.id}`,
+            age,
+            sex
+          });
+        } else {
+          // Fallback if no lab request data available - fetch patient details directly
+          console.log('🔄 Lab request failed, attempting to fetch patient details directly...');
+          try {
+            await loadPatientById(patientId);
+            const patientDetails = getPatientDetails(patientId);
+            
+            if (patientDetails) {
+              console.log('✅ Retrieved patient details from Patient API:', patientDetails);
+              setPatientInfo({
+                patientNumber: patientDetails.patientNumber,
+                patientName: `${patientDetails.firstName} ${patientDetails.lastName}`.trim(),
+                age: patientDetails.age,
+                sex: patientDetails.gender
+              });
+            } else {
+              // Final fallback if both APIs fail
+              console.warn('⚠️ Both lab request and patient APIs failed, using UUID fallback');
+              setPatientInfo({
+                patientNumber: patientId,
+                patientName: `Patient ${patientId}`,
+                age: undefined,
+                sex: undefined
+              });
+            }
+          } catch (patientError) {
+            console.error('❌ Error fetching patient details:', patientError);
+            // Final fallback if both APIs fail
+            setPatientInfo({
+              patientNumber: patientId,
+              patientName: `Patient ${patientId}`,
+              age: undefined,
+              sex: undefined
+            });
+          }
+        }
+        
       } catch (err) {
-        setLabTestsError(err instanceof Error ? err.message : 'Failed to fetch lab tests');
-      } finally {
-        setLabTestsLoading(false);
+        console.error('❌ Error fetching lab tests:', err);
+        // Error handling is now managed by the store
       }
     };
 
     fetchLabTests();
-  }, [patientId]);
+  }, [patientId, fetchLabTestsByPatientId, fetchLabRequestByPatientId, loadPatientById, getPatientDetails]);
 
-  // Mock patient info - this would come from API
-  useEffect(() => {
-    // In real implementation, fetch patient info based on patientId
-    setPatientInfo({
-      patientNumber: '2025-R3',
-      patientName: 'Raj Va Riego',
-      age: 12,
-      sex: 'FEMALE'
-    });
-  }, [patientId]);
 
   const handleBackToLaboratory = () => {
     navigate('/laboratory');
@@ -188,6 +189,9 @@ export const LaboratoryTestsPage: React.FC = () => {
   };
 
   const handleAddResult = (test: LabTest) => {
+    console.log('🧪 Add Result clicked for test:', test);
+    console.log('🧪 Test category:', test.testCategory);
+    console.log('🧪 Specific tests to enable:', test.tests);
     setSelectedLabTest(test);
     setAddResultModalOpened(true);
     setError(null);
@@ -204,18 +208,93 @@ export const LaboratoryTestsPage: React.FC = () => {
     setError(null);
     
     try {
-      // TODO: Implement API call to save lab test results
-      console.log('Submitting lab test results:', data);
+      console.log('🔬 Submitting lab test results:', data);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!patientId || !selectedLabTest || !patientInfo) {
+        throw new Error('Missing required patient information or selected lab test');
+      }
+
+      // Check if this is a blood chemistry test by looking at the selected tests
+      const isBloodChemistryTest = selectedLabTest.testName.toLowerCase().includes('blood chemistry') ||
+                                   selectedLabTest.selectedTests.some(test => 
+                                     ['fbs', 'bun', 'creatinine', 'uric_acid', 'cholesterol', 'triglycerides', 'hdl', 'ldl', 'sgot', 'sgpt']
+                                       .includes(test.toLowerCase())
+                                   );
+
+      if (isBloodChemistryTest) {
+        // Convert form data to blood chemistry command
+        const bloodChemistryCommand = {
+          patientName: patientInfo.patientName,
+          age: patientInfo.age || 0,
+          sex: patientInfo.sex || 'Unknown',
+          dateTaken: new Date().toISOString(),
+          
+          // Map form field IDs to blood chemistry command properties
+          fbs: data.fbs ? parseFloat(data.fbs) : undefined,
+          bun: data.bun ? parseFloat(data.bun) : undefined,
+          creatinine: data.creatinine ? parseFloat(data.creatinine) : undefined,
+          uricAcid: (data.uricAcid || data.blood_uric_acid) ? parseFloat(data.uricAcid || data.blood_uric_acid || '0') : undefined,
+          cholesterol: data.cholesterol ? parseFloat(data.cholesterol) : undefined,
+          triglycerides: data.triglycerides ? parseFloat(data.triglycerides) : undefined,
+          hdl: data.hdl ? parseFloat(data.hdl) : undefined,
+          ldl: data.ldl ? parseFloat(data.ldl) : undefined,
+          vldl: data.vldl ? parseFloat(data.vldl) : undefined,
+          sodium: (data.sodium || data.sodiumNa) ? parseFloat(data.sodium || data.sodiumNa || '0') : undefined,
+          potassium: (data.potassium || data.potassiumK) ? parseFloat(data.potassium || data.potassiumK || '0') : undefined,
+          chloride: data.chloride ? parseFloat(data.chloride) : undefined,
+          calcium: data.calcium ? parseFloat(data.calcium) : undefined,
+          sgot: data.sgot ? parseFloat(data.sgot) : undefined,
+          sgpt: data.sgpt ? parseFloat(data.sgpt) : undefined,
+          rbs: data.rbs ? parseFloat(data.rbs) : undefined,
+          alkPhosphatase: (data.alkPhosphatase || data.alp) ? parseFloat(data.alkPhosphatase || data.alp || '0') : undefined,
+          totalProtein: (data.totalProtein || data.total_protein) ? parseFloat(data.totalProtein || data.total_protein || '0') : undefined,
+          albumin: data.albumin ? parseFloat(data.albumin) : undefined,
+          globulin: data.globulin ? parseFloat(data.globulin) : undefined,
+          agRatio: (data.agRatio || data.ag_ratio) ? parseFloat(data.agRatio || data.ag_ratio || '0') : undefined,
+          totalBilirubin: (data.totalBilirubin || data.total_bilirubin) ? parseFloat(data.totalBilirubin || data.total_bilirubin || '0') : undefined,
+          directBilirubin: (data.directBilirubin || data.direct_bilirubin) ? parseFloat(data.directBilirubin || data.direct_bilirubin || '0') : undefined,
+          indirectBilirubin: (data.indirectBilirubin || data.indirect_bilirubin) ? parseFloat(data.indirectBilirubin || data.indirect_bilirubin || '0') : undefined,
+          ionisedCalcium: (data.ionisedCalcium || data.ionised_calcium) ? parseFloat(data.ionisedCalcium || data.ionised_calcium || '0') : undefined,
+          magnesium: data.magnesium ? parseFloat(data.magnesium) : undefined,
+          hbalc: data.hbalc ? parseFloat(data.hbalc) : undefined,
+          ogtt30min: (data.ogtt30min || data.ogtt_30min) ? parseFloat(data.ogtt30min || data.ogtt_30min || '0') : undefined,
+          ogtt1hr: (data.ogtt1hr || data.ogtt_1hr) ? parseFloat(data.ogtt1hr || data.ogtt_1hr || '0') : undefined,
+          ogtt2hr: (data.ogtt2hr || data.ogtt_2hr) ? parseFloat(data.ogtt2hr || data.ogtt_2hr || '0') : undefined,
+          ppbs2hr: (data.ppbs2hr || data.ppbs_2hr) ? parseFloat(data.ppbs2hr || data.ppbs_2hr || '0') : undefined,
+          inorPhosphorus: (data.inorPhosphorus || data.inorg_phosphorus) ? parseFloat(data.inorPhosphorus || data.inorg_phosphorus || '0') : undefined,
+        };
+
+        console.log('🧪 Creating blood chemistry with command:', bloodChemistryCommand);
+
+        // Call the blood chemistry API
+        const success = await createBloodChemistry(bloodChemistryCommand);
+        
+        if (!success) {
+          throw new Error('Failed to create blood chemistry results');
+        }
+
+        console.log('✅ Blood chemistry results submitted successfully!');
+      } else {
+        // For other lab tests, use the legacy simulation approach
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('✅ Other lab test results submitted successfully!');
+      }
+      
+      // Update the specific lab test status to "Complete" 
+      setLabTests(prevTests => 
+        prevTests.map(test => 
+          test.id === selectedLabTest.id 
+            ? { ...test, status: 'Complete', results: 'Available' }
+            : test
+        )
+      );
       
       // Close modal on success
       setAddResultModalOpened(false);
       setSelectedLabTest(null);
       
-      console.log('Lab test results submitted successfully!');
     } catch (err) {
+      console.error('❌ Error submitting lab test results:', err);
       setError(err instanceof Error ? err.message : 'Failed to submit lab test results');
     } finally {
       setIsLoading(false);
@@ -229,13 +308,40 @@ export const LaboratoryTestsPage: React.FC = () => {
 
   // Helper function to format test display name from new structure
   const formatTestDisplayName = (test: LabTest): string => {
-    // Use testDisplayNames if available, otherwise fall back to testName
-    if (test.testDisplayNames && test.testDisplayNames.length > 0) {
-      const categoryDisplayName = test.testCategory.replace('_', ' ');
-      return `${categoryDisplayName}: ${test.testDisplayNames.join(', ')}`;
+    console.log('🧪 formatTestDisplayName called with test:', {
+      id: test.id,
+      testName: test.testName,
+      testCategory: test.testCategory,
+      tests: test.tests,
+      testDisplayNames: test.testDisplayNames
+    });
+    
+    // Priority 1: Use testName if available (already formatted from API)
+    if (test.testName && test.testName.trim() !== '') {
+      console.log('✅ Using testName:', test.testName);
+      return test.testName;
     }
-    // Fallback to legacy testName for backward compatibility
-    return test.testName || `${test.testCategory.replace('_', ' ')}: ${test.tests.join(', ')}`;
+    
+    // Priority 2: Use testDisplayNames if available, otherwise fall back to tests
+    if (test.testDisplayNames && test.testDisplayNames.length > 0) {
+      const categoryDisplayName = test.testCategory?.replace('_', ' ') || 'Test';
+      const result = `${categoryDisplayName}: ${test.testDisplayNames.join(', ')}`;
+      console.log('✅ Using testDisplayNames:', result);
+      return result;
+    }
+    
+    // Priority 3: Construct from testCategory and tests array
+    if (test.tests && test.tests.length > 0) {
+      const categoryDisplayName = test.testCategory?.replace('_', ' ') || 'Test';
+      const result = `${categoryDisplayName}: ${test.tests.join(', ')}`;
+      console.log('✅ Using tests array:', result);
+      return result;
+    }
+    
+    // Final fallback
+    const result = test.testCategory?.replace('_', ' ') || 'Test: N/A';
+    console.log('⚠️ Using final fallback:', result);
+    return result;
   };
 
   const getStatusBadge = (status: LabTest['status']) => {
@@ -342,7 +448,12 @@ export const LaboratoryTestsPage: React.FC = () => {
       width: '35%',
       align: 'left',
       searchable: true,
-      render: (test: LabTest) => formatTestDisplayName(test)
+      render: (_value: string | undefined, record: LabTest) => {
+        console.log('📊 Table render called for record:', record);
+        const result = formatTestDisplayName(record);
+        console.log('📊 Table render result:', result);
+        return result;
+      }
     },
     {
       key: 'date',
@@ -426,15 +537,18 @@ export const LaboratoryTestsPage: React.FC = () => {
         )}
       </Box>
       
+      {/* Debug: Log current labTests state before rendering table */}
+      {console.log('📊 Rendering DataTable with labTests:', labTests)}
+      
       <DataTable
         data={labTests}
         columns={columns}
         searchable={true}
         searchPlaceholder="Search lab tests by name, date, or status..."
-        emptyStateMessage={labTestsError ? `Error: ${labTestsError}` : "No lab tests found"}
+        emptyStateMessage={errorStates.fetchError ? `Error: ${errorStates.fetchError}` : "No lab tests found"}
         useViewportHeight={true}
         bottomPadding={90}
-        isLoading={labTestsLoading}
+        isLoading={loadingStates.fetching}
       />
 
       {/* Add Lab Test Result Modal */}
@@ -452,6 +566,7 @@ export const LaboratoryTestsPage: React.FC = () => {
         >
           <AddLabTestResultForm
               testType={selectedLabTest.testCategory}
+              enabledFields={selectedLabTest.tests} // Pass the specific tests that should be enabled
               patientData={{
                 patientNumber: patientInfo.patientNumber,
                 patientName: patientInfo.patientName,
