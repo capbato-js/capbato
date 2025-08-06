@@ -1,6 +1,7 @@
 import { injectable } from 'tsyringe';
 import { Patient } from '@nx-starter/application-shared';
 import { IPatientRepository } from '@nx-starter/application-shared';
+import { NameFormattingService } from '@nx-starter/domain';
 import { PatientNotFoundError } from '@nx-starter/application-shared';
 import { generateId } from '@nx-starter/utils-core';
 
@@ -185,8 +186,16 @@ export class InMemoryPatientRepository implements IPatientRepository {
       );
     }).sort((a, b) => {
       // Sort by relevance (exact matches first, then by name)
-      const aFullName = `${a.firstName} ${a.middleName || ''} ${a.lastName}`.toLowerCase();
-      const bFullName = `${b.firstName} ${b.middleName || ''} ${b.lastName}`.toLowerCase();
+      const aFullName = [
+        NameFormattingService.formatToProperCase(a.firstName),
+        a.middleName ? NameFormattingService.formatToProperCase(a.middleName) : '',
+        NameFormattingService.formatToProperCase(a.lastName)
+      ].filter(Boolean).join(' ').toLowerCase();
+      const bFullName = [
+        NameFormattingService.formatToProperCase(b.firstName),
+        b.middleName ? NameFormattingService.formatToProperCase(b.middleName) : '',
+        NameFormattingService.formatToProperCase(b.lastName)
+      ].filter(Boolean).join(' ').toLowerCase();
       
       const aExact = aFullName.includes(searchLower);
       const bExact = bFullName.includes(searchLower);

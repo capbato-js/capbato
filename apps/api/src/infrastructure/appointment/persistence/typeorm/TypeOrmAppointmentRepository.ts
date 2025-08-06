@@ -3,6 +3,7 @@ import { Repository, DataSource, Between } from 'typeorm';
 import { Appointment } from '@nx-starter/domain';
 import type { IAppointmentRepository } from '@nx-starter/domain';
 import { AppointmentMapper } from '@nx-starter/application-shared';
+import { NameFormattingService } from '@nx-starter/domain';
 import { AppointmentEntity } from './AppointmentEntity';
 import { generateId, generateUUID } from '@nx-starter/utils-core';
 import { PatientEntity } from '../../../patient/persistence/typeorm/PatientEntity';
@@ -344,13 +345,13 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
         patientNumber: data.patient.patientNumber,
         firstName: data.patient.firstName,
         lastName: data.patient.lastName,
-        fullName: `${data.patient.firstName} ${data.patient.lastName}`.trim(),
+        fullName: `${NameFormattingService.formatToProperCase(data.patient.firstName)} ${NameFormattingService.formatToProperCase(data.patient.lastName)}`.trim(),
       },
       doctor: {
         id: data.doctor.id,
         firstName: data.doctorUser.firstName,
         lastName: data.doctorUser.lastName,
-        fullName: `${data.doctorUser.firstName} ${data.doctorUser.lastName}`.trim(),
+        fullName: `${NameFormattingService.formatToProperCase(data.doctorUser.firstName)} ${NameFormattingService.formatToProperCase(data.doctorUser.lastName)}`.trim(),
         specialization: data.doctor.specialization,
       }
     });

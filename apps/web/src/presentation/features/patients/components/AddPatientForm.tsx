@@ -17,6 +17,7 @@ import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { AddressSelector } from '../../../components/ui/AddressSelector';
 import { useAddressSelector } from '../../../hooks';
 import { Icon } from '../../../components/common';
+import { NameFormattingService } from '@nx-starter/domain';
 import type { CreatePatientCommand } from '@nx-starter/application-shared';
 import { classifyError, formatFieldErrorMessage } from '../utils/errorClassification';
 
@@ -246,6 +247,18 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
     await trigger(fieldName);
   };
 
+  // Handle name field formatting on blur
+  const handleNameFieldBlur = async (fieldName: 'firstName' | 'lastName' | 'middleName' | 'guardianName') => {
+    const currentValue = watch(fieldName);
+    if (currentValue && typeof currentValue === 'string') {
+      const formattedValue = NameFormattingService.formatToProperCase(currentValue);
+      if (formattedValue !== currentValue) {
+        setValue(fieldName, formattedValue);
+      }
+    }
+    await trigger(fieldName);
+  };
+
   // Clear field error when user starts typing
   const handleFieldChange = (fieldName: keyof CreatePatientCommand) => {
     if (errors[fieldName]?.type === 'server') {
@@ -297,7 +310,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                       disabled={isLoading}
                       required
                       {...register('lastName', {
-                        onBlur: () => handleFieldBlur('lastName')
+                        onBlur: () => handleNameFieldBlur('lastName')
                       })}
                     />
                   </Grid.Col>
@@ -309,7 +322,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                       disabled={isLoading}
                       required
                       {...register('firstName', {
-                        onBlur: () => handleFieldBlur('firstName')
+                        onBlur: () => handleNameFieldBlur('firstName')
                       })}
                     />
                   </Grid.Col>
@@ -320,7 +333,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                       error={getErrorMessage(errors.middleName)}
                       disabled={isLoading}
                       {...register('middleName', {
-                        onBlur: () => handleFieldBlur('middleName')
+                        onBlur: () => handleNameFieldBlur('middleName')
                       })}
                     />
                   </Grid.Col>
@@ -481,7 +494,7 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
                   error={getErrorMessage(errors.guardianName)}
                   disabled={isLoading}
                   {...register('guardianName', {
-                    onBlur: () => handleFieldBlur('guardianName')
+                    onBlur: () => handleNameFieldBlur('guardianName')
                   })}
                 />
 

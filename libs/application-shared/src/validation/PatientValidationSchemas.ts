@@ -188,6 +188,57 @@ export const GetPatientByIdCommandSchema = z.object({
   id: z.string().min(1, 'Patient ID cannot be empty'),
 });
 
+export const UpdatePatientCommandSchema = z.object({
+  id: z.string().min(1, 'Patient ID cannot be empty'),
+  firstName: z.string().optional().superRefine((val, ctx) => {
+    if (val !== undefined) validateName('First name')(val, ctx);
+  }),
+  lastName: z.string().optional().superRefine((val, ctx) => {
+    if (val !== undefined) validateName('Last name')(val, ctx);
+  }),
+  middleName: z.string().optional(),
+  dateOfBirth: z.string().optional().superRefine((val, ctx) => {
+    if (val !== undefined) validateDateOfBirth(val, ctx);
+  }),
+  gender: GenderSchema.optional(),
+  contactNumber: z.string().optional().superRefine((val, ctx) => {
+    if (val !== undefined) validatePhilippineMobile(val, ctx);
+  }),
+  
+  // Address Information
+  houseNumber: z.string().max(20, 'House number cannot exceed 20 characters').optional(),
+  streetName: z.string().max(100, 'Street name cannot exceed 100 characters').optional(),
+  province: z.string().max(50, 'Province cannot exceed 50 characters').optional(),
+  cityMunicipality: z.string().max(50, 'City/Municipality cannot exceed 50 characters').optional(),
+  barangay: z.string().max(50, 'Barangay cannot exceed 50 characters').optional(),
+  
+  // Guardian Information (optional but complete when provided)
+  guardianName: z.string().optional().superRefine((val, ctx) => {
+    if (val && val.trim()) {
+      validateName('Guardian name')(val, ctx);
+    }
+  }),
+  guardianGender: GenderSchema.optional(),
+  guardianRelationship: z.string().optional(),
+  guardianContactNumber: z.string().optional().superRefine((val, ctx) => {
+    if (val && val.trim()) {
+      validatePhilippineMobile(val, ctx);
+    }
+  }),
+  
+  // Guardian Address Information
+  guardianHouseNumber: z.string().max(20, 'Guardian house number cannot exceed 20 characters').optional(),
+  guardianStreetName: z.string().max(100, 'Guardian street name cannot exceed 100 characters').optional(),
+  guardianProvince: z.string().max(50, 'Guardian province cannot exceed 50 characters').optional(),
+  guardianCityMunicipality: z.string().max(50, 'Guardian city/municipality cannot exceed 50 characters').optional(),
+  guardianBarangay: z.string().max(50, 'Guardian barangay cannot exceed 50 characters').optional(),
+}).transform((data) => ({
+  ...data,
+  // Sanitize phone numbers if provided
+  contactNumber: data.contactNumber ? data.contactNumber.replace(/\D/g, '') : undefined,
+  guardianContactNumber: data.guardianContactNumber ? data.guardianContactNumber.replace(/\D/g, '') : undefined,
+}));
+
 // Patient ID validation schema - Dashless UUID format
 export const PatientIdSchema = z.string()
   .min(1, 'Patient ID cannot be empty')
@@ -196,10 +247,12 @@ export const PatientIdSchema = z.string()
 // Inferred TypeScript types from Zod schemas
 export type CreatePatientCommand = z.infer<typeof CreatePatientCommandSchema>;
 export type GetPatientByIdCommand = z.infer<typeof GetPatientByIdCommandSchema>;
+export type UpdatePatientCommand = z.infer<typeof UpdatePatientCommandSchema>;
 
 // Export all schemas as a collection for easier importing
 export const PatientValidationSchemas = {
   CreatePatientCommandSchema,
   GetPatientByIdCommandSchema,
+  UpdatePatientCommandSchema,
   PatientIdSchema,
 } as const;

@@ -40,6 +40,8 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     reset,
     control,
     watch,
+    setValue,
+    trigger,
     formState: { errors },
   } = useForm<RegisterUserCommand>({
     resolver: zodResolver(RegisterUserCommandSchema),
@@ -249,6 +251,9 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
               errors={errors}
               isLoading={isLoading}
               register={register}
+              setValue={setValue}
+              watch={watch}
+              trigger={trigger}
               onInputChange={handleInputChange}
               fieldErrors={fieldErrors}
             />
@@ -273,6 +278,9 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
               errors={errors}
               isLoading={isLoading}
               register={register}
+              setValue={setValue}
+              watch={watch}
+              trigger={trigger}
               onInputChange={handleInputChange}
               fieldErrors={fieldErrors}
             />
@@ -311,6 +319,9 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
                     errors={errors}
                     isLoading={isLoading}
                     register={register}
+                    setValue={setValue}
+                    watch={watch}
+                    trigger={trigger}
                     onInputChange={handleInputChange}
                     fieldErrors={fieldErrors}
                   />

@@ -2,6 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { User, IUserRepository, UserDomainService } from '@nx-starter/domain';
 import { generateUUID } from '@nx-starter/utils-core';
 import { RegisterUserCommand, TOKENS, CreateDoctorProfileCommandSchema, CreateDoctorProfileCommand } from '@nx-starter/application-shared';
+import { NameFormattingService } from '@nx-starter/domain';
 import { IPasswordHashingService } from '../../services/PasswordHashingService';
 import { CreateDoctorProfileCommandHandler } from './CreateDoctorProfileCommandHandler';
 
@@ -65,11 +66,15 @@ export class RegisterUserUseCase {
     // 5. Hash the password
     const hashedPassword = await this.passwordHashingService.hash(command.password);
 
-    // 6. Create user entity with domain validation (using pre-generated UUID)
+    // 6. Format names using NameFormattingService
+    const formattedFirstName = NameFormattingService.formatToProperCase(command.firstName);
+    const formattedLastName = NameFormattingService.formatToProperCase(command.lastName);
+
+    // 7. Create user entity with domain validation (using pre-generated UUID)
     const user = User.create(
       userId,
-      command.firstName,
-      command.lastName,
+      formattedFirstName,
+      formattedLastName,
       command.email,
       username,
       hashedPassword,
@@ -77,10 +82,10 @@ export class RegisterUserUseCase {
       command.mobile
     );
 
-    // 7. Persist user (only after doctor profile validation passed)
+    // 8. Persist user (only after doctor profile validation passed)
     await this.userRepository.create(user);
 
-    // 8. If role is 'doctor', create doctor profile (validation already passed)
+    // 9. If role is 'doctor', create doctor profile (validation already passed)
     if (command.role === 'doctor' && validatedDoctorCommand) {
       // UUID already set during validation, no need to update
       
@@ -88,7 +93,7 @@ export class RegisterUserUseCase {
       await this.createDoctorProfileCommandHandler.execute(validatedDoctorCommand);
     }
 
-    // 9. Return created user
+    // 10. Return created user
     return user;
   }
 }

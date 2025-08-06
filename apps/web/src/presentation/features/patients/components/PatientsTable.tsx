@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Text, useMantineTheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common';
+import { NameFormattingService } from '@nx-starter/domain';
 import { PatientListDto } from '@nx-starter/application-shared';
 
 interface PatientsTableProps {
@@ -19,9 +20,14 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
   const navigate = useNavigate();
 
   // Transform patients to include fullName for display
+  // Note: Names should already be formatted from backend, but ensuring consistency
   const patientsWithFullName = patients.map(patient => ({
     ...patient,
-    fullName: [patient.firstName, patient.middleName, patient.lastName].filter(Boolean).join(' ')
+    fullName: [
+      NameFormattingService.formatToProperCase(patient.firstName),
+      patient.middleName ? NameFormattingService.formatToProperCase(patient.middleName) : undefined,
+      NameFormattingService.formatToProperCase(patient.lastName)
+    ].filter(Boolean).join(' ')
   }));
 
   const handlePatientClick = (patientId: string) => {

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Control, FieldErrors, UseFormRegister, Controller } from 'react-hook-form';
+import { Control, FieldErrors, UseFormRegister, Controller, UseFormSetValue, UseFormWatch, UseFormTrigger } from 'react-hook-form';
 import { Stack, Select } from '@mantine/core';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
+import { NameFormattingService } from '@nx-starter/domain';
 import { RegisterUserCommand } from '@nx-starter/application-shared';
 
 interface Step1FieldsProps {
@@ -9,6 +10,9 @@ interface Step1FieldsProps {
   errors: FieldErrors<RegisterUserCommand>; 
   isLoading: boolean;
   register: UseFormRegister<RegisterUserCommand>;
+  setValue: UseFormSetValue<RegisterUserCommand>;
+  watch: UseFormWatch<RegisterUserCommand>;
+  trigger: UseFormTrigger<RegisterUserCommand>;
   onInputChange?: () => void;
   fieldErrors?: Record<string, string>;
 }
@@ -18,9 +22,24 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
   errors,
   isLoading,
   register,
+  setValue,
+  watch,
+  trigger,
   onInputChange,
   fieldErrors = {}
 }) => {
+  
+  // Handle name field formatting on blur
+  const handleNameFieldBlur = async (fieldName: 'firstName' | 'lastName') => {
+    const currentValue = watch(fieldName);
+    if (currentValue && typeof currentValue === 'string') {
+      const formattedValue = NameFormattingService.formatToProperCase(currentValue);
+      if (formattedValue !== currentValue) {
+        setValue(fieldName, formattedValue);
+      }
+    }
+    await trigger(fieldName);
+  };
   return (
     <Stack gap="md">
       <FormTextInput
@@ -29,7 +48,9 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
         error={errors.firstName || fieldErrors.firstName}
         disabled={isLoading}
         required
-        {...register('firstName')}
+        {...register('firstName', {
+          onBlur: () => handleNameFieldBlur('firstName')
+        })}
         onChange={(e) => {
           register('firstName').onChange(e);
           onInputChange?.();
@@ -42,7 +63,9 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
         error={errors.lastName || fieldErrors.lastName}
         disabled={isLoading}
         required
-        {...register('lastName')}
+        {...register('lastName', {
+          onBlur: () => handleNameFieldBlur('lastName')
+        })}
         onChange={(e) => {
           register('lastName').onChange(e);
           onInputChange?.();

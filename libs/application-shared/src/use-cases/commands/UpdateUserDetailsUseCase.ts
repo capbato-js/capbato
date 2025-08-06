@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { User, IUserRepository } from '@nx-starter/domain';
+import { User, IUserRepository, NameFormattingService } from '@nx-starter/domain';
 import type { UpdateUserDetailsCommand } from '../../dto/UserCommands';
 import { TOKENS } from '../../di/tokens';
 
@@ -24,11 +24,11 @@ export class UpdateUserDetailsUseCase {
     const updates: any = {};
 
     if (command.firstName !== undefined) {
-      updates.firstName = { value: command.firstName };
+      updates.firstName = { value: NameFormattingService.formatToProperCase(command.firstName) };
     }
 
     if (command.lastName !== undefined) {
-      updates.lastName = { value: command.lastName };
+      updates.lastName = { value: NameFormattingService.formatToProperCase(command.lastName) };
     }
 
     if (command.email !== undefined) {
