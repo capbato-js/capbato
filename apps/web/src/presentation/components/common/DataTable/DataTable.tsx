@@ -219,7 +219,6 @@ export function DataTable<T extends SearchableItem>({
                   key={String(column.key)}
                   style={{
                     padding: '16px 24px',
-                    // textAlign: column.align || 'left',
                     textAlign: 'center',
                     fontWeight: 600,
                     fontSize: '16px',
