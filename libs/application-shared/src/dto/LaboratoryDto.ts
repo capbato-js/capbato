@@ -287,3 +287,23 @@ export interface LaboratoryOperationResponse {
   success: boolean;
   message: string;
 }
+
+// New LabTest DTOs for frontend integration
+export interface LabTestDto {
+  id: string;
+  testCategory: 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'CBC' | 'THYROID_FUNCTION';
+  tests: string[]; // Array of test IDs like ['fbs', 'bun', 'creatinine']
+  testDisplayNames?: string[]; // Optional formatted names like ['FBS', 'BUN', 'Creatinine']
+  date: string;
+  status: 'Complete' | 'Confirmed' | 'Pending' | 'In Progress';
+  results?: string;
+  patientId?: string;
+  // Backward compatibility - computed display value
+  testName?: string; // Deprecated: Use testCategory and tests instead
+}
+
+export interface LabTestListResponse {
+  success: boolean;
+  data: LabTestDto[];
+  message?: string;
+}

@@ -20,6 +20,11 @@ export const LaboratoryTestsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  // Lab tests data state
+  const [labTests, setLabTests] = useState<LabTest[]>([]);
+  const [labTestsLoading, setLabTestsLoading] = useState(true);
+  const [labTestsError, setLabTestsError] = useState<string | null>(null);
+  
   const [patientInfo, setPatientInfo] = useState<{
     patientNumber: string;
     patientName: string;
@@ -27,22 +32,135 @@ export const LaboratoryTestsPage: React.FC = () => {
     sex?: string;
   } | null>(null);
 
-  // Mock data based on the image - this would come from API
-  const mockLabTests: LabTest[] = [
-    {
-      id: '1',
-      testName: 'BLOOD CHEMISTRY: FBS, BUN',
-      date: 'Jun 30, 2025',
-      status: 'Confirmed',
-      results: 'Available'
-    },
-    {
-      id: '2',
-      testName: 'BLOOD CHEMISTRY: FBS',
-      date: 'Jul 1, 2025',
-      status: 'Pending'
-    }
-  ];
+  // Fetch lab tests from API
+  useEffect(() => {
+    const fetchLabTests = async () => {
+      if (!patientId) return;
+      
+      setLabTestsLoading(true);
+      setLabTestsError(null);
+      
+      try {
+        // TODO: Replace with actual API call once lab service is integrated
+        // For now, simulate API response with the diverse test data
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
+        
+        const mockLabTests: LabTest[] = [
+          // Blood Chemistry Tests
+          { 
+            id: '1', 
+            testCategory: 'BLOOD_CHEMISTRY',
+            tests: ['fbs', 'bun'],
+            testDisplayNames: ['FBS', 'BUN'],
+            date: 'Jun 30, 2025', 
+            status: 'Confirmed', 
+            results: 'Available',
+            testName: 'BLOOD CHEMISTRY: FBS, BUN' // Legacy compatibility
+          },
+          { 
+            id: '2', 
+            testCategory: 'BLOOD_CHEMISTRY',
+            tests: ['fbs'],
+            testDisplayNames: ['FBS'],
+            date: 'Jul 1, 2025', 
+            status: 'Pending',
+            testName: 'BLOOD CHEMISTRY: FBS' // Legacy compatibility
+          },
+          { 
+            id: '3', 
+            testCategory: 'BLOOD_CHEMISTRY',
+            tests: ['lipidProfile'],
+            testDisplayNames: ['Lipid Profile'],
+            date: 'Jul 2, 2025', 
+            status: 'Complete', 
+            results: 'Available',
+            testName: 'BLOOD CHEMISTRY: Lipid Profile' // Legacy compatibility
+          },
+          { 
+            id: '4', 
+            testCategory: 'BLOOD_CHEMISTRY',
+            tests: ['hbalc', 'sgot', 'sgpt'],
+            testDisplayNames: ['HBA1C', 'SGOT', 'SGPT'],
+            date: 'Jul 3, 2025', 
+            status: 'In Progress',
+            testName: 'BLOOD CHEMISTRY: HBA1C, SGOT, SGPT' // Legacy compatibility
+          },
+          
+          // Urinalysis Tests  
+          { 
+            id: '5', 
+            testCategory: 'URINALYSIS',
+            tests: ['urinalysis'],
+            testDisplayNames: ['URINALYSIS'],
+            date: 'Jun 28, 2025', 
+            status: 'Pending',
+            testName: 'URINALYSIS' // Legacy compatibility
+          },
+          { 
+            id: '6', 
+            testCategory: 'URINALYSIS',
+            tests: ['urinalysis', 'urine_color', 'protein_urine'],
+            testDisplayNames: ['URINALYSIS', 'Color', 'Protein'],
+            date: 'Jun 29, 2025', 
+            status: 'Confirmed', 
+            results: 'Available',
+            testName: 'URINALYSIS: Complete Panel' // Legacy compatibility
+          },
+          
+          // Fecalysis Tests
+          { 
+            id: '7', 
+            testCategory: 'FECALYSIS',
+            tests: ['fecalysis'],
+            testDisplayNames: ['FECALYSIS'],
+            date: 'Jul 4, 2025', 
+            status: 'Pending',
+            testName: 'FECALYSIS' // Legacy compatibility
+          },
+          { 
+            id: '8', 
+            testCategory: 'FECALYSIS',
+            tests: ['fecalysis', 'fecal_color', 'parasites'],
+            testDisplayNames: ['FECALYSIS', 'Color', 'Parasites'],
+            date: 'Jul 5, 2025', 
+            status: 'Complete', 
+            results: 'Available',
+            testName: 'FECALYSIS: Comprehensive' // Legacy compatibility
+          },
+          
+          // Other Tests
+          { 
+            id: '9', 
+            testCategory: 'CBC',
+            tests: ['cbcWithPlatelet'],
+            testDisplayNames: ['CBC with Platelet'],
+            date: 'Jul 6, 2025', 
+            status: 'Confirmed', 
+            results: 'Available',
+            testName: 'CBC: CBC with Platelet' // Legacy compatibility
+          },
+          { 
+            id: '10', 
+            testCategory: 'BLOOD_CHEMISTRY', // Fallback for unknown tests
+            tests: ['pregnancyTest'],
+            testDisplayNames: ['Pregnancy Test'],
+            date: 'Jul 7, 2025', 
+            status: 'Complete', 
+            results: 'Available',
+            testName: 'BLOOD CHEMISTRY: Pregnancy Test' // Legacy compatibility
+          }
+        ];
+        
+        setLabTests(mockLabTests);
+      } catch (err) {
+        setLabTestsError(err instanceof Error ? err.message : 'Failed to fetch lab tests');
+      } finally {
+        setLabTestsLoading(false);
+      }
+    };
+
+    fetchLabTests();
+  }, [patientId]);
 
   // Mock patient info - this would come from API
   useEffect(() => {
@@ -107,6 +225,17 @@ export const LaboratoryTestsPage: React.FC = () => {
   const handleCancelTest = (test: LabTest) => {
     console.log('Cancel test:', test);
     // TODO: Implement cancel test functionality
+  };
+
+  // Helper function to format test display name from new structure
+  const formatTestDisplayName = (test: LabTest): string => {
+    // Use testDisplayNames if available, otherwise fall back to testName
+    if (test.testDisplayNames && test.testDisplayNames.length > 0) {
+      const categoryDisplayName = test.testCategory.replace('_', ' ');
+      return `${categoryDisplayName}: ${test.testDisplayNames.join(', ')}`;
+    }
+    // Fallback to legacy testName for backward compatibility
+    return test.testName || `${test.testCategory.replace('_', ' ')}: ${test.tests.join(', ')}`;
   };
 
   const getStatusBadge = (status: LabTest['status']) => {
@@ -212,7 +341,8 @@ export const LaboratoryTestsPage: React.FC = () => {
       header: 'Lab Test',
       width: '35%',
       align: 'left',
-      searchable: true
+      searchable: true,
+      render: (test: LabTest) => formatTestDisplayName(test)
     },
     {
       key: 'date',
@@ -297,13 +427,14 @@ export const LaboratoryTestsPage: React.FC = () => {
       </Box>
       
       <DataTable
-        data={mockLabTests}
+        data={labTests}
         columns={columns}
         searchable={true}
         searchPlaceholder="Search lab tests by name, date, or status..."
-        emptyStateMessage="No lab tests found"
+        emptyStateMessage={labTestsError ? `Error: ${labTestsError}` : "No lab tests found"}
         useViewportHeight={true}
         bottomPadding={90}
+        isLoading={labTestsLoading}
       />
 
       {/* Add Lab Test Result Modal */}
@@ -320,6 +451,7 @@ export const LaboratoryTestsPage: React.FC = () => {
           }}
         >
           <AddLabTestResultForm
+              testType={selectedLabTest.testCategory}
               patientData={{
                 patientNumber: patientInfo.patientNumber,
                 patientName: patientInfo.patientName,

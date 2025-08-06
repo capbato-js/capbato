@@ -2,6 +2,7 @@ import {
   CreateLabRequestCommand,
   LabRequestResponse,
   LabRequestListResponse,
+  LabTestListResponse,
   BloodChemistryResponse,
   LaboratoryOperationResponse,
   CreateBloodChemistryCommand
@@ -30,6 +31,11 @@ export interface ILaboratoryApiService {
    * Get lab request by patient ID
    */
   getLabRequestByPatientId(patientId: string): Promise<LabRequestResponse>;
+  
+  /**
+   * Get lab tests by patient ID (formatted for frontend)
+   */
+  getLabTestsByPatientId(patientId: string): Promise<LabTestListResponse>;
   
   /**
    * Update lab request results

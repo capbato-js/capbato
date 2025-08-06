@@ -4,6 +4,7 @@ import {
   CreateBloodChemistryCommand,
   LabRequestResponse,
   LabRequestListResponse,
+  LabTestListResponse,
   BloodChemistryResponse,
   LaboratoryOperationResponse,
   TOKENS 
@@ -74,7 +75,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
         data: []
       };
     }
-  }  /**
+  }
+  
+  /**
    * Get laboratory test request by patient ID
    */
   async getLabRequestByPatientId(patientId: string): Promise<LabRequestResponse> {
@@ -91,6 +94,27 @@ export class LaboratoryApiService implements ILaboratoryApiService {
         success: false,
         message: error instanceof Error ? error.message : 'Failed to fetch lab request'
       } as LabRequestResponse;
+    }
+  }
+
+  /**
+   * Get lab tests by patient ID (formatted for frontend)
+   */
+  async getLabTestsByPatientId(patientId: string): Promise<LabTestListResponse> {
+    try {
+      console.log('🧪 Fetching lab tests for patient:', patientId);
+      
+      const response = await this.httpClient.get<LabTestListResponse>(`/api/laboratory/lab-tests/${patientId}`);
+      
+      console.log('✅ Lab tests fetched successfully for patient:', patientId, '- Found', response.data?.data?.length || 0, 'tests');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error fetching lab tests for patient:', patientId, error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fetch lab tests',
+        data: []
+      };
     }
   }
 

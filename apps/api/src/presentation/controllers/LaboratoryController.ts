@@ -25,6 +25,7 @@ import {
   LabRequestResponse,
   BloodChemistryResponse,
   LaboratoryOperationResponse,
+  LabTestListResponse,
   CreateLabRequestRequestDto,
   UpdateLabRequestResultsRequestDto,
   CreateBloodChemistryRequestDto,
@@ -87,6 +88,23 @@ export class LaboratoryController {
     const labRequestDto = LaboratoryMapper.toLabRequestDto(labRequest);
 
     return ApiResponseBuilder.success(labRequestDto);
+  }
+
+  /**
+   * GET /api/laboratory/lab-tests/:patientId - Get formatted lab tests for specific patient
+   */
+  @Get('/lab-tests/:patientId')
+  async getLabTestsByPatientId(@Param('patientId') patientId: string): Promise<LabTestListResponse> {
+    const validatedPatientId = LabRequestIdSchema.parse(patientId);
+    
+    // For now, get all lab requests and transform them to lab tests format
+    // In a real scenario, you might want a specific query handler for this
+    const labRequests = await this.getAllLabRequestsQueryHandler.execute();
+    
+    // Filter by patient and transform to LabTestDto format
+    const labTestDtos = LaboratoryMapper.toLabTestDtoArray(labRequests, validatedPatientId);
+
+    return ApiResponseBuilder.success(labTestDtos);
   }
 
   /**

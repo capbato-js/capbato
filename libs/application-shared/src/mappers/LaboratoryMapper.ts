@@ -8,6 +8,7 @@ import { BloodChemistryResults } from '@nx-starter/domain';
 import {
   LabRequestDto,
   BloodChemistryDto,
+  LabTestDto,
   CreateLabRequestCommand,
   CreateBloodChemistryCommand,
 } from '../dto/LaboratoryDto';
@@ -46,6 +47,181 @@ export class LaboratoryMapper {
    */
   static toLabRequestDtoArray(labRequests: LabRequest[]): LabRequestDto[] {
     return labRequests.map(labRequest => this.toLabRequestDto(labRequest));
+  }
+
+  /**
+   * Convert array of LabRequest domain entities to LabTestDto format for frontend
+   */
+  static toLabTestDtoArray(labRequests: LabRequest[], patientId?: string): LabTestDto[] {
+    // Filter by patient if specified
+    const filteredRequests = patientId 
+      ? labRequests.filter(request => request.patientInfo.patientId === patientId)
+      : labRequests;
+
+    return filteredRequests.map(request => this.toLabTestDto(request));
+  }
+
+  /**
+   * Convert LabRequest to LabTestDto format for frontend
+   */
+  static toLabTestDto(labRequest: LabRequest): LabTestDto {
+    // Get selected tests
+    const selectedTests = labRequest.tests.getSelectedTests();
+    
+    // Determine test category from selected tests
+    const testCategory = this.determineTestCategory(selectedTests);
+    
+    // Generate display names for the tests
+    const testDisplayNames = selectedTests.map(test => this.formatTestName(test));
+    
+    // Map status
+    const status = this.mapStatusToFrontend(labRequest.status.value);
+
+    // Create backward compatibility testName for transition period
+    const testName = this.generateLegacyTestName(testCategory, testDisplayNames);
+
+    return {
+      id: labRequest.id?.value || '',
+      testCategory,
+      tests: selectedTests,
+      testDisplayNames,
+      date: labRequest.requestDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      status,
+      results: labRequest.status.value === 'complete' ? 'Available' : undefined,
+      patientId: labRequest.patientInfo.patientId,
+      // Backward compatibility
+      testName,
+    };
+  }
+
+  /**
+   * Generate a human-readable test name from selected tests
+   */
+  private static generateTestName(selectedTests: string[], tests: LabRequestTests): string {
+    if (selectedTests.length === 0) {
+      return 'Lab Test';
+    }
+
+    // Group tests by category
+    const bloodChemistryTests = ['fbs', 'bun', 'creatinine', 'bloodUricAcid', 'lipidProfile', 'sgot', 'sgpt', 'hbalc'];
+    const routineTests = ['urinalysis', 'fecalysis', 'cbcWithPlatelet', 'pregnancyTest'];
+    const thyroidTests = ['t3', 't4', 'ft3', 'ft4', 'tsh'];
+
+    const bloodChemistry = selectedTests.filter(test => bloodChemistryTests.includes(test));
+    const routine = selectedTests.filter(test => routineTests.includes(test));
+    const thyroid = selectedTests.filter(test => thyroidTests.includes(test));
+
+    // Build test name based on categories
+    if (bloodChemistry.length > 0) {
+      const testNames = bloodChemistry.map(test => this.formatTestName(test)).join(', ');
+      return `BLOOD CHEMISTRY: ${testNames}`;
+    } else if (routine.length > 0) {
+      if (routine.includes('urinalysis')) {
+        return routine.length === 1 ? 'URINALYSIS' : 'URINALYSIS: Complete Panel';
+      } else if (routine.includes('fecalysis')) {
+        return routine.length === 1 ? 'FECALYSIS' : 'FECALYSIS: Comprehensive';
+      } else {
+        return routine.map(test => this.formatTestName(test)).join(', ');
+      }
+    } else if (thyroid.length > 0) {
+      const testNames = thyroid.map(test => this.formatTestName(test)).join(', ');
+      return `THYROID FUNCTION: ${testNames}`;
+    }
+
+    // Fallback for other tests
+    return selectedTests.map(test => this.formatTestName(test)).join(', ');
+  }
+
+  /**
+   * Format individual test name for display
+   */
+  private static formatTestName(test: string): string {
+    const formatMap: Record<string, string> = {
+      fbs: 'FBS',
+      bun: 'BUN',
+      creatinine: 'Creatinine',
+      bloodUricAcid: 'Uric Acid',
+      lipidProfile: 'Lipid Profile',
+      sgot: 'SGOT',
+      sgpt: 'SGPT',
+      hbalc: 'HBA1C',
+      urinalysis: 'URINALYSIS',
+      fecalysis: 'FECALYSIS',
+      cbcWithPlatelet: 'CBC with Platelet',
+      pregnancyTest: 'Pregnancy Test',
+      t3: 'T3',
+      t4: 'T4',
+      ft3: 'FT3',
+      ft4: 'FT4',
+      tsh: 'TSH',
+    };
+
+    return formatMap[test] || test.toUpperCase();
+  }
+
+  /**
+   * Determine test category from selected tests
+   */
+  private static determineTestCategory(selectedTests: string[]): 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'CBC' | 'THYROID_FUNCTION' {
+    const bloodChemistryTests = ['fbs', 'bun', 'creatinine', 'bloodUricAcid', 'lipidProfile', 'sgot', 'sgpt', 'hbalc'];
+    const thyroidTests = ['t3', 't4', 'ft3', 'ft4', 'tsh'];
+    
+    if (selectedTests.includes('urinalysis')) {
+      return 'URINALYSIS';
+    } else if (selectedTests.includes('fecalysis')) {
+      return 'FECALYSIS';
+    } else if (selectedTests.includes('cbcWithPlatelet')) {
+      return 'CBC';
+    } else if (selectedTests.some(test => thyroidTests.includes(test))) {
+      return 'THYROID_FUNCTION';
+    } else if (selectedTests.some(test => bloodChemistryTests.includes(test))) {
+      return 'BLOOD_CHEMISTRY';
+    }
+
+    // Default fallback
+    return 'BLOOD_CHEMISTRY';
+  }
+
+  /**
+   * Generate legacy testName for backward compatibility during transition
+   */
+  private static generateLegacyTestName(testCategory: string, testDisplayNames: string[]): string {
+    if (testDisplayNames.length === 0) {
+      return 'Lab Test';
+    }
+
+    // Handle single test categories
+    if (testCategory === 'URINALYSIS' && testDisplayNames.length === 1) {
+      return 'URINALYSIS';
+    } else if (testCategory === 'FECALYSIS' && testDisplayNames.length === 1) {
+      return 'FECALYSIS';
+    }
+
+    // Handle multiple tests or specific naming
+    if (testCategory === 'URINALYSIS' && testDisplayNames.length > 1) {
+      return 'URINALYSIS: Complete Panel';
+    } else if (testCategory === 'FECALYSIS' && testDisplayNames.length > 1) {
+      return 'FECALYSIS: Comprehensive';
+    } else if (testCategory === 'THYROID_FUNCTION') {
+      return `THYROID FUNCTION: ${testDisplayNames.join(', ')}`;
+    } else {
+      return `${testCategory.replace('_', ' ')}: ${testDisplayNames.join(', ')}`;
+    }
+  }
+
+  /**
+   * Map backend status to frontend status format
+   */
+  private static mapStatusToFrontend(backendStatus: string): 'Complete' | 'Confirmed' | 'Pending' | 'In Progress' {
+    const statusMap: Record<string, 'Complete' | 'Confirmed' | 'Pending' | 'In Progress'> = {
+      'complete': 'Complete',
+      'confirmed': 'Confirmed', 
+      'pending': 'Pending',
+      'in_progress': 'In Progress',
+      'in-progress': 'In Progress',
+    };
+
+    return statusMap[backendStatus.toLowerCase()] || 'Pending';
   }
 
   /**
