@@ -15,9 +15,13 @@ export interface CreatePrescriptionRequestDto {
   medicationName: string;
   dosage: string;
   instructions: string;
+  frequency: string;
+  duration: string;
   prescribedDate?: string; // ISO datetime string
   expiryDate?: string; // ISO datetime string
-  isActive?: boolean;
+  quantity?: string;
+  additionalNotes?: string;
+  status?: 'active' | 'completed' | 'discontinued' | 'on-hold';
 }
 
 /**
@@ -29,6 +33,10 @@ export interface UpdatePrescriptionRequestDto {
   medicationName?: string;
   dosage?: string;
   instructions?: string;
+  frequency?: string;
+  duration?: string;
   expiryDate?: string; // ISO datetime string
-  isActive?: boolean;
+  quantity?: string;
+  additionalNotes?: string;
+  status?: 'active' | 'completed' | 'discontinued' | 'on-hold';
 }

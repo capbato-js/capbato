@@ -1,0 +1,933 @@
+{
+  "info": {
+    "_postman_id": "presc1a2b3-c4d5-6789-efgh-ijkl123456789",
+    "name": "Prescription API",
+    "description": "Prescription management endpoints for healthcare clinic\n\n## Prescription Management Architecture\nThe API manages prescription creation, tracking, and lifecycle with comprehensive business logic:\n\n**Prescription Information:**\n- `id`: Unique prescription identifier\n- `patientId`: Reference to patient (string)\n- `doctorId`: Reference to prescribing doctor (string)\n- `medicationName`: Name of prescribed medication\n- `dosage`: Medication dosage (e.g., '500mg')\n- `instructions`: Patient instructions for taking medication\n- `frequency`: How often to take (e.g., 'twice daily', 'every 8 hours')\n- `duration`: How long to take (e.g., '7 days', '2 weeks')\n- `prescribedDate`: Date prescription was written (ISO format)\n- `expiryDate`: Optional expiration date for prescription\n- `quantity`: Optional quantity prescribed\n- `additionalNotes`: Optional additional notes or warnings\n- `status`: Prescription status ('active', 'completed', 'discontinued', 'on-hold')\n- `createdAt`: Creation timestamp\n\n**Prescription Status Types:**\n- **active**: Prescription is currently active and being taken\n- **completed**: Patient has finished the prescribed course\n- **discontinued**: Prescription was stopped before completion\n- **on-hold**: Prescription is temporarily paused\n\n**Business Rules Implemented:**\n- **Required Fields**: patientId, doctorId, medicationName, dosage, instructions, frequency, duration\n- **Status Transitions**: active ↔ on-hold, active → completed/discontinued\n- **Date Validation**: Prescribed dates validated, expiry dates must be future\n- **ID Validation**: Patient and Doctor IDs validated using Zod schemas\n- **Medication Safety**: Duplicate active prescriptions for same medication flagged\n\n**API Response Structure:**\nAll responses follow consistent format:\n- `success`: Boolean indicating operation success\n- `data`: Response data (prescription object, array, or stats)\n- `message`: Success/error message for operations\n\n**Query Capabilities:**\n- Get all prescriptions\n- Get active prescriptions only\n- Get expired prescriptions\n- Get prescriptions by patient ID\n- Get prescriptions by doctor ID\n- Get prescriptions by medication name\n- Get prescription statistics\n- Filter by status and date ranges\n\n**Prescription Statistics:**\nComprehensive analytics including:\n- Total prescription counts\n- Status distribution (active, completed, discontinued, on-hold)\n- Expired prescription counts\n- Most prescribed medications with counts\n- Doctor and patient prescription patterns\n\n**Integration with Other APIs:**\nPrescription API integrates with:\n- **Patient API**: Validates patient information and links to patient records\n- **Doctor API**: Validates prescribing doctors and tracks prescribing patterns\n- **Appointment API**: Links prescriptions to patient visits and consultations\n- **Laboratory API**: Coordinates with lab tests for medication monitoring\n\n**Security Features:**\n- Input validation using Zod schemas\n- Parameter sanitization\n- Error handling with appropriate HTTP status codes\n- Data integrity constraints\n\n**Clinical Workflow Support:**\n- Electronic prescribing workflow\n- Medication adherence tracking\n- Drug interaction warnings (extensible)\n- Prescription renewal management\n- Patient medication history",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "💊 Prescription Management",
+      "item": [
+        {
+          "name": "Get All Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions"]
+            },
+            "description": "Get all prescriptions in the system\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"1\",\n      \"patientId\": \"PAT001\",\n      \"doctorId\": \"DOC001\",\n      \"medicationName\": \"Amoxicillin\",\n      \"dosage\": \"500mg\",\n      \"instructions\": \"Take with food\",\n      \"frequency\": \"Three times daily\",\n      \"duration\": \"7 days\",\n      \"prescribedDate\": \"2025-08-06T08:00:00.000Z\",\n      \"expiryDate\": \"2025-09-06T08:00:00.000Z\",\n      \"quantity\": \"21 tablets\",\n      \"additionalNotes\": \"Complete full course even if feeling better\",\n      \"status\": \"active\",\n      \"createdAt\": \"2025-08-06T08:00:00.000Z\"\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Prescription management dashboard\n- Medication inventory planning\n- Clinical oversight and auditing\n- Patient medication history review"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains data array', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Active Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "active"]
+            },
+            "description": "Get all active prescriptions\n\n**Response Format:**\nSame as 'Get All Prescriptions' but filtered to status='active'\n\n**Use Cases:**\n- Current patient medications\n- Active prescription monitoring\n- Drug interaction checking\n- Medication adherence tracking"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/active",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "active"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('All prescriptions are active', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        jsonData.data.forEach(prescription => {",
+                  "            pm.expect(prescription.status).to.equal('active');",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Expired Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/expired",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "expired"]
+            },
+            "description": "Get all expired prescriptions\n\n**Response Format:**\nSame as 'Get All Prescriptions' but filtered to expired prescriptions\n\n**Use Cases:**\n- Prescription renewal notifications\n- Expired medication cleanup\n- Patient follow-up scheduling\n- Regulatory compliance auditing"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/expired",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "expired"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('All prescriptions are expired', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        const now = new Date();",
+                  "        jsonData.data.forEach(prescription => {",
+                  "            if (prescription.expiryDate) {",
+                  "                const expiryDate = new Date(prescription.expiryDate);",
+                  "                pm.expect(expiryDate).to.be.below(now);",
+                  "            }",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Prescription Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "stats"]
+            },
+            "description": "Get comprehensive prescription statistics and analytics\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"totalCount\": 150,\n    \"activeCount\": 45,\n    \"completedCount\": 89,\n    \"discontinuedCount\": 12,\n    \"onHoldCount\": 4,\n    \"expiredCount\": 23,\n    \"mostPrescribedMedications\": [\n      {\n        \"medication\": \"Amoxicillin\",\n        \"count\": 25\n      },\n      {\n        \"medication\": \"Ibuprofen\",\n        \"count\": 18\n      }\n    ]\n  }\n}\n```\n\n**Use Cases:**\n- Dashboard analytics\n- Medication usage patterns\n- Inventory planning\n- Clinical reporting\n- Quality metrics"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/stats",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "stats"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totalCount\": 0,\n    \"activeCount\": 0,\n    \"completedCount\": 0,\n    \"discontinuedCount\": 0,\n    \"onHoldCount\": 0,\n    \"expiredCount\": 0,\n    \"mostPrescribedMedications\": []\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains stats data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('totalCount');",
+                  "    pm.expect(jsonData.data).to.have.property('activeCount');",
+                  "    pm.expect(jsonData.data).to.have.property('mostPrescribedMedications');",
+                  "    pm.expect(jsonData.data.mostPrescribedMedications).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🔍 Prescription Queries",
+      "item": [
+        {
+          "name": "Get Prescriptions by Patient ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/patient/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "patient", "{{patient_id}}"]
+            },
+            "description": "Get all prescriptions for a specific patient\n\n**Path Parameters:**\n- `patient_id`: Patient identifier (string)\n\n**Response Format:**\nArray of prescription objects for the specified patient\n\n**Use Cases:**\n- Patient medication history\n- Drug interaction checking\n- Medication adherence review\n- Clinical consultation preparation"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/patient/PAT001",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "patient", "PAT001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            },
+            {
+              "name": "Patient Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/patient/INVALID",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "patient", "INVALID"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid patient ID format\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('All prescriptions belong to the patient', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const patientId = pm.request.url.path[pm.request.url.path.length - 1];",
+                  "    if (jsonData.data.length > 0) {",
+                  "        jsonData.data.forEach(prescription => {",
+                  "            pm.expect(prescription.patientId).to.equal(patientId);",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Prescriptions by Doctor ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/doctor/{{doctor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "doctor", "{{doctor_id}}"]
+            },
+            "description": "Get all prescriptions written by a specific doctor\n\n**Path Parameters:**\n- `doctor_id`: Doctor identifier (string)\n\n**Response Format:**\nArray of prescription objects written by the specified doctor\n\n**Use Cases:**\n- Doctor prescribing patterns analysis\n- Clinical audit and review\n- Performance metrics\n- Medication safety monitoring"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/doctor/DOC001",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "doctor", "DOC001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('All prescriptions belong to the doctor', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const doctorId = pm.request.url.path[pm.request.url.path.length - 1];",
+                  "    if (jsonData.data.length > 0) {",
+                  "        jsonData.data.forEach(prescription => {",
+                  "            pm.expect(prescription.doctorId).to.equal(doctorId);",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Prescriptions by Medication Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/medication/{{medication_name}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "medication", "{{medication_name}}"]
+            },
+            "description": "Get all prescriptions for a specific medication\n\n**Path Parameters:**\n- `medication_name`: Medication name (string)\n\n**Response Format:**\nArray of prescription objects for the specified medication\n\n**Use Cases:**\n- Medication usage tracking\n- Drug safety monitoring\n- Inventory management\n- Clinical research and analytics"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/medication/Amoxicillin",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "medication", "Amoxicillin"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('All prescriptions are for the specified medication', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const medicationName = decodeURIComponent(pm.request.url.path[pm.request.url.path.length - 1]);",
+                  "    if (jsonData.data.length > 0) {",
+                  "        jsonData.data.forEach(prescription => {",
+                  "            pm.expect(prescription.medicationName).to.equal(medicationName);",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Prescription by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/{{prescription_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "{{prescription_id}}"]
+            },
+            "description": "Get a specific prescription by its ID\n\n**Path Parameters:**\n- `prescription_id`: Prescription identifier (string)\n\n**Response Format:**\nSingle prescription object\n\n**Use Cases:**\n- Prescription details view\n- Prescription verification\n- Clinical decision support\n- Patient consultation reference"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"1\",\n    \"patientId\": \"PAT001\",\n    \"doctorId\": \"DOC001\",\n    \"medicationName\": \"Amoxicillin\",\n    \"dosage\": \"500mg\",\n    \"instructions\": \"Take with food\",\n    \"frequency\": \"Three times daily\",\n    \"duration\": \"7 days\",\n    \"prescribedDate\": \"2025-08-06T08:00:00.000Z\",\n    \"expiryDate\": \"2025-09-06T08:00:00.000Z\",\n    \"quantity\": \"21 tablets\",\n    \"additionalNotes\": \"Complete full course\",\n    \"status\": \"active\",\n    \"createdAt\": \"2025-08-06T08:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "Prescription Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Prescription not found\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains prescription data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('patientId');",
+                  "    pm.expect(jsonData.data).to.have.property('doctorId');",
+                  "    pm.expect(jsonData.data).to.have.property('medicationName');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "✏️ Prescription Operations",
+      "item": [
+        {
+          "name": "Create New Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"PAT001\",\n  \"doctorId\": \"DOC001\",\n  \"medicationName\": \"Amoxicillin\",\n  \"dosage\": \"500mg\",\n  \"instructions\": \"Take with food to reduce stomach upset\",\n  \"frequency\": \"Three times daily\",\n  \"duration\": \"7 days\",\n  \"prescribedDate\": \"2025-08-06T08:00:00.000Z\",\n  \"expiryDate\": \"2025-09-06T08:00:00.000Z\",\n  \"quantity\": \"21 tablets\",\n  \"additionalNotes\": \"Complete full course even if feeling better. Contact doctor if allergic reaction occurs.\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions"]
+            },
+            "description": "Create a new prescription\n\n**Required Fields:**\n- `patientId`: Patient identifier\n- `doctorId`: Prescribing doctor identifier\n- `medicationName`: Name of medication\n- `dosage`: Medication dosage (e.g., '500mg', '10ml')\n- `instructions`: Patient instructions\n- `frequency`: How often to take medication\n- `duration`: Length of treatment\n\n**Optional Fields:**\n- `prescribedDate`: Date prescription written (defaults to current date)\n- `expiryDate`: Prescription expiration date\n- `quantity`: Amount prescribed\n- `additionalNotes`: Additional notes or warnings\n- `status`: Initial status (defaults to 'active')\n\n**Business Rules:**\n- Patient and Doctor IDs must be valid\n- Expiry date must be in the future\n- Status must be one of: active, completed, discontinued, on-hold\n\n**Response:**\nReturns created prescription with generated ID and timestamps"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": \"PAT001\",\n  \"doctorId\": \"DOC001\",\n  \"medicationName\": \"Amoxicillin\",\n  \"dosage\": \"500mg\",\n  \"instructions\": \"Take with food\",\n  \"frequency\": \"Three times daily\",\n  \"duration\": \"7 days\",\n  \"quantity\": \"21 tablets\",\n  \"status\": \"active\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"1\",\n    \"patientId\": \"PAT001\",\n    \"doctorId\": \"DOC001\",\n    \"medicationName\": \"Amoxicillin\",\n    \"dosage\": \"500mg\",\n    \"instructions\": \"Take with food\",\n    \"frequency\": \"Three times daily\",\n    \"duration\": \"7 days\",\n    \"prescribedDate\": \"2025-08-06T08:00:00.000Z\",\n    \"quantity\": \"21 tablets\",\n    \"status\": \"active\",\n    \"createdAt\": \"2025-08-06T08:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": \"\",\n  \"medicationName\": \"Amoxicillin\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed: patientId is required, doctorId is required, dosage is required, instructions is required, frequency is required, duration is required\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Prescription created with ID', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('createdAt');",
+                  "    ",
+                  "    // Store the created prescription ID for other tests",
+                  "    pm.environment.set('prescription_id', jsonData.data.id);",
+                  "});",
+                  "",
+                  "pm.test('Required fields are present', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const prescription = jsonData.data;",
+                  "    pm.expect(prescription).to.have.property('patientId');",
+                  "    pm.expect(prescription).to.have.property('doctorId');",
+                  "    pm.expect(prescription).to.have.property('medicationName');",
+                  "    pm.expect(prescription).to.have.property('dosage');",
+                  "    pm.expect(prescription).to.have.property('instructions');",
+                  "    pm.expect(prescription).to.have.property('frequency');",
+                  "    pm.expect(prescription).to.have.property('duration');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Prescription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicationName\": \"Amoxicillin\",\n  \"dosage\": \"750mg\",\n  \"instructions\": \"Take with food to reduce stomach upset. Avoid alcohol.\",\n  \"frequency\": \"Twice daily\",\n  \"duration\": \"10 days\",\n  \"expiryDate\": \"2025-10-06T08:00:00.000Z\",\n  \"quantity\": \"20 tablets\",\n  \"additionalNotes\": \"Increased dosage due to infection severity. Complete full course.\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/{{prescription_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "{{prescription_id}}"]
+            },
+            "description": "Update an existing prescription\n\n**Path Parameters:**\n- `prescription_id`: ID of prescription to update\n\n**Updatable Fields:**\n- `medicationName`: Change medication\n- `dosage`: Adjust dosage\n- `instructions`: Update patient instructions\n- `frequency`: Change frequency\n- `duration`: Adjust treatment duration\n- `expiryDate`: Update expiration date\n- `quantity`: Change prescribed quantity\n- `additionalNotes`: Update notes\n- `status`: Change status (active, completed, discontinued, on-hold)\n\n**Business Rules:**\n- Only specific fields can be updated (patientId, doctorId, prescribedDate are immutable)\n- Status transitions must be valid\n- Expiry date must be in the future\n\n**Use Cases:**\n- Dosage adjustments\n- Status updates (completion, discontinuation)\n- Instruction clarifications\n- Treatment duration changes"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dosage\": \"750mg\",\n  \"status\": \"completed\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Prescription updated successfully\"\n}"
+            },
+            {
+              "name": "Prescription Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"completed\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Prescription not found\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Success message is present', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('updated successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Prescription",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescriptions/{{prescription_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prescriptions", "{{prescription_id}}"]
+            },
+            "description": "Delete a prescription\n\n**Path Parameters:**\n- `prescription_id`: ID of prescription to delete\n\n**Business Rules:**\n- Prescription must exist\n- Soft delete preserves audit trail\n- Cannot delete prescriptions with critical status\n\n**Use Cases:**\n- Remove erroneous prescriptions\n- Clean up test data\n- Regulatory compliance (with audit trail)\n\n**Security Considerations:**\n- Requires appropriate permissions\n- Audit trail maintained\n- Irreversible operation"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Prescription deleted successfully\"\n}"
+            },
+            {
+              "name": "Prescription Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/prescriptions/999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "prescriptions", "999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Prescription not found\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Success message is present', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL for the API server"
+    },
+    {
+      "key": "patient_id",
+      "value": "PAT001",
+      "type": "string",
+      "description": "Sample patient ID for testing"
+    },
+    {
+      "key": "doctor_id",
+      "value": "DOC001",
+      "type": "string",
+      "description": "Sample doctor ID for testing"
+    },
+    {
+      "key": "prescription_id",
+      "value": "1",
+      "type": "string",
+      "description": "Sample prescription ID for testing (will be set by create prescription test)"
+    },
+    {
+      "key": "medication_name",
+      "value": "Amoxicillin",
+      "type": "string",
+      "description": "Sample medication name for testing"
+    }
+  ]
+}
