@@ -346,13 +346,13 @@ const PatientDetailsLoadingSkeleton: React.FC<{
       >
         Patient Info
       </CustomTabButton>
-      <CustomTabButton
+      {/* <CustomTabButton
         isActive={activeTab === 'medical-records'}
         icon="fas fa-notes-medical"
         onClick={() => onTabChange('medical-records')}
       >
         Medical Records
-      </CustomTabButton>
+      </CustomTabButton> */}
       <CustomTabButton
         isActive={activeTab === 'appointments'}
         icon="fas fa-calendar-check"
@@ -507,12 +507,12 @@ const PatientDetailsLoadingSkeleton: React.FC<{
               paddingBottom: '8px'
             }}
           >
-            {activeTab === 'medical-records' ? 'Medical Records' : 
-             activeTab === 'prescriptions' ? 'Prescriptions' : 'Laboratory Requests'}
+            {/* {activeTab === 'medical-records' ? 'Medical Records' :  */}
+            {activeTab === 'prescriptions' ? 'Prescriptions' : 'Laboratory Requests'}
           </Text>
           <Text style={{ fontSize: '16px', color: '#666' }}>
-            {activeTab === 'medical-records' ? 'Medical Records' : 
-             activeTab === 'prescriptions' ? 'Prescriptions' : 'Laboratory Requests'} functionality will be implemented in future iterations.
+            {/* {activeTab === 'medical-records' ? 'Medical Records' :  */}
+            {activeTab === 'prescriptions' ? 'Prescriptions' : 'Laboratory Requests'} functionality will be implemented in future iterations.
           </Text>
         </Box>
       )}
@@ -651,13 +651,13 @@ export const PatientDetailsPage: React.FC = () => {
           >
             Patient Info
           </CustomTabButton>
-          <CustomTabButton
+          {/* <CustomTabButton
             isActive={activeTab === 'medical-records'}
             icon="fas fa-notes-medical"
             onClick={() => handleTabChange('medical-records')}
           >
             Medical Records
-          </CustomTabButton>
+          </CustomTabButton> */}
           <CustomTabButton
             isActive={activeTab === 'appointments'}
             icon="fas fa-calendar-check"
@@ -684,7 +684,7 @@ export const PatientDetailsPage: React.FC = () => {
         {/* Tab Content */}
         <Box style={{ flex: 1 }}>
           {activeTab === 'patient-info' && <PatientInfoTab patient={patient} />}
-          {activeTab === 'medical-records' && <PlaceholderTab title="Medical Records" />}
+          {/* {activeTab === 'medical-records' && <PlaceholderTab title="Medical Records" />} */}
           {activeTab === 'appointments' && <AppointmentsTab appointments={patient.appointments || []} />}
           {activeTab === 'prescriptions' && <PlaceholderTab title="Prescriptions" />}
           {activeTab === 'laboratories' && <PlaceholderTab title="Laboratory Requests" />}
