@@ -27,11 +27,16 @@ import { IAddressApiService } from '../api/AddressApiService';
 import { AddressApiService } from '../api/AddressApiService';
 import { ILaboratoryApiService } from '../api/ILaboratoryApiService';
 import { LaboratoryApiService } from '../api/LaboratoryApiService';
+import { IPrescriptionApiService } from '../api/IPrescriptionApiService';
+import { PrescriptionApiService } from '../api/PrescriptionApiService';
+import { ApiPrescriptionRepository } from '../api/ApiPrescriptionRepository';
 import { WebUserQueryService } from '../services/WebUserQueryService';
 import { getFeatureFlags, configProvider } from '../config';
 import {
   TodoCommandService,
   TodoQueryService,
+  PrescriptionCommandService,
+  PrescriptionQueryService,
   CreateTodoUseCase,
   UpdateTodoUseCase,
   DeleteTodoUseCase,
@@ -44,9 +49,19 @@ import {
   GetTodoByIdQueryHandler,
   GetAllPatientsQueryHandler,
   GetPatientByIdQueryHandler,
+  CreatePrescriptionUseCase,
+  UpdatePrescriptionUseCase,
+  DeletePrescriptionUseCase,
+  GetAllPrescriptionsQueryHandler,
+  GetPrescriptionByIdQueryHandler,
+  GetPrescriptionsByPatientIdQueryHandler,
+  GetPrescriptionsByDoctorIdQueryHandler,
+  GetActivePrescriptionsQueryHandler,
+  GetExpiredPrescriptionsQueryHandler,
+  GetPrescriptionsByMedicationNameQueryHandler,
   TOKENS,
 } from '@nx-starter/application-shared';
-import type { ITodoRepository } from '@nx-starter/domain';
+import type { ITodoRepository, IPrescriptionRepository } from '@nx-starter/domain';
 import type {
   ITodoCommandService,
   ITodoQueryService,
@@ -55,6 +70,8 @@ import type {
   IPatientQueryService,
   IPatientRepository,
   IUserQueryService,
+  IPrescriptionCommandService,
+  IPrescriptionQueryService,
 } from '@nx-starter/application-shared';
 
 // Initialize configuration before using it
@@ -77,6 +94,7 @@ export const configureDI = () => {
   container.registerSingleton<IDoctorApiService>(TOKENS.DoctorApiService, DoctorApiService);
   container.registerSingleton<IAddressApiService>(TOKENS.AddressApiService, AddressApiService);
   container.registerSingleton<ILaboratoryApiService>(TOKENS.LaboratoryApiService, LaboratoryApiService);
+  container.registerSingleton<IPrescriptionApiService>(TOKENS.PrescriptionApiService, PrescriptionApiService);
   container.registerSingleton(AppointmentApiService, AppointmentApiService);
   container.registerSingleton(ScheduleApiService, ScheduleApiService);
   
@@ -100,6 +118,10 @@ export const configureDI = () => {
       TOKENS.PatientRepository,
       ApiPatientRepository
     );
+    container.registerSingleton<IPrescriptionRepository>(
+      TOKENS.PrescriptionRepository,
+      ApiPrescriptionRepository
+    );
   } else {
     console.log('💾 Using local Dexie.js for data storage');
     container.registerSingleton<ITodoRepository>(
@@ -112,6 +134,11 @@ export const configureDI = () => {
       TOKENS.PatientRepository,
       ApiPatientRepository
     );
+    // For prescriptions, always use API backend
+    container.registerSingleton<IPrescriptionRepository>(
+      TOKENS.PrescriptionRepository,
+      ApiPrescriptionRepository
+    );
   }
 
   // Application Layer - Use Cases (Commands)
@@ -119,6 +146,9 @@ export const configureDI = () => {
   container.registerSingleton(TOKENS.UpdateTodoUseCase, UpdateTodoUseCase);
   container.registerSingleton(TOKENS.DeleteTodoUseCase, DeleteTodoUseCase);
   container.registerSingleton(TOKENS.ToggleTodoUseCase, ToggleTodoUseCase);
+  container.registerSingleton(TOKENS.CreatePrescriptionUseCase, CreatePrescriptionUseCase);
+  container.registerSingleton(TOKENS.UpdatePrescriptionUseCase, UpdatePrescriptionUseCase);
+  container.registerSingleton(TOKENS.DeletePrescriptionUseCase, DeletePrescriptionUseCase);
 
   // Application Layer - Use Cases (Queries)
   container.registerSingleton(
@@ -153,6 +183,34 @@ export const configureDI = () => {
     TOKENS.GetPatientByIdQueryHandler,
     GetPatientByIdQueryHandler
   );
+  container.registerSingleton(
+    TOKENS.GetAllPrescriptionsQueryHandler,
+    GetAllPrescriptionsQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetPrescriptionByIdQueryHandler,
+    GetPrescriptionByIdQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetPrescriptionsByPatientIdQueryHandler,
+    GetPrescriptionsByPatientIdQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetPrescriptionsByDoctorIdQueryHandler,
+    GetPrescriptionsByDoctorIdQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetActivePrescriptionsQueryHandler,
+    GetActivePrescriptionsQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetExpiredPrescriptionsQueryHandler,
+    GetExpiredPrescriptionsQueryHandler
+  );
+  container.registerSingleton(
+    TOKENS.GetPrescriptionsByMedicationNameQueryHandler,
+    GetPrescriptionsByMedicationNameQueryHandler
+  );
 
   // Application Layer - CQRS Services
   container.registerSingleton<ITodoCommandService>(
@@ -174,6 +232,14 @@ export const configureDI = () => {
   container.registerSingleton<IPatientQueryService>(
     TOKENS.PatientQueryService,
     PatientQueryService
+  );
+  container.registerSingleton<IPrescriptionCommandService>(
+    TOKENS.PrescriptionCommandService,
+    PrescriptionCommandService
+  );
+  container.registerSingleton<IPrescriptionQueryService>(
+    TOKENS.PrescriptionQueryService,
+    PrescriptionQueryService
   );
   container.registerSingleton<IUserQueryService>(
     TOKENS.UserQueryService,

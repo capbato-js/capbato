@@ -5,114 +5,29 @@ import { Prescription } from '../types';
 import { AddPrescriptionModal } from '../components/AddPrescriptionModal';
 import { ViewPrescriptionModal } from '../components/ViewPrescriptionModal';
 import { DeletePrescriptionModal } from '../components/DeletePrescriptionModal';
+import { usePrescriptionListViewModel } from '../../prescriptions/view-models/usePrescriptionListViewModel';
+import { usePrescriptionItemViewModel } from '../../prescriptions/view-models/usePrescriptionItemViewModel';
 
-// Enhanced dummy data for prescriptions with both formats
-const initialPrescriptions: Prescription[] = [
-  {
-    id: '1',
-    patientNumber: 'P001',
-    patientName: 'John Doe',
-    patientId: 'patient_001',
-    doctor: 'Dr. Smith',
-    doctorId: 'doctor_001',
-    datePrescribed: '2025-07-28',
-    medications: [
-      {
-        id: '1',
-        name: 'Amoxicillin',
-        dosage: '500mg',
-        frequency: 'Every 8 hours',
-        duration: '7 days',
-        instructions: 'Take with food'
-      },
-      {
-        id: '2',
-        name: 'Paracetamol',
-        dosage: '500mg',
-        frequency: 'Every 6 hours',
-        duration: '5 days',
-        instructions: 'For pain relief'
-      }
-    ],
-    notes: 'Patient has history of penicillin allergy - confirmed safe to use Amoxicillin'
-  },
-  {
-    id: '2',
-    patientNumber: 'P002',
-    patientName: 'Jane Smith',
-    patientId: 'patient_002',
-    doctor: 'Dr. Johnson',
-    doctorId: 'doctor_002',
-    datePrescribed: '2025-07-27',
-    medications: [
-      {
-        id: '3',
-        name: 'Ibuprofen',
-        dosage: '400mg',
-        frequency: 'Every 8 hours',
-        duration: '5 days',
-        instructions: 'Take after meals'
-      },
-      {
-        id: '4',
-        name: 'Cetirizine',
-        dosage: '10mg',
-        frequency: 'Once daily',
-        duration: '7 days',
-        instructions: 'For allergic reactions'
-      }
-    ],
-    notes: 'Patient experiencing seasonal allergies'
-  },
-  {
-    id: '3',
-    patientNumber: 'P003',
-    patientName: 'Mike Wilson',
-    patientId: 'patient_003',
-    doctor: 'Dr. Brown',
-    doctorId: 'doctor_003',
-    datePrescribed: '2025-07-26',
-    medications: 'Metformin 850mg, Lisinopril 10mg', // Legacy string format
-    notes: 'Continue monitoring blood pressure and glucose levels'
-  },
-  {
-    id: '4',
-    patientNumber: 'P004',
-    patientName: 'Sarah Davis',
-    patientId: 'patient_004',
-    doctor: 'Dr. Garcia',
-    doctorId: 'doctor_004',
-    datePrescribed: '2025-07-25',
-    medications: [
-      {
-        id: '5',
-        name: 'Omeprazole',
-        dosage: '20mg',
-        frequency: 'Once daily',
-        duration: '14 days',
-        instructions: 'Take before breakfast'
-      },
-      {
-        id: '6',
-        name: 'Simvastatin',
-        dosage: '40mg',
-        frequency: 'Once daily',
-        duration: 'Ongoing',
-        instructions: 'Take at bedtime'
-      }
-    ],
-    notes: 'GERD treatment and cholesterol management'
-  }
-];
+// Type for the display prescription with grouped medications
+type DisplayPrescription = {
+  id: string;
+  patientNumber: string;
+  patientName: string;
+  patientId: string;
+  doctor: string;
+  doctorId: string;
+  datePrescribed: string;
+  medications: string;
+  notes: string | undefined;
+};
 
 export const PrescriptionsPage: React.FC = () => {
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>(initialPrescriptions);
+  const prescriptionListViewModel = usePrescriptionListViewModel();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -126,57 +41,132 @@ export const PrescriptionsPage: React.FC = () => {
     setAddModalOpen(true);
   };
 
-  const handleViewPrescription = (prescription: Prescription) => {
-    setSelectedPrescription(prescription);
+  const handleViewPrescription = (prescription: Prescription | DisplayPrescription) => {
+    // If this is a grouped prescription from the table, we need to find the actual prescriptions
+    if ('id' in prescription && prescription.id.includes(',')) {
+      // This is a grouped prescription - get the actual prescriptions for this group
+      const prescriptionIds = prescription.id.split(',');
+      const groupedPrescriptions = prescriptionListViewModel.filteredPrescriptions.filter(p => 
+        prescriptionIds.includes(p.stringId || '')
+      );
+      
+      // Create a combined prescription object with all the medications
+      const firstPrescription = groupedPrescriptions[0];
+      
+      // Type assertion to access populated data that may be attached to the domain object
+      const prescriptionWithData = firstPrescription as unknown as {
+        _populatedPatient?: {
+          patientNumber: string;
+          fullName: string;
+        };
+        _populatedDoctor?: {
+          fullName: string;
+        };
+      };
+      
+      const combinedPrescription: Prescription = {
+        id: prescription.id,
+        patientNumber: prescriptionWithData._populatedPatient?.patientNumber || `P${firstPrescription.patientId.slice(-3)}`,
+        patientName: prescriptionWithData._populatedPatient?.fullName || `Patient ${firstPrescription.patientId.slice(-4)}`,
+        patientId: firstPrescription.patientId,
+        doctor: prescriptionWithData._populatedDoctor?.fullName || `Dr. ${firstPrescription.doctorId.slice(-4)}`,
+        doctorId: firstPrescription.doctorId,
+        datePrescribed: firstPrescription.prescribedDate.toISOString().split('T')[0],
+        medications: groupedPrescriptions.map(p => ({
+          id: p.stringId || '',
+          name: p.medicationNameValue,
+          dosage: p.dosageValue,
+          frequency: p.frequency,
+          duration: p.duration,
+          instructions: p.instructionsValue
+        })),
+        notes: firstPrescription.additionalNotes || ''
+      };
+      
+      setSelectedPrescription(combinedPrescription);
+    } else {
+      // This is a regular prescription
+      setSelectedPrescription(prescription as Prescription);
+    }
     setViewModalOpen(true);
   };
 
-  const handleEditPrescription = (prescription: Prescription) => {
-    setSelectedPrescription(prescription);
-    setEditModalOpen(true);
+  const handleEditPrescription = (prescription: DisplayPrescription) => {
+    // For grouped prescriptions, we can't edit directly since they represent multiple prescriptions
+    if (prescription.id.includes(',')) {
+      console.warn('Cannot edit grouped prescriptions. Please edit individual prescriptions.');
+      return;
+    }
+    
+    // Find the actual prescription object from the domain
+    const actualPrescription = prescriptionListViewModel.filteredPrescriptions.find(p => 
+      p.stringId === prescription.id
+    );
+    
+    if (actualPrescription) {
+      setSelectedPrescription(actualPrescription as unknown as Prescription);
+      setEditModalOpen(true);
+    }
   };
 
-  const handleDeletePrescription = (prescription: Prescription) => {
-    setSelectedPrescription(prescription);
-    setDeleteModalOpen(true);
+  const handleDeletePrescription = (prescription: DisplayPrescription) => {
+    // For grouped prescriptions, we can't delete directly since they represent multiple prescriptions
+    if (prescription.id.includes(',')) {
+      console.warn('Cannot delete grouped prescriptions. Please delete individual prescriptions.');
+      return;
+    }
+    
+    // Find the actual prescription object from the domain
+    const actualPrescription = prescriptionListViewModel.filteredPrescriptions.find(p => 
+      p.stringId === prescription.id
+    );
+    
+    if (actualPrescription) {
+      setSelectedPrescription(actualPrescription as unknown as Prescription);
+      setDeleteModalOpen(true);
+    }
   };
 
   const handlePrescriptionCreated = (newPrescription: Prescription) => {
-    setPrescriptions(prev => [newPrescription, ...prev]);
     console.log('Prescription created successfully:', newPrescription);
+    // Refresh the list to get the latest data from the API
+    prescriptionListViewModel.refreshPrescriptions();
   };
 
   const handlePrescriptionUpdated = () => {
-    // In a real app, this would refetch data or update the specific prescription
     console.log('Prescription updated successfully');
     setEditModalOpen(false);
     setSelectedPrescription(null);
+    // Refresh the list to get the latest data from the API
+    prescriptionListViewModel.refreshPrescriptions();
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedPrescription) return;
+    if (!selectedPrescription?.id) return;
 
-    setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Find the prescription in the list
+      const foundPrescription = prescriptionListViewModel.prescriptions.find(p => p.stringId === selectedPrescription.id);
+      if (!foundPrescription) return;
+
+      // Create item view model to handle deletion
+      const itemViewModel = usePrescriptionItemViewModel(foundPrescription);
       
-      setPrescriptions(prev => 
-        prev.filter(p => p.id !== selectedPrescription.id)
-      );
+      await itemViewModel.deletePrescription();
       
       console.log('Prescription deleted successfully:', selectedPrescription.id);
       
       setDeleteModalOpen(false);
       setSelectedPrescription(null);
-    } catch {
-      console.error('Failed to delete prescription');
-    } finally {
-      setIsLoading(false);
+      
+      // Refresh the list to get the latest data from the API
+      prescriptionListViewModel.refreshPrescriptions();
+    } catch (error) {
+      console.error('Failed to delete prescription:', error);
     }
   };
 
-  const actions: TableActions<Prescription> = {
+  const actions: TableActions<DisplayPrescription> = {
     buttons: [
       {
         icon: 'fas fa-eye',
@@ -195,6 +185,61 @@ export const PrescriptionsPage: React.FC = () => {
       }
     ]
   };
+
+  // Convert domain prescriptions to display format for the table
+  const displayPrescriptions = (() => {
+    // Group prescriptions by patient, doctor, and date to combine medications
+    const groupedPrescriptions = new Map<string, {
+      prescriptions: typeof prescriptionListViewModel.filteredPrescriptions;
+      medications: string[];
+    }>();
+
+    prescriptionListViewModel.filteredPrescriptions.forEach(prescription => {
+      const datePrescribed = prescription.prescribedDate.toISOString().split('T')[0];
+
+      // Create a unique key for grouping
+      const groupKey = `${prescription.patientId}-${prescription.doctorId}-${datePrescribed}`;
+
+      if (!groupedPrescriptions.has(groupKey)) {
+        groupedPrescriptions.set(groupKey, {
+          prescriptions: [],
+          medications: []
+        });
+      }
+
+      const group = groupedPrescriptions.get(groupKey);
+      if (group) {
+        group.prescriptions.push(prescription);
+        group.medications.push(prescription.medicationNameValue);
+      }
+    });
+
+    // Convert grouped prescriptions to display format
+    return Array.from(groupedPrescriptions.entries()).map(([, group]) => {
+      const firstPrescription = group.prescriptions[0];
+      const prescriptionWithData = firstPrescription as unknown as {
+        _populatedPatient?: {
+          patientNumber: string;
+          fullName: string;
+        };
+        _populatedDoctor?: {
+          fullName: string;
+        };
+      };
+
+      return {
+        id: group.prescriptions.map(p => p.stringId || '').join(','), // Combine IDs for actions
+        patientNumber: prescriptionWithData._populatedPatient?.patientNumber || `P${firstPrescription.patientId.slice(-3)}`,
+        patientName: prescriptionWithData._populatedPatient?.fullName || `Patient ${firstPrescription.patientId.slice(-4)}`,
+        patientId: firstPrescription.patientId,
+        doctor: prescriptionWithData._populatedDoctor?.fullName || `Dr. ${firstPrescription.doctorId.slice(-4)}`,
+        doctorId: firstPrescription.doctorId,
+        datePrescribed: firstPrescription.prescribedDate.toISOString().split('T')[0],
+        medications: group.medications.join(', '), // Combine all medications with commas
+        notes: firstPrescription.additionalNotes,
+      };
+    });
+  })();
 
   // Define columns for the DataTable with enhanced medication display
   const columns: TableColumn<Prescription>[] = [
@@ -252,13 +297,19 @@ export const PrescriptionsPage: React.FC = () => {
       />
       
       <DataTable
-        data={prescriptions}
+        data={displayPrescriptions}
         columns={columns}
         actions={actions}
         onRowClick={handleViewPrescription}
         searchable={true}
         searchPlaceholder="Search prescriptions by patient, doctor, or medications..."
-        emptyStateMessage="No prescriptions found"
+        emptyStateMessage={
+          prescriptionListViewModel.isLoading 
+            ? "Loading prescriptions..." 
+            : prescriptionListViewModel.error 
+              ? `Error: ${prescriptionListViewModel.error}`
+              : "No prescriptions found"
+        }
         cursor="pointer"
         useViewportHeight={true}
         bottomPadding={90}
@@ -302,7 +353,7 @@ export const PrescriptionsPage: React.FC = () => {
         }}
         prescription={selectedPrescription}
         onConfirm={handleConfirmDelete}
-        isLoading={isLoading}
+        isLoading={prescriptionListViewModel.isLoading}
       />
     </MedicalClinicLayout>
   );

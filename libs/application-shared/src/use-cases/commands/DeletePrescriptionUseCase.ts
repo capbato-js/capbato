@@ -22,7 +22,7 @@ export class DeletePrescriptionUseCase {
 
     // Business rule: Check if prescription can be deleted
     // For example, might not allow deletion of active prescriptions or those with recent activity
-    if (existingPrescription.isActive && existingPrescription.isValid()) {
+    if (existingPrescription.status === 'active' && existingPrescription.isValid()) {
       // Instead of hard delete, we could deactivate
       // But for this implementation, we'll allow deletion
     }

@@ -12,16 +12,24 @@
 export interface CreatePrescriptionRequestDto {
   patientId: string;
   doctorId: string;
-  medicationName: string;
-  dosage: string;
-  instructions: string;
-  frequency: string;
-  duration: string;
+  medications: Array<{
+    medicationName: string;
+    dosage: string;
+    instructions: string;
+    frequency: string;
+    duration: string;
+  }>;
   prescribedDate?: string; // ISO datetime string
   expiryDate?: string; // ISO datetime string
   quantity?: string;
   additionalNotes?: string;
   status?: 'active' | 'completed' | 'discontinued' | 'on-hold';
+  // Legacy single medication fields for backward compatibility
+  medicationName?: string;
+  dosage?: string;
+  instructions?: string;
+  frequency?: string;
+  duration?: string;
 }
 
 /**
@@ -30,13 +38,22 @@ export interface CreatePrescriptionRequestDto {
  * Note: id comes from route parameter, not request body
  */
 export interface UpdatePrescriptionRequestDto {
+  medications?: Array<{
+    id?: string;
+    medicationName: string;
+    dosage: string;
+    instructions: string;
+    frequency: string;
+    duration: string;
+  }>;
+  expiryDate?: string; // ISO datetime string
+  quantity?: string;
+  additionalNotes?: string;
+  status?: 'active' | 'completed' | 'discontinued' | 'on-hold';
+  // Legacy single medication fields for backward compatibility
   medicationName?: string;
   dosage?: string;
   instructions?: string;
   frequency?: string;
   duration?: string;
-  expiryDate?: string; // ISO datetime string
-  quantity?: string;
-  additionalNotes?: string;
-  status?: 'active' | 'completed' | 'discontinued' | 'on-hold';
 }

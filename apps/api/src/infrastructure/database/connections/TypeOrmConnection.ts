@@ -12,6 +12,7 @@ import { HematologyResultEntity } from '../../laboratory/persistence/typeorm/Hem
 import { FecalysisResultEntity } from '../../laboratory/persistence/typeorm/FecalysisResultEntity';
 import { SerologyResultEntity } from '../../laboratory/persistence/typeorm/SerologyResultEntity';
 import { PrescriptionEntity } from '../../prescription/persistence/typeorm/PrescriptionEntity';
+import { MedicationEntity } from '../../prescription/persistence/typeorm/MedicationEntity';
 import { getDatabaseConfig, isDevelopment, isProduction } from '../../../config';
 
 /**
@@ -57,7 +58,8 @@ export const createTypeOrmDataSource = (): DataSource => {
       HematologyResultEntity,
       FecalysisResultEntity,
       SerologyResultEntity,
-      PrescriptionEntity
+      PrescriptionEntity,
+      MedicationEntity
     ],
     synchronize: shouldSynchronize,
     logging: isDevelopment() || (isProduction() && allowProductionAutoMigration), // Extra logging for production debug

@@ -97,49 +97,51 @@ export const AddPrescriptionForm: React.FC<AddPrescriptionFormProps> = ({
   const [doctors, setDoctors] = useState<Array<{ value: string; label: string }>>([]);
   const [selectedPatientNumber, setSelectedPatientNumber] = useState<string>('');
   
-  // Get stores
-  const patientStore = usePatientStore();
-  const doctorStore = useDoctorStore();
+  // Get stores with selectors to prevent unnecessary re-renders
+  const patientStorePatients = usePatientStore((state) => state.patients);
+  const patientStoreLoadPatients = usePatientStore((state) => state.loadPatients);
+  const doctorStoreSummaries = useDoctorStore((state) => state.doctorSummaries);
+  const doctorStoreGetAllDoctors = useDoctorStore((state) => state.getAllDoctors);
 
   // Load patients and doctors on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
         // Load patients
-        await patientStore.loadPatients();
+        await patientStoreLoadPatients();
         
         // Load doctors
-        await doctorStore.getAllDoctors(true, 'summary');
+        await doctorStoreGetAllDoctors(true, 'summary');
       } catch (error) {
         console.error('Failed to load data:', error);
       }
     };
 
     loadData();
-  }, []);
+  }, [patientStoreLoadPatients, doctorStoreGetAllDoctors]);
 
   // Format patients for select component
   useEffect(() => {
-    if (patientStore.patients.length > 0) {
-      const formattedPatients = patientStore.patients.map(patient => ({
+    if (patientStorePatients.length > 0) {
+      const formattedPatients = patientStorePatients.map(patient => ({
         value: patient.id,
         label: `${patient.firstName} ${patient.lastName}`,
         patientNumber: patient.patientNumber,
       }));
       setPatients(formattedPatients);
     }
-  }, [patientStore.patients]);
+  }, [patientStorePatients]);
 
   // Format doctors for select component
   useEffect(() => {
-    if (doctorStore.doctorSummaries.length > 0) {
-      const formattedDoctors = doctorStore.doctorSummaries.map(doctor => ({
+    if (doctorStoreSummaries.length > 0) {
+      const formattedDoctors = doctorStoreSummaries.map(doctor => ({
         value: doctor.id,
-        label: `Dr. ${doctor.fullName} - ${doctor.specialization}`,
+        label: `${doctor.fullName} - ${doctor.specialization}`,
       }));
       setDoctors(formattedDoctors);
     }
-  }, [doctorStore.doctorSummaries]);
+  }, [doctorStoreSummaries]);
 
   // React Hook Form setup
   const {
@@ -299,8 +301,15 @@ export const AddPrescriptionForm: React.FC<AddPrescriptionFormProps> = ({
               value={field.value ? new Date(field.value) : null}
               onChange={(date) => {
                 if (date) {
-                  const dateObj = date as unknown as Date;
-                  field.onChange(dateObj.toISOString().split('T')[0]);
+                  // Ensure we have a proper Date object
+                  const dateObj = date instanceof Date ? date : new Date(date);
+                  
+                  // Check if the date is valid
+                  if (!isNaN(dateObj.getTime())) {
+                    field.onChange(dateObj.toISOString().split('T')[0]);
+                  } else {
+                    field.onChange('');
+                  }
                 } else {
                   field.onChange('');
                 }

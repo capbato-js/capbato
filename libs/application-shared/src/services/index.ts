@@ -10,4 +10,6 @@ export * from './AuthService';
 export * from './UserQueryService';
 export * from './PatientCommandService';
 export * from './PatientQueryService';
+export * from './PrescriptionCommandService';
+export * from './PrescriptionQueryService';
 export * from './ScheduleWithDoctorService';

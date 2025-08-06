@@ -6,3 +6,4 @@
 // Export all interfaces
 export * from './ITodoService';
 export * from './IPatientQueryService';
+export * from './IPrescriptionService';
