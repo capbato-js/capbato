@@ -16,11 +16,15 @@ import { SqliteScheduleRepository } from '../schedule/persistence/sqlite/SqliteS
 import { MongooseScheduleRepository } from '../schedule/persistence/mongoose/MongooseScheduleRepository';
 import { InMemoryAppointmentRepository } from '../appointment/persistence/in-memory/InMemoryAppointmentRepository';
 import { TypeOrmAppointmentRepository } from '../appointment/persistence/typeorm/TypeOrmAppointmentRepository';
-import { 
+import {
   InMemoryLabRequestRepository, 
   InMemoryBloodChemistryRepository,
   TypeOrmLabRequestRepository,
   TypeOrmBloodChemistryRepository,
+  TypeOrmUrinalysisResultRepository,
+  TypeOrmHematologyResultRepository,
+  TypeOrmFecalysisResultRepository,
+  TypeOrmSerologyResultRepository,
   MongooseLabRequestRepository,
   MongooseBloodChemistryRepository,
   SqliteLabRequestRepository,
@@ -76,10 +80,34 @@ import {
   CreateLabRequestUseCase,
   UpdateLabRequestResultsUseCase,
   CreateBloodChemistryUseCase,
+  CreateUrinalysisResultUseCase,
+  UpdateUrinalysisResultUseCase,
+  DeleteUrinalysisResultUseCase,
+  CreateHematologyResultUseCase,
+  UpdateHematologyResultUseCase,
+  DeleteHematologyResultUseCase,
+  CreateFecalysisResultUseCase,
+  UpdateFecalysisResultUseCase,
+  DeleteFecalysisResultUseCase,
+  CreateSerologyResultUseCase,
+  UpdateSerologyResultUseCase,
+  DeleteSerologyResultUseCase,
   // Laboratory Query Handlers
   GetAllLabRequestsQueryHandler,
   GetCompletedLabRequestsQueryHandler,
   GetLabRequestByPatientIdQueryHandler,
+  GetAllUrinalysisResultsQueryHandler,
+  GetUrinalysisResultByIdQueryHandler,
+  GetUrinalysisResultsByPatientIdQueryHandler,
+  GetAllHematologyResultsQueryHandler,
+  GetHematologyResultByIdQueryHandler,
+  GetHematologyResultsByPatientIdQueryHandler,
+  GetAllFecalysisResultsQueryHandler,
+  GetFecalysisResultByIdQueryHandler,
+  GetFecalysisResultsByPatientIdQueryHandler,
+  GetAllSerologyResultsQueryHandler,
+  GetSerologyResultByIdQueryHandler,
+  GetSerologyResultsByPatientIdQueryHandler,
   // Laboratory Validation Services
   LaboratoryValidationService,
   CreateLabRequestValidationService,
@@ -89,6 +117,14 @@ import {
   CreateBloodChemistryValidationService,
   UpdateBloodChemistryValidationService,
   DeleteBloodChemistryValidationService,
+  CreateUrinalysisResultValidationService,
+  UpdateUrinalysisResultValidationService,
+  CreateHematologyResultValidationService,
+  UpdateHematologyResultValidationService,
+  CreateFecalysisResultValidationService,
+  UpdateFecalysisResultValidationService,
+  CreateSerologyResultValidationService,
+  UpdateSerologyResultValidationService,
   // Prescription Use Cases
   CreatePrescriptionUseCase,
   UpdatePrescriptionUseCase,
@@ -176,7 +212,7 @@ import {
 } from '@nx-starter/application-shared';
 import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
-import type { ILabRequestRepository, IBloodChemistryRepository } from '@nx-starter/domain';
+import type { ILabRequestRepository, IBloodChemistryRepository, IUrinalysisResultRepository, IHematologyResultRepository, IFecalysisResultRepository, ISerologyResultRepository } from '@nx-starter/domain';
 import { AppointmentDomainService } from '@nx-starter/domain';
 import { getTypeOrmDataSource } from '../database/connections/TypeOrmConnection';
 import { connectMongoDB } from '../database/connections/MongooseConnection';
@@ -240,6 +276,30 @@ export const configureDI = async () => {
     bloodChemistryRepositoryImplementation
   );
 
+  const urinalysisResultRepositoryImplementation = await getUrinalysisResultRepositoryImplementation();
+  container.registerInstance<IUrinalysisResultRepository>(
+    TOKENS.UrinalysisResultRepository,
+    urinalysisResultRepositoryImplementation
+  );
+
+  const hematologyResultRepositoryImplementation = await getHematologyResultRepositoryImplementation();
+  container.registerInstance<IHematologyResultRepository>(
+    TOKENS.HematologyResultRepository,
+    hematologyResultRepositoryImplementation
+  );
+
+  const fecalysisResultRepositoryImplementation = await getFecalysisResultRepositoryImplementation();
+  container.registerInstance<IFecalysisResultRepository>(
+    TOKENS.FecalysisResultRepository,
+    fecalysisResultRepositoryImplementation
+  );
+
+  const serologyResultRepositoryImplementation = await getSerologyResultRepositoryImplementation();
+  container.registerInstance<ISerologyResultRepository>(
+    TOKENS.SerologyResultRepository,
+    serologyResultRepositoryImplementation
+  );
+
   const prescriptionRepositoryImplementation = await getPrescriptionRepositoryImplementation();
   container.registerInstance<IPrescriptionRepository>(
     TOKENS.PrescriptionRepository,
@@ -299,6 +359,18 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreateLabRequestUseCase, CreateLabRequestUseCase);
   container.registerSingleton(TOKENS.UpdateLabRequestResultsUseCase, UpdateLabRequestResultsUseCase);
   container.registerSingleton(TOKENS.CreateBloodChemistryUseCase, CreateBloodChemistryUseCase);
+  container.registerSingleton(TOKENS.CreateUrinalysisResultUseCase, CreateUrinalysisResultUseCase);
+  container.registerSingleton(TOKENS.UpdateUrinalysisResultUseCase, UpdateUrinalysisResultUseCase);
+  container.registerSingleton(TOKENS.DeleteUrinalysisResultUseCase, DeleteUrinalysisResultUseCase);
+  container.registerSingleton(TOKENS.CreateHematologyResultUseCase, CreateHematologyResultUseCase);
+  container.registerSingleton(TOKENS.UpdateHematologyResultUseCase, UpdateHematologyResultUseCase);
+  container.registerSingleton(TOKENS.DeleteHematologyResultUseCase, DeleteHematologyResultUseCase);
+  container.registerSingleton(TOKENS.CreateFecalysisResultUseCase, CreateFecalysisResultUseCase);
+  container.registerSingleton(TOKENS.UpdateFecalysisResultUseCase, UpdateFecalysisResultUseCase);
+  container.registerSingleton(TOKENS.DeleteFecalysisResultUseCase, DeleteFecalysisResultUseCase);
+  container.registerSingleton(TOKENS.CreateSerologyResultUseCase, CreateSerologyResultUseCase);
+  container.registerSingleton(TOKENS.UpdateSerologyResultUseCase, UpdateSerologyResultUseCase);
+  container.registerSingleton(TOKENS.DeleteSerologyResultUseCase, DeleteSerologyResultUseCase);
 
   // Prescription Use Cases (Commands)
   container.registerSingleton(TOKENS.CreatePrescriptionUseCase, CreatePrescriptionUseCase);
@@ -398,6 +470,18 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetAllLabRequestsQueryHandler, GetAllLabRequestsQueryHandler);
   container.registerSingleton(TOKENS.GetCompletedLabRequestsQueryHandler, GetCompletedLabRequestsQueryHandler);
   container.registerSingleton(TOKENS.GetLabRequestByPatientIdQueryHandler, GetLabRequestByPatientIdQueryHandler);
+  container.registerSingleton(TOKENS.GetAllUrinalysisResultsQueryHandler, GetAllUrinalysisResultsQueryHandler);
+  container.registerSingleton(TOKENS.GetUrinalysisResultByIdQueryHandler, GetUrinalysisResultByIdQueryHandler);
+  container.registerSingleton(TOKENS.GetUrinalysisResultsByPatientIdQueryHandler, GetUrinalysisResultsByPatientIdQueryHandler);
+  container.registerSingleton(TOKENS.GetAllHematologyResultsQueryHandler, GetAllHematologyResultsQueryHandler);
+  container.registerSingleton(TOKENS.GetHematologyResultByIdQueryHandler, GetHematologyResultByIdQueryHandler);
+  container.registerSingleton(TOKENS.GetHematologyResultsByPatientIdQueryHandler, GetHematologyResultsByPatientIdQueryHandler);
+  container.registerSingleton(TOKENS.GetAllFecalysisResultsQueryHandler, GetAllFecalysisResultsQueryHandler);
+  container.registerSingleton(TOKENS.GetFecalysisResultByIdQueryHandler, GetFecalysisResultByIdQueryHandler);
+  container.registerSingleton(TOKENS.GetFecalysisResultsByPatientIdQueryHandler, GetFecalysisResultsByPatientIdQueryHandler);
+  container.registerSingleton(TOKENS.GetAllSerologyResultsQueryHandler, GetAllSerologyResultsQueryHandler);
+  container.registerSingleton(TOKENS.GetSerologyResultByIdQueryHandler, GetSerologyResultByIdQueryHandler);
+  container.registerSingleton(TOKENS.GetSerologyResultsByPatientIdQueryHandler, GetSerologyResultsByPatientIdQueryHandler);
 
   // Prescription Query Handlers
   container.registerSingleton(TOKENS.GetAllPrescriptionsQueryHandler, GetAllPrescriptionsQueryHandler);
@@ -515,6 +599,14 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreateBloodChemistryValidationService, CreateBloodChemistryValidationService);
   container.registerSingleton(TOKENS.UpdateBloodChemistryValidationService, UpdateBloodChemistryValidationService);
   container.registerSingleton(TOKENS.DeleteBloodChemistryValidationService, DeleteBloodChemistryValidationService);
+  container.registerSingleton(TOKENS.CreateUrinalysisResultValidationService, CreateUrinalysisResultValidationService);
+  container.registerSingleton(TOKENS.UpdateUrinalysisResultValidationService, UpdateUrinalysisResultValidationService);
+  container.registerSingleton(TOKENS.CreateHematologyResultValidationService, CreateHematologyResultValidationService);
+  container.registerSingleton(TOKENS.UpdateHematologyResultValidationService, UpdateHematologyResultValidationService);
+  container.registerSingleton(TOKENS.CreateFecalysisResultValidationService, CreateFecalysisResultValidationService);
+  container.registerSingleton(TOKENS.UpdateFecalysisResultValidationService, UpdateFecalysisResultValidationService);
+  container.registerSingleton(TOKENS.CreateSerologyResultValidationService, CreateSerologyResultValidationService);
+  container.registerSingleton(TOKENS.UpdateSerologyResultValidationService, UpdateSerologyResultValidationService);
 
   // Prescription Validation Services
   container.registerSingleton(TOKENS.PrescriptionValidationService, PrescriptionValidationService);
@@ -902,6 +994,46 @@ async function getPrescriptionRepositoryImplementation(): Promise<IPrescriptionR
       return new TypeOrmPrescriptionRepository(dataSource);
     }
   }
+}
+
+async function getUrinalysisResultRepositoryImplementation(): Promise<IUrinalysisResultRepository> {
+  const dbType = process.env.DATABASE_TYPE || 'typeorm';
+  const ormType = process.env.ORM_TYPE || 'typeorm';
+
+  // For now, since we only have TypeORM implementation
+  const dataSource = await getTypeOrmDataSource();
+  console.log('📦 Using TypeORM urinalysis result repository');
+  return new TypeOrmUrinalysisResultRepository(dataSource);
+}
+
+async function getHematologyResultRepositoryImplementation(): Promise<IHematologyResultRepository> {
+  const dbType = process.env.DATABASE_TYPE || 'typeorm';
+  const ormType = process.env.ORM_TYPE || 'typeorm';
+
+  // For now, since we only have TypeORM implementation
+  const dataSource = await getTypeOrmDataSource();
+  console.log('📦 Using TypeORM hematology result repository');
+  return new TypeOrmHematologyResultRepository(dataSource);
+}
+
+async function getFecalysisResultRepositoryImplementation(): Promise<IFecalysisResultRepository> {
+  const dbType = process.env.DATABASE_TYPE || 'typeorm';
+  const ormType = process.env.ORM_TYPE || 'typeorm';
+
+  // For now, since we only have TypeORM implementation
+  const dataSource = await getTypeOrmDataSource();
+  console.log('📦 Using TypeORM fecalysis result repository');
+  return new TypeOrmFecalysisResultRepository(dataSource);
+}
+
+async function getSerologyResultRepositoryImplementation(): Promise<ISerologyResultRepository> {
+  const dbType = process.env.DATABASE_TYPE || 'typeorm';
+  const ormType = process.env.ORM_TYPE || 'typeorm';
+
+  // For now, since we only have TypeORM implementation
+  const dataSource = await getTypeOrmDataSource();
+  console.log('📦 Using TypeORM serology result repository');
+  return new TypeOrmSerologyResultRepository(dataSource);
 }
 
 // Export container and tokens for use in controllers

@@ -9,6 +9,14 @@ import {
   CreateBloodChemistryCommand,
   UpdateBloodChemistryCommand,
   DeleteBloodChemistryCommand,
+  CreateUrinalysisResultCommand,
+  UpdateUrinalysisResultCommand,
+  CreateHematologyResultCommand,
+  UpdateHematologyResultCommand,
+  CreateFecalysisResultCommand,
+  UpdateFecalysisResultCommand,
+  CreateSerologyResultCommand,
+  UpdateSerologyResultCommand,
   CreateLabRequestCommandSchema,
   UpdateLabRequestCommandSchema,
   DeleteLabRequestCommandSchema,
@@ -16,6 +24,14 @@ import {
   CreateBloodChemistryCommandSchema,
   UpdateBloodChemistryCommandSchema,
   DeleteBloodChemistryCommandSchema,
+  CreateUrinalysisResultCommandSchema,
+  UpdateUrinalysisResultCommandSchema,
+  CreateHematologyResultCommandSchema,
+  UpdateHematologyResultCommandSchema,
+  CreateFecalysisResultCommandSchema,
+  UpdateFecalysisResultCommandSchema,
+  CreateSerologyResultCommandSchema,
+  UpdateSerologyResultCommandSchema,
   LabRequestIdSchema,
   BloodChemistryIdSchema,
 } from './LaboratoryValidationSchemas';
@@ -56,6 +72,47 @@ export class DeleteBloodChemistryValidationService extends ValidationService<unk
   protected schema = DeleteBloodChemistryCommandSchema;
 }
 
+// Specialized results validation services
+@injectable()
+export class CreateUrinalysisResultValidationService extends ValidationService<unknown, CreateUrinalysisResultCommand> {
+  protected schema = CreateUrinalysisResultCommandSchema;
+}
+
+@injectable()
+export class UpdateUrinalysisResultValidationService extends ValidationService<unknown, UpdateUrinalysisResultCommand> {
+  protected schema = UpdateUrinalysisResultCommandSchema;
+}
+
+@injectable()
+export class CreateHematologyResultValidationService extends ValidationService<unknown, CreateHematologyResultCommand> {
+  protected schema = CreateHematologyResultCommandSchema;
+}
+
+@injectable()
+export class UpdateHematologyResultValidationService extends ValidationService<unknown, UpdateHematologyResultCommand> {
+  protected schema = UpdateHematologyResultCommandSchema;
+}
+
+@injectable()
+export class CreateFecalysisResultValidationService extends ValidationService<unknown, CreateFecalysisResultCommand> {
+  protected schema = CreateFecalysisResultCommandSchema;
+}
+
+@injectable()
+export class UpdateFecalysisResultValidationService extends ValidationService<unknown, UpdateFecalysisResultCommand> {
+  protected schema = UpdateFecalysisResultCommandSchema;
+}
+
+@injectable()
+export class CreateSerologyResultValidationService extends ValidationService<unknown, CreateSerologyResultCommand> {
+  protected schema = CreateSerologyResultCommandSchema;
+}
+
+@injectable()
+export class UpdateSerologyResultValidationService extends ValidationService<unknown, UpdateSerologyResultCommand> {
+  protected schema = UpdateSerologyResultCommandSchema;
+}
+
 // Composite facade service combining all validations following TodoValidationService pattern
 @injectable()
 export class LaboratoryValidationService {
@@ -66,7 +123,15 @@ export class LaboratoryValidationService {
     @inject(TOKENS.UpdateLabRequestResultsValidationService) private readonly updateLabRequestResultsValidator: UpdateLabRequestResultsValidationService,
     @inject(TOKENS.CreateBloodChemistryValidationService) private readonly createBloodChemistryValidator: CreateBloodChemistryValidationService,
     @inject(TOKENS.UpdateBloodChemistryValidationService) private readonly updateBloodChemistryValidator: UpdateBloodChemistryValidationService,
-    @inject(TOKENS.DeleteBloodChemistryValidationService) private readonly deleteBloodChemistryValidator: DeleteBloodChemistryValidationService
+    @inject(TOKENS.DeleteBloodChemistryValidationService) private readonly deleteBloodChemistryValidator: DeleteBloodChemistryValidationService,
+    @inject(TOKENS.CreateUrinalysisResultValidationService) private readonly createUrinalysisResultValidator: CreateUrinalysisResultValidationService,
+    @inject(TOKENS.UpdateUrinalysisResultValidationService) private readonly updateUrinalysisResultValidator: UpdateUrinalysisResultValidationService,
+    @inject(TOKENS.CreateHematologyResultValidationService) private readonly createHematologyResultValidator: CreateHematologyResultValidationService,
+    @inject(TOKENS.UpdateHematologyResultValidationService) private readonly updateHematologyResultValidator: UpdateHematologyResultValidationService,
+    @inject(TOKENS.CreateFecalysisResultValidationService) private readonly createFecalysisResultValidator: CreateFecalysisResultValidationService,
+    @inject(TOKENS.UpdateFecalysisResultValidationService) private readonly updateFecalysisResultValidator: UpdateFecalysisResultValidationService,
+    @inject(TOKENS.CreateSerologyResultValidationService) private readonly createSerologyResultValidator: CreateSerologyResultValidationService,
+    @inject(TOKENS.UpdateSerologyResultValidationService) private readonly updateSerologyResultValidator: UpdateSerologyResultValidationService
   ) {}
 
   // Lab Request validation methods
@@ -106,6 +171,39 @@ export class LaboratoryValidationService {
 
   validateBloodChemistryId(id: unknown): string {
     return BloodChemistryIdSchema.parse(id);
+  }
+
+  // Specialized Results validation methods
+  validateCreateUrinalysisResultCommand(data: unknown): CreateUrinalysisResultCommand {
+    return this.createUrinalysisResultValidator.validate(data);
+  }
+
+  validateUpdateUrinalysisResultCommand(data: unknown): UpdateUrinalysisResultCommand {
+    return this.updateUrinalysisResultValidator.validate(data);
+  }
+
+  validateCreateHematologyResultCommand(data: unknown): CreateHematologyResultCommand {
+    return this.createHematologyResultValidator.validate(data);
+  }
+
+  validateUpdateHematologyResultCommand(data: unknown): UpdateHematologyResultCommand {
+    return this.updateHematologyResultValidator.validate(data);
+  }
+
+  validateCreateFecalysisResultCommand(data: unknown): CreateFecalysisResultCommand {
+    return this.createFecalysisResultValidator.validate(data);
+  }
+
+  validateUpdateFecalysisResultCommand(data: unknown): UpdateFecalysisResultCommand {
+    return this.updateFecalysisResultValidator.validate(data);
+  }
+
+  validateCreateSerologyResultCommand(data: unknown): CreateSerologyResultCommand {
+    return this.createSerologyResultValidator.validate(data);
+  }
+
+  validateUpdateSerologyResultCommand(data: unknown): UpdateSerologyResultCommand {
+    return this.updateSerologyResultValidator.validate(data);
   }
 
   // Safe validation methods (non-throwing)

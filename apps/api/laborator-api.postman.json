@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "lab1a2b3-c4d5-6789-efgh-ijkl123456789",
     "name": "Laboratory API",
-    "description": "Laboratory management endpoints for healthcare clinic\n\n## Laboratory Management Architecture\nThe API manages laboratory requests and blood chemistry results with comprehensive business logic:\n\n**Laboratory Request Information:**\n- `id`: Unique lab request identifier\n- `patient`: Patient information object\n  - `id`: Patient identifier (string)\n  - `name`: Full patient name\n  - `ageGender`: Combined age and gender (e.g., '25 M', '30 F')\n- `requestDate`: Date of lab request in ISO format\n- `status`: Request status ('pending', 'complete', 'cancelled')\n- `dateTaken`: Date when samples were taken (optional)\n- `others`: Additional notes/remarks\n- `selectedTests`: Array of selected test names\n- `createdAt`: Creation timestamp\n- `updatedAt`: Last update timestamp\n\n**Available Laboratory Tests:**\n\n**Basic Tests:**\n- CBC with Platelet Count\n- Pregnancy Test\n- Urinalysis\n- Fecalysis\n- Occult Blood Test\n\n**Hepatitis Tests:**\n- Hepatitis B Screening\n- Hepatitis A Screening\n- Hepatitis Profile\n\n**STD Tests:**\n- VDRL/RPR (Syphilis screening)\n\n**Other Tests:**\n- Dengue NS1\n- CA 125 / CEA / PSA (Cancer markers)\n\n**Blood Chemistry Tests:**\n- FBS (Fasting Blood Sugar)\n- BUN (Blood Urea Nitrogen)\n- Creatinine\n- Blood Uric Acid\n- Lipid Profile\n- SGOT/SGPT (Liver enzymes)\n- ALP (Alkaline Phosphatase)\n- Sodium (Na)\n- Potassium (K+)\n- HBA1C (Glycated Hemoglobin)\n\n**Thyroid Function Tests:**\n- T3, T4, FT3, FT4, TSH\n\n**Other Diagnostic Tests:**\n- ECG (Electrocardiogram)\n\n**Blood Chemistry Results:**\nSeparate entity for detailed blood chemistry with numeric values:\n- `patient`: Patient information object\n  - `name`: Patient name\n  - `age`: Numeric age\n  - `sex`: Gender ('M', 'F', 'Male', 'Female')\n- `dateTaken`: Sample collection date\n- `results`: Object containing all numeric test results\n- `hasAbnormalValues`: Boolean flag for abnormal results\n- `criticalValues`: Array of critical value alerts\n\n**Business Rules Implemented:**\n- **Test Selection**: At least one test must be selected\n- **Status Transitions**: pending → complete/cancelled\n- **Date Validation**: Request dates cannot be in future\n- **Results Validation**: Numeric ranges for blood chemistry values\n- **Critical Value Alerts**: Automatic flagging of dangerous values\n\n**Laboratory Status Flow:**\n1. **pending**: Initial status when request is created\n2. **complete**: All tests completed and results available\n3. **cancelled**: Request cancelled before completion\n\n**API Response Structure:**\nAll responses follow consistent format:\n- `success`: Boolean indicating operation success\n- `data`: Response data (lab request/result object or array)\n- `message`: Success/error message for operations\n\n**Query Capabilities:**\n- Get all lab requests\n- Get completed requests only\n- Get requests by patient ID\n- Filter by date range\n- Update test results\n- Create blood chemistry records\n\n**Test Result Formats:**\nThe API accepts various result formats:\n- **Qualitative**: 'Positive', 'Negative', 'Normal', 'Abnormal'\n- **Quantitative**: Numeric values with units\n- **Descriptive**: Free text descriptions\n\n**Critical Value Management:**\nAutomatic detection and alerting for:\n- FBS > 200 mg/dL (critical high glucose)\n- Creatinine > 3.0 mg/dL (kidney function)\n- SGOT/SGPT > 100 U/L (liver function)\n- BUN > 50 mg/dL (kidney function)\n\n**Integration with Other APIs:**\nLaboratory API integrates with:\n- **Patient API**: Validates patient information\n- **Doctor API**: Associates requests with ordering physicians\n- **Appointment API**: Links lab requests to patient visits",
+    "description": "Laboratory management endpoints for healthcare clinic\n\n## Laboratory Management Architecture\nThe API manages comprehensive laboratory operations including lab requests and detailed test results with business logic:\n\n**Laboratory Request Information:**\n- `id`: Unique lab request identifier\n- `patient`: Patient information object\n  - `id`: Patient identifier (string)\n  - `name`: Full patient name\n  - `ageGender`: Combined age and gender (e.g., '25 M', '30 F')\n- `requestDate`: Date of lab request in ISO format\n- `status`: Request status ('pending', 'complete', 'cancelled')\n- `dateTaken`: Date when samples were taken (optional)\n- `others`: Additional notes/remarks\n- `selectedTests`: Array of selected test names\n- `createdAt`: Creation timestamp\n- `updatedAt`: Last update timestamp\n\n**Laboratory Test Results Management:**\nThe API supports full CRUD operations for specialized test results:\n\n**Urinalysis Results:**\n- Complete urinalysis parameters (color, transparency, specific gravity, pH)\n- Chemical examination (protein, glucose, ketones)\n- Microscopic examination (cells, crystals, bacteria)\n- Pregnancy test results when applicable\n\n**Hematology Results:**\n- Complete Blood Count (CBC) parameters\n- Hemoglobin, Hematocrit, RBC, WBC, Platelet counts\n- Differential count (neutrophils, lymphocytes, monocytes, eosinophils)\n- Red cell indices (MCV, MCH, MCHC)\n- ESR (Erythrocyte Sedimentation Rate)\n\n**Fecalysis Results:**\n- Macroscopic examination (color, consistency)\n- Microscopic examination (RBC, WBC counts)\n- Occult blood testing\n- Parasitology examination\n\n**Serology Results:**\n- Hepatitis markers (HBsAg, Anti-HCV)\n- STD screening (VDRL, RPR, HIV)\n- Dengue testing (NS1, Tourniquet test)\n- Blood typing (ABO, Rh factor)\n- Other immunological tests\n\n**Available Laboratory Tests:**\n\n**Basic Tests:**\n- CBC with Platelet Count\n- Pregnancy Test\n- Urinalysis\n- Fecalysis\n- Occult Blood Test\n\n**Hepatitis Tests:**\n- Hepatitis B Screening\n- Hepatitis A Screening\n- Hepatitis Profile\n\n**STD Tests:**\n- VDRL/RPR (Syphilis screening)\n\n**Other Tests:**\n- Dengue NS1\n- CA 125 / CEA / PSA (Cancer markers)\n\n**Blood Chemistry Tests:**\n- FBS (Fasting Blood Sugar)\n- BUN (Blood Urea Nitrogen)\n- Creatinine\n- Blood Uric Acid\n- Lipid Profile\n- SGOT/SGPT (Liver enzymes)\n- ALP (Alkaline Phosphatase)\n- Sodium (Na)\n- Potassium (K+)\n- HBA1C (Glycated Hemoglobin)\n\n**Thyroid Function Tests:**\n- T3, T4, FT3, FT4, TSH\n\n**Other Diagnostic Tests:**\n- ECG (Electrocardiogram)\n\n**Blood Chemistry Results:**\nSeparate entity for detailed blood chemistry with numeric values:\n- `patient`: Patient information object\n  - `name`: Patient name\n  - `age`: Numeric age\n  - `sex`: Gender ('M', 'F', 'Male', 'Female')\n- `dateTaken`: Sample collection date\n- `results`: Object containing all numeric test results\n- `hasAbnormalValues`: Boolean flag for abnormal results\n- `criticalValues`: Array of critical value alerts\n\n**Business Rules Implemented:**\n- **Test Selection**: At least one test must be selected\n- **Status Transitions**: pending → complete/cancelled\n- **Date Validation**: Request dates cannot be in future\n- **Results Validation**: Numeric ranges for blood chemistry values\n- **Critical Value Alerts**: Automatic flagging of dangerous values\n- **Result Management**: Full CRUD for all test result types\n\n**Laboratory Status Flow:**\n1. **pending**: Initial status when request is created\n2. **complete**: All tests completed and results available\n3. **cancelled**: Request cancelled before completion\n\n**API Response Structure:**\nAll responses follow consistent format:\n- `success`: Boolean indicating operation success\n- `data`: Response data (lab request/result object or array)\n- `message`: Success/error message for operations\n\n**Query Capabilities:**\n- Get all lab requests\n- Get completed requests only\n- Get requests by patient ID\n- Get formatted lab tests by patient\n- Filter by date range\n- Update test results\n- Create blood chemistry records\n- Full CRUD operations for all result types:\n  - Urinalysis results\n  - Hematology results\n  - Fecalysis results\n  - Serology results\n\n**Test Result Formats:**\nThe API accepts various result formats:\n- **Qualitative**: 'Positive', 'Negative', 'Normal', 'Abnormal'\n- **Quantitative**: Numeric values with units\n- **Descriptive**: Free text descriptions\n\n**Critical Value Management:**\nAutomatic detection and alerting for:\n- FBS > 200 mg/dL (critical high glucose)\n- Creatinine > 3.0 mg/dL (kidney function)\n- SGOT/SGPT > 100 U/L (liver function)\n- BUN > 50 mg/dL (kidney function)\n\n**Integration with Other APIs:**\nLaboratory API integrates with:\n- **Patient API**: Validates patient information\n- **Doctor API**: Associates requests with ordering physicians\n- **Appointment API**: Links lab requests to patient visits",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "version": {
       "major": 1,
@@ -206,6 +206,70 @@
           ]
         },
         {
+          "name": "Get Lab Tests by Patient ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/lab-tests/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "lab-tests", "{{patient_id}}"]
+            },
+            "description": "Get formatted lab tests for a specific patient\n\n**Path Parameters:**\n- `patient_id`: Patient identifier (string)\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"1\",\n      \"patientId\": \"PAT001\",\n      \"testName\": \"CBC with Platelet\",\n      \"requestDate\": \"2025-08-03T08:00:00.000Z\",\n      \"status\": \"pending\",\n      \"result\": null\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Patient test history\n- Lab test overview\n- Results tracking\n- Test status monitoring"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/lab-tests/PAT001",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "laboratory", "lab-tests", "PAT001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": []\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is successful', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains data array', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Create Lab Request",
           "request": {
             "method": "POST",
@@ -217,7 +281,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"ageGender\": \"35 M\",\n  \"requestDate\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbcWithPlatelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipidProfile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
+              "raw": "{\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"ageGender\": \"35 M\",\n  \"requestDate\": \"2025-08-06T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbcWithPlatelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipidProfile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/laboratory/lab-requests",
@@ -239,7 +303,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"ageGender\": \"35 M\",\n  \"requestDate\": \"2025-08-03T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbcWithPlatelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipidProfile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
+                  "raw": "{\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"ageGender\": \"35 M\",\n  \"requestDate\": \"2025-08-06T08:00:00.000Z\",\n  \"others\": \"Routine annual checkup\",\n  \"cbcWithPlatelet\": \"requested\",\n  \"fbs\": \"requested\",\n  \"lipidProfile\": \"requested\",\n  \"urinalysis\": \"requested\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/laboratory/lab-requests",
@@ -249,7 +313,7 @@
               },
               "status": "Created",
               "code": 201,
-              "body": "{\n  \"success\": true,\n  \"message\": \"Laboratory request created successfully\",\n  \"data\": {\n    \"id\": \"1\",\n    \"patient_id\": \"PAT001\",\n    \"patient_name\": \"Juan Dela Cruz\",\n    \"status\": \"pending\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"d48b6255f38c4a238eff0f8db6e29377\",\n    \"patient\": {\n      \"id\": \"PAT001\",\n      \"name\": \"Juan Dela Cruz\",\n      \"ageGender\": \"35 M\"\n    },\n    \"requestDate\": \"2025-08-06T08:00:00.000Z\",\n    \"status\": \"pending\",\n    \"others\": \"Routine annual checkup\",\n    \"selectedTests\": [\"CBC with Platelet\", \"Urinalysis\", \"FBS\", \"Lipid Profile\"],\n    \"createdAt\": \"2025-08-06T14:03:17.919Z\",\n    \"updatedAt\": \"2025-08-06T14:03:17.941Z\"\n  }\n}"
             }
           ],
           "event": [
@@ -377,7 +441,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patientName\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"dateTaken\": \"2025-08-03T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uricAcid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
+              "raw": "{\n  \"patientName\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"dateTaken\": \"2025-08-06T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uricAcid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/laboratory/blood-chemistry",
@@ -399,7 +463,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"patient_name\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"date_taken\": \"2025-08-03T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uric_acid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
+                  "raw": "{\n  \"patientName\": \"Maria Santos\",\n  \"age\": 28,\n  \"sex\": \"F\",\n  \"dateTaken\": \"2025-08-06T09:00:00.000Z\",\n  \"fbs\": 92,\n  \"bun\": 15,\n  \"creatinine\": 0.9,\n  \"uricAcid\": 4.2,\n  \"cholesterol\": 185,\n  \"triglycerides\": 120,\n  \"hdl\": 55,\n  \"ldl\": 110,\n  \"sgot\": 25,\n  \"sgpt\": 22,\n  \"sodium\": 140,\n  \"potassium\": 4.0,\n  \"hbalc\": 5.2\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/laboratory/blood-chemistry",
@@ -409,7 +473,7 @@
               },
               "status": "Created",
               "code": 201,
-              "body": "{\n  \"success\": true,\n  \"message\": \"Blood chemistry record created successfully\",\n  \"data\": {\n    \"id\": \"1\",\n    \"patient_name\": \"Maria Santos\",\n    \"has_abnormal_values\": false,\n    \"critical_values\": []\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"c90ee132739045aa9adb142407fbc681\",\n    \"patient\": {\n      \"name\": \"Maria Santos\",\n      \"age\": 28,\n      \"sex\": \"F\"\n    },\n    \"dateTaken\": \"2025-08-06T09:00:00.000Z\",\n    \"results\": {\n      \"fbs\": 92,\n      \"bun\": 15,\n      \"creatinine\": 0.9,\n      \"uricAcid\": 4.2,\n      \"cholesterol\": 185,\n      \"triglycerides\": 120,\n      \"hdl\": 55,\n      \"ldl\": 110,\n      \"sgot\": 25,\n      \"sgpt\": 22,\n      \"sodium\": 140,\n      \"potassium\": 4.0,\n      \"hbalc\": 5.2\n    },\n    \"hasAbnormalValues\": false,\n    \"criticalValues\": [],\n    \"createdAt\": \"2025-08-06T14:03:29.313Z\",\n    \"updatedAt\": \"2025-08-06T14:03:29.324Z\"\n  }\n}"
             }
           ],
           "event": [
@@ -444,6 +508,466 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "🧪 Urinalysis Results",
+      "item": [
+        {
+          "name": "Get All Urinalysis Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/urinalysis-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "urinalysis-results"]
+            }
+          }
+        },
+        {
+          "name": "Get Urinalysis Result by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/urinalysis-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "urinalysis-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Urinalysis Results by Patient ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/urinalysis-results/patient/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "urinalysis-results", "patient", "{{patient_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Urinalysis Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"labRequestId\": \"REQ001\",\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"age\": \"35\",\n  \"sex\": \"M\",\n  \"dateTaken\": \"2025-08-06T08:00:00.000Z\",\n  \"color\": \"Yellow\",\n  \"transparency\": \"Clear\",\n  \"specificGravity\": \"1.020\",\n  \"ph\": \"6.0\",\n  \"protein\": \"Negative\",\n  \"glucose\": \"Negative\",\n  \"epithelialCells\": \"Few\",\n  \"redCells\": \"0-2/hpf\",\n  \"pusCells\": \"0-3/hpf\",\n  \"mucusThread\": \"Few\",\n  \"pregnancyTest\": \"N/A\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/urinalysis-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "urinalysis-results"]
+            }
+          }
+        },
+        {
+          "name": "Update Urinalysis Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"color\": \"Pale Yellow\",\n  \"transparency\": \"Slightly Cloudy\",\n  \"protein\": \"Trace\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/urinalysis-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "urinalysis-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Urinalysis Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/urinalysis-results/{{result_id}}/delete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "urinalysis-results", "{{result_id}}", "delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🩸 Hematology Results",
+      "item": [
+        {
+          "name": "Get All Hematology Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/hematology-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "hematology-results"]
+            }
+          }
+        },
+        {
+          "name": "Get Hematology Result by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/hematology-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "hematology-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Hematology Results by Patient ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/hematology-results/patient/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "hematology-results", "patient", "{{patient_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Hematology Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"labRequestId\": \"REQ001\",\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"age\": \"35\",\n  \"sex\": \"M\",\n  \"dateTaken\": \"2025-08-06T08:00:00.000Z\",\n  \"hemoglobin\": \"14.5\",\n  \"hematocrit\": \"42.0\",\n  \"rbc\": \"4.8\",\n  \"wbc\": \"7500\",\n  \"plateletCount\": \"250000\",\n  \"neutrophils\": \"65\",\n  \"lymphocytes\": \"30\",\n  \"monocytes\": \"4\",\n  \"eosinophils\": \"1\",\n  \"basophils\": \"0\",\n  \"mcv\": \"85\",\n  \"mch\": \"30\",\n  \"mchc\": \"34\",\n  \"esr\": \"15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/hematology-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "hematology-results"]
+            }
+          }
+        },
+        {
+          "name": "Update Hematology Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hemoglobin\": \"15.0\",\n  \"hematocrit\": \"43.5\",\n  \"basophils\": \"1\",\n  \"esr\": \"12\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/hematology-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "hematology-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Hematology Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/hematology-results/{{result_id}}/delete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "hematology-results", "{{result_id}}", "delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🦠 Fecalysis Results",
+      "item": [
+        {
+          "name": "Get All Fecalysis Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/fecalysis-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "fecalysis-results"]
+            }
+          }
+        },
+        {
+          "name": "Get Fecalysis Result by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/fecalysis-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "fecalysis-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Fecalysis Results by Patient ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/fecalysis-results/patient/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "fecalysis-results", "patient", "{{patient_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Fecalysis Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"labRequestId\": \"REQ001\",\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"age\": \"35\",\n  \"sex\": \"M\",\n  \"dateTaken\": \"2025-08-06T08:00:00.000Z\",\n  \"color\": \"Brown\",\n  \"consistency\": \"Formed\",\n  \"rbc\": \"0-1/hpf\",\n  \"wbc\": \"0-2/hpf\",\n  \"occultBlood\": \"Negative\",\n  \"urobilinogen\": \"Normal\",\n  \"others\": \"No ova or parasites seen\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/fecalysis-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "fecalysis-results"]
+            }
+          }
+        },
+        {
+          "name": "Update Fecalysis Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consistency\": \"Soft\",\n  \"occultBlood\": \"Trace\",\n  \"urobilinogen\": \"Elevated\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/fecalysis-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "fecalysis-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Fecalysis Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/fecalysis-results/{{result_id}}/delete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "fecalysis-results", "{{result_id}}", "delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔬 Serology Results",
+      "item": [
+        {
+          "name": "Get All Serology Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/serology-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "serology-results"]
+            }
+          }
+        },
+        {
+          "name": "Get Serology Result by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/serology-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "serology-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Serology Results by Patient ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/serology-results/patient/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "serology-results", "patient", "{{patient_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Serology Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"labRequestId\": \"REQ001\",\n  \"patientId\": \"PAT001\",\n  \"patientName\": \"Juan Dela Cruz\",\n  \"age\": \"35\",\n  \"sex\": \"M\",\n  \"dateTaken\": \"2025-08-06T08:00:00.000Z\",\n  \"vdrl\": \"Non-Reactive\",\n  \"rpr\": \"Non-Reactive\",\n  \"hbsag\": \"Non-Reactive\",\n  \"antiHcv\": \"Non-Reactive\",\n  \"hivTest\": \"Non-Reactive\",\n  \"pregnancyTest\": \"Non-Reactive\",\n  \"dengueNs1\": \"Non-Reactive\",\n  \"dengueTourniquet\": \"Negative\",\n  \"weilFelix\": \"Non-Reactive\",\n  \"typhidot\": \"Non-Reactive\",\n  \"bloodType\": \"O\",\n  \"rhFactor\": \"Positive\",\n  \"others\": \"All results within normal limits\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/serology-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "serology-results"]
+            }
+          }
+        },
+        {
+          "name": "Update Serology Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hbsag\": \"Reactive\",\n  \"pregnancyTest\": \"Positive\",\n  \"others\": \"Follow-up recommended\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/serology-results/{{result_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "serology-results", "{{result_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Serology Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/laboratory/serology-results/{{result_id}}/delete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "laboratory", "serology-results", "{{result_id}}", "delete"]
+            }
+          }
         }
       ]
     },

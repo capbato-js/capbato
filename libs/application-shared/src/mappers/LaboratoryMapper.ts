@@ -47,7 +47,7 @@ export class LaboratoryMapper {
       },
       requestDate: labRequest.requestDate.toISOString(),
       status: labRequest.status.value,
-      dateTaken: labRequest.dateTaken?.toISOString(),
+      dateTaken: labRequest.dateTaken ? (labRequest.dateTaken instanceof Date ? labRequest.dateTaken.toISOString() : new Date(labRequest.dateTaken).toISOString()) : undefined,
       others: labRequest.others,
       selectedTests: labRequest.tests.getSelectedTests(),
       createdAt: labRequest.createdAt.toISOString(),
@@ -248,7 +248,7 @@ export class LaboratoryMapper {
         age: bloodChemistry.patientInfo.age,
         sex: bloodChemistry.patientInfo.sex,
       },
-      dateTaken: bloodChemistry.dateTaken.toISOString(),
+      dateTaken: bloodChemistry.dateTaken instanceof Date ? bloodChemistry.dateTaken.toISOString() : new Date(bloodChemistry.dateTaken).toISOString(),
       results: bloodChemistry.results.results as Record<string, number | undefined>,
       hasAbnormalValues: bloodChemistry.hasAbnormalResults(),
       criticalValues: bloodChemistry.results.getCriticalValues(),
@@ -655,5 +655,148 @@ export class LaboratoryMapper {
       rhFactor: command.rhFactor,
       others: command.others,
     });
+  }
+
+  // ==================== DTO CONVERSION METHODS ====================
+
+  /**
+   * Convert UrinalysisResult domain entity to DTO
+   */
+  static toUrinalysisResultDto(result: UrinalysisResult): any {
+    return {
+      id: result.id?.value,
+      labRequestId: result.labRequestId?.value,
+      patientId: result.patientId,
+      patientName: result.patientName,
+      dateTaken: result.dateTaken ? (result.dateTaken instanceof Date ? result.dateTaken.toISOString() : new Date(result.dateTaken).toISOString()) : undefined,
+      age: result.age,
+      sex: result.sex,
+      color: result.color,
+      transparency: result.transparency,
+      specificGravity: result.specificGravity,
+      protein: result.protein,
+      glucose: result.glucose,
+      rbc: result.rbc,
+      wbc: result.wbc,
+      epithelialCells: result.epithelialCells,
+      bacteria: result.bacteria,
+      amorphous: result.amorphous,
+      others: result.others,
+      createdAt: result.createdAt?.toISOString(),
+      updatedAt: result.updatedAt?.toISOString(),
+    };
+  }
+
+  /**
+   * Convert array of UrinalysisResult domain entities to DTOs
+   */
+  static toUrinalysisResultDtoArray(results: UrinalysisResult[]): any[] {
+    return results.map(result => this.toUrinalysisResultDto(result));
+  }
+
+  /**
+   * Convert HematologyResult domain entity to DTO
+   */
+  static toHematologyResultDto(result: HematologyResult): any {
+    return {
+      id: result.id?.value,
+      labRequestId: result.labRequestId?.value,
+      patientId: result.patientId,
+      patientName: result.patientName,
+      dateTaken: result.dateTaken ? (result.dateTaken instanceof Date ? result.dateTaken.toISOString() : new Date(result.dateTaken).toISOString()) : undefined,
+      age: result.age,
+      sex: result.sex,
+      hemoglobin: result.hemoglobin,
+      hematocrit: result.hematocrit,
+      rbc: result.rbc,
+      wbc: result.wbc,
+      plateletCount: result.plateletCount,
+      neutrophils: result.neutrophils,
+      lymphocytes: result.lymphocytes,
+      monocytes: result.monocytes,
+      eosinophils: result.eosinophils,
+      basophils: result.basophils,
+      mcv: result.mcv,
+      mch: result.mch,
+      mchc: result.mchc,
+      esr: result.esr,
+      createdAt: result.createdAt?.toISOString(),
+      updatedAt: result.updatedAt?.toISOString(),
+    };
+  }
+
+  /**
+   * Convert array of HematologyResult domain entities to DTOs
+   */
+  static toHematologyResultDtoArray(results: HematologyResult[]): any[] {
+    return results.map(result => this.toHematologyResultDto(result));
+  }
+
+  /**
+   * Convert FecalysisResult domain entity to DTO
+   */
+  static toFecalysisResultDto(result: FecalysisResult): any {
+    return {
+      id: result.id?.value,
+      labRequestId: result.labRequestId?.value,
+      patientId: result.patientId,
+      patientName: result.patientName,
+      dateTaken: result.dateTaken ? (result.dateTaken instanceof Date ? result.dateTaken.toISOString() : new Date(result.dateTaken).toISOString()) : undefined,
+      age: result.age,
+      sex: result.sex,
+      color: result.color,
+      consistency: result.consistency,
+      rbc: result.rbc,
+      wbc: result.wbc,
+      occultBlood: result.occultBlood,
+      urobilinogen: result.urobilinogen,
+      others: result.others,
+      createdAt: result.createdAt?.toISOString(),
+      updatedAt: result.updatedAt?.toISOString(),
+    };
+  }
+
+  /**
+   * Convert array of FecalysisResult domain entities to DTOs
+   */
+  static toFecalysisResultDtoArray(results: FecalysisResult[]): any[] {
+    return results.map(result => this.toFecalysisResultDto(result));
+  }
+
+  /**
+   * Convert SerologyResult domain entity to DTO
+   */
+  static toSerologyResultDto(result: SerologyResult): any {
+    return {
+      id: result.id?.value,
+      labRequestId: result.labRequestId?.value,
+      patientId: result.patientId,
+      patientName: result.patientName,
+      dateTaken: result.dateTaken ? (result.dateTaken instanceof Date ? result.dateTaken.toISOString() : new Date(result.dateTaken).toISOString()) : undefined,
+      age: result.age,
+      sex: result.sex,
+      vdrl: result.vdrl,
+      rpr: result.rpr,
+      hbsag: result.hbsag,
+      antiHcv: result.antiHcv,
+      hivTest: result.hivTest,
+      pregnancyTest: result.pregnancyTest,
+      dengueNs1: result.dengueNs1,
+      dengueTourniquet: result.dengueTourniquet,
+      weilFelix: result.weilFelix,
+      typhidot: result.typhidot,
+      bloodType: result.bloodType,
+      rhFactor: result.rhFactor,
+      others: result.others,
+      createdAt: result.createdAt?.toISOString(),
+      updatedAt: result.updatedAt?.toISOString(),
+    };
+  }
+
+  /**
+   * Convert array of SerologyResult domain entities to DTOs
+   */
+  static toSerologyResultDtoArray(results: SerologyResult[]): any[] {
+    return results.map(result => this.toSerologyResultDto(result));
   }
 }
