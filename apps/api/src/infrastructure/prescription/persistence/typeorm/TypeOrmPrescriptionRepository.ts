@@ -34,9 +34,13 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
       medicationName: prescription.medicationNameValue,
       dosage: prescription.dosageValue,
       instructions: prescription.instructionsValue,
+      frequency: prescription.frequency,
+      duration: prescription.duration,
       prescribedDate: prescription.prescribedDate,
       expiryDate: prescription.expiryDate,
-      isActive: prescription.isActive,
+      quantity: prescription.quantity,
+      additionalNotes: prescription.additionalNotes,
+      status: prescription.status,
       createdAt: prescription.createdAt,
     });
 
@@ -68,8 +72,24 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
       updateData.expiryDate = changes.expiryDate;
     }
 
-    if (changes.isActive !== undefined) {
-      updateData.isActive = changes.isActive;
+    if (changes.frequency) {
+      updateData.frequency = changes.frequency;
+    }
+
+    if (changes.duration) {
+      updateData.duration = changes.duration;
+    }
+
+    if (changes.quantity !== undefined) {
+      updateData.quantity = changes.quantity;
+    }
+
+    if (changes.additionalNotes !== undefined) {
+      updateData.additionalNotes = changes.additionalNotes;
+    }
+
+    if (changes.status !== undefined) {
+      updateData.status = changes.status;
     }
 
     await this.repository.update(id, updateData);
@@ -105,7 +125,15 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
 
   async getActive(): Promise<Prescription[]> {
     const entities = await this.repository.find({
-      where: { isActive: true },
+      where: { status: 'active' },
+      order: { createdAt: 'DESC' },
+    });
+    return entities.map(this.toDomain);
+  }
+
+  async getByStatus(status: 'active' | 'completed' | 'discontinued' | 'on-hold'): Promise<Prescription[]> {
+    const entities = await this.repository.find({
+      where: { status },
       order: { createdAt: 'DESC' },
     });
     return entities.map(this.toDomain);
@@ -140,9 +168,13 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
       medicationName: entity.medicationName,
       dosage: entity.dosage,
       instructions: entity.instructions,
+      frequency: entity.frequency,
+      duration: entity.duration,
       prescribedDate: entity.prescribedDate,
       expiryDate: entity.expiryDate,
-      isActive: entity.isActive,
+      quantity: entity.quantity,
+      additionalNotes: entity.additionalNotes,
+      status: entity.status,
       createdAt: entity.createdAt,
     });
   }

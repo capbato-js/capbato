@@ -7,10 +7,10 @@ import {
 } from 'typeorm';
 
 @Entity('prescriptions')
-@Index(['patientId', 'isActive'])
-@Index(['doctorId', 'isActive'])
+@Index(['patientId', 'status'])
+@Index(['doctorId', 'status'])
 @Index(['medicationName'])
-@Index(['expiryDate', 'isActive'])
+@Index(['expiryDate', 'status'])
 export class PrescriptionEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -32,14 +32,26 @@ export class PrescriptionEntity {
   @Column({ type: 'text' })
   instructions!: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  frequency!: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  duration!: string;
+
   @Column({ type: 'datetime', name: 'prescribed_date' })
   prescribedDate!: Date;
 
   @Column({ type: 'datetime', nullable: true, name: 'expiry_date' })
   expiryDate?: Date;
 
-  @Column({ type: 'boolean', default: true, name: 'is_active' })
-  isActive!: boolean;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  quantity?: string;
+
+  @Column({ type: 'text', nullable: true, name: 'additional_notes' })
+  additionalNotes?: string;
+
+  @Column({ type: 'enum', enum: ['active', 'completed', 'discontinued', 'on-hold'], default: 'active' })
+  status!: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

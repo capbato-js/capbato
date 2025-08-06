@@ -267,15 +267,17 @@ export const UpdatePrescriptionFormSchema = AddPrescriptionFormSchema.extend({
 // Create Prescription Command Schema (Backend API)
 export const CreatePrescriptionCommandSchema = z
   .object({
-    patientId: z.string().uuid({
-      message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID,
-    }),
-    doctorId: z.string().uuid({
-      message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID,
-    }),
+    patientId: z.string()
+      .min(1, 'Patient ID is required')
+      .regex(/^[0-9a-fA-F]{32}$/, PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID),
+    doctorId: z.string()
+      .min(1, 'Doctor ID is required')
+      .regex(/^[0-9a-fA-F]{32}$/, PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID),
     medicationName: z.string().superRefine(validateMedicationName),
     dosage: z.string().superRefine(validateDosage),
     instructions: z.string().superRefine(validateInstructions),
+    frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less'),
+    duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less'),
     prescribedDate: z
       .string()
       .datetime({ message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_DATETIME })
@@ -286,7 +288,9 @@ export const CreatePrescriptionCommandSchema = z
       .datetime({ message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_DATETIME })
       .optional()
       .or(z.date().optional()),
-    isActive: z.boolean().optional().default(true),
+    quantity: z.string().max(50, 'Quantity must be 50 characters or less').optional(),
+    additionalNotes: z.string().max(1000, 'Additional notes must be 1000 characters or less').optional(),
+    status: z.enum(['active', 'completed', 'discontinued', 'on-hold']).optional().default('active'),
   })
   .superRefine((data, ctx) => {
     // Custom validation: expiry date must be after prescribed date
@@ -311,12 +315,16 @@ export const UpdatePrescriptionCommandSchema = z
     medicationName: z.string().superRefine(validateMedicationName).optional(),
     dosage: z.string().superRefine(validateDosage).optional(),
     instructions: z.string().superRefine(validateInstructions).optional(),
+    frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less').optional(),
+    duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less').optional(),
     expiryDate: z
       .string()
       .datetime({ message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_DATETIME })
       .optional()
       .or(z.date().optional()),
-    isActive: z.boolean().optional(),
+    quantity: z.string().max(50, 'Quantity must be 50 characters or less').optional(),
+    additionalNotes: z.string().max(1000, 'Additional notes must be 1000 characters or less').optional(),
+    status: z.enum(['active', 'completed', 'discontinued', 'on-hold']).optional(),
   })
   .refine((data) => {
     // At least one field must be provided for update

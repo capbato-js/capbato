@@ -16,9 +16,13 @@ export class PrescriptionMapper {
       medicationName: prescription.medicationName.value,
       dosage: prescription.dosage.value,
       instructions: prescription.instructions.value,
+      frequency: prescription.frequency,
+      duration: prescription.duration,
       prescribedDate: prescription.prescribedDate.toISOString(),
       expiryDate: prescription.expiryDate?.toISOString(),
-      isActive: prescription.isActive,
+      quantity: prescription.quantity,
+      additionalNotes: prescription.additionalNotes,
+      status: prescription.status,
       createdAt: prescription.createdAt.toISOString(),
     };
   }
@@ -40,10 +44,14 @@ export class PrescriptionMapper {
       dto.medicationName,
       dto.dosage,
       dto.instructions,
+      dto.frequency,
+      dto.duration,
       new Date(dto.prescribedDate),
       dto.id || undefined,
       dto.expiryDate ? new Date(dto.expiryDate) : undefined,
-      dto.isActive,
+      dto.quantity,
+      dto.additionalNotes,
+      dto.status,
       new Date(dto.createdAt)
     );
   }
@@ -58,10 +66,14 @@ export class PrescriptionMapper {
       dto.medicationName,
       dto.dosage,
       dto.instructions,
+      dto.frequency,
+      dto.duration,
       dto.prescribedDate ? new Date(dto.prescribedDate) : new Date(),
       undefined,
       dto.expiryDate ? new Date(dto.expiryDate) : undefined,
-      dto.isActive !== undefined ? dto.isActive : true
+      dto.quantity,
+      dto.additionalNotes,
+      dto.status || 'active'
     );
   }
 
@@ -76,9 +88,13 @@ export class PrescriptionMapper {
     medicationName: string;
     dosage: string;
     instructions: string;
+    frequency: string;
+    duration: string;
     prescribedDate: Date;
     expiryDate?: Date;
-    isActive: boolean;
+    quantity?: string;
+    additionalNotes?: string;
+    status: 'active' | 'completed' | 'discontinued' | 'on-hold';
     createdAt: Date;
   }): Prescription {
     return new Prescription(
@@ -87,10 +103,14 @@ export class PrescriptionMapper {
       obj.medicationName,
       obj.dosage,
       obj.instructions,
+      obj.frequency,
+      obj.duration,
       obj.prescribedDate,
       obj.id,
       obj.expiryDate,
-      obj.isActive,
+      obj.quantity,
+      obj.additionalNotes,
+      obj.status,
       obj.createdAt
     );
   }
@@ -108,9 +128,13 @@ export class PrescriptionMapper {
     medicationName: string;
     dosage: string;
     instructions: string;
+    frequency: string;
+    duration: string;
     prescribedDate: Date;
     expiryDate?: Date;
-    isActive: boolean;
+    quantity?: string;
+    additionalNotes?: string;
+    status: 'active' | 'completed' | 'discontinued' | 'on-hold';
     createdAt: Date;
   } {
     return {
@@ -120,9 +144,13 @@ export class PrescriptionMapper {
       medicationName: prescription.medicationName.value,
       dosage: prescription.dosage.value,
       instructions: prescription.instructions.value,
+      frequency: prescription.frequency,
+      duration: prescription.duration,
       prescribedDate: prescription.prescribedDate,
       expiryDate: prescription.expiryDate,
-      isActive: prescription.isActive,
+      quantity: prescription.quantity,
+      additionalNotes: prescription.additionalNotes,
+      status: prescription.status,
       createdAt: prescription.createdAt,
     };
   }

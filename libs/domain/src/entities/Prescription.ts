@@ -14,9 +14,13 @@ interface IPrescription {
   medicationName: MedicationName;
   dosage: Dosage;
   instructions: Instructions;
+  frequency: string;
+  duration: string;
   prescribedDate: Date;
   expiryDate?: Date;
-  isActive: boolean;
+  quantity?: string;
+  additionalNotes?: string;
+  status: 'active' | 'completed' | 'discontinued' | 'on-hold';
   createdAt: Date;
 }
 
@@ -41,7 +45,11 @@ export class Prescription implements IPrescription {
   private readonly _instructions: Instructions;
   private readonly _prescribedDate: Date;
   private readonly _expiryDate?: Date;
-  private readonly _isActive: boolean;
+  private readonly _frequency: string;
+  private readonly _duration: string;
+  private readonly _quantity?: string;
+  private readonly _additionalNotes?: string;
+  private readonly _status: 'active' | 'completed' | 'discontinued' | 'on-hold';
   private readonly _createdAt: Date;
 
   constructor(
@@ -50,13 +58,17 @@ export class Prescription implements IPrescription {
     medicationName: string | MedicationName,
     dosage: string | Dosage,
     instructions: string | Instructions,
+    frequency: string,
+    duration: string,
     prescribedDate: Date = new Date(),
     id?: string | PrescriptionId,
     expiryDate?: Date,
-    isActive = true,
+    quantity?: string,
+    additionalNotes?: string,
+    status: 'active' | 'completed' | 'discontinued' | 'on-hold' = 'active',
     createdAt = new Date()
   ) {
-    this.validateRequiredFields(patientId, doctorId);
+    this.validateRequiredFields(patientId, doctorId, frequency, duration);
     this.validateDates(prescribedDate, expiryDate);
     
     this._patientId = patientId.trim();
@@ -64,9 +76,13 @@ export class Prescription implements IPrescription {
     this._medicationName = medicationName instanceof MedicationName ? medicationName : new MedicationName(medicationName);
     this._dosage = dosage instanceof Dosage ? dosage : new Dosage(dosage);
     this._instructions = instructions instanceof Instructions ? instructions : new Instructions(instructions);
+    this._frequency = frequency.trim();
+    this._duration = duration.trim();
     this._prescribedDate = prescribedDate;
     this._expiryDate = expiryDate;
-    this._isActive = isActive;
+    this._quantity = quantity?.trim();
+    this._additionalNotes = additionalNotes?.trim();
+    this._status = status;
     this._createdAt = createdAt;
     this._id = id instanceof PrescriptionId ? id : id ? new PrescriptionId(id) : undefined;
   }
@@ -103,8 +119,24 @@ export class Prescription implements IPrescription {
     return this._expiryDate;
   }
 
-  get isActive(): boolean {
-    return this._isActive;
+  get frequency(): string {
+    return this._frequency;
+  }
+
+  get duration(): string {
+    return this._duration;
+  }
+
+  get quantity(): string | undefined {
+    return this._quantity;
+  }
+
+  get additionalNotes(): string | undefined {
+    return this._additionalNotes;
+  }
+
+  get status(): 'active' | 'completed' | 'discontinued' | 'on-hold' {
+    return this._status;
   }
 
   get createdAt(): Date {
@@ -150,11 +182,19 @@ export class Prescription implements IPrescription {
   }
 
   activate(): Prescription {
-    return this.createCopy({ isActive: true });
+    return this.createCopy({ status: 'active' });
   }
 
-  deactivate(): Prescription {
-    return this.createCopy({ isActive: false });
+  complete(): Prescription {
+    return this.createCopy({ status: 'completed' });
+  }
+
+  discontinue(): Prescription {
+    return this.createCopy({ status: 'discontinued' });
+  }
+
+  putOnHold(): Prescription {
+    return this.createCopy({ status: 'on-hold' });
   }
 
   /**
@@ -166,7 +206,11 @@ export class Prescription implements IPrescription {
     dosage?: Dosage;
     instructions?: Instructions;
     expiryDate?: Date;
-    isActive?: boolean;
+    frequency?: string;
+    duration?: string;
+    quantity?: string;
+    additionalNotes?: string;
+    status?: 'active' | 'completed' | 'discontinued' | 'on-hold';
   }): Prescription {
     return new Prescription(
       this._patientId,
@@ -174,10 +218,14 @@ export class Prescription implements IPrescription {
       updates.medicationName || this._medicationName,
       updates.dosage || this._dosage,
       updates.instructions || this._instructions,
+      updates.frequency || this._frequency,
+      updates.duration || this._duration,
       this._prescribedDate,
       this._id,
       updates.expiryDate !== undefined ? updates.expiryDate : this._expiryDate,
-      updates.isActive !== undefined ? updates.isActive : this._isActive,
+      updates.quantity !== undefined ? updates.quantity : this._quantity,
+      updates.additionalNotes !== undefined ? updates.additionalNotes : this._additionalNotes,
+      updates.status || this._status,
       this._createdAt
     );
   }
@@ -196,7 +244,7 @@ export class Prescription implements IPrescription {
    * Checks if the prescription is currently valid
    */
   isValid(): boolean {
-    return this._isActive && !this.isExpired();
+    return this._status === 'active' && !this.isExpired();
   }
 
   /**
@@ -234,13 +282,21 @@ export class Prescription implements IPrescription {
     this.validateDates(this._prescribedDate, this._expiryDate);
   }
 
-  private validateRequiredFields(patientId: string, doctorId: string): void {
+  private validateRequiredFields(patientId: string, doctorId: string, frequency: string, duration: string): void {
     if (!patientId || patientId.trim().length === 0) {
       throw new Error('Patient ID is required for Prescription entity');
     }
 
     if (!doctorId || doctorId.trim().length === 0) {
       throw new Error('Doctor ID is required for Prescription entity');
+    }
+
+    if (!frequency || frequency.trim().length === 0) {
+      throw new Error('Frequency is required for Prescription entity');
+    }
+
+    if (!duration || duration.trim().length === 0) {
+      throw new Error('Duration is required for Prescription entity');
     }
   }
 

@@ -35,10 +35,14 @@ export class CreatePrescriptionUseCase {
       medicationName,
       dosage,
       instructions,
+      command.frequency,
+      command.duration,
       prescribedDate,
       undefined, // no ID yet
       expiryDate,
-      command.isActive !== undefined ? command.isActive : true,
+      command.quantity,
+      command.additionalNotes,
+      command.status || 'active',
       new Date() // createdAt
     );
 
@@ -55,10 +59,14 @@ export class CreatePrescriptionUseCase {
       medicationName,
       dosage,
       instructions,
+      prescription.frequency,
+      prescription.duration,
       prescription.prescribedDate,
       id,
       prescription.expiryDate,
-      prescription.isActive,
+      prescription.quantity,
+      prescription.additionalNotes,
+      prescription.status,
       prescription.createdAt
     );
   }

@@ -25,10 +25,14 @@ export class InMemoryPrescriptionRepository implements IPrescriptionRepository {
       prescription.medicationName.value,
       prescription.dosage.value,
       prescription.instructions.value,
+      prescription.frequency,
+      prescription.duration,
       prescription.prescribedDate,
       id,
       prescription.expiryDate,
-      prescription.isActive,
+      prescription.quantity,
+      prescription.additionalNotes,
+      prescription.status,
       prescription.createdAt
     );
 
@@ -67,10 +71,14 @@ export class InMemoryPrescriptionRepository implements IPrescriptionRepository {
             ? (changes.instructions as any).value
             : existingPrescription.instructions.value
         : existingPrescription.instructions.value,
+      (changes as any).frequency !== undefined ? (changes as any).frequency : existingPrescription.frequency,
+      (changes as any).duration !== undefined ? (changes as any).duration : existingPrescription.duration,
       existingPrescription.prescribedDate,
       id,
       changes.expiryDate !== undefined ? changes.expiryDate : existingPrescription.expiryDate,
-      changes.isActive !== undefined ? changes.isActive : existingPrescription.isActive,
+      (changes as any).quantity !== undefined ? (changes as any).quantity : existingPrescription.quantity,
+      (changes as any).additionalNotes !== undefined ? (changes as any).additionalNotes : existingPrescription.additionalNotes,
+      (changes as any).status !== undefined ? (changes as any).status : existingPrescription.status,
       existingPrescription.createdAt
     );
 
@@ -102,7 +110,13 @@ export class InMemoryPrescriptionRepository implements IPrescriptionRepository {
 
   async getActive(): Promise<Prescription[]> {
     return Array.from(this.prescriptions.values())
-      .filter(prescription => prescription.isActive)
+      .filter(prescription => prescription.status === 'active')
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getByStatus(status: 'active' | 'completed' | 'discontinued' | 'on-hold'): Promise<Prescription[]> {
+    return Array.from(this.prescriptions.values())
+      .filter(prescription => prescription.status === status)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
