@@ -9,6 +9,7 @@ export const TOKENS = {
   DoctorApiService: 'IDoctorApiService',
   AddressApiService: 'IAddressApiService',
   LaboratoryApiService: 'ILaboratoryApiService',
+  PrescriptionApiService: 'IPrescriptionApiService',
   
   // Infrastructure Layer - Repositories
   TodoRepository: 'ITodoRepository',
@@ -38,6 +39,8 @@ export const TOKENS = {
   PatientCommandService: 'IPatientCommandService',
   PatientQueryService: 'IPatientQueryService',
   UserQueryService: 'IUserQueryService',
+  PrescriptionCommandService: 'IPrescriptionCommandService',
+  PrescriptionQueryService: 'IPrescriptionQueryService',
   ScheduleWithDoctorService: 'ScheduleWithDoctorService',
 
   // Application Layer - Use Cases (Commands)

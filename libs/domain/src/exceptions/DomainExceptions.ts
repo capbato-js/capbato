@@ -346,6 +346,12 @@ export class PrescriptionNotFoundException extends DomainException {
   }
 }
 
+export class InvalidMedicationIdException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid medication ID: ${reason}`, 'INVALID_MEDICATION_ID');
+  }
+}
+
 export class InvalidMedicationNameException extends DomainException {
   constructor(reason: string) {
     super(`Invalid medication name: ${reason}`, 'INVALID_MEDICATION_NAME');

@@ -55,6 +55,17 @@ export interface ApiConfiguration {
       cities: (provinceCode: string) => string;
       barangays: (cityCode: string) => string;
     };
+    prescriptions: {
+      base: string;
+      all: string;
+      byId: (id: string) => string;
+      active: string;
+      expired: string;
+      stats: string;
+      byPatientId: (patientId: string) => string;
+      byDoctorId: (doctorId: string) => string;
+      byMedicationName: (medicationName: string) => string;
+    };
   };
 }
 

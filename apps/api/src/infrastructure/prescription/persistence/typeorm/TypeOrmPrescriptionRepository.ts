@@ -1,10 +1,10 @@
 import { injectable } from 'tsyringe';
 import { Repository, DataSource } from 'typeorm';
-import { Prescription } from '@nx-starter/domain';
+import { Prescription, Medication } from '@nx-starter/domain';
 import type { IPrescriptionRepository } from '@nx-starter/domain';
 import { PrescriptionEntity } from './PrescriptionEntity';
-import { PrescriptionMapper } from '@nx-starter/application-shared';
-import { generateUUID } from '@nx-starter/utils-core';
+import { MedicationEntity } from './MedicationEntity';
+import { generateId } from '@nx-starter/utils-core';
 
 /**
  * TypeORM implementation of IPrescriptionRepository
@@ -20,22 +20,20 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
 
   async getAll(): Promise<Prescription[]> {
     const entities = await this.repository.find({
+      relations: ['medications'],
       order: { createdAt: 'DESC' },
     });
-    return entities.map(this.toDomain);
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async create(prescription: Prescription): Promise<string> {
-    const id = generateUUID();
-    const entity = this.repository.create({
+    const id = generateId();
+    
+    // Create prescription entity
+    const prescriptionEntity = this.repository.create({
       id,
       patientId: prescription.patientId,
       doctorId: prescription.doctorId,
-      medicationName: prescription.medicationNameValue,
-      dosage: prescription.dosageValue,
-      instructions: prescription.instructionsValue,
-      frequency: prescription.frequency,
-      duration: prescription.duration,
       prescribedDate: prescription.prescribedDate,
       expiryDate: prescription.expiryDate,
       quantity: prescription.quantity,
@@ -44,40 +42,61 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
       createdAt: prescription.createdAt,
     });
 
-    await this.repository.save(entity);
+    // Create medication entities
+    const medicationEntities: MedicationEntity[] = prescription.medications.map(medication => {
+      const medicationEntity = new MedicationEntity();
+      medicationEntity.id = generateId();
+      medicationEntity.prescriptionId = id;
+      medicationEntity.prescription = prescriptionEntity;
+      medicationEntity.medicationName = medication.medicationNameValue;
+      medicationEntity.dosage = medication.dosageValue;
+      medicationEntity.instructions = medication.instructionsValue;
+      medicationEntity.frequency = medication.frequency;
+      medicationEntity.duration = medication.duration;
+      return medicationEntity;
+    });
+
+    prescriptionEntity.medications = medicationEntities;
+
+    await this.repository.save(prescriptionEntity);
     return id;
   }
 
   async update(id: string, changes: Partial<Prescription>): Promise<void> {
-    const entity = await this.repository.findOne({ where: { id } });
+    const entity = await this.repository.findOne({ 
+      where: { id }, 
+      relations: ['medications'] 
+    });
     if (!entity) {
       throw new Error(`Prescription with ID ${id} not found`);
     }
 
     const updateData: Partial<PrescriptionEntity> = {};
 
-    if (changes.medicationName) {
-      updateData.medicationName = changes.medicationName.value;
-    }
+    // Handle medications update
+    if (changes.medications !== undefined) {
+      // Remove existing medications
+      const medicationRepository = this.dataSource.getRepository(MedicationEntity);
+      await medicationRepository.delete({ prescriptionId: id });
 
-    if (changes.dosage) {
-      updateData.dosage = changes.dosage.value;
-    }
+      // Create new medications
+      const newMedicationEntities: MedicationEntity[] = changes.medications.map(medication => {
+        const medicationEntity = new MedicationEntity();
+        medicationEntity.id = generateId();
+        medicationEntity.prescriptionId = id;
+        medicationEntity.medicationName = medication.medicationNameValue;
+        medicationEntity.dosage = medication.dosageValue;
+        medicationEntity.instructions = medication.instructionsValue;
+        medicationEntity.frequency = medication.frequency;
+        medicationEntity.duration = medication.duration;
+        return medicationEntity;
+      });
 
-    if (changes.instructions) {
-      updateData.instructions = changes.instructions.value;
+      entity.medications = newMedicationEntities;
     }
 
     if (changes.expiryDate !== undefined) {
       updateData.expiryDate = changes.expiryDate;
-    }
-
-    if (changes.frequency) {
-      updateData.frequency = changes.frequency;
-    }
-
-    if (changes.duration) {
-      updateData.duration = changes.duration;
     }
 
     if (changes.quantity !== undefined) {
@@ -92,7 +111,13 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
       updateData.status = changes.status;
     }
 
+    // Update prescription entity
     await this.repository.update(id, updateData);
+    
+    // Save medications if they were updated
+    if (changes.medications !== undefined) {
+      await this.repository.save(entity);
+    }
   }
 
   async delete(id: string): Promise<void> {
@@ -103,79 +128,100 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
   }
 
   async getById(id: string): Promise<Prescription | undefined> {
-    const entity = await this.repository.findOne({ where: { id } });
+    const entity = await this.repository.findOne({ 
+      where: { id },
+      relations: ['medications']
+    });
     return entity ? this.toDomain(entity) : undefined;
   }
 
   async getByPatientId(patientId: string): Promise<Prescription[]> {
     const entities = await this.repository.find({
       where: { patientId },
+      relations: ['medications'],
       order: { createdAt: 'DESC' },
     });
-    return entities.map(this.toDomain);
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async getByDoctorId(doctorId: string): Promise<Prescription[]> {
     const entities = await this.repository.find({
       where: { doctorId },
+      relations: ['medications'],
       order: { createdAt: 'DESC' },
     });
-    return entities.map(this.toDomain);
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async getActive(): Promise<Prescription[]> {
     const entities = await this.repository.find({
       where: { status: 'active' },
+      relations: ['medications'],
       order: { createdAt: 'DESC' },
     });
-    return entities.map(this.toDomain);
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async getByStatus(status: 'active' | 'completed' | 'discontinued' | 'on-hold'): Promise<Prescription[]> {
     const entities = await this.repository.find({
       where: { status },
+      relations: ['medications'],
       order: { createdAt: 'DESC' },
     });
-    return entities.map(this.toDomain);
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async getExpired(): Promise<Prescription[]> {
     const currentDate = new Date();
     const entities = await this.repository
       .createQueryBuilder('prescription')
+      .leftJoinAndSelect('prescription.medications', 'medications')
       .where('prescription.expiryDate < :currentDate', { currentDate })
       .orderBy('prescription.createdAt', 'DESC')
       .getMany();
-    return entities.map(this.toDomain);
+    return entities.map(entity => this.toDomain(entity));
   }
 
   async getByMedicationName(medicationName: string): Promise<Prescription[]> {
-    const entities = await this.repository.find({
-      where: { medicationName },
-      order: { createdAt: 'DESC' },
-    });
-    return entities.map(this.toDomain);
+    const entities = await this.repository
+      .createQueryBuilder('prescription')
+      .leftJoinAndSelect('prescription.medications', 'medications')
+      .where('medications.medicationName LIKE :medicationName', { 
+        medicationName: `%${medicationName}%` 
+      })
+      .orderBy('prescription.createdAt', 'DESC')
+      .getMany();
+    return entities.map(entity => this.toDomain(entity));
   }
 
   /**
    * Maps database entity to domain entity
    */
   private toDomain(entity: PrescriptionEntity): Prescription {
-    return PrescriptionMapper.fromPlainObject({
-      id: entity.id,
-      patientId: entity.patientId,
-      doctorId: entity.doctorId,
-      medicationName: entity.medicationName,
-      dosage: entity.dosage,
-      instructions: entity.instructions,
-      frequency: entity.frequency,
-      duration: entity.duration,
-      prescribedDate: entity.prescribedDate,
-      expiryDate: entity.expiryDate,
-      quantity: entity.quantity,
-      additionalNotes: entity.additionalNotes,
-      status: entity.status,
-      createdAt: entity.createdAt,
-    });
+    // Convert medication entities to domain entities
+    const medications: Medication[] = entity.medications?.map(medicationEntity => 
+      new Medication(
+        medicationEntity.prescriptionId,
+        medicationEntity.medicationName,
+        medicationEntity.dosage,
+        medicationEntity.instructions,
+        medicationEntity.frequency,
+        medicationEntity.duration,
+        medicationEntity.id
+      )
+    ) || [];
+
+    return new Prescription(
+      entity.patientId,
+      entity.doctorId,
+      medications,
+      entity.prescribedDate,
+      entity.id,
+      entity.expiryDate,
+      entity.quantity,
+      entity.additionalNotes,
+      entity.status as 'active' | 'completed' | 'discontinued' | 'on-hold',
+      entity.createdAt
+    );
   }
 }

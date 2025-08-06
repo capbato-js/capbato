@@ -9,7 +9,7 @@ export class Instructions {
 
   constructor(value: string) {
     this.validateInstructions(value);
-    this._value = value.trim();
+    this._value = value ? value.trim() : '';
   }
 
   get value(): string {
@@ -17,15 +17,18 @@ export class Instructions {
   }
 
   private validateInstructions(instructions: string): void {
-    if (!instructions || !instructions.trim()) {
-      throw new InvalidInstructionsException('cannot be empty');
+    // Allow empty instructions
+    if (!instructions) {
+      return;
     }
 
-    if (instructions.trim().length > 1000) {
+    const trimmed = instructions.trim();
+    
+    if (trimmed.length > 1000) {
       throw new InvalidInstructionsException('cannot exceed 1000 characters');
     }
 
-    if (instructions.trim().length < 3) {
+    if (trimmed.length > 0 && trimmed.length < 3) {
       throw new InvalidInstructionsException('must be at least 3 characters long');
     }
   }

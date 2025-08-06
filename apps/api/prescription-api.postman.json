@@ -29,7 +29,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "prescriptions"]
             },
-            "description": "Get all prescriptions in the system\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"1\",\n      \"patientId\": \"PAT001\",\n      \"doctorId\": \"DOC001\",\n      \"medicationName\": \"Amoxicillin\",\n      \"dosage\": \"500mg\",\n      \"instructions\": \"Take with food\",\n      \"frequency\": \"Three times daily\",\n      \"duration\": \"7 days\",\n      \"prescribedDate\": \"2025-08-06T08:00:00.000Z\",\n      \"expiryDate\": \"2025-09-06T08:00:00.000Z\",\n      \"quantity\": \"21 tablets\",\n      \"additionalNotes\": \"Complete full course even if feeling better\",\n      \"status\": \"active\",\n      \"createdAt\": \"2025-08-06T08:00:00.000Z\"\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Prescription management dashboard\n- Medication inventory planning\n- Clinical oversight and auditing\n- Patient medication history review"
+            "description": "Get all prescriptions in the system\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"d3a844dc6b124121abe4c7c031e2a540\",\n      \"patientId\": \"57886cdf08174d7f916f02647e4fb963\",\n      \"doctorId\": \"6c8eba4a9e3941ba98c2d956f3395960\",\n      \"medications\": [\n        {\n          \"id\": \"17cfffd59a11477d8b46466d88be9e27\",\n          \"medicationName\": \"Ibuprofen\",\n          \"dosage\": \"200mg\",\n          \"instructions\": \"Take as needed for pain relief\",\n          \"frequency\": \"Every 6 hours\",\n          \"duration\": \"5 days\"\n        },\n        {\n          \"id\": \"53979e79e91d477ca6b885bb7d3ea69e\",\n          \"medicationName\": \"Vitamin D3\",\n          \"dosage\": \"1000 IU\",\n          \"instructions\": \"Take with breakfast\",\n          \"frequency\": \"Once daily\",\n          \"duration\": \"30 days\"\n        }\n      ],\n      \"prescribedDate\": \"2025-01-06T10:00:00.000Z\",\n      \"expiryDate\": \"2025-03-06T10:00:00.000Z\",\n      \"quantity\": \"Total prescribed items\",\n      \"additionalNotes\": \"Multiple medication regimen for comprehensive treatment. Monitor for side effects.\",\n      \"status\": \"active\",\n      \"createdAt\": \"2025-08-06T22:13:50.484Z\",\n      \"patient\": {\n        \"id\": \"57886cdf08174d7f916f02647e4fb963\",\n        \"patientNumber\": \"2025-D1\",\n        \"firstName\": \"Juana\",\n        \"lastName\": \"Del Agua\",\n        \"middleName\": \"Santos\",\n        \"fullName\": \"Juana Santos Del Agua\"\n      },\n      \"doctor\": {\n        \"id\": \"6c8eba4a9e3941ba98c2d956f3395960\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Reyes\",\n        \"fullName\": \"Dr. John Reyes\",\n        \"specialization\": \"General Practice\"\n      }\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Prescription management dashboard\n- Medication inventory planning\n- Clinical oversight and auditing\n- Patient medication history review"
           },
           "response": [
             {
@@ -616,14 +616,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patientId\": \"PAT001\",\n  \"doctorId\": \"DOC001\",\n  \"medicationName\": \"Amoxicillin\",\n  \"dosage\": \"500mg\",\n  \"instructions\": \"Take with food to reduce stomach upset\",\n  \"frequency\": \"Three times daily\",\n  \"duration\": \"7 days\",\n  \"prescribedDate\": \"2025-08-06T08:00:00.000Z\",\n  \"expiryDate\": \"2025-09-06T08:00:00.000Z\",\n  \"quantity\": \"21 tablets\",\n  \"additionalNotes\": \"Complete full course even if feeling better. Contact doctor if allergic reaction occurs.\",\n  \"status\": \"active\"\n}"
+              "raw": "{\n  \"patientId\": \"57886cdf08174d7f916f02647e4fb963\",\n  \"doctorId\": \"6c8eba4a9e3941ba98c2d956f3395960\",\n  \"medications\": [\n    {\n      \"medicationName\": \"Amoxicillin\",\n      \"dosage\": \"500mg\",\n      \"instructions\": \"Take with food to reduce stomach upset\",\n      \"frequency\": \"Three times daily\",\n      \"duration\": \"7 days\"\n    },\n    {\n      \"medicationName\": \"Ibuprofen\",\n      \"dosage\": \"200mg\",\n      \"instructions\": \"Take as needed for pain relief\",\n      \"frequency\": \"Every 6 hours\",\n      \"duration\": \"5 days\"\n    },\n    {\n      \"medicationName\": \"Vitamin D3\",\n      \"dosage\": \"1000 IU\",\n      \"instructions\": \"Take with breakfast\",\n      \"frequency\": \"Once daily\",\n      \"duration\": \"30 days\"\n    }\n  ],\n  \"prescribedDate\": \"2025-01-06T08:00:00.000Z\",\n  \"expiryDate\": \"2025-03-06T08:00:00.000Z\",\n  \"quantity\": \"Total prescribed items\",\n  \"additionalNotes\": \"Multiple medication regimen for comprehensive treatment. Monitor for side effects.\",\n  \"status\": \"active\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/prescriptions",
               "host": ["{{base_url}}"],
               "path": ["api", "prescriptions"]
             },
-            "description": "Create a new prescription\n\n**Required Fields:**\n- `patientId`: Patient identifier\n- `doctorId`: Prescribing doctor identifier\n- `medicationName`: Name of medication\n- `dosage`: Medication dosage (e.g., '500mg', '10ml')\n- `instructions`: Patient instructions\n- `frequency`: How often to take medication\n- `duration`: Length of treatment\n\n**Optional Fields:**\n- `prescribedDate`: Date prescription written (defaults to current date)\n- `expiryDate`: Prescription expiration date\n- `quantity`: Amount prescribed\n- `additionalNotes`: Additional notes or warnings\n- `status`: Initial status (defaults to 'active')\n\n**Business Rules:**\n- Patient and Doctor IDs must be valid\n- Expiry date must be in the future\n- Status must be one of: active, completed, discontinued, on-hold\n\n**Response:**\nReturns created prescription with generated ID and timestamps"
+            "description": "Create a new prescription with multiple medications\n\n**Required Fields:**\n- `patientId`: Patient identifier\n- `doctorId`: Prescribing doctor identifier\n- `medications`: Array of medications, each containing:\n  - `medicationName`: Name of medication\n  - `dosage`: Medication dosage (e.g., '500mg', '10ml')\n  - `instructions`: Patient instructions\n  - `frequency`: How often to take medication\n  - `duration`: Length of treatment\n\n**Optional Fields:**\n- `prescribedDate`: Date prescription written (defaults to current date)\n- `expiryDate`: Prescription expiration date\n- `quantity`: Amount prescribed\n- `additionalNotes`: Additional notes or warnings\n- `status`: Initial status (defaults to 'active')\n\n**Medications Array:**\nEach medication object supports:\n- Multiple medications per prescription\n- Individual dosage and instructions per medication\n- Separate frequency and duration for each medication\n\n**Business Rules:**\n- Patient and Doctor IDs must be valid\n- At least one medication must be provided\n- Expiry date must be in the future\n- Status must be one of: active, completed, discontinued, on-hold\n\n**Response:**\nReturns created prescription with generated ID, timestamps, and medications array"
           },
           "response": [
             {
@@ -638,7 +638,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"patientId\": \"PAT001\",\n  \"doctorId\": \"DOC001\",\n  \"medicationName\": \"Amoxicillin\",\n  \"dosage\": \"500mg\",\n  \"instructions\": \"Take with food\",\n  \"frequency\": \"Three times daily\",\n  \"duration\": \"7 days\",\n  \"quantity\": \"21 tablets\",\n  \"status\": \"active\"\n}"
+                  "raw": "{\n  \"patientId\": \"57886cdf08174d7f916f02647e4fb963\",\n  \"doctorId\": \"6c8eba4a9e3941ba98c2d956f3395960\",\n  \"medications\": [\n    {\n      \"medicationName\": \"Amoxicillin\",\n      \"dosage\": \"500mg\",\n      \"instructions\": \"Take with food to reduce stomach upset\",\n      \"frequency\": \"Three times daily\",\n      \"duration\": \"7 days\"\n    }\n  ],\n  \"prescribedDate\": \"2025-01-06T08:00:00.000Z\",\n  \"expiryDate\": \"2025-02-06T08:00:00.000Z\",\n  \"quantity\": \"21 tablets\",\n  \"additionalNotes\": \"Complete full course even if feeling better.\",\n  \"status\": \"active\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/prescriptions",
@@ -648,7 +648,7 @@
               },
               "status": "Created",
               "code": 201,
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"1\",\n    \"patientId\": \"PAT001\",\n    \"doctorId\": \"DOC001\",\n    \"medicationName\": \"Amoxicillin\",\n    \"dosage\": \"500mg\",\n    \"instructions\": \"Take with food\",\n    \"frequency\": \"Three times daily\",\n    \"duration\": \"7 days\",\n    \"prescribedDate\": \"2025-08-06T08:00:00.000Z\",\n    \"quantity\": \"21 tablets\",\n    \"status\": \"active\",\n    \"createdAt\": \"2025-08-06T08:00:00.000Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"d8a5472b8dc34e0cb8c31b718e11fed3\",\n    \"patientId\": \"57886cdf08174d7f916f02647e4fb963\",\n    \"doctorId\": \"6c8eba4a9e3941ba98c2d956f3395960\",\n    \"medications\": [\n      {\n        \"medicationName\": \"Amoxicillin\",\n        \"dosage\": \"500mg\",\n        \"instructions\": \"Take with food to reduce stomach upset\",\n        \"frequency\": \"Three times daily\",\n        \"duration\": \"7 days\"\n      }\n    ],\n    \"medicationName\": \"Amoxicillin\",\n    \"dosage\": \"500mg\",\n    \"instructions\": \"Take with food to reduce stomach upset\",\n    \"frequency\": \"Three times daily\",\n    \"duration\": \"7 days\",\n    \"prescribedDate\": \"2025-01-06T08:00:00.000Z\",\n    \"expiryDate\": \"2025-02-06T08:00:00.000Z\",\n    \"quantity\": \"21 tablets\",\n    \"additionalNotes\": \"Complete full course even if feeling better.\",\n    \"status\": \"active\",\n    \"createdAt\": \"2025-08-06T22:13:34.838Z\",\n    \"patient\": {\n      \"id\": \"57886cdf08174d7f916f02647e4fb963\",\n      \"patientNumber\": \"2025-D1\",\n      \"firstName\": \"Juana\",\n      \"lastName\": \"Del Agua\",\n      \"middleName\": \"Santos\",\n      \"fullName\": \"Juana Santos Del Agua\"\n    },\n    \"doctor\": {\n      \"id\": \"6c8eba4a9e3941ba98c2d956f3395960\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Reyes\",\n      \"fullName\": \"Dr. John Reyes\",\n      \"specialization\": \"General Practice\"\n    }\n  }\n}"
             },
             {
               "name": "Validation Error",
@@ -662,7 +662,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"patientId\": \"\",\n  \"medicationName\": \"Amoxicillin\"\n}"
+                  "raw": "{\n  \"patientId\": \"\",\n  \"medications\": []\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/prescriptions",
@@ -672,7 +672,7 @@
               },
               "status": "Bad Request",
               "code": 400,
-              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed: patientId is required, doctorId is required, dosage is required, instructions is required, frequency is required, duration is required\"\n}"
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed: patientId is required, doctorId is required, medications array is required and cannot be empty\"\n}"
             }
           ],
           "event": [
@@ -727,14 +727,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicationName\": \"Amoxicillin\",\n  \"dosage\": \"750mg\",\n  \"instructions\": \"Take with food to reduce stomach upset. Avoid alcohol.\",\n  \"frequency\": \"Twice daily\",\n  \"duration\": \"10 days\",\n  \"expiryDate\": \"2025-10-06T08:00:00.000Z\",\n  \"quantity\": \"20 tablets\",\n  \"additionalNotes\": \"Increased dosage due to infection severity. Complete full course.\",\n  \"status\": \"active\"\n}"
+              "raw": "{\n  \"medications\": [\n    {\n      \"id\": \"med-1\",\n      \"medicationName\": \"Amoxicillin\",\n      \"dosage\": \"750mg\",\n      \"instructions\": \"Take with food to reduce stomach upset. Avoid alcohol.\",\n      \"frequency\": \"Twice daily\",\n      \"duration\": \"10 days\"\n    },\n    {\n      \"medicationName\": \"Vitamin D3\",\n      \"dosage\": \"1000 IU\",\n      \"instructions\": \"Take once daily with breakfast\",\n      \"frequency\": \"Once daily\",\n      \"duration\": \"30 days\"\n    }\n  ],\n  \"expiryDate\": \"2025-10-06T08:00:00.000Z\",\n  \"quantity\": \"20 tablets\",\n  \"additionalNotes\": \"Increased dosage due to infection severity. Complete full course.\",\n  \"status\": \"active\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/prescriptions/{{prescription_id}}",
               "host": ["{{base_url}}"],
               "path": ["api", "prescriptions", "{{prescription_id}}"]
             },
-            "description": "Update an existing prescription\n\n**Path Parameters:**\n- `prescription_id`: ID of prescription to update\n\n**Updatable Fields:**\n- `medicationName`: Change medication\n- `dosage`: Adjust dosage\n- `instructions`: Update patient instructions\n- `frequency`: Change frequency\n- `duration`: Adjust treatment duration\n- `expiryDate`: Update expiration date\n- `quantity`: Change prescribed quantity\n- `additionalNotes`: Update notes\n- `status`: Change status (active, completed, discontinued, on-hold)\n\n**Business Rules:**\n- Only specific fields can be updated (patientId, doctorId, prescribedDate are immutable)\n- Status transitions must be valid\n- Expiry date must be in the future\n\n**Use Cases:**\n- Dosage adjustments\n- Status updates (completion, discontinuation)\n- Instruction clarifications\n- Treatment duration changes"
+            "description": "Update an existing prescription with multiple medications\n\n**Path Parameters:**\n- `prescription_id`: ID of prescription to update\n\n**Updatable Fields:**\n- `medications`: Array of medications, each medication can have:\n  - `id`: Medication ID (for existing medications)\n  - `medicationName`: Change medication name\n  - `dosage`: Adjust dosage\n  - `instructions`: Update patient instructions\n  - `frequency`: Change frequency\n  - `duration`: Adjust treatment duration\n- `expiryDate`: Update expiration date\n- `quantity`: Change prescribed quantity\n- `additionalNotes`: Update notes\n- `status`: Change status (active, completed, discontinued, on-hold)\n\n**Medications Update Logic:**\n- Include `id` for existing medications to update them\n- Omit `id` for new medications to add them\n- Medications not included in the array will be removed\n\n**Business Rules:**\n- Only specific fields can be updated (patientId, doctorId, prescribedDate are immutable)\n- Status transitions must be valid\n- Expiry date must be in the future\n- At least one medication must remain\n\n**Use Cases:**\n- Add new medications to existing prescription\n- Update dosages for specific medications\n- Remove medications from prescription\n- Status updates (completion, discontinuation)\n- Treatment duration changes"
           },
           "response": [
             {

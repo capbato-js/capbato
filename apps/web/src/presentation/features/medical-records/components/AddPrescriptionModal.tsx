@@ -3,6 +3,8 @@ import { Modal } from '../../../components/common';
 import { AddPrescriptionForm } from './AddPrescriptionForm';
 import { AddPrescriptionFormData } from '@nx-starter/application-shared';
 import { Prescription } from '../types';
+import { usePrescriptionFormViewModel } from '../../prescriptions/view-models/usePrescriptionFormViewModel';
+import { PrescriptionTypeMapper } from '../../prescriptions/types/FormTypes';
 
 interface AddPrescriptionModalProps {
   opened: boolean;
@@ -22,35 +24,47 @@ export const AddPrescriptionModal: React.FC<AddPrescriptionModalProps> = ({
   prescription,
   onPrescriptionUpdated,
 }) => {
+  const prescriptionViewModel = usePrescriptionFormViewModel();
+
   const handleSubmit = async (data: AddPrescriptionFormData): Promise<boolean> => {
     try {
-      // For now, just simulate success since we're using dummy data
-      console.log('Prescription form data:', data);
-      
-      if (editMode) {
-        console.log('Updating prescription:', prescription?.id);
-        // TODO: Implement update prescription functionality
-        onPrescriptionUpdated?.();
+      if (editMode && prescription?.id) {
+        // Convert form data to update command
+        const updateCommand = PrescriptionTypeMapper.toUpdateCommand({
+          ...data,
+          id: prescription.id,
+        });
+        
+        const success = await prescriptionViewModel.handleUpdateSubmit(prescription.id, updateCommand);
+        if (success) {
+          onPrescriptionUpdated?.();
+          onClose();
+        }
+        return success;
       } else {
-        console.log('Creating new prescription');
-        // TODO: Implement create prescription functionality
-        // For now, create a dummy prescription
-        const newPrescription: Prescription = {
-          id: Date.now().toString(),
-          patientId: data.patientId,
-          patientName: 'Patient Name', // This would come from the actual patient data
-          patientNumber: 'P001', // This would come from the actual patient data
-          doctorId: data.doctorId,
-          doctor: 'Dr. Name', // This would come from the actual doctor data
-          datePrescribed: data.datePrescribed,
-          medications: data.medications,
-          notes: data.notes,
-        };
-        onPrescriptionCreated?.(newPrescription);
+        // Convert form data to create command (single prescription with multiple medications)
+        const createCommand = PrescriptionTypeMapper.toCreateCommand(data);
+        
+        const success = await prescriptionViewModel.handleFormSubmit(createCommand);
+        if (success) {
+          // For compatibility with existing UI, create a dummy prescription object with all medications
+          const medicationNames = data.medications.map(med => med.name).join(', ');
+          const newPrescription: Prescription = {
+            id: Date.now().toString(),
+            patientId: data.patientId,
+            patientName: 'Patient Name', // This would come from the actual patient data
+            patientNumber: 'P001', // This would come from the actual patient data
+            doctorId: data.doctorId,
+            doctor: 'Dr. Name', // This would come from the actual doctor data
+            datePrescribed: data.datePrescribed,
+            medications: medicationNames, // Show all medication names
+            notes: data.notes,
+          };
+          onPrescriptionCreated?.(newPrescription);
+          onClose();
+        }
+        return success;
       }
-      
-      onClose();
-      return true;
     } catch (error) {
       console.error('Failed to save prescription:', error);
       return false;
@@ -80,8 +94,9 @@ export const AddPrescriptionModal: React.FC<AddPrescriptionModalProps> = ({
     >
       <AddPrescriptionForm
         onSubmit={handleSubmit}
-        isLoading={false}
-        error={null}
+        isLoading={prescriptionViewModel.isSubmitting}
+        error={prescriptionViewModel.error}
+        onClearError={prescriptionViewModel.clearError}
         editMode={editMode}
         initialData={initialData}
       />

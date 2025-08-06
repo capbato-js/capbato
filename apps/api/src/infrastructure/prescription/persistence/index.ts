@@ -5,6 +5,7 @@
 
 // TypeORM implementation
 export * from './typeorm/PrescriptionEntity';
+export * from './typeorm/MedicationEntity';
 export * from './typeorm/TypeOrmPrescriptionRepository';
 
 // In-memory implementation

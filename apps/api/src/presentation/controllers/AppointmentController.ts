@@ -223,7 +223,7 @@ export class AppointmentController {
   async updateAppointment(
     @Param('id') id: string, 
     @Body() body: UpdateAppointmentRequestDto
-  ): Promise<AppointmentOperationResponse> {
+  ): Promise<AppointmentResponse> {
     // Validate the combined data (body + id) using the validation service
     const validatedData = this.validationService.validateUpdateCommand({
       ...body,
@@ -232,7 +232,24 @@ export class AppointmentController {
 
     await this.updateAppointmentUseCase.execute(validatedData);
 
-    return ApiResponseBuilder.successWithMessage('Appointment updated successfully');
+    // Fetch the updated appointment to return with populated data
+    const appointment = await this.getAppointmentByIdQueryHandler.execute({ id: validatedData.id });
+    
+    // Fetch patient and doctor data separately to populate the response
+    const [patientData, doctorData] = await Promise.all([
+      this.getPatientByIdQueryHandler.execute({ id: appointment.patientId }),
+      this.getDoctorByIdQueryHandler.execute({ id: appointment.doctorId })
+    ]);
+    
+    // Check if doctor was found
+    if (!doctorData) {
+      throw new DoctorNotFoundException(appointment.doctorId);
+    }
+    
+    // Map appointment to DTO with populated patient and doctor data
+    const appointmentDto = AppointmentMapper.toDto(appointment, patientData, doctorData);
+
+    return ApiResponseBuilder.success(appointmentDto);
   }
 
   /**

@@ -22,3 +22,4 @@ export * from './HematologyResult';
 export * from './FecalysisResult';
 export * from './SerologyResult';
 export * from './Prescription';
+export * from './Medication';

@@ -75,6 +75,17 @@ export function getEnvironmentConfig(): AppConfig {
           cities: (provinceCode: string) => `/api/address/cities/${provinceCode}`,
           barangays: (cityCode: string) => `/api/address/barangays/${cityCode}`,
         },
+        prescriptions: {
+          base: '/api/prescriptions',
+          all: '/api/prescriptions',
+          byId: (id: string) => `/api/prescriptions/${id}`,
+          active: '/api/prescriptions/active',
+          expired: '/api/prescriptions/expired',
+          stats: '/api/prescriptions/stats',
+          byPatientId: (patientId: string) => `/api/prescriptions/patient/${patientId}`,
+          byDoctorId: (doctorId: string) => `/api/prescriptions/doctor/${doctorId}`,
+          byMedicationName: (medicationName: string) => `/api/prescriptions/medication/${medicationName}`,
+        },
       },
     },
     features: {

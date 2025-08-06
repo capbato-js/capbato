@@ -42,6 +42,7 @@ export * from './HematologyResultId';
 export * from './FecalysisResultId';
 export * from './SerologyResultId';
 export * from './PrescriptionId';
+export * from './MedicationId';
 export * from './MedicationName';
 export * from './Dosage';
 export * from './Instructions';

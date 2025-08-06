@@ -21,10 +21,13 @@ import {
   GetExpiredPrescriptionsQueryHandler,
   GetPrescriptionsByMedicationNameQueryHandler,
   GetPrescriptionStatsQueryHandler,
+  GetPatientByIdQueryHandler,
+  GetDoctorByIdQueryHandler,
   PrescriptionMapper,
   TOKENS,
   PrescriptionValidationService,
   PrescriptionIdSchema,
+  FlexibleIdSchema,
 } from '@nx-starter/application-shared';
 import {
   PrescriptionListResponse,
@@ -66,6 +69,10 @@ export class PrescriptionController {
     private getPrescriptionsByMedicationNameQueryHandler: GetPrescriptionsByMedicationNameQueryHandler,
     @inject(TOKENS.GetPrescriptionStatsQueryHandler)
     private getPrescriptionStatsQueryHandler: GetPrescriptionStatsQueryHandler,
+    @inject(TOKENS.GetPatientByIdQueryHandler)
+    private getPatientByIdQueryHandler: GetPatientByIdQueryHandler,
+    @inject(TOKENS.GetDoctorByIdQueryHandler)
+    private getDoctorByIdQueryHandler: GetDoctorByIdQueryHandler,
     @inject(TOKENS.PrescriptionValidationService)
     private validationService: PrescriptionValidationService
   ) {}
@@ -76,7 +83,18 @@ export class PrescriptionController {
   @Get('/')
   async getAllPrescriptions(): Promise<PrescriptionListResponse> {
     const prescriptions = await this.getAllPrescriptionsQueryHandler.execute();
-    const prescriptionDtos = PrescriptionMapper.toDtoArray(prescriptions);
+    
+    // Map prescriptions to DTOs with populated patient and doctor data
+    const prescriptionDtos = await Promise.all(prescriptions.map(async (prescription) => {
+      // Fetch patient and doctor data separately to populate the response
+      const [patientData, doctorData] = await Promise.all([
+        this.getPatientByIdQueryHandler.execute({ id: prescription.patientId }),
+        this.getDoctorByIdQueryHandler.execute({ id: prescription.doctorId })
+      ]);
+      
+      // Map prescription to DTO with populated patient and doctor data
+      return PrescriptionMapper.toDto(prescription, patientData, doctorData);
+    }));
 
     return ApiResponseBuilder.success(prescriptionDtos);
   }
@@ -119,7 +137,7 @@ export class PrescriptionController {
   @Get('/patient/:patientId')
   async getPrescriptionsByPatientId(@Param('patientId') patientId: string): Promise<PrescriptionListResponse> {
     // Validate the patient ID parameter
-    const validatedPatientId = PrescriptionIdSchema.parse(patientId);
+    const validatedPatientId = FlexibleIdSchema.parse(patientId);
     const prescriptions = await this.getPrescriptionsByPatientIdQueryHandler.execute({ 
       patientId: validatedPatientId 
     });
@@ -134,7 +152,7 @@ export class PrescriptionController {
   @Get('/doctor/:doctorId')
   async getPrescriptionsByDoctorId(@Param('doctorId') doctorId: string): Promise<PrescriptionListResponse> {
     // Validate the doctor ID parameter
-    const validatedDoctorId = PrescriptionIdSchema.parse(doctorId);
+    const validatedDoctorId = FlexibleIdSchema.parse(doctorId);
     const prescriptions = await this.getPrescriptionsByDoctorIdQueryHandler.execute({ 
       doctorId: validatedDoctorId 
     });
@@ -177,7 +195,15 @@ export class PrescriptionController {
   async createPrescription(@Body() body: CreatePrescriptionRequestDto): Promise<PrescriptionResponse> {
     const validatedData = this.validationService.validateCreateCommand(body);
     const prescription = await this.createPrescriptionUseCase.execute(validatedData);
-    const prescriptionDto = PrescriptionMapper.toDto(prescription);
+    
+    // Fetch patient and doctor data separately to populate the response
+    const [patientData, doctorData] = await Promise.all([
+      this.getPatientByIdQueryHandler.execute({ id: prescription.patientId }),
+      this.getDoctorByIdQueryHandler.execute({ id: prescription.doctorId })
+    ]);
+    
+    // Map prescription to DTO with populated patient and doctor data
+    const prescriptionDto = PrescriptionMapper.toDto(prescription, patientData, doctorData);
 
     return ApiResponseBuilder.success(prescriptionDto);
   }
@@ -189,7 +215,7 @@ export class PrescriptionController {
   async updatePrescription(
     @Param('id') id: string, 
     @Body() body: UpdatePrescriptionRequestDto
-  ): Promise<PrescriptionOperationResponse> {
+  ): Promise<PrescriptionResponse> {
     // Validate the combined data (body + id) using the validation service
     const validatedData = this.validationService.validateUpdateCommand({
       ...body,
@@ -198,7 +224,19 @@ export class PrescriptionController {
 
     await this.updatePrescriptionUseCase.execute(validatedData);
 
-    return ApiResponseBuilder.successWithMessage('Prescription updated successfully');
+    // Fetch the updated prescription to return with populated data
+    const prescription = await this.getPrescriptionByIdQueryHandler.execute({ id: validatedData.id });
+    
+    // Fetch patient and doctor data separately to populate the response
+    const [patientData, doctorData] = await Promise.all([
+      this.getPatientByIdQueryHandler.execute({ id: prescription.patientId }),
+      this.getDoctorByIdQueryHandler.execute({ id: prescription.doctorId })
+    ]);
+    
+    // Map prescription to DTO with populated patient and doctor data
+    const prescriptionDto = PrescriptionMapper.toDto(prescription, patientData, doctorData);
+
+    return ApiResponseBuilder.success(prescriptionDto);
   }
 
   /**

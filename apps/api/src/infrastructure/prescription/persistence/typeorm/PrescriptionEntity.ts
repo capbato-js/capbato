@@ -1,42 +1,28 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
+  OneToMany,
   CreateDateColumn,
   Index,
 } from 'typeorm';
+import { MedicationEntity } from './MedicationEntity';
 
 @Entity('prescriptions')
 @Index(['patientId', 'status'])
 @Index(['doctorId', 'status'])
-@Index(['medicationName'])
 @Index(['expiryDate', 'status'])
 export class PrescriptionEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('varchar')
   id!: string;
 
-  @Column({ type: 'uuid', name: 'patient_id' })
+  @Column({ type: 'varchar', length: 50, name: 'patient_id' })
   @Index()
   patientId!: string;
 
-  @Column({ type: 'uuid', name: 'doctor_id' })
+  @Column({ type: 'varchar', length: 50, name: 'doctor_id' })
   @Index()
   doctorId!: string;
-
-  @Column({ type: 'varchar', length: 200, name: 'medication_name' })
-  medicationName!: string;
-
-  @Column({ type: 'varchar', length: 100 })
-  dosage!: string;
-
-  @Column({ type: 'text' })
-  instructions!: string;
-
-  @Column({ type: 'varchar', length: 100 })
-  frequency!: string;
-
-  @Column({ type: 'varchar', length: 100 })
-  duration!: string;
 
   @Column({ type: 'datetime', name: 'prescribed_date' })
   prescribedDate!: Date;
@@ -55,4 +41,11 @@ export class PrescriptionEntity {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  // Relations
+  @OneToMany(() => MedicationEntity, medication => medication.prescription, {
+    cascade: true,
+    eager: true,
+  })
+  medications!: MedicationEntity[];
 }

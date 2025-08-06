@@ -7,7 +7,6 @@ import {
   Badge, 
   Divider, 
   Box,
-  Table,
   Paper,
 } from '@mantine/core';
 import { Icon } from '../../../components/common';
@@ -159,36 +158,6 @@ export const ViewPrescriptionModal: React.FC<ViewPrescriptionModalProps> = ({
                   {prescription.notes}
                 </Text>
               </Paper>
-            </Box>
-          </>
-        )}
-
-        {/* Summary Table for Legacy Format */}
-        {typeof prescription.medications === 'string' && (
-          <>
-            <Divider />
-            <Box>
-              <Text fw={600} mb="sm">Prescription Summary</Text>
-              <Table striped highlightOnHover>
-                <Table.Tbody>
-                  <Table.Tr>
-                    <Table.Td fw={500}>Patient</Table.Td>
-                    <Table.Td>{prescription.patientName} ({prescription.patientNumber})</Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td fw={500}>Doctor</Table.Td>
-                    <Table.Td>{prescription.doctor}</Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td fw={500}>Date</Table.Td>
-                    <Table.Td>{formatDate(prescription.datePrescribed)}</Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td fw={500}>Medications</Table.Td>
-                    <Table.Td>{prescription.medications}</Table.Td>
-                  </Table.Tr>
-                </Table.Tbody>
-              </Table>
             </Box>
           </>
         )}

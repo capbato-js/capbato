@@ -223,6 +223,18 @@ export const PrescriptionIdSchema = z.string()
     message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID,
   });
 
+// Generic ID schema for patientId and doctorId that supports both formats
+export const FlexibleIdSchema = z.string()
+  .min(1, 'ID is required')
+  .refine((id) => {
+    // Support both UUID format (with dashes) and dashless UUID format
+    const uuidPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    const dashlessUuidPattern = /^[0-9a-fA-F]{32}$/;
+    return uuidPattern.test(id) || dashlessUuidPattern.test(id);
+  }, {
+    message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID,
+  });
+
 // Medication validation schema for forms (with frequency and duration)
 export const MedicationSchema = z.object({
   id: z.string().optional(),
@@ -267,17 +279,15 @@ export const UpdatePrescriptionFormSchema = AddPrescriptionFormSchema.extend({
 // Create Prescription Command Schema (Backend API)
 export const CreatePrescriptionCommandSchema = z
   .object({
-    patientId: z.string()
-      .min(1, 'Patient ID is required')
-      .regex(/^[0-9a-fA-F]{32}$/, PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID),
-    doctorId: z.string()
-      .min(1, 'Doctor ID is required')
-      .regex(/^[0-9a-fA-F]{32}$/, PRESCRIPTION_VALIDATION_ERRORS.INVALID_UUID),
-    medicationName: z.string().superRefine(validateMedicationName),
-    dosage: z.string().superRefine(validateDosage),
-    instructions: z.string().superRefine(validateInstructions),
-    frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less'),
-    duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less'),
+    patientId: FlexibleIdSchema,
+    doctorId: FlexibleIdSchema,
+    medications: z.array(z.object({
+      medicationName: z.string().superRefine(validateMedicationName),
+      dosage: z.string().superRefine(validateDosage),
+      instructions: z.string().superRefine(validateInstructions),
+      frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less'),
+      duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less'),
+    })).min(1, PRESCRIPTION_VALIDATION_ERRORS.MISSING_MEDICATIONS),
     prescribedDate: z
       .string()
       .datetime({ message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_DATETIME })
@@ -291,8 +301,26 @@ export const CreatePrescriptionCommandSchema = z
     quantity: z.string().max(50, 'Quantity must be 50 characters or less').optional(),
     additionalNotes: z.string().max(1000, 'Additional notes must be 1000 characters or less').optional(),
     status: z.enum(['active', 'completed', 'discontinued', 'on-hold']).optional().default('active'),
+    // Legacy single medication fields for backward compatibility
+    medicationName: z.string().superRefine(validateMedicationName).optional(),
+    dosage: z.string().superRefine(validateDosage).optional(),
+    instructions: z.string().superRefine(validateInstructions).optional(),
+    frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less').optional(),
+    duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less').optional(),
   })
   .superRefine((data, ctx) => {
+    // Ensure either medications array or legacy fields are provided
+    const hasMedicationsArray = data.medications && data.medications.length > 0;
+    const hasLegacyFields = data.medicationName && data.dosage && data.instructions && data.frequency && data.duration;
+    
+    if (!hasMedicationsArray && !hasLegacyFields) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Either medications array or legacy medication fields must be provided',
+        path: ['medications'],
+      });
+    }
+
     // Custom validation: expiry date must be after prescribed date
     if (data.expiryDate && data.prescribedDate) {
       const prescribedDate = new Date(data.prescribedDate);
@@ -312,11 +340,14 @@ export const CreatePrescriptionCommandSchema = z
 export const UpdatePrescriptionCommandSchema = z
   .object({
     id: PrescriptionIdSchema,
-    medicationName: z.string().superRefine(validateMedicationName).optional(),
-    dosage: z.string().superRefine(validateDosage).optional(),
-    instructions: z.string().superRefine(validateInstructions).optional(),
-    frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less').optional(),
-    duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less').optional(),
+    medications: z.array(z.object({
+      id: z.string().optional(),
+      medicationName: z.string().superRefine(validateMedicationName),
+      dosage: z.string().superRefine(validateDosage),
+      instructions: z.string().superRefine(validateInstructions),
+      frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less'),
+      duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less'),
+    })).optional(),
     expiryDate: z
       .string()
       .datetime({ message: PRESCRIPTION_VALIDATION_ERRORS.INVALID_DATETIME })
@@ -325,6 +356,12 @@ export const UpdatePrescriptionCommandSchema = z
     quantity: z.string().max(50, 'Quantity must be 50 characters or less').optional(),
     additionalNotes: z.string().max(1000, 'Additional notes must be 1000 characters or less').optional(),
     status: z.enum(['active', 'completed', 'discontinued', 'on-hold']).optional(),
+    // Legacy single medication fields for backward compatibility
+    medicationName: z.string().superRefine(validateMedicationName).optional(),
+    dosage: z.string().superRefine(validateDosage).optional(),
+    instructions: z.string().superRefine(validateInstructions).optional(),
+    frequency: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_FREQUENCY).max(100, 'Frequency must be 100 characters or less').optional(),
+    duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less').optional(),
   })
   .refine((data) => {
     // At least one field must be provided for update
@@ -363,4 +400,5 @@ export const PrescriptionValidationSchemas = {
   DeletePrescriptionCommandSchema,
   // Common schemas
   PrescriptionIdSchema,
+  FlexibleIdSchema,
 } as const;

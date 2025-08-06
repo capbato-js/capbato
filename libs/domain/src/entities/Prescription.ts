@@ -1,7 +1,5 @@
 import { PrescriptionId } from '../value-objects/PrescriptionId';
-import { MedicationName } from '../value-objects/MedicationName';
-import { Dosage } from '../value-objects/Dosage';
-import { Instructions } from '../value-objects/Instructions';
+import { Medication } from './Medication';
 import { 
   PrescriptionExpiredException,
   InvalidPrescriptionDateException 
@@ -11,11 +9,7 @@ interface IPrescription {
   id?: PrescriptionId;
   patientId: string; // Foreign key to Patient entity
   doctorId: string; // Foreign key to Doctor entity
-  medicationName: MedicationName;
-  dosage: Dosage;
-  instructions: Instructions;
-  frequency: string;
-  duration: string;
+  medications: Medication[];
   prescribedDate: Date;
   expiryDate?: Date;
   quantity?: string;
@@ -28,11 +22,11 @@ interface IPrescription {
  * Prescription Entity - Medical Prescription for Patients
  * 
  * This entity represents a medical prescription linking patients, doctors, 
- * and medication information with proper business rules.
+ * and multiple medications with proper business rules.
  * 
  * Responsibilities:
- * - Store prescription details (medication, dosage, instructions)
- * - Link to Patient and Doctor entities
+ * - Store prescription details (patient, doctor, date)
+ * - Manage multiple medications in a single prescription
  * - Handle prescription validity and expiry
  * - Maintain prescription status and history
  */
@@ -40,13 +34,9 @@ export class Prescription implements IPrescription {
   private readonly _id?: PrescriptionId;
   private readonly _patientId: string;
   private readonly _doctorId: string;
-  private readonly _medicationName: MedicationName;
-  private readonly _dosage: Dosage;
-  private readonly _instructions: Instructions;
+  private readonly _medications: Medication[];
   private readonly _prescribedDate: Date;
   private readonly _expiryDate?: Date;
-  private readonly _frequency: string;
-  private readonly _duration: string;
   private readonly _quantity?: string;
   private readonly _additionalNotes?: string;
   private readonly _status: 'active' | 'completed' | 'discontinued' | 'on-hold';
@@ -55,11 +45,7 @@ export class Prescription implements IPrescription {
   constructor(
     patientId: string,
     doctorId: string,
-    medicationName: string | MedicationName,
-    dosage: string | Dosage,
-    instructions: string | Instructions,
-    frequency: string,
-    duration: string,
+    medications: Medication[] = [],
     prescribedDate: Date = new Date(),
     id?: string | PrescriptionId,
     expiryDate?: Date,
@@ -68,16 +54,12 @@ export class Prescription implements IPrescription {
     status: 'active' | 'completed' | 'discontinued' | 'on-hold' = 'active',
     createdAt = new Date()
   ) {
-    this.validateRequiredFields(patientId, doctorId, frequency, duration);
+    this.validateRequiredFields(patientId, doctorId);
     this.validateDates(prescribedDate, expiryDate);
     
     this._patientId = patientId.trim();
     this._doctorId = doctorId.trim();
-    this._medicationName = medicationName instanceof MedicationName ? medicationName : new MedicationName(medicationName);
-    this._dosage = dosage instanceof Dosage ? dosage : new Dosage(dosage);
-    this._instructions = instructions instanceof Instructions ? instructions : new Instructions(instructions);
-    this._frequency = frequency.trim();
-    this._duration = duration.trim();
+    this._medications = medications;
     this._prescribedDate = prescribedDate;
     this._expiryDate = expiryDate;
     this._quantity = quantity?.trim();
@@ -87,6 +69,7 @@ export class Prescription implements IPrescription {
     this._id = id instanceof PrescriptionId ? id : id ? new PrescriptionId(id) : undefined;
   }
 
+  // Getters
   get id(): PrescriptionId | undefined {
     return this._id;
   }
@@ -99,16 +82,8 @@ export class Prescription implements IPrescription {
     return this._doctorId;
   }
 
-  get medicationName(): MedicationName {
-    return this._medicationName;
-  }
-
-  get dosage(): Dosage {
-    return this._dosage;
-  }
-
-  get instructions(): Instructions {
-    return this._instructions;
+  get medications(): Medication[] {
+    return this._medications;
   }
 
   get prescribedDate(): Date {
@@ -117,14 +92,6 @@ export class Prescription implements IPrescription {
 
   get expiryDate(): Date | undefined {
     return this._expiryDate;
-  }
-
-  get frequency(): string {
-    return this._frequency;
-  }
-
-  get duration(): string {
-    return this._duration;
   }
 
   get quantity(): string | undefined {
@@ -148,37 +115,53 @@ export class Prescription implements IPrescription {
     return this._id?.value;
   }
 
+  // Compatibility methods for legacy single-medication prescriptions
   get medicationNameValue(): string {
-    return this._medicationName.value;
+    return this._medications.length > 0 ? this._medications[0].medicationNameValue : '';
   }
 
   get dosageValue(): string {
-    return this._dosage.value;
+    return this._medications.length > 0 ? this._medications[0].dosageValue : '';
   }
 
   get instructionsValue(): string {
-    return this._instructions.value;
+    return this._medications.length > 0 ? this._medications[0].instructionsValue : '';
+  }
+
+  get frequency(): string {
+    return this._medications.length > 0 ? this._medications[0].frequency : '';
+  }
+
+  get duration(): string {
+    return this._medications.length > 0 ? this._medications[0].duration : '';
   }
 
   // Domain business logic methods
-  updateMedication(medicationName: string | MedicationName): Prescription {
-    const medication = medicationName instanceof MedicationName ? medicationName : new MedicationName(medicationName);
-    return this.createCopy({ medicationName: medication });
+  addMedication(medication: Medication): Prescription {
+    const newMedications = [...this._medications, medication];
+    return this.createCopy({ medications: newMedications });
   }
 
-  updateDosage(dosage: string | Dosage): Prescription {
-    const newDosage = dosage instanceof Dosage ? dosage : new Dosage(dosage);
-    return this.createCopy({ dosage: newDosage });
+  removeMedication(medicationId: string): Prescription {
+    const newMedications = this._medications.filter(med => med.stringId !== medicationId);
+    return this.createCopy({ medications: newMedications });
   }
 
-  updateInstructions(instructions: string | Instructions): Prescription {
-    const newInstructions = instructions instanceof Instructions ? instructions : new Instructions(instructions);
-    return this.createCopy({ instructions: newInstructions });
+  updateMedications(medications: Medication[]): Prescription {
+    return this.createCopy({ medications });
   }
 
   updateExpiryDate(expiryDate?: Date): Prescription {
     this.validateDates(this._prescribedDate, expiryDate);
     return this.createCopy({ expiryDate });
+  }
+
+  updateQuantity(quantity?: string): Prescription {
+    return this.createCopy({ quantity });
+  }
+
+  updateAdditionalNotes(additionalNotes?: string): Prescription {
+    return this.createCopy({ additionalNotes });
   }
 
   activate(): Prescription {
@@ -202,12 +185,8 @@ export class Prescription implements IPrescription {
    * Immutable entity pattern - all changes create new instances
    */
   private createCopy(updates: {
-    medicationName?: MedicationName;
-    dosage?: Dosage;
-    instructions?: Instructions;
+    medications?: Medication[];
     expiryDate?: Date;
-    frequency?: string;
-    duration?: string;
     quantity?: string;
     additionalNotes?: string;
     status?: 'active' | 'completed' | 'discontinued' | 'on-hold';
@@ -215,11 +194,7 @@ export class Prescription implements IPrescription {
     return new Prescription(
       this._patientId,
       this._doctorId,
-      updates.medicationName || this._medicationName,
-      updates.dosage || this._dosage,
-      updates.instructions || this._instructions,
-      updates.frequency || this._frequency,
-      updates.duration || this._duration,
+      updates.medications || this._medications,
       this._prescribedDate,
       this._id,
       updates.expiryDate !== undefined ? updates.expiryDate : this._expiryDate,
@@ -282,21 +257,13 @@ export class Prescription implements IPrescription {
     this.validateDates(this._prescribedDate, this._expiryDate);
   }
 
-  private validateRequiredFields(patientId: string, doctorId: string, frequency: string, duration: string): void {
+  private validateRequiredFields(patientId: string, doctorId: string): void {
     if (!patientId || patientId.trim().length === 0) {
       throw new Error('Patient ID is required for Prescription entity');
     }
 
     if (!doctorId || doctorId.trim().length === 0) {
       throw new Error('Doctor ID is required for Prescription entity');
-    }
-
-    if (!frequency || frequency.trim().length === 0) {
-      throw new Error('Frequency is required for Prescription entity');
-    }
-
-    if (!duration || duration.trim().length === 0) {
-      throw new Error('Duration is required for Prescription entity');
     }
   }
 
