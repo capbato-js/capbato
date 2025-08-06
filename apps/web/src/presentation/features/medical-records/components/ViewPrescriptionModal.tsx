@@ -29,8 +29,28 @@ export const ViewPrescriptionModal: React.FC<ViewPrescriptionModalProps> = ({
 
   // Handle both string and array formats for medications
   const medications = Array.isArray(prescription.medications) 
-    ? prescription.medications 
+    ? prescription.medications.map(med => {
+        // Handle different medication formats:
+        // 1. Domain format: { medicationNameValue, dosageValue, ... }
+        // 2. DTO format: { medicationName, dosage, ... }
+        // 3. UI format: { name, dosage, ... }
+        const name = med.name || med.medicationName || med.medicationNameValue || '';
+        const dosage = med.dosage || med.dosageValue || '';
+        const frequency = med.frequency || '';
+        const duration = med.duration || '';
+        const instructions = med.instructions || med.instructionsValue || '';
+        
+        return {
+          id: med.id || '',
+          name,
+          dosage,
+          frequency,
+          duration,
+          instructions
+        };
+      })
     : [{ 
+        id: '',
         name: prescription.medications, 
         dosage: '', 
         frequency: '', 
@@ -92,7 +112,7 @@ export const ViewPrescriptionModal: React.FC<ViewPrescriptionModalProps> = ({
             <Text fw={600} size="lg">Medications</Text>
           </Group>
 
-          {medications.length > 0 && medications[0].name ? (
+          {medications.length > 0 && medications.some(med => med.name && med.name.trim() !== '') ? (
             <Stack gap="md">
               {medications.map((medication, index) => (
                 <Paper key={index} p="md" withBorder>

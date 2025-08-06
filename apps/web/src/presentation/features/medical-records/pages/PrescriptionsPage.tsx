@@ -85,8 +85,52 @@ export const PrescriptionsPage: React.FC = () => {
       
       setSelectedPrescription(combinedPrescription);
     } else {
-      // This is a regular prescription
-      setSelectedPrescription(prescription as Prescription);
+      // For display prescriptions from the table, find the corresponding raw domain prescription(s)
+      const displayPrescription = prescription as DisplayPrescription;
+      
+      // If this is a single prescription, find the domain prescription by ID
+      const domainPrescription = prescriptionListViewModel.filteredPrescriptions.find(p => 
+        p.stringId === displayPrescription.id
+      );
+      
+      if (domainPrescription) {
+        // Transform domain prescription to UI format with populated data
+        const prescriptionWithData = domainPrescription as unknown as {
+          _populatedPatient?: {
+            patientNumber: string;
+            fullName: string;
+          };
+          _populatedDoctor?: {
+            fullName: string;
+          };
+        };
+        
+        const transformedPrescription: Prescription = {
+          id: domainPrescription.stringId || '',
+          patientNumber: prescriptionWithData._populatedPatient?.patientNumber || displayPrescription.patientNumber,
+          patientName: prescriptionWithData._populatedPatient?.fullName || displayPrescription.patientName,
+          patientId: domainPrescription.patientId,
+          doctor: prescriptionWithData._populatedDoctor?.fullName || displayPrescription.doctor,
+          doctorId: domainPrescription.doctorId,
+          datePrescribed: domainPrescription.prescribedDate.toISOString().split('T')[0],
+          medications: domainPrescription.medications.map(med => ({
+            id: med.stringId || '',
+            name: med.medicationNameValue,
+            medicationName: med.medicationNameValue, // Include both for compatibility
+            dosage: med.dosageValue,
+            frequency: med.frequency,
+            duration: med.duration,
+            instructions: med.instructionsValue
+          })),
+          notes: domainPrescription.additionalNotes || ''
+        };
+        
+        setSelectedPrescription(transformedPrescription);
+      } else {
+        // Fallback - this shouldn't happen but handle gracefully
+        console.warn('Could not find domain prescription for display prescription:', displayPrescription);
+        setSelectedPrescription(prescription as Prescription);
+      }
     }
     setViewModalOpen(true);
   };

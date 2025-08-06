@@ -1,6 +1,7 @@
 export interface Medication {
   id?: string;
-  name: string;
+  name?: string; // Frontend compatibility
+  medicationName?: string; // API compatibility
   dosage: string;
   frequency: string;
   duration: string;
