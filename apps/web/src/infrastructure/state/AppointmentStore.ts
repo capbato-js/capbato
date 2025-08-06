@@ -39,6 +39,7 @@ interface AppointmentState {
   
   // Query Operations
   fetchAllAppointments: () => Promise<void>;
+  getAppointmentsByDate: (date: string) => AppointmentDto[];
   getAppointmentById: (id: string) => Promise<AppointmentDto>;
   
   // Utility Actions
@@ -239,6 +240,11 @@ export const useAppointmentStore = create<AppointmentState>()(
               appointments: [] 
             });
           }
+        },
+
+        getAppointmentsByDate: (date: string) => {
+          const { appointments } = get();
+          return appointments.filter(appointment => appointment.appointmentDate === date);
         },
 
         getAppointmentById: async (id) => {
