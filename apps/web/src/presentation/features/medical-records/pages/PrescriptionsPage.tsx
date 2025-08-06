@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { Prescription } from '../types';
@@ -113,6 +113,13 @@ export const PrescriptionsPage: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
 
   const handleAddPrescription = () => {
     setSelectedPrescription(null);

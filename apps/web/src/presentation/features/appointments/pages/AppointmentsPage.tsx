@@ -24,6 +24,13 @@ const mapAppointmentDtoToAppointment = (dto: AppointmentDto): Appointment => ({
 export const AppointmentsPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showAll, setShowAll] = useState<boolean>(false);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
   
   // Modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

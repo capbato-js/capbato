@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Title, Text } from '@mantine/core';
 import { MedicalClinicLayout } from '../../../components/layout';
 
 export const DashboardPage: React.FC = () => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
     <MedicalClinicLayout>
       {/* No boxing - content flows naturally */}
