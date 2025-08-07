@@ -2,7 +2,8 @@ import {
   PatientListDto, 
   PatientDto, 
   PatientStatsDto,
-  CreatePatientCommand 
+  CreatePatientCommand,
+  UpdatePatientCommand
 } from '@nx-starter/application-shared';
 
 export interface PatientListResponse {
@@ -25,6 +26,7 @@ export interface PatientStatsResponse {
 
 export interface IPatientApiService {
   createPatient(command: CreatePatientCommand): Promise<PatientResponse>;
+  updatePatient(command: UpdatePatientCommand): Promise<PatientResponse>;
   getAllPatients(): Promise<PatientListResponse>;
   getPatientById(id: string): Promise<PatientResponse>;
   getPatientStats(): Promise<PatientStatsResponse>;

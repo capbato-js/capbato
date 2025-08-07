@@ -5,7 +5,7 @@ import { AboutPage } from '../presentation/features/about';
 import { LoginPage } from '../presentation/features/login';
 import { DashboardPage } from '../presentation/features/dashboard';
 import { AppointmentsPage } from '../presentation/features/appointments';
-import { PatientsPage, AddPatientPage } from '../presentation/features/patients';
+import { PatientsPage, AddPatientPage, EditPatientPage } from '../presentation/features/patients';
 import { PatientDetailsPage } from '../presentation/features/patients/pages/PatientDetailsPage';
 import { LaboratoryPage, LaboratoryTestsPage, PrescriptionsPage } from '../presentation/features/medical-records';
 import { DoctorsPage, AccountsPage } from '../presentation/features/staff';
@@ -48,6 +48,11 @@ function App() {
         <Route path="/patients/new" element={
           <AuthGuard requireAuth={true}>
             <AddPatientPage />
+          </AuthGuard>
+        } />
+        <Route path="/patients/:id/edit" element={
+          <AuthGuard requireAuth={true}>
+            <EditPatientPage />
           </AuthGuard>
         } />
         <Route path="/patients/:id" element={

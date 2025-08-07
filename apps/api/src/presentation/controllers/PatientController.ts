@@ -3,12 +3,14 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Param,
   Body,
   HttpCode,
 } from 'routing-controllers';
 import {
   CreatePatientUseCase,
+  UpdatePatientUseCase,
   GetAllPatientsQueryHandler,
   GetPatientByIdQueryHandler,
   GetPatientStatsQueryHandler,
@@ -22,6 +24,7 @@ import {
   PatientListResponse,
   PatientStatsResponse,
   CreatePatientRequestDto,
+  UpdatePatientRequestDto,
 } from '@nx-starter/application-shared';
 import { ApiResponseBuilder } from '../dto/ApiResponse';
 
@@ -35,6 +38,8 @@ export class PatientController {
   constructor(
     @inject(TOKENS.CreatePatientUseCase)
     private createPatientUseCase: CreatePatientUseCase,
+    @inject(TOKENS.UpdatePatientUseCase)
+    private updatePatientUseCase: UpdatePatientUseCase,
     @inject(TOKENS.GetAllPatientsQueryHandler)
     private getAllPatientsQueryHandler: GetAllPatientsQueryHandler,
     @inject(TOKENS.GetPatientByIdQueryHandler)
@@ -84,6 +89,27 @@ export class PatientController {
   async createPatient(@Body() body: CreatePatientRequestDto): Promise<PatientResponse> {
     const validatedData = this.validationService.validateCreateCommand(body);
     const patient = await this.createPatientUseCase.execute(validatedData);
+    const patientDto = PatientMapper.toDto(patient);
+    
+    return ApiResponseBuilder.success(patientDto);
+  }
+
+  /**
+   * PUT /api/patients/:id - Update an existing patient
+   */
+  @Put('/:id')
+  async updatePatient(@Param('id') id: string, @Body() body: UpdatePatientRequestDto): Promise<PatientResponse> {
+    // Validate the ID parameter
+    const validatedId = PatientIdSchema.parse(id);
+    
+    // Create update command with ID from path parameter
+    const updateCommand = {
+      id: validatedId,
+      ...body,
+    };
+    
+    const validatedData = this.validationService.validateUpdateCommand(updateCommand);
+    const patient = await this.updatePatientUseCase.execute(validatedData);
     const patientDto = PatientMapper.toDto(patient);
     
     return ApiResponseBuilder.success(patientDto);

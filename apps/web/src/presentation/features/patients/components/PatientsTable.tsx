@@ -35,8 +35,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
   };
 
   const handleEditPatient = (patient: typeof patientsWithFullName[0]) => {
-    // TODO: Implement edit functionality
-    console.log('Edit patient:', patient);
+    navigate(`/patients/${patient.id}/edit`);
   };
 
   const actions: TableActions<typeof patientsWithFullName[0]> = {

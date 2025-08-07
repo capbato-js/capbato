@@ -3,8 +3,10 @@ import { ValidationService, IValidationService } from './ValidationService';
 import { TOKENS } from '../di/tokens';
 import {
   CreatePatientCommandSchema,
+  UpdatePatientCommandSchema,
   GetPatientByIdCommandSchema,
   CreatePatientCommand,
+  UpdatePatientCommand,
   GetPatientByIdCommand,
 } from './PatientValidationSchemas';
 
@@ -27,6 +29,15 @@ export class GetPatientByIdValidationService extends ValidationService<unknown, 
 }
 
 /**
+ * Validation service for UpdatePatientCommand
+ * Encapsulates validation logic for updating existing patients
+ */
+@injectable()
+export class UpdatePatientValidationService extends ValidationService<unknown, UpdatePatientCommand> {
+  protected schema = UpdatePatientCommandSchema;
+}
+
+/**
  * Composite validation service that provides all Patient validation operations
  * Follows the Facade pattern to provide a unified interface for Patient validation
  */
@@ -36,7 +47,9 @@ export class PatientValidationService {
     @inject(TOKENS.CreatePatientValidationService)
     private createValidator: CreatePatientValidationService,
     @inject(TOKENS.GetPatientByIdValidationService)
-    private getByIdValidator: GetPatientByIdValidationService
+    private getByIdValidator: GetPatientByIdValidationService,
+    @inject(TOKENS.UpdatePatientValidationService)
+    private updateValidator: UpdatePatientValidationService
   ) {}
 
   /**
@@ -54,6 +67,13 @@ export class PatientValidationService {
   }
 
   /**
+   * Validates data for updating an existing patient
+   */
+  validateUpdateCommand(data: unknown): UpdatePatientCommand {
+    return this.updateValidator.validate(data);
+  }
+
+  /**
    * Safe validation methods that don't throw exceptions
    */
   safeValidateCreateCommand(data: unknown) {
@@ -63,8 +83,13 @@ export class PatientValidationService {
   safeValidateGetByIdCommand(data: unknown) {
     return this.getByIdValidator.safeParse(data);
   }
+
+  safeValidateUpdateCommand(data: unknown) {
+    return this.updateValidator.safeParse(data);
+  }
 }
 
 // Export interfaces for dependency injection
 export type ICreatePatientValidationService = IValidationService<unknown, CreatePatientCommand>;
+export type IUpdatePatientValidationService = IValidationService<unknown, UpdatePatientCommand>;
 export type IGetPatientByIdValidationService = IValidationService<unknown, GetPatientByIdCommand>;

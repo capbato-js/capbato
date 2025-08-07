@@ -3,11 +3,11 @@ import { Box, Button, Group, Title, useMantineTheme } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { PatientForm } from '../components';
-import { useAddPatientFormViewModel } from '../view-models/useAddPatientFormViewModel';
+import { useEditPatientFormViewModel } from '../view-models/useEditPatientFormViewModel';
 
-export const AddPatientPage: React.FC = () => {
+export const EditPatientPage: React.FC = () => {
   const theme = useMantineTheme();
-  const viewModel = useAddPatientFormViewModel();
+  const viewModel = useEditPatientFormViewModel();
 
   return (
     <MedicalClinicLayout>
@@ -44,18 +44,29 @@ export const AddPatientPage: React.FC = () => {
                 margin: 0
               }}
             >
-              Add New Patient
+              Update Patient Info
             </Title>
           </Group>
         </Box>
 
-        <PatientForm
-          mode="create"
-          onSubmit={viewModel.handleFormSubmit}
-          onCancel={viewModel.handleCancel}
-          isLoading={viewModel.isLoading}
-          error={viewModel.error}
-        />
+        {viewModel.isLoadingPatient ? (
+          <Box style={{ textAlign: 'center', padding: '50px' }}>
+            Loading patient information...
+          </Box>
+        ) : viewModel.patientNotFound ? (
+          <Box style={{ textAlign: 'center', padding: '50px' }}>
+            Patient not found
+          </Box>
+        ) : (
+          <PatientForm
+            mode="update"
+            initialData={viewModel.initialData}
+            onSubmit={viewModel.handleFormSubmit}
+            onCancel={viewModel.handleCancel}
+            isLoading={viewModel.isLoading}
+            error={viewModel.error}
+          />
+        )}
     </MedicalClinicLayout>
   );
 };
