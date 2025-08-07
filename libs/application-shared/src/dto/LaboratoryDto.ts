@@ -269,6 +269,7 @@ export interface LabRequestDto {
 
 export interface BloodChemistryDto {
   id?: string;
+  labRequestId?: string;
   patient: {
     name: string;
     age: number;

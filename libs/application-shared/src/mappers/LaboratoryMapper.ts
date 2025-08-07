@@ -319,6 +319,7 @@ export class LaboratoryMapper {
   static toBloodChemistryDto(bloodChemistry: BloodChemistry): BloodChemistryDto {
     return {
       id: bloodChemistry.id?.value,
+      labRequestId: bloodChemistry.labRequestId?.value,
       patient: {
         name: bloodChemistry.patientInfo.patientName,
         age: bloodChemistry.patientInfo.age,

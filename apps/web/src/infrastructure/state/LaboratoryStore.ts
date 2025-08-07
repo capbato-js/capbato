@@ -44,6 +44,7 @@ interface LaboratoryStore {
     results: Record<string, string>
   ) => Promise<boolean>;
   createBloodChemistry: (command: CreateBloodChemistryCommand) => Promise<boolean>;
+  fetchBloodChemistryByPatientId: (patientId: string) => Promise<BloodChemistryDto[]>;
   clearErrors: () => void;
   reset: () => void;
 }
@@ -385,6 +386,43 @@ export const useLaboratoryStore = create<LaboratoryStore>((set, get) => {
           errorStates: { ...state.errorStates, createError: errorMessage }
         }));
         return false;
+      }
+    },
+
+    fetchBloodChemistryByPatientId: async (patientId: string): Promise<BloodChemistryDto[]> => {
+      set(state => ({
+        ...state,
+        loadingStates: { ...state.loadingStates, fetching: true },
+        errorStates: { ...state.errorStates, fetchError: null }
+      }));
+
+      try {
+        const laboratoryApiService = getLaboratoryApiService();
+        const response = await laboratoryApiService.getBloodChemistryByPatientId(patientId);
+        
+        if (response.success && response.data) {
+          const results = Array.isArray(response.data) ? response.data : [response.data];
+          set(state => ({
+            ...state,
+            bloodChemistryResults: results,
+            loadingStates: { ...state.loadingStates, fetching: false }
+          }));
+          return results;
+        }
+        
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, fetching: false }
+        }));
+        return [];
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, fetching: false },
+          errorStates: { ...state.errorStates, fetchError: errorMessage }
+        }));
+        return [];
       }
     },
 
