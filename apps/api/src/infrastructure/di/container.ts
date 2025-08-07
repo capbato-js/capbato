@@ -48,6 +48,7 @@ import {
   GetTodoByIdQueryHandler,
   GetTodoStatsQueryHandler,
   CreatePatientUseCase,
+  UpdatePatientUseCase,
   GetAllPatientsQueryHandler,
   GetPatientByIdQueryHandler,
   GetPatientStatsQueryHandler,
@@ -66,6 +67,7 @@ import {
   UpdateUserDetailsValidationService,
   PatientValidationService,
   CreatePatientValidationService,
+  UpdatePatientValidationService,
   GetPatientByIdValidationService,
   DoctorValidationService,
   GetDoctorByIdValidationService,
@@ -337,6 +339,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.ChangeUserPasswordUseCase, ChangeUserPasswordUseCase);
   container.registerSingleton(TOKENS.UpdateUserDetailsUseCase, UpdateUserDetailsUseCase);
   container.registerSingleton(TOKENS.CreatePatientUseCase, CreatePatientUseCase);
+  container.registerSingleton(TOKENS.UpdatePatientUseCase, UpdatePatientUseCase);
   container.registerSingleton(TOKENS.CreateDoctorProfileCommandHandler, CreateDoctorProfileCommandHandler);
 
   // Schedule Use Cases
@@ -535,6 +538,10 @@ export const configureDI = async () => {
   container.registerSingleton(
     TOKENS.CreatePatientValidationService,
     CreatePatientValidationService
+  );
+  container.registerSingleton(
+    TOKENS.UpdatePatientValidationService,
+    UpdatePatientValidationService
   );
   container.registerSingleton(
     TOKENS.GetPatientByIdValidationService,

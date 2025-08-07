@@ -1,2 +1,4 @@
 export { PatientsTable } from './PatientsTable';
-export { AddPatientForm } from './AddPatientForm';
+export { PatientForm } from './PatientForm';
+// Backward compatibility
+export { PatientForm as AddPatientForm } from './PatientForm';

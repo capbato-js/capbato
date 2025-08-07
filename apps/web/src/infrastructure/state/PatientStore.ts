@@ -22,9 +22,11 @@ export const usePatientStore = create<PatientStore>()(
           status: 'idle',
           patientDetailsStatus: {},
           createPatientStatus: 'idle',
+          updatePatientStatus: {},
           error: null,
           patientDetailsErrors: {},
           createPatientError: null,
+          updatePatientErrors: {},
 
           // Computed values as functions
           getIsLoading() {
@@ -47,12 +49,20 @@ export const usePatientStore = create<PatientStore>()(
             return get().createPatientStatus === 'loading';
           },
 
+          getIsUpdatingPatient(id: string) {
+            return get().updatePatientStatus[id] === 'loading';
+          },
+
           getPatientDetailsError(id: string) {
             return get().patientDetailsErrors[id] || null;
           },
 
           getCreatePatientError() {
             return get().createPatientError;
+          },
+
+          getUpdatePatientError(id: string) {
+            return get().updatePatientErrors[id];
           },
 
           getPatientDetails(id: string) {
@@ -150,6 +160,56 @@ export const usePatientStore = create<PatientStore>()(
             }
           },
 
+          async updatePatient(command) {
+            console.log('🔄 PatientStore.updatePatient called with:', command);
+            set((state) => {
+              state.updatePatientStatus[command.id] = 'loading';
+              state.updatePatientErrors[command.id] = null;
+            });
+
+            try {
+              console.log('📡 Calling API service updatePatient...');
+              const response = await getApiService().updatePatient(command);
+              console.log('✅ API response received:', response);
+              const updatedPatient = response.data;
+              
+              set((state) => {
+                // Update patient in the list
+                const patientIndex = state.patients.findIndex(p => p.id === command.id);
+                if (patientIndex !== -1) {
+                  const updatedPatientListItem = {
+                    id: updatedPatient.id,
+                    patientNumber: updatedPatient.patientNumber,
+                    firstName: updatedPatient.firstName,
+                    lastName: updatedPatient.lastName,
+                    middleName: updatedPatient.middleName,
+                    age: updatedPatient.age,
+                    gender: updatedPatient.gender,
+                    contactNumber: updatedPatient.contactNumber,
+                    address: updatedPatient.address,
+                    dateOfBirth: updatedPatient.dateOfBirth,
+                  };
+                  state.patients[patientIndex] = updatedPatientListItem;
+                }
+                
+                // Update cached patient details
+                state.patientDetails[updatedPatient.id] = updatedPatient;
+                state.patientDetailsStatus[updatedPatient.id] = 'succeeded';
+                
+                state.updatePatientStatus[command.id] = 'succeeded';
+              });
+              
+              return updatedPatient;
+            } catch (error) {
+              set((state) => {
+                // Preserve the error object for proper classification
+                state.updatePatientErrors[command.id] = error;
+                state.updatePatientStatus[command.id] = 'failed';
+              });
+              return null;
+            }
+          },
+
           clearError() {
             set((state) => {
               state.error = null;
@@ -173,6 +233,15 @@ export const usePatientStore = create<PatientStore>()(
               state.createPatientError = null;
               if (state.createPatientStatus === 'failed') {
                 state.createPatientStatus = 'idle';
+              }
+            });
+          },
+
+          clearUpdatePatientError(id: string) {
+            set((state) => {
+              state.updatePatientErrors[id] = null;
+              if (state.updatePatientStatus[id] === 'failed') {
+                state.updatePatientStatus[id] = 'idle';
               }
             });
           },

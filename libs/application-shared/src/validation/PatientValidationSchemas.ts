@@ -246,13 +246,13 @@ export const PatientIdSchema = z.string()
 
 // Inferred TypeScript types from Zod schemas
 export type CreatePatientCommand = z.infer<typeof CreatePatientCommandSchema>;
-export type GetPatientByIdCommand = z.infer<typeof GetPatientByIdCommandSchema>;
 export type UpdatePatientCommand = z.infer<typeof UpdatePatientCommandSchema>;
+export type GetPatientByIdCommand = z.infer<typeof GetPatientByIdCommandSchema>;
 
 // Export all schemas as a collection for easier importing
 export const PatientValidationSchemas = {
   CreatePatientCommandSchema,
-  GetPatientByIdCommandSchema,
   UpdatePatientCommandSchema,
+  GetPatientByIdCommandSchema,
   PatientIdSchema,
 } as const;

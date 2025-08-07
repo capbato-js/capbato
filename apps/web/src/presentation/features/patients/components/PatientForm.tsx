@@ -12,17 +12,18 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
-import { CreatePatientCommandSchema } from '@nx-starter/application-shared';
+import { CreatePatientCommandSchema, UpdatePatientCommandSchema } from '@nx-starter/application-shared';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { AddressSelector } from '../../../components/ui/AddressSelector';
 import { useAddressSelector } from '../../../hooks';
 import { Icon } from '../../../components/common';
 import { NameFormattingService } from '@nx-starter/domain';
-import type { CreatePatientCommand } from '@nx-starter/application-shared';
+import type { CreatePatientCommand, UpdatePatientCommand } from '@nx-starter/application-shared';
 import { classifyError, formatFieldErrorMessage } from '../utils/errorClassification';
 
 // Form data type that matches the schema input before transformation
-type CreatePatientFormData = Omit<CreatePatientCommand, 'contactNumber' | 'guardianContactNumber'> & {
+type PatientFormData = Omit<CreatePatientCommand, 'contactNumber' | 'guardianContactNumber'> & {
+  id?: string; // Include id for update mode
   contactNumber: string;
   guardianContactNumber: string | undefined;
 };
@@ -36,15 +37,17 @@ const getErrorMessage = (error: unknown): string | undefined => {
   return undefined;
 };
 
-interface AddPatientFormProps {
-  onSubmit: (data: CreatePatientCommand) => Promise<boolean>;
+interface PatientFormProps {
+  mode: 'create' | 'update';
+  initialData?: Partial<PatientFormData>;
+  onSubmit: (data: CreatePatientCommand | UpdatePatientCommand) => Promise<boolean>;
   onCancel: () => void;
   isLoading: boolean;
   error?: unknown; // Changed to handle both string and structured errors
 }
 
 /**
- * AddPatientForm component handles the creation of new patient records
+ * PatientForm component handles both creation and updating of patient records
  * with comprehensive validation and proper TypeScript typing.
  * Layout matches the legacy UI with two-column design.
  * 
@@ -56,7 +59,9 @@ interface AddPatientFormProps {
  *   address fields (length limits), guardian info (conditional validation)
  * - Validation only triggers on blur, providing non-aggressive UX
  */
-export const AddPatientForm: React.FC<AddPatientFormProps> = ({
+export const PatientForm: React.FC<PatientFormProps> = ({
+  mode,
+  initialData,
   onSubmit,
   onCancel,
   isLoading,
@@ -64,6 +69,9 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
 }) => {
   const theme = useMantineTheme();
   // React Hook Form setup
+  const isUpdateMode = mode === 'update';
+  const validationSchema = isUpdateMode ? UpdatePatientCommandSchema : CreatePatientCommandSchema;
+
   const {
     register,
     handleSubmit,
@@ -75,30 +83,30 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
     setError,
     clearErrors,
     formState: { errors },
-  } = useForm<CreatePatientCommand>({
-    resolver: zodResolver(CreatePatientCommandSchema) as any,
+  } = useForm<CreatePatientCommand | UpdatePatientCommand>({
+    resolver: zodResolver(validationSchema) as any,
     mode: 'onBlur',
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      middleName: '',
-      dateOfBirth: '',
-      gender: undefined,
-      contactNumber: '',
-      houseNumber: '',
-      streetName: '',
-      province: '',
-      cityMunicipality: '',
-      barangay: '',
-      guardianName: '',
-      guardianGender: undefined,
-      guardianRelationship: '',
-      guardianContactNumber: '', // Set as empty string instead of undefined
-      guardianHouseNumber: '',
-      guardianStreetName: '',
-      guardianProvince: '',
-      guardianCityMunicipality: '',
-      guardianBarangay: '',
+      firstName: initialData?.firstName || '',
+      lastName: initialData?.lastName || '',
+      middleName: initialData?.middleName || '',
+      dateOfBirth: initialData?.dateOfBirth || '',
+      gender: initialData?.gender || undefined,
+      contactNumber: initialData?.contactNumber || '',
+      houseNumber: initialData?.houseNumber || '',
+      streetName: initialData?.streetName || '',
+      province: initialData?.province || '',
+      cityMunicipality: initialData?.cityMunicipality || '',
+      barangay: initialData?.barangay || '',
+      guardianName: initialData?.guardianName || '',
+      guardianGender: initialData?.guardianGender || undefined,
+      guardianRelationship: initialData?.guardianRelationship || '',
+      guardianContactNumber: initialData?.guardianContactNumber || '', // Set as empty string instead of undefined
+      guardianHouseNumber: initialData?.guardianHouseNumber || '',
+      guardianStreetName: initialData?.guardianStreetName || '',
+      guardianProvince: initialData?.guardianProvince || '',
+      guardianCityMunicipality: initialData?.guardianCityMunicipality || '',
+      guardianBarangay: initialData?.guardianBarangay || '',
     },
   });
 
@@ -236,11 +244,29 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   const ageDisplayValue = computedAge !== null ? computedAge.toString() : '';
 
   // Check if required form fields are empty
-  const isFormEmpty = !firstName?.trim() || 
-                     !lastName?.trim() || 
-                     !dateOfBirth?.trim() || 
-                     !gender?.trim() ||
-                     !contactNumber?.trim();
+  // For update mode, allow partial updates
+  const isFormEmpty = isUpdateMode ? 
+    false : // Allow updates even with empty fields  
+    (!firstName?.trim() || 
+     !lastName?.trim() || 
+     !dateOfBirth?.trim() || 
+     !gender?.trim() ||
+     !contactNumber?.trim());
+
+  // Debug logging for button state
+  console.log('🔍 Form state debug:', {
+    isUpdateMode,
+    isFormEmpty,
+    isLoading,
+    buttonDisabled: isFormEmpty || isLoading,
+    firstName: firstName?.trim(),
+    lastName: lastName?.trim(),
+    dateOfBirth: dateOfBirth?.trim(),
+    gender: gender?.trim(),
+    contactNumber: contactNumber?.trim(),
+    formErrors: errors,
+    hasErrors: Object.keys(errors).length > 0
+  });
 
   // Handle field blur validation for optional fields with validation rules
   const handleFieldBlur = async (fieldName: keyof CreatePatientFormData) => {
@@ -267,10 +293,38 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
   };
 
   const handleFormSubmit = handleSubmit(async (data) => {
-    const success = await onSubmit(data as unknown as CreatePatientCommand);
-    if (success) {
-      reset(); // Reset form after successful submission
+    console.log('📝 PatientForm.handleFormSubmit called');
+    console.log('📝 Form data:', data);
+    console.log('📝 Mode:', mode, 'isUpdateMode:', isUpdateMode);
+    console.log('📝 Initial data ID:', initialData?.id);
+    
+    try {
+      let submitData: CreatePatientCommand | UpdatePatientCommand;
+      
+      if (isUpdateMode && initialData?.id) {
+        // For update mode, include the ID
+        submitData = {
+          ...data,
+          id: initialData.id
+        } as UpdatePatientCommand;
+        console.log('📝 Prepared UPDATE data:', submitData);
+      } else {
+        // For create mode, exclude ID
+        submitData = data as CreatePatientCommand;
+        console.log('📝 Prepared CREATE data:', submitData);
+      }
+      
+      console.log('📝 Calling onSubmit with data...');
+      const success = await onSubmit(submitData);
+      console.log('📝 onSubmit result:', success);
+      if (success && !isUpdateMode) {
+        reset(); // Only reset form after successful creation, not update
+      }
+    } catch (error) {
+      console.error('📝 Error in handleFormSubmit:', error);
     }
+  }, (errors) => {
+    console.error('📝 Form validation errors:', errors);
   });
 
   return (
@@ -632,9 +686,46 @@ export const AddPatientForm: React.FC<AddPatientFormProps> = ({
             Cancel
           </Button>
           <Button
-            type="submit"
+            type="button"
             disabled={isFormEmpty || isLoading}
             loading={isLoading}
+            onClick={async () => {
+              console.log('🖱️ Submit button clicked!');
+              console.log('🖱️ Button disabled?', isFormEmpty || isLoading);
+              
+              // Get current form data and submit directly
+              const formData = watch();
+              console.log('🖱️ Current form data:', formData);
+              
+              if (isUpdateMode && initialData?.id) {
+                const submitData = {
+                  ...formData,
+                  id: initialData.id
+                } as UpdatePatientCommand;
+                console.log('🖱️ Submit data prepared:', submitData);
+                try {
+                  const result = await onSubmit(submitData);
+                  console.log('🖱️ Submit result:', result);
+                  if (result && !isUpdateMode) {
+                    reset();
+                  }
+                } catch (error) {
+                  console.error('🖱️ Submit error:', error);
+                }
+              } else {
+                // Create mode
+                const submitData = formData as CreatePatientCommand;
+                try {
+                  const result = await onSubmit(submitData);
+                  console.log('🖱️ Submit result:', result);
+                  if (result && !isUpdateMode) {
+                    reset();
+                  }
+                } catch (error) {
+                  console.error('🖱️ Submit error:', error);
+                }
+              }
+            }}
           >
             <Icon icon="fas fa-save" style={{ marginRight: '4px' }} />
             {isLoading ? 'Submitting...' : 'Submit'}

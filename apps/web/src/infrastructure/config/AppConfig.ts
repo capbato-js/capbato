@@ -26,6 +26,7 @@ export interface ApiConfiguration {
       base: string;
       all: string;
       create: string;
+      update: (id: string) => string;
       byId: (id: string) => string;
       stats: string;
     };
