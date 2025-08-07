@@ -194,4 +194,24 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       } as BloodChemistryResponse;
     }
   }
+
+  /**
+   * Get blood chemistry results by patient ID
+   */
+  async getBloodChemistryByPatientId(patientId: string): Promise<BloodChemistryResponse> {
+    try {
+      console.log('🧪 Fetching blood chemistry results for patient:', patientId);
+      
+      const response = await this.httpClient.get<BloodChemistryResponse>(`/api/laboratory/blood-chemistry/${patientId}`);
+      
+      console.log('✅ Blood chemistry results fetched successfully');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error fetching blood chemistry results:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fetch blood chemistry results'
+      } as BloodChemistryResponse;
+    }
+  }
 }

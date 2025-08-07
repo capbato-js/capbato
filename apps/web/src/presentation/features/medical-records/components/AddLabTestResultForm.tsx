@@ -25,6 +25,8 @@ export type AddLabTestResultFormData = Record<string, string | undefined>;
 interface AddLabTestResultFormProps {
   testType?: LabTestType;
   enabledFields?: string[]; // Array of field IDs that should be enabled (e.g., ['fbs', 'bun'])
+  viewMode?: boolean; // If true, all fields are read-only and form shows existing data
+  existingData?: AddLabTestResultFormData; // Pre-populate form with existing results
   patientData?: {
     patientNumber?: string;
     patientName?: string;
@@ -45,6 +47,8 @@ interface AddLabTestResultFormProps {
 export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   testType = 'BLOOD_CHEMISTRY',
   enabledFields, // Array of field IDs that should be enabled
+  viewMode = false, // Read-only mode for viewing existing results
+  existingData, // Pre-populated data for view mode
   patientData,
   onSubmit,
   onCancel,
@@ -68,6 +72,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
     handleSubmit,
   } = useForm<AddLabTestResultFormData>({
     resolver: zodResolver(schema),
+    defaultValues: existingData || {}, // Pre-populate with existing data in view mode
   });
 
   const handleFormSubmit = (data: AddLabTestResultFormData) => {
@@ -77,8 +82,9 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   // Reusable field component
   const renderField = (field: LabTestFieldConfig) => {
     // Determine if this field should be enabled
-    // Handle case-insensitive matching and various formats
-    const isFieldEnabled = !enabledFields || enabledFields.length === 0 || 
+    // In view mode, all fields are disabled but visible
+    // In edit mode, respect the enabledFields array
+    const isFieldEnabled = !viewMode && (!enabledFields || enabledFields.length === 0 || 
       enabledFields.some(enabledField => {
         const normalizedEnabledField = enabledField.toLowerCase().trim();
         const normalizedFieldId = field.id.toLowerCase().trim();
@@ -89,7 +95,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                normalizedEnabledField === normalizedFieldLabel ||
                normalizedFieldLabel.includes(normalizedEnabledField) ||
                normalizedFieldId.includes(normalizedEnabledField);
-      });
+      }));
     
     return (
       <Box 
@@ -103,25 +109,26 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
           fontSize: '14px', 
           fontWeight: 'bold', 
           gap: '10px',
-          opacity: isFieldEnabled ? 1 : 0.5 // Visual indication of disabled state
+          opacity: viewMode || isFieldEnabled ? 1 : 0.5 // In view mode, show all fields clearly
         }}
       >
-        <Text size="sm" fw={500} style={{ color: isFieldEnabled ? 'inherit' : '#999' }}>
+        <Text size="sm" fw={500} style={{ color: viewMode || isFieldEnabled ? 'inherit' : '#999' }}>
           {field.label}
         </Text>
         <input
           {...register(field.id)}
           type="text"
           className={classes.nativeInput}
-          disabled={!isFieldEnabled}
+          disabled={viewMode || !isFieldEnabled} // Disable all fields in view mode
+          readOnly={viewMode} // Make read-only in view mode for better UX
           style={{
-            backgroundColor: isFieldEnabled ? 'white' : '#f5f5f5',
-            color: isFieldEnabled ? 'inherit' : '#999',
-            cursor: isFieldEnabled ? 'text' : 'not-allowed',
-            border: isFieldEnabled ? '1px solid #007bff' : '1px solid #e9ecef', // Blue border for enabled fields
+            backgroundColor: viewMode ? '#f8f9fa' : (isFieldEnabled ? 'white' : '#f5f5f5'),
+            color: viewMode || isFieldEnabled ? 'inherit' : '#999',
+            cursor: viewMode ? 'default' : (isFieldEnabled ? 'text' : 'not-allowed'),
+            border: viewMode ? '1px solid #dee2e6' : (isFieldEnabled ? '1px solid #007bff' : '1px solid #e9ecef'),
           }}
         />
-        <Text size="sm" style={{ fontSize: '14px', color: isFieldEnabled ? 'inherit' : '#999' }}>
+        <Text size="sm" style={{ fontSize: '14px', color: viewMode || isFieldEnabled ? 'inherit' : '#999' }}>
           {field.normalRange ? ` ${field.normalRange} ` : ''}
         </Text>
       </Box>
@@ -312,18 +319,20 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                 disabled={isLoading}
                 leftSection={<Icon icon="fas fa-times" size={14} />}
               >
-                Cancel
+                {viewMode ? 'Close' : 'Cancel'}
               </Button>
             )}
-            <Button
-              type="submit"
-              style={{ minWidth: '100px' }}
-              loading={isLoading}
-              disabled={isLoading}
-              leftSection={<Icon icon="fas fa-save" size={14} />}
-            >
-              Submit
-            </Button>
+            {!viewMode && (
+              <Button
+                type="submit"
+                style={{ minWidth: '100px' }}
+                loading={isLoading}
+                disabled={isLoading}
+                leftSection={<Icon icon="fas fa-save" size={14} />}
+              >
+                Submit
+              </Button>
+            )}
           </Box>
         </Stack>
       </form>

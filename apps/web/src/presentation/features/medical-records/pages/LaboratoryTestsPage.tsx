@@ -18,7 +18,9 @@ export const LaboratoryTestsPage: React.FC = () => {
   
   // Modal state
   const [addResultModalOpened, setAddResultModalOpened] = useState(false);
+  const [viewResultModalOpened, setViewResultModalOpened] = useState(false);
   const [selectedLabTest, setSelectedLabTest] = useState<LabTest | null>(null);
+  const [bloodChemistryData, setBloodChemistryData] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -36,6 +38,7 @@ export const LaboratoryTestsPage: React.FC = () => {
     fetchLabTestsByPatientId,
     fetchLabRequestByPatientId,
     createBloodChemistry,
+    fetchBloodChemistryByPatientId,
     loadingStates, 
     errorStates 
   } = useLaboratoryStore();
@@ -178,9 +181,39 @@ export const LaboratoryTestsPage: React.FC = () => {
     navigate('/laboratory');
   };
 
-  const handleViewTest = (test: LabTest) => {
+  const handleViewTest = async (test: LabTest) => {
     console.log('View test:', test);
-    // TODO: Implement view test functionality
+    setSelectedLabTest(test);
+    
+    // Fetch blood chemistry data if it's a blood chemistry test
+    if (test.testCategory === 'BLOOD_CHEMISTRY' && patientId) {
+      try {
+        const bloodChemistryResults = await fetchBloodChemistryByPatientId(patientId);
+        
+        // Find the blood chemistry result that matches this lab test ID
+        const matchingResult = bloodChemistryResults.find(result => 
+          result.labRequestId === test.id
+        );
+        
+        if (matchingResult && matchingResult.results) {
+          // Convert BloodChemistryDto results to form data format (string values)
+          const formData: Record<string, string> = {};
+          Object.entries(matchingResult.results).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              formData[key] = value.toString();
+            }
+          });
+          setBloodChemistryData(formData);
+        } else {
+          setBloodChemistryData({});
+        }
+      } catch (error) {
+        console.error('Error fetching blood chemistry data:', error);
+        setBloodChemistryData({});
+      }
+    }
+    
+    setViewResultModalOpened(true);
   };
 
   const handleEditTest = (test: LabTest) => {
@@ -578,6 +611,36 @@ export const LaboratoryTestsPage: React.FC = () => {
               onSubmit={handleSubmitResult}
               isLoading={isLoading}
               error={error}
+            />
+        </Modal>
+      )}
+
+      {/* View Result Modal */}
+      {selectedLabTest && viewResultModalOpened && patientInfo && (
+        <Modal
+          opened={viewResultModalOpened}
+          onClose={() => setViewResultModalOpened(false)}
+          title="View Lab Test Result"
+          size="xl"
+          customStyles={{
+            body: {
+              padding: '0 24px 24px',
+            }
+          }}
+        >
+          <AddLabTestResultForm
+              testType={selectedLabTest.testCategory}
+              viewMode={true} // Enable view-only mode
+              enabledFields={selectedLabTest.tests} // Show the specific tests
+              existingData={bloodChemistryData} // Use fetched blood chemistry data
+              patientData={{
+                patientNumber: patientInfo.patientNumber,
+                patientName: patientInfo.patientName,
+                age: patientInfo.age || 0,
+                sex: patientInfo.sex || ''
+              }}
+              onSubmit={() => { /* No-op for view mode */ }}
+              onCancel={() => setViewResultModalOpened(false)}
             />
         </Modal>
       )}

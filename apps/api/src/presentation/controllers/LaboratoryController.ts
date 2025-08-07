@@ -50,6 +50,7 @@ import {
   LabRequestListResponse,
   LabRequestResponse,
   BloodChemistryResponse,
+  BloodChemistryListResponse,
   LaboratoryOperationResponse,
   LabTestListResponse,
   CreateLabRequestRequestDto,
@@ -202,6 +203,18 @@ export class LaboratoryController {
     // Blood chemistry results are added directly to lab requests, not as separate records
 
     return ApiResponseBuilder.success(labRequestDtos);
+  }
+
+  /**
+   * GET /api/laboratory/blood-chemistry/:patientId - Get blood chemistry results for specific patient
+   */
+  @Get('/blood-chemistry/:patientId')
+  async getBloodChemistryByPatientId(@Param('patientId') patientId: string): Promise<BloodChemistryListResponse> {
+    const validatedPatientId = LabRequestIdSchema.parse(patientId);
+    const bloodChemistryResults = await this.getBloodChemistryByPatientIdQueryHandler.execute(validatedPatientId);
+    const bloodChemistryDtos = LaboratoryMapper.toBloodChemistryDtoArray(bloodChemistryResults);
+
+    return ApiResponseBuilder.success(bloodChemistryDtos);
   }
 
   /**

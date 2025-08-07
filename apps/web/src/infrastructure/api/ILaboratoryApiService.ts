@@ -50,4 +50,9 @@ export interface ILaboratoryApiService {
    * Create blood chemistry results
    */
   createBloodChemistry(command: CreateBloodChemistryCommand): Promise<BloodChemistryResponse>;
+
+  /**
+   * Get blood chemistry results by patient ID
+   */
+  getBloodChemistryByPatientId(patientId: string): Promise<BloodChemistryResponse>;
 }
