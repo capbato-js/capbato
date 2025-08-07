@@ -1,0 +1,177 @@
+name: 🐛 Bug Report
+description: File a bug report to help us improve
+title: "[component] [BUG] "
+labels: ["bug", "triage"]
+assignees: []
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component Affected
+      description: Which component is experiencing the issue?
+      options:
+        - api
+        - web
+        - domain
+        - application-api
+        - application-shared
+        - application-web
+        - utils-core
+        - build system
+        - deployment
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: setup-prerequisites
+    attributes:
+      label: "📋 Setup Prerequisites"
+      description: "**IMPORTANT**: Before working on this issue, ensure you have the correct package manager setup!"
+      value: |
+        ## 🚀 Required Setup Steps
+        
+        **⚠️ CRITICAL**: This project uses **pnpm** as the package manager. Using npm or yarn will cause issues!
+        
+        ### 1. Install pnpm globally (if not already installed)
+        ```bash
+        npm install -g pnpm
+        ```
+        
+        ### 2. Install project dependencies
+        ```bash
+        pnpm install
+        ```
+        
+        ### 3. Verify setup by running tests
+        ```bash
+        # For API components
+        pnpm nx test api
+        
+        # For PWA components  
+        pnpm nx test web
+        
+        # For library components
+        pnpm nx test domain
+        pnpm nx test application-api
+        pnpm nx test application-shared
+        pnpm nx test application-web
+        pnpm nx test utils-core
+        ```
+        
+        **✅ You're ready to work on this issue once these commands run successfully!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "Describe the bug..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+        
+        Or use "_No response_" if steps are not available or obvious.
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: "What should have happened?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: A clear and concise description of what actually happened.
+      placeholder: "What actually happened?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots/Logs
+      description: If applicable, add screenshots or logs to help explain your problem.
+      placeholder: "Paste screenshots or logs here..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical - System is unusable
+        - High - Major functionality broken
+        - Medium - Minor functionality issues
+        - Low - Cosmetic issues
+    validations:
+      required: true
+
+  - type: textarea
+    id: commit-message-guidelines
+    attributes:
+      label: "⚠️ CRITICAL: Commit Message Guidelines"
+      description: "**IMPORTANT**: Following these rules is mandatory - commits will FAIL if not followed!"
+      value: |
+        ## ⚠️ MANDATORY Commit Message Format
+        
+        **🚨 FAILURE TO FOLLOW THESE RULES WILL CAUSE COMMIT FAILURES! 🚨**
+        
+        **Format:** `type(scope): subject`
+        
+        **Example:** `fix(api): resolve memory leak in todo service`
+        
+        **Available Types:**
+        - `fix` - A bug fix (for fixing bugs reported in this issue)
+        - `feat` - A new feature  
+        - `refactor` - Code changes that neither fix bugs nor add features
+        - `test` - Adding missing tests or correcting existing tests
+        - `docs` - Documentation only changes
+        - `perf` - Performance improvements
+        - `style` - Formatting changes
+        - `build` - Build system or dependency changes
+        - `ci` - CI configuration changes
+        - `chore` - Other changes
+        
+        **Scope Rules (REQUIRED):**
+        - Use kebab-case (lowercase with hyphens)
+        - Examples: `api`, `web`, `domain`, application-shared`, `utils-core`
+        
+        **Subject Rules (REQUIRED):**
+        - Start with lowercase letter or number
+        - No period at the end
+        - Header length limits vary by scope:
+          - `api-e2e`, `web-e2e`, application-shared`: max 100 characters
+          - `domain`: max 95 characters  
+          - `api`, `web`: max 93 characters
+          - `utils-core`: max 90 characters
+          - All other scopes: max 82 characters
+        - Be descriptive and specific
+        
+        **Reference:** See `commitlint.config.ts` and `.husky/commit-msg` for complete rules
+        
+        **⚠️ Your commits will be automatically rejected if they don't follow these rules!**
+      render: markdown
+    validations:
+      required: false

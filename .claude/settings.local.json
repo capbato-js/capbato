@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "🚀 Package managers and CLIs",
+      "Bash(pnpm *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+
+      "🔧 Build, test, dev",
+      "Bash(vitest *)",
+      "Bash(* build*)",
+      "Bash(* test*)",
+      "Bash(* dev*)",
+      "Bash(npx vitest run:*)",
+
+      "🛠️ Utility commands",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(mkdir *)",
+      "Bash(rm)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(node *)",
+      "Bash(curl *)",
+      "Bash(tree *)",
+      "Bash(timeout *)",
+
+      "🔍 Code tools",
+      "Bash(nx *)"
+    ],
+    "deny": [
+      "🚫 Dangerous commands",
+      "Bash(rm -rf *)",
+      "Bash(del *)",
+      "Bash(chmod *)",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(python3.11 *)"
+    ]
+  }
+}
