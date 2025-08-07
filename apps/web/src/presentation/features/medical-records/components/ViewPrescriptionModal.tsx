@@ -34,14 +34,14 @@ export const ViewPrescriptionModal: React.FC<ViewPrescriptionModalProps> = ({
         // 1. Domain format: { medicationNameValue, dosageValue, ... }
         // 2. DTO format: { medicationName, dosage, ... }
         // 3. UI format: { name, dosage, ... }
-        const name = med.name || med.medicationName || med.medicationNameValue || '';
-        const dosage = med.dosage || med.dosageValue || '';
-        const frequency = med.frequency || '';
-        const duration = med.duration || '';
-        const instructions = med.instructions || med.instructionsValue || '';
+        const name = String(med.name || med.medicationName || med.medicationNameValue || '');
+        const dosage = String(med.dosage || med.dosageValue || '');
+        const frequency = String(med.frequency || '');
+        const duration = String(med.duration || '');
+        const instructions = String(med.instructions || med.instructionsValue || '');
         
         return {
-          id: med.id || '',
+          id: String(med.id || ''),
           name,
           dosage,
           frequency,
@@ -51,7 +51,7 @@ export const ViewPrescriptionModal: React.FC<ViewPrescriptionModalProps> = ({
       })
     : [{ 
         id: '',
-        name: prescription.medications, 
+        name: String(prescription.medications || ''), 
         dosage: '', 
         frequency: '', 
         duration: '', 
@@ -112,7 +112,7 @@ export const ViewPrescriptionModal: React.FC<ViewPrescriptionModalProps> = ({
             <Text fw={600} size="lg">Medications</Text>
           </Group>
 
-          {medications.length > 0 && medications.some(med => med.name && med.name.trim() !== '') ? (
+          {medications.length > 0 && medications.some(med => med.name && typeof med.name === 'string' && med.name.trim() !== '') ? (
             <Stack gap="md">
               {medications.map((medication, index) => (
                 <Paper key={index} p="md" withBorder>
