@@ -224,6 +224,7 @@ export const LaboratoryTestsPage: React.FC = () => {
       if (isBloodChemistryTest) {
         // Convert form data to blood chemistry command
         const bloodChemistryCommand = {
+          patientId: patientId, // Include patient ID for proper identification
           patientName: patientInfo.patientName,
           age: patientInfo.age || 0,
           sex: patientInfo.sex || 'Unknown',

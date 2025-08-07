@@ -153,6 +153,7 @@ export const UpdateLabRequestResultsCommandSchema = z.object({
 const NumericResultSchema = z.number().min(0).optional();
 
 export const CreateBloodChemistryCommandSchema = z.object({
+  patientId: z.string().optional(),
   patientName: z.string().min(1, 'Patient name is required').max(255, 'Patient name cannot exceed 255 characters'),
   age: z.number().int().min(0, 'Age must be positive').max(200, 'Age cannot exceed 200'),
   sex: z.string().min(1, 'Sex is required').refine(

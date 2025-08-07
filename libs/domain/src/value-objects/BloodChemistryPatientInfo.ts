@@ -1,19 +1,26 @@
 export interface BloodChemistryPatientData {
+  patientId?: string;
   patientName: string;
   age: number;
   sex: string;
 }
 
 export class BloodChemistryPatientInfo {
+  private readonly _patientId?: string;
   private readonly _patientName: string;
   private readonly _age: number;
   private readonly _sex: string;
 
   constructor(data: BloodChemistryPatientData) {
+    this._patientId = data.patientId;
     this._patientName = data.patientName;
     this._age = data.age;
     this._sex = data.sex;
     this.validate();
+  }
+
+  get patientId(): string | undefined {
+    return this._patientId;
   }
 
   get patientName(): string {
