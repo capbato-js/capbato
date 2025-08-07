@@ -100,7 +100,8 @@ export class MongooseBloodChemistryRepository implements IBloodChemistryReposito
 
   private domainToDocument(bloodChemistry: BloodChemistry): Partial<IBloodChemistryDocument> {
     const doc: Partial<IBloodChemistryDocument> = {
-      patientId: `BC-${Date.now()}`, // Generate a simple patient ID
+      labRequestId: bloodChemistry.labRequestId?.value,
+      patientId: bloodChemistry.patientInfo.patientId || `BC-${Date.now()}`, // Use actual patient ID or generate fallback
       patientName: bloodChemistry.patientInfo.patientName,
       ageGender: `${bloodChemistry.patientInfo.age}/${bloodChemistry.patientInfo.sex}`,
       requestDate: bloodChemistry.dateTaken, // Use dateTaken as requestDate
@@ -159,7 +160,8 @@ export class MongooseBloodChemistryRepository implements IBloodChemistryReposito
       document.dateTaken || document.requestDate,
       results,
       document.createdAt,
-      document.updatedAt
+      document.updatedAt,
+      document.labRequestId
     );
   }
 }

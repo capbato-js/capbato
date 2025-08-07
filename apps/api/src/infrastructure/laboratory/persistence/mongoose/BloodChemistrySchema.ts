@@ -2,6 +2,7 @@ import { Schema, model, Document } from 'mongoose';
 
 export interface IBloodChemistryDocument extends Document {
   _id: string;
+  labRequestId?: string;
   patientId: string;
   patientName: string;
   ageGender: string;
@@ -29,6 +30,11 @@ export interface IBloodChemistryDocument extends Document {
 
 const BloodChemistrySchema = new Schema<IBloodChemistryDocument>(
   {
+    labRequestId: {
+      type: String,
+      required: false,
+      index: true,
+    },
     patientId: {
       type: String,
       required: true,

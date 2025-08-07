@@ -198,14 +198,10 @@ export class LaboratoryController {
     const labRequests = await this.getAllLabRequestsQueryHandler.execute();
     const labRequestDtos = LaboratoryMapper.toLabTestDtoArray(labRequests, validatedPatientId);
     
-    // Get blood chemistry results for the patient
-    const bloodChemistryResults = await this.getBloodChemistryByPatientIdQueryHandler.execute(validatedPatientId);
-    const bloodChemistryDtos = LaboratoryMapper.bloodChemistryToLabTestDtoArray(bloodChemistryResults);
-    
-    // Combine both types of lab tests
-    const allLabTestDtos = [...labRequestDtos, ...bloodChemistryDtos];
+    // No longer combine with blood chemistry results since they're now part of lab requests
+    // Blood chemistry results are added directly to lab requests, not as separate records
 
-    return ApiResponseBuilder.success(allLabTestDtos);
+    return ApiResponseBuilder.success(labRequestDtos);
   }
 
   /**

@@ -5,6 +5,9 @@ export class BloodChemistryEntity {
   @PrimaryColumn('varchar')
   id!: string;
 
+  @Column({ name: 'lab_request_id', nullable: true })
+  labRequestId?: string;
+
   @Column({ name: 'patient_id' })
   patientId!: string;
 

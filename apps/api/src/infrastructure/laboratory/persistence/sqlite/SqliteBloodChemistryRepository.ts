@@ -12,6 +12,7 @@ import { getSqliteDatabase } from '../../../database/connections/SqliteConnectio
 
 interface BloodChemistryRecord {
   id: number;
+  labRequestId?: string;
   patientId: string;
   patientName: string;
   ageGender: string;
@@ -50,6 +51,7 @@ export class SqliteBloodChemistryRepository implements IBloodChemistryRepository
     const stmt = this.db.prepare(`
       CREATE TABLE IF NOT EXISTS blood_chem (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        labRequestId TEXT,
         patientId TEXT NOT NULL,
         patientName TEXT NOT NULL,
         ageGender TEXT NOT NULL,
@@ -79,6 +81,7 @@ export class SqliteBloodChemistryRepository implements IBloodChemistryRepository
 
     // Create indexes
     this.db.prepare('CREATE INDEX IF NOT EXISTS idx_blood_chem_patient_id ON blood_chem(patientId)').run();
+    this.db.prepare('CREATE INDEX IF NOT EXISTS idx_blood_chem_lab_request_id ON blood_chem(labRequestId)').run();
     this.db.prepare('CREATE INDEX IF NOT EXISTS idx_blood_chem_status ON blood_chem(status)').run();
     this.db.prepare('CREATE INDEX IF NOT EXISTS idx_blood_chem_date ON blood_chem(requestDate)').run();
   }
@@ -91,14 +94,15 @@ export class SqliteBloodChemistryRepository implements IBloodChemistryRepository
     const results = bloodChemistry.results.results;
     const stmt = this.db.prepare(`
       INSERT INTO blood_chem (
-        patientId, patientName, ageGender, requestDate, status, dateTaken, others,
+        labRequestId, patientId, patientName, ageGender, requestDate, status, dateTaken, others,
         fbs, bun, creatinine, bloodUricAcid, lipidProfile, sgot, sgpt, alp, sodiumNa, potassiumK, hbalc,
         createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
-      `BC-${Date.now()}`, // Generate a simple patient ID
+      bloodChemistry.labRequestId?.value,
+      bloodChemistry.patientInfo.patientId || `BC-${Date.now()}`, // Use actual patient ID or generate fallback
       bloodChemistry.patientInfo.patientName,
       `${bloodChemistry.patientInfo.age}/${bloodChemistry.patientInfo.sex}`,
       bloodChemistry.dateTaken.toISOString(),
@@ -126,7 +130,8 @@ export class SqliteBloodChemistryRepository implements IBloodChemistryRepository
       bloodChemistry.dateTaken,
       bloodChemistry.results,
       bloodChemistry.createdAt,
-      bloodChemistry.updatedAt
+      bloodChemistry.updatedAt,
+      bloodChemistry.labRequestId
     );
 
     return newBloodChemistry;
@@ -253,7 +258,8 @@ export class SqliteBloodChemistryRepository implements IBloodChemistryRepository
       record.dateTaken ? new Date(record.dateTaken) : new Date(record.requestDate),
       results,
       new Date(record.createdAt),
-      record.updatedAt ? new Date(record.updatedAt) : undefined
+      record.updatedAt ? new Date(record.updatedAt) : undefined,
+      record.labRequestId
     );
   }
 }
