@@ -23,6 +23,7 @@ export * from './RescheduleAppointmentUseCase';
 export * from './CreateLabRequestUseCase';
 export * from './UpdateLabRequestUseCase';
 export * from './UpdateLabRequestResultsUseCase';
+export * from './UpdateLabRequestStatusByIdUseCase';
 export * from './CreateBloodChemistryUseCase';
 export * from './CreateUrinalysisResultUseCase';
 export * from './UpdateUrinalysisResultUseCase';

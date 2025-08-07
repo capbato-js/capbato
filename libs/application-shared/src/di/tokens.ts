@@ -71,6 +71,7 @@ export const TOKENS = {
   UpdateLabRequestUseCase: 'UpdateLabRequestUseCase',
   DeleteLabRequestUseCase: 'DeleteLabRequestUseCase',
   UpdateLabRequestResultsUseCase: 'UpdateLabRequestResultsUseCase',
+  UpdateLabRequestStatusByIdUseCase: 'UpdateLabRequestStatusByIdUseCase',
   CreateBloodChemistryUseCase: 'CreateBloodChemistryUseCase',
   UpdateBloodChemistryUseCase: 'UpdateBloodChemistryUseCase',
   DeleteBloodChemistryUseCase: 'DeleteBloodChemistryUseCase',

@@ -1,9 +1,11 @@
 import { BloodChemistryId } from '../value-objects/BloodChemistryId';
 import { BloodChemistryPatientInfo } from '../value-objects/BloodChemistryPatientInfo';
 import { BloodChemistryResults } from '../value-objects/BloodChemistryResults';
+import { LabRequestId } from '../value-objects/LabRequestId';
 
 interface IBloodChemistry {
   id?: BloodChemistryId;
+  labRequestId?: LabRequestId;
   patientInfo: BloodChemistryPatientInfo;
   dateTaken: Date;
   results: BloodChemistryResults;
@@ -13,6 +15,7 @@ interface IBloodChemistry {
 
 export class BloodChemistry implements IBloodChemistry {
   private readonly _id?: BloodChemistryId;
+  private readonly _labRequestId?: LabRequestId;
   private readonly _patientInfo: BloodChemistryPatientInfo;
   private readonly _dateTaken: Date;
   private readonly _results: BloodChemistryResults;
@@ -24,6 +27,7 @@ export class BloodChemistry implements IBloodChemistry {
     dateTaken: Date,
     results: BloodChemistryResults,
     id?: string | BloodChemistryId,
+    labRequestId?: string | LabRequestId,
     createdAt = new Date(),
     updatedAt?: Date
   ) {
@@ -31,6 +35,7 @@ export class BloodChemistry implements IBloodChemistry {
     this._dateTaken = dateTaken;
     this._results = results;
     this._id = id instanceof BloodChemistryId ? id : id ? new BloodChemistryId(id) : undefined;
+    this._labRequestId = labRequestId instanceof LabRequestId ? labRequestId : labRequestId ? new LabRequestId(labRequestId) : undefined;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
   }
@@ -41,9 +46,10 @@ export class BloodChemistry implements IBloodChemistry {
   public static create(
     patientInfo: BloodChemistryPatientInfo,
     dateTaken: Date,
-    results: BloodChemistryResults
+    results: BloodChemistryResults,
+    labRequestId?: string | LabRequestId
   ): BloodChemistry {
-    const bloodChemistry = new BloodChemistry(patientInfo, dateTaken, results);
+    const bloodChemistry = new BloodChemistry(patientInfo, dateTaken, results, undefined, labRequestId);
     
     // Business rule validation for new records
     bloodChemistry.validate();
@@ -60,13 +66,15 @@ export class BloodChemistry implements IBloodChemistry {
     dateTaken: Date,
     results: BloodChemistryResults,
     createdAt: Date,
-    updatedAt?: Date
+    updatedAt?: Date,
+    labRequestId?: string | LabRequestId
   ): BloodChemistry {
     return new BloodChemistry(
       patientInfo,
       dateTaken,
       results,
       id,
+      labRequestId,
       createdAt,
       updatedAt
     );
@@ -74,6 +82,10 @@ export class BloodChemistry implements IBloodChemistry {
 
   get id(): BloodChemistryId | undefined {
     return this._id;
+  }
+
+  get labRequestId(): LabRequestId | undefined {
+    return this._labRequestId;
   }
 
   get patientInfo(): BloodChemistryPatientInfo {
@@ -98,13 +110,17 @@ export class BloodChemistry implements IBloodChemistry {
 
   // Business methods
   updateResults(newResults: BloodChemistryResults): BloodChemistry {
+    if (!this._id) {
+      throw new Error('Cannot update results of unsaved BloodChemistry record');
+    }
     return BloodChemistry.reconstruct(
-      this._id!,
+      this._id,
       this._patientInfo,
       this._dateTaken,
       newResults,
       this._createdAt,
-      new Date()
+      new Date(),
+      this._labRequestId
     );
   }
 

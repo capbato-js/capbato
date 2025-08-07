@@ -443,7 +443,8 @@ export class LaboratoryMapper {
     return BloodChemistry.create(
       patientInfo,
       command.dateTaken,
-      results
+      results,
+      command.labRequestId
     );
   }
 

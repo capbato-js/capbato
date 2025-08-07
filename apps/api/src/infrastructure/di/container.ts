@@ -81,6 +81,7 @@ import {
   // Laboratory Use Cases  
   CreateLabRequestUseCase,
   UpdateLabRequestResultsUseCase,
+  UpdateLabRequestStatusByIdUseCase,
   CreateBloodChemistryUseCase,
   CreateUrinalysisResultUseCase,
   UpdateUrinalysisResultUseCase,
@@ -362,6 +363,8 @@ export const configureDI = async () => {
   // Laboratory Use Cases
   container.registerSingleton(TOKENS.CreateLabRequestUseCase, CreateLabRequestUseCase);
   container.registerSingleton(TOKENS.UpdateLabRequestResultsUseCase, UpdateLabRequestResultsUseCase);
+  container.registerSingleton(TOKENS.UpdateLabRequestStatusByIdUseCase, UpdateLabRequestStatusByIdUseCase);
+  container.registerSingleton(TOKENS.UpdateLabRequestStatusByIdUseCase, UpdateLabRequestStatusByIdUseCase);
   container.registerSingleton(TOKENS.CreateBloodChemistryUseCase, CreateBloodChemistryUseCase);
   container.registerSingleton(TOKENS.CreateUrinalysisResultUseCase, CreateUrinalysisResultUseCase);
   container.registerSingleton(TOKENS.UpdateUrinalysisResultUseCase, UpdateUrinalysisResultUseCase);
