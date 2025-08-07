@@ -104,7 +104,7 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
 
   private domainToEntity(bloodChemistry: BloodChemistry): Partial<BloodChemistryEntity> {
     const entity: Partial<BloodChemistryEntity> = {
-      patientId: `BC-${Date.now()}`, // Generate a simple patient ID since it's not in the domain
+      patientId: bloodChemistry.patientInfo.patientId || `BC-${Date.now()}`, // Use actual patient ID if available
       patientName: bloodChemistry.patientInfo.patientName,
       ageGender: `${bloodChemistry.patientInfo.age}/${bloodChemistry.patientInfo.sex}`,
       requestDate: bloodChemistry.dateTaken, // Use dateTaken as requestDate for now
@@ -138,6 +138,7 @@ export class TypeOrmBloodChemistryRepository implements IBloodChemistryRepositor
 
   private entityToDomain(entity: BloodChemistryEntity): BloodChemistry {
     const patientInfo = new BloodChemistryPatientInfo({
+      patientId: entity.patientId,
       patientName: entity.patientName,
       age: parseInt(entity.ageGender.split('/')[0]) || 0,
       sex: entity.ageGender.split('/')[1] || 'unknown'

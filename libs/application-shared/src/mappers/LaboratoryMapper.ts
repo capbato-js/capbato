@@ -178,7 +178,7 @@ export class LaboratoryMapper {
       date: bloodChemistry.dateTaken.toISOString().split('T')[0], // Format as YYYY-MM-DD
       status: 'Complete', // Blood chemistry results are always complete once created
       results: 'Available',
-      patientId: bloodChemistry.patient.name, // Use patient name as ID for now
+      patientId: bloodChemistry.patientInfo.patientId || bloodChemistry.patientInfo.patientName, // Use patient ID if available, fallback to name
       testName,
     };
   }
@@ -399,6 +399,7 @@ export class LaboratoryMapper {
    */
   static fromCreateBloodChemistryCommand(command: CreateBloodChemistryCommand): BloodChemistry {
     const patientInfo = new BloodChemistryPatientInfo({
+      patientId: command.patientId,
       patientName: command.patientName,
       age: command.age,
       sex: command.sex,
