@@ -6,7 +6,7 @@ import { AddPrescriptionModal } from '../components/AddPrescriptionModal';
 import { ViewPrescriptionModal } from '../components/ViewPrescriptionModal';
 import { DeletePrescriptionModal } from '../components/DeletePrescriptionModal';
 import { usePrescriptionListViewModel } from '../../prescriptions/view-models/usePrescriptionListViewModel';
-import { usePrescriptionItemViewModel } from '../../prescriptions/view-models/usePrescriptionItemViewModel';
+import { usePrescriptionStore } from '../../../../infrastructure/state/PrescriptionStore';
 
 // Type for the display prescription with grouped medications
 type DisplayPrescription = {
@@ -23,6 +23,7 @@ type DisplayPrescription = {
 
 export const PrescriptionsPage: React.FC = () => {
   const prescriptionListViewModel = usePrescriptionListViewModel();
+  const prescriptionStore = usePrescriptionStore();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -85,8 +86,52 @@ export const PrescriptionsPage: React.FC = () => {
       
       setSelectedPrescription(combinedPrescription);
     } else {
-      // This is a regular prescription
-      setSelectedPrescription(prescription as Prescription);
+      // For display prescriptions from the table, find the corresponding raw domain prescription(s)
+      const displayPrescription = prescription as DisplayPrescription;
+      
+      // If this is a single prescription, find the domain prescription by ID
+      const domainPrescription = prescriptionListViewModel.filteredPrescriptions.find(p => 
+        p.stringId === displayPrescription.id
+      );
+      
+      if (domainPrescription) {
+        // Transform domain prescription to UI format with populated data
+        const prescriptionWithData = domainPrescription as unknown as {
+          _populatedPatient?: {
+            patientNumber: string;
+            fullName: string;
+          };
+          _populatedDoctor?: {
+            fullName: string;
+          };
+        };
+        
+        const transformedPrescription: Prescription = {
+          id: domainPrescription.stringId || '',
+          patientNumber: prescriptionWithData._populatedPatient?.patientNumber || displayPrescription.patientNumber,
+          patientName: prescriptionWithData._populatedPatient?.fullName || displayPrescription.patientName,
+          patientId: domainPrescription.patientId,
+          doctor: prescriptionWithData._populatedDoctor?.fullName || displayPrescription.doctor,
+          doctorId: domainPrescription.doctorId,
+          datePrescribed: domainPrescription.prescribedDate.toISOString().split('T')[0],
+          medications: domainPrescription.medications.map(med => ({
+            id: med.stringId || '',
+            name: med.medicationNameValue,
+            medicationName: med.medicationNameValue, // Include both for compatibility
+            dosage: med.dosageValue,
+            frequency: med.frequency,
+            duration: med.duration,
+            instructions: med.instructionsValue
+          })),
+          notes: domainPrescription.additionalNotes || ''
+        };
+        
+        setSelectedPrescription(transformedPrescription);
+      } else {
+        // Fallback - this shouldn't happen but handle gracefully
+        console.warn('Could not find domain prescription for display prescription:', displayPrescription);
+        setSelectedPrescription(prescription as Prescription);
+      }
     }
     setViewModalOpen(true);
   };
@@ -104,7 +149,38 @@ export const PrescriptionsPage: React.FC = () => {
     );
     
     if (actualPrescription) {
-      setSelectedPrescription(actualPrescription as unknown as Prescription);
+      // Transform domain prescription to UI format with populated data (same logic as handleViewPrescription)
+      const prescriptionWithData = actualPrescription as unknown as {
+        _populatedPatient?: {
+          patientNumber: string;
+          fullName: string;
+        };
+        _populatedDoctor?: {
+          fullName: string;
+        };
+      };
+      
+      const transformedPrescription: Prescription = {
+        id: actualPrescription.stringId || '',
+        patientNumber: prescriptionWithData._populatedPatient?.patientNumber || prescription.patientNumber,
+        patientName: prescriptionWithData._populatedPatient?.fullName || prescription.patientName,
+        patientId: actualPrescription.patientId,
+        doctor: prescriptionWithData._populatedDoctor?.fullName || prescription.doctor,
+        doctorId: actualPrescription.doctorId,
+        datePrescribed: actualPrescription.prescribedDate.toISOString().split('T')[0],
+        medications: actualPrescription.medications.map(med => ({
+          id: med.stringId || '',
+          name: med.medicationNameValue,
+          medicationName: med.medicationNameValue, // Include both for compatibility
+          dosage: med.dosageValue,
+          frequency: med.frequency,
+          duration: med.duration,
+          instructions: med.instructionsValue
+        })),
+        notes: actualPrescription.additionalNotes || ''
+      };
+      
+      setSelectedPrescription(transformedPrescription);
       setEditModalOpen(true);
     }
   };
@@ -122,7 +198,38 @@ export const PrescriptionsPage: React.FC = () => {
     );
     
     if (actualPrescription) {
-      setSelectedPrescription(actualPrescription as unknown as Prescription);
+      // Transform domain prescription to UI format with populated data (same logic as handleViewPrescription)
+      const prescriptionWithData = actualPrescription as unknown as {
+        _populatedPatient?: {
+          patientNumber: string;
+          fullName: string;
+        };
+        _populatedDoctor?: {
+          fullName: string;
+        };
+      };
+      
+      const transformedPrescription: Prescription = {
+        id: actualPrescription.stringId || '',
+        patientNumber: prescriptionWithData._populatedPatient?.patientNumber || prescription.patientNumber,
+        patientName: prescriptionWithData._populatedPatient?.fullName || prescription.patientName,
+        patientId: actualPrescription.patientId,
+        doctor: prescriptionWithData._populatedDoctor?.fullName || prescription.doctor,
+        doctorId: actualPrescription.doctorId,
+        datePrescribed: actualPrescription.prescribedDate.toISOString().split('T')[0],
+        medications: actualPrescription.medications.map(med => ({
+          id: med.stringId || '',
+          name: med.medicationNameValue,
+          medicationName: med.medicationNameValue, // Include both for compatibility
+          dosage: med.dosageValue,
+          frequency: med.frequency,
+          duration: med.duration,
+          instructions: med.instructionsValue
+        })),
+        notes: actualPrescription.additionalNotes || ''
+      };
+      
+      setSelectedPrescription(transformedPrescription);
       setDeleteModalOpen(true);
     }
   };
@@ -145,14 +252,15 @@ export const PrescriptionsPage: React.FC = () => {
     if (!selectedPrescription?.id) return;
 
     try {
-      // Find the prescription in the list
+      // Find the prescription in the list using the ID from the transformed prescription
       const foundPrescription = prescriptionListViewModel.prescriptions.find(p => p.stringId === selectedPrescription.id);
-      if (!foundPrescription) return;
+      if (!foundPrescription || !foundPrescription.stringId) {
+        console.error('Prescription not found for deletion:', selectedPrescription.id);
+        return;
+      }
 
-      // Create item view model to handle deletion
-      const itemViewModel = usePrescriptionItemViewModel(foundPrescription);
-      
-      await itemViewModel.deletePrescription();
+      // Use the store directly to delete the prescription
+      await prescriptionStore.deletePrescription(foundPrescription.stringId);
       
       console.log('Prescription deleted successfully:', selectedPrescription.id);
       
@@ -163,6 +271,7 @@ export const PrescriptionsPage: React.FC = () => {
       prescriptionListViewModel.refreshPrescriptions();
     } catch (error) {
       console.error('Failed to delete prescription:', error);
+      // TODO: Show error notification to user
     }
   };
 
@@ -210,7 +319,10 @@ export const PrescriptionsPage: React.FC = () => {
       const group = groupedPrescriptions.get(groupKey);
       if (group) {
         group.prescriptions.push(prescription);
-        group.medications.push(prescription.medicationNameValue);
+        // Extract all medication names from the medications array
+        prescription.medications.forEach(medication => {
+          group.medications.push(medication.medicationNameValue);
+        });
       }
     });
 

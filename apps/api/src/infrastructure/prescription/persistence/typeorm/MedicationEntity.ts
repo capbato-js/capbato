@@ -24,8 +24,8 @@ export class MedicationEntity {
   @Column({ type: 'varchar', length: 100 })
   dosage!: string;
 
-  @Column({ type: 'text' })
-  instructions!: string;
+  @Column({ type: 'text', nullable: true })
+  instructions!: string | null;
 
   @Column({ type: 'varchar', length: 100 })
   frequency!: string;
