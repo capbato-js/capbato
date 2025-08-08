@@ -1,0 +1,863 @@
+{
+  "info": {
+    "_postman_id": "cms-combined-api-collection",
+    "name": "Clinic Management System - Complete API Collection",
+    "description": "Complete comprehensive API collection for the Clinic Management System with Clean Architecture. This collection combines all individual API collections into a unified testing suite.\n\n## API Coverage\n\n### 🔐 Authentication API (/api/auth)\n- User registration with role-based access (admin, doctor, receptionist)\n- User login with email/username support\n- JWT token management and validation\n- Password strength validation\n- Doctor-specific profile fields during registration\n\n### 👥 User Management (/api/users)\n- User CRUD operations\n- Password change functionality\n- Role-based operations and filtering\n- User profile management\n\n### 👨‍⚕️ Doctor Management (/api/doctors)\n- Doctor profile CRUD operations\n- User-Doctor relationship management\n- Medical specialization tracking\n- License and experience management\n- Philippine and US phone number validation\n\n### 🏥 Patient Management (/api/patients)\n- Patient CRUD operations\n- Patient statistics and reporting\n- Structured Philippine address management\n- Guardian information handling\n- Medical history tracking\n\n### 📅 Schedule Management (/api/schedules)\n- Doctor schedule CRUD operations\n- Date and time validation\n- Schedule statistics and reporting\n- Today's doctor lookup\n- Future schedule filtering\n\n### 📋 Appointment Management (/api/appointments)\n- Appointment CRUD operations\n- Business rule validation (4 per slot, no duplicates)\n- Status management (scheduled, confirmed, cancelled)\n- Patient-Doctor association\n- Time slot management\n\n### 🧪 Laboratory Management (/api/laboratory)\n- Laboratory request management\n- Blood chemistry results tracking\n- Critical value alerting\n- Test selection and validation\n- Patient-lab request association\n\n### 📍 Address API (/api/address)\n- Philippine address hierarchy (provinces, cities, barangays)\n- Address validation and lookup\n- Geographic data management\n\n### ✅ Todo Management (/api/todos)\n- Complete todo CRUD operations\n- Priority and completion management\n- Todo filtering and statistics\n\n## Testing Strategy\n\nThis collection follows comprehensive testing best practices:\n- **Happy Path Testing**: Core functionality validation\n- **Error Handling**: Validation errors, authentication failures, not found scenarios\n- **Schema Validation**: Response structure verification\n- **Dynamic Data**: Variable management for realistic test flows\n- **Performance Testing**: Response time validations\n- **Security Testing**: Authentication and authorization flows\n- **Business Logic Testing**: Complex validation rules and constraints\n\n## Environment Variables\n\nUse the following environment variables:\n- `cms_local`: http://localhost:4000 (for local development)\n- `cms_prod`: https://capstone-api.up.railway.app (for production)\n- `baseUrl`: Base URL for backward compatibility\n- `authToken`: JWT token for authenticated requests\n- Various test data variables for dynamic testing\n\n## Collection Organization\n\nThe collection is organized into logical folders matching the API structure:\n1. 🏥 Server Health & Info\n2. 🔐 Authentication API\n3. 👥 User Management API\n4. 👨‍⚕️ Doctor Management API\n5. 🏥 Patient Management API (from copy collection)\n6. 📅 Schedule Management API\n7. 📋 Appointment Management API\n8. 🧪 Laboratory Management API\n9. 📍 Address API\n10. ✅ Todo Management API (from copy collection)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 2,
+      "minor": 3,
+      "patch": 0
+    }
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "{{cms_local}}",
+      "type": "string",
+      "description": "Base URL for the Clinic Management System API server"
+    },
+    {
+      "key": "base_url",
+      "value": "{{cms_local}}",
+      "type": "string",
+      "description": "Alias for baseUrl to support different collection formats"
+    },
+    {
+      "key": "cms_local",
+      "value": "http://localhost:4000",
+      "type": "string",
+      "description": "CMS Local environment base URL"
+    },
+    {
+      "key": "cms_prod",
+      "value": "https://capstone-api.up.railway.app",
+      "type": "string",
+      "description": "CMS Production environment base URL"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from login operations"
+    },
+    {
+      "key": "testUserId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic user ID for testing"
+    },
+    {
+      "key": "testPatientId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic patient ID for testing"
+    },
+    {
+      "key": "todoId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic todo ID for testing"
+    },
+    {
+      "key": "testDoctorId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic doctor ID for testing"
+    },
+    {
+      "key": "doctor_profile_id",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic doctor profile ID for testing"
+    },
+    {
+      "key": "appointment_id",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic appointment ID for testing"
+    },
+    {
+      "key": "sample_patient_id",
+      "value": "1",
+      "type": "string",
+      "description": "Sample patient ID for appointment testing"
+    },
+    {
+      "key": "sample_doctor_id",
+      "value": "1",
+      "type": "string",
+      "description": "Sample doctor ID for appointment testing"
+    },
+    {
+      "key": "future_date",
+      "value": "2025-08-10",
+      "type": "string",
+      "description": "Future date for appointment testing"
+    },
+    {
+      "key": "updated_date",
+      "value": "2025-08-11",
+      "type": "string",
+      "description": "Updated date for appointment testing"
+    },
+    {
+      "key": "updated_doctor_id",
+      "value": "2",
+      "type": "string",
+      "description": "Updated doctor ID for appointment testing"
+    },
+    {
+      "key": "testEmail",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic test email for registration tests"
+    },
+    {
+      "key": "loginTestEmail",
+      "value": "test.admin@clinic.com",
+      "type": "string",
+      "description": "Fixed email for login testing"
+    },
+    {
+      "key": "loginTestPassword",
+      "value": "AdminPass123",
+      "type": "string",
+      "description": "Fixed password for login testing"
+    },
+    {
+      "key": "doctorTestEmail",
+      "value": "doctor.test@clinic.com",
+      "type": "string",
+      "description": "Fixed email for doctor role testing"
+    },
+    {
+      "key": "doctorTestPassword",
+      "value": "DoctorPass123",
+      "type": "string",
+      "description": "Fixed password for doctor role testing"
+    },
+    {
+      "key": "receptionistTestEmail",
+      "value": "receptionist.test@clinic.com",
+      "type": "string",
+      "description": "Fixed email for receptionist role testing"
+    },
+    {
+      "key": "receptionistTestPassword",
+      "value": "ReceptionistPass123",
+      "type": "string",
+      "description": "Fixed password for receptionist role testing"
+    },
+    {
+      "key": "metro_manila_code",
+      "value": "METRO_MANILA",
+      "type": "string",
+      "description": "Metro Manila province code for address testing"
+    },
+    {
+      "key": "cebu_code",
+      "value": "CEBU",
+      "type": "string",
+      "description": "Cebu province code for address testing"
+    },
+    {
+      "key": "davao_code",
+      "value": "DAVAO_REGION",
+      "type": "string",
+      "description": "Davao region code for address testing"
+    }
+  ],
+  "item": [
+    {
+      "name": "📋 Appointment Management API",
+      "description": "Appointment management endpoints for healthcare clinic\n\n## Appointment Management Architecture\nThe API manages patient appointments with comprehensive business logic:\n\n**Appointment Information:**\n- `id`: Unique appointment identifier\n- `patientId`: Reference to patient record (foreign key to User entity)\n- `reasonForVisit`: Purpose/reason for the appointment\n- `appointmentDate`: Date in ISO format (YYYY-MM-DD)\n- `appointmentTime`: Time in 24-hour format (HH:MM)\n- `status`: Appointment status ('scheduled', 'confirmed', 'cancelled')\n- `doctorId`: Reference to doctor record (foreign key to Doctor entity)\n- `createdAt`: Creation timestamp\n- `updatedAt`: Last update timestamp\n\n**Note:** Patient name and contact info are retrieved from User entity via patientId for data consistency\n\n**Business Rules Implemented:**\n- **Time Slot Limits**: Maximum 4 appointments per time slot\n- **Duplicate Prevention**: One appointment per patient per day\n- **Past Date Validation**: Cannot schedule appointments for past dates\n- **Status Transitions**: scheduled → confirmed/cancelled\n- **Patient Validation**: Patient must exist before appointment creation\n\n**Appointment Status Flow:**\n1. **scheduled**: Initial status when appointment is created\n2. **confirmed**: Appointment is confirmed by staff/patient\n3. **cancelled**: Appointment is cancelled\n\n**API Response Structure:**\nAll responses follow a consistent format:\n- `success`: Boolean indicating operation success\n- `data`: The actual response data (appointment object or array)\n- `message`: Success/error message for operations\n\n**Query Capabilities:**\n- Get appointments by patient ID\n- Get appointments by date range\n- Get today's appointments\n- Get confirmed appointments only\n- Get appointment statistics and summaries\n\n**Time Format Support:**\nThe API accepts various time formats:\n- 24-hour format: '14:30', '09:00'\n- 12-hour format: '2:30 PM', '9:00 AM'\n- Automatically converts to consistent format\n\n**Integration with Other APIs:**\nAppointments API integrates with:\n- **Patient API**: Validates patient existence and retrieves contact info\n- **Doctor API**: Associates appointments with doctor profiles\n- **Schedule API**: Coordinates with doctor availability",
+      "item": [
+        {
+          "name": "📋 Basic CRUD Operations",
+          "item": [
+            {
+              "name": "Get All Appointments",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "Get all appointments in the system\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"apt_123\",\n      \"patientId\": 1,\n      \"reasonForVisit\": \"Regular checkup\",\n      \"appointmentDate\": \"2025-08-05\",\n      \"appointmentTime\": \"14:30\",\n      \"status\": \"scheduled\",\n      \"doctorId\": 2,\n      \"createdAt\": \"2025-08-02T10:00:00Z\",\n      \"updatedAt\": null\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Administrative overview\n- Appointment list displays\n- Data analysis and reporting"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Appointment by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/{{appointment_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "{{appointment_id}}"
+                  ]
+                },
+                "description": "Get a specific appointment by its ID\n\n**Path Parameters:**\n- `appointment_id`: The unique identifier of the appointment\n\n**Use Cases:**\n- View appointment details\n- Edit appointment forms\n- Appointment confirmation pages"
+              },
+              "response": []
+            },
+            {
+              "name": "Create New Appointment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": {{sample_patient_id}},\n  \"reasonForVisit\": \"Regular checkup\",\n  \"appointmentDate\": \"{{future_date}}\",\n  \"appointmentTime\": \"14:30\",\n  \"doctorId\": {{sample_doctor_id}}\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "Create a new appointment\n\n**Required Fields:**\n- `patientId`: Must be a valid patient ID from the system (foreign key to User entity)\n- `reasonForVisit`: Purpose of the appointment\n- `appointmentDate`: Date in YYYY-MM-DD format (future date only)\n- `appointmentTime`: Time in HH:MM format or with AM/PM\n- `doctorId`: Must be a valid doctor ID from the system (foreign key to Doctor entity)\n\n**Optional Fields:**\n- `status`: Defaults to 'scheduled' if not provided\n\n**Business Validations:**\n- Patient must exist in the database\n- Doctor must exist in the database\n- Date cannot be in the past\n- Maximum 4 appointments per time slot\n- One appointment per patient per day\n- Time slot must be valid\n\n**Expected Response:** 201 Created with appointment details"
+              },
+              "response": []
+            },
+            {
+              "name": "Update Appointment",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reasonForVisit\": \"Follow-up consultation\",\n  \"appointmentDate\": \"{{updated_date}}\",\n  \"appointmentTime\": \"15:00\",\n  \"doctorId\": {{updated_doctor_id}}\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/{{appointment_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "{{appointment_id}}"
+                  ]
+                },
+                "description": "Update an existing appointment\n\n**Path Parameters:**\n- `appointment_id`: The unique identifier of the appointment\n\n**Updatable Fields:**\n- `patientId`: Patient ID (foreign key to User entity)\n- `reasonForVisit`: Purpose of visit\n- `appointmentDate`: New date (must be future date)\n- `appointmentTime`: New time\n- `doctorId`: Assigned doctor ID (foreign key to Doctor entity)\n- `status`: Appointment status\n\n**Business Validations:**\n- All create validations apply\n- Cannot update cancelled appointments\n- Time slot availability checked for new time\n- Patient and doctor must exist in database\n\n**Note:** Use dedicated endpoints for status changes (confirm/cancel/reschedule)"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Appointment",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/{{appointment_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "{{appointment_id}}"
+                  ]
+                },
+                "description": "Delete an appointment permanently\n\n**Path Parameters:**\n- `appointment_id`: The unique identifier of the appointment\n\n**Use Cases:**\n- Administrative cleanup\n- Error correction\n- Patient request for complete removal\n\n**Note:** For most cases, use 'Cancel Appointment' instead of deletion\n\n**Expected Response:** 200 OK with success message"
+              },
+              "response": []
+            }
+          ],
+          "description": "Basic CRUD operations for appointment management"
+        },
+        {
+          "name": "🔄 Status Management",
+          "item": [
+            {
+              "name": "Confirm Appointment",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/{{appointment_id}}/confirm",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "{{appointment_id}}",
+                    "confirm"
+                  ]
+                },
+                "description": "Confirm a scheduled appointment\n\n**Path Parameters:**\n- `appointment_id`: The unique identifier of the appointment\n\n**Business Rules:**\n- Only 'scheduled' appointments can be confirmed\n- Cannot confirm cancelled appointments\n- Time slot availability is verified (max 4 confirmed per slot)\n\n**Status Flow:** scheduled → confirmed\n\n**Use Cases:**\n- Patient confirmation calls\n- Staff confirmation process\n- Automated confirmation systems\n\n**Expected Response:** 200 OK with updated appointment"
+              },
+              "response": []
+            },
+            {
+              "name": "Cancel Appointment",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Patient requested cancellation\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/{{appointment_id}}/cancel",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "{{appointment_id}}",
+                    "cancel"
+                  ]
+                },
+                "description": "Cancel an appointment\n\n**Path Parameters:**\n- `appointment_id`: The unique identifier of the appointment\n\n**Optional Body:**\n- `reason`: Reason for cancellation (optional)\n\n**Business Rules:**\n- Can cancel both 'scheduled' and 'confirmed' appointments\n- Cannot cancel already cancelled appointments\n- Frees up the time slot for other appointments\n\n**Status Flow:** scheduled/confirmed → cancelled\n\n**Use Cases:**\n- Patient cancellations\n- Emergency rescheduling\n- Doctor unavailability\n\n**Expected Response:** 200 OK with updated appointment"
+              },
+              "response": []
+            },
+            {
+              "name": "Reschedule Appointment",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"appointmentDate\": \"{{new_date}}\",\n  \"appointmentTime\": \"16:00\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/{{appointment_id}}/reschedule",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "{{appointment_id}}",
+                    "reschedule"
+                  ]
+                },
+                "description": "Reschedule an appointment to a new date and time\n\n**Path Parameters:**\n- `appointment_id`: The unique identifier of the appointment\n\n**Required Body:**\n- `appointmentDate`: New appointment date (YYYY-MM-DD format)\n- `appointmentTime`: New appointment time (HH:MM format)\n\n**Business Rules:**\n- Cannot reschedule to past dates\n- New time slot availability is verified\n- Original time slot is freed up\n- Status returns to 'scheduled'\n\n**Status Flow:** any → scheduled (with new date/time)\n\n**Use Cases:**\n- Patient schedule conflicts\n- Doctor availability changes\n- Emergency rescheduling\n\n**Expected Response:** 200 OK with updated appointment"
+              },
+              "response": []
+            }
+          ],
+          "description": "Appointment status management operations"
+        },
+        {
+          "name": "🔍 Query Operations",
+          "item": [
+            {
+              "name": "Get Appointments by Patient",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/patient/{{patient_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "patient",
+                    "{{patient_id}}"
+                  ]
+                },
+                "description": "Get all appointments for a specific patient\n\n**Path Parameters:**\n- `patient_id`: The unique identifier of the patient\n\n**Response:** Array of appointments ordered by date (most recent first)\n\n**Use Cases:**\n- Patient history review\n- Medical record systems\n- Patient portals\n- Appointment history displays"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Today's Appointments",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/today",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "today"
+                  ]
+                },
+                "description": "Get all appointments scheduled for today\n\n**Response:** Array of today's appointments ordered by time\n\n**Includes all statuses:** scheduled, confirmed, cancelled\n\n**Use Cases:**\n- Daily appointment dashboard\n- Reception desk displays\n- Daily planning and scheduling\n- Staff coordination"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Today's Confirmed Appointments",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/today/confirmed",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "today",
+                    "confirmed"
+                  ]
+                },
+                "description": "Get only confirmed appointments for today\n\n**Response:** Array of confirmed appointments for today ordered by time\n\n**Status Filter:** Only 'confirmed' appointments\n\n**Use Cases:**\n- Doctor's daily schedule\n- Confirmed patient list\n- Resource planning\n- Final daily schedule confirmation"
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Confirmed Appointments",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/confirmed",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "confirmed"
+                  ]
+                },
+                "description": "Get all confirmed appointments in the system\n\n**Response:** Array of all confirmed appointments\n\n**Status Filter:** Only 'confirmed' appointments\n\n**Use Cases:**\n- Confirmed appointments overview\n- Revenue planning\n- Doctor workload analysis\n- Confirmed appointment statistics"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Appointments by Date",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/date/{{target_date}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "date",
+                    "{{target_date}}"
+                  ]
+                },
+                "description": "Get appointments for a specific date\n\n**Path Parameters:**\n- `target_date`: Date in YYYY-MM-DD format\n\n**Response:** Array of appointments for the specified date\n\n**Use Cases:**\n- Date-specific appointment views\n- Calendar integration\n- Historical appointment data\n- Daily schedule planning"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Appointments by Date Range",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/date-range?startDate={{start_date}}&endDate={{end_date}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "date-range"
+                  ],
+                  "query": [
+                    {
+                      "key": "startDate",
+                      "value": "{{start_date}}",
+                      "description": "Start date in YYYY-MM-DD format"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "{{end_date}}",
+                      "description": "End date in YYYY-MM-DD format"
+                    }
+                  ]
+                },
+                "description": "Get appointments within a specific date range\n\n**Query Parameters:**\n- `startDate`: Start date in YYYY-MM-DD format\n- `endDate`: End date in YYYY-MM-DD format\n\n**Response:** Array of appointments within the date range\n\n**Use Cases:**\n- Weekly/monthly appointment views\n- Reporting and analytics\n- Calendar range displays\n- Appointment trend analysis"
+              },
+              "response": []
+            }
+          ],
+          "description": "Query operations for finding specific appointments"
+        },
+        {
+          "name": "📊 Statistics & Reports",
+          "item": [
+            {
+              "name": "Get Appointment Statistics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/stats",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "stats"
+                  ]
+                },
+                "description": "Get comprehensive appointment statistics\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"total\": 150,\n    \"scheduled\": 45,\n    \"confirmed\": 85,\n    \"cancelled\": 20,\n    \"today\": 12,\n    \"todayConfirmed\": 8,\n    \"thisWeek\": 35,\n    \"thisMonth\": 120,\n    \"upcomingConfirmed\": 25\n  }\n}\n```\n\n**Use Cases:**\n- Dashboard statistics\n- Performance metrics\n- Business intelligence\n- Management reporting"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Weekly Appointment Summary",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/stats/weekly",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "stats",
+                    "weekly"
+                  ]
+                },
+                "description": "Get weekly appointment summary for the last 7 days\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"date\": \"2025-08-01\",\n      \"count\": 8,\n      \"confirmed\": 6,\n      \"scheduled\": 2,\n      \"cancelled\": 0\n    },\n    {\n      \"date\": \"2025-08-02\",\n      \"count\": 12,\n      \"confirmed\": 10,\n      \"scheduled\": 2,\n      \"cancelled\": 0\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Weekly performance charts\n- Trend analysis\n- Capacity planning\n- Weekly reports"
+              },
+              "response": []
+            }
+          ],
+          "description": "Statistical data and reporting endpoints"
+        },
+        {
+          "name": "🧪 Test Scenarios",
+          "item": [
+            {
+              "name": "Test - Create Valid Appointment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"reasonForVisit\": \"Test appointment\",\n  \"appointmentDate\": \"{{tomorrow_date}}\",\n  \"appointmentTime\": \"10:00\",\n  \"doctorId\": \"{{sample_doctor_id}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "Test creating a valid appointment\n\n**Expected:** 201 Created with appointment details\n\n**Test Validations:**\n- Valid patient ID (foreign key to User entity)\n- Valid doctor ID (foreign key to Doctor entity)\n- Future date\n- Valid time format\n- All required fields present"
+              },
+              "response": []
+            },
+            {
+              "name": "Test - Create Past Date Appointment (Should Fail)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"reasonForVisit\": \"Test past appointment\",\n  \"appointmentDate\": \"2025-01-01\",\n  \"appointmentTime\": \"10:00\",\n  \"doctorId\": \"{{sample_doctor_id}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "Test creating appointment with past date\n\n**Expected:** 400 Bad Request with validation error\n\n**Error:** 'Cannot create appointment for past date'"
+              },
+              "response": []
+            },
+            {
+              "name": "Test - Create Duplicate Patient Date (Should Fail)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"reasonForVisit\": \"Duplicate test\",\n  \"appointmentDate\": \"{{tomorrow_date}}\",\n  \"appointmentTime\": \"11:00\",\n  \"doctorId\": \"{{sample_doctor_id}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "Test creating second appointment for same patient on same date\n\n**Prerequisite:** Run after 'Test - Create Valid Appointment'\n\n**Expected:** 409 Conflict\n\n**Error:** 'Patient already has an appointment on this date'"
+              },
+              "response": []
+            },
+            {
+              "name": "Test - Invalid Patient ID (Should Fail)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": \"99999999-9999-9999-9999-999999999999\",\n  \"reasonForVisit\": \"Test invalid patient\",\n  \"appointmentDate\": \"{{tomorrow_date}}\",\n  \"appointmentTime\": \"12:00\",\n  \"doctorId\": \"{{sample_doctor_id}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "Test creating appointment with non-existent patient ID\n\n**Expected:** 400 Bad Request\n\n**Error:** 'Patient does not exist in the database'"
+              },
+              "response": []
+            },
+            {
+              "name": "Test - Time Slot Capacity (4 Appointments)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patientId\": \"880e8400-e29b-41d4-a716-446655440008\",\n  \"reasonForVisit\": \"Time slot capacity test\",\n  \"appointmentDate\": \"{{day_after_tomorrow}}\",\n  \"appointmentTime\": \"14:00\",\n  \"doctorId\": \"{{sample_doctor_id}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "Test time slot capacity limits\n\n**Instructions:**\n1. Run this request 4 times with different patient UUIDs\n2. The 5th attempt should fail with time slot full error\n\n**Expected (1st-4th):** 201 Created\n**Expected (5th):** 409 Conflict - 'Time slot is already booked'"
+              },
+              "response": []
+            },
+            {
+              "name": "Test - Confirm Non-existent Appointment (Should Fail)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/non-existent-id/confirm",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "non-existent-id",
+                    "confirm"
+                  ]
+                },
+                "description": "Test confirming non-existent appointment\n\n**Expected:** 404 Not Found\n\n**Error:** 'Appointment not found'"
+              },
+              "response": []
+            }
+          ],
+          "description": "Test scenarios for validation and error handling"
+        },
+        {
+          "name": "🔄 Workflow Examples",
+          "item": [
+            {
+              "name": "Workflow - Complete Appointment Lifecycle",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments"
+                  ]
+                },
+                "description": "**Complete Appointment Lifecycle Demo**\n\n**Step 1:** Create appointment (status: 'scheduled')\n- `POST /api/appointments`\n\n**Step 2:** Confirm appointment (status: 'confirmed')\n- `PUT /api/appointments/{id}/confirm`\n\n**Step 3:** Reschedule if needed (status: 'scheduled')\n- `PUT /api/appointments/{id}/reschedule`\n\n**Step 4:** Re-confirm after reschedule (status: 'confirmed')\n- `PUT /api/appointments/{id}/confirm`\n\n**Alternative Step 4:** Cancel if needed (status: 'cancelled') \n- `PUT /api/appointments/{id}/cancel`\n\n**Verification Steps:**\n- `GET /api/appointments/{id}` - Check appointment details\n- `GET /api/appointments/patient/{patientId}` - Patient history\n- `GET /api/appointments/today` - Today's appointments\n\n**Result:** Full appointment management workflow"
+              },
+              "response": []
+            },
+            {
+              "name": "Workflow - Daily Appointment Management",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/appointments/today",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "appointments",
+                    "today"
+                  ]
+                },
+                "description": "**Daily Appointment Management Workflow**\n\n**Morning Setup:**\n1. `GET /api/appointments/today` - Get all today's appointments\n2. `GET /api/appointments/today/confirmed` - Get confirmed only\n3. `GET /api/appointments/stats` - Check overall statistics\n\n**During the Day:**\n4. `PUT /api/appointments/{id}/confirm` - Confirm arriving patients\n5. `PUT /api/appointments/{id}/cancel` - Handle cancellations\n6. `PUT /api/appointments/{id}/reschedule` - Reschedule as needed\n7. `POST /api/appointments` - Create walk-in appointments\n\n**End of Day:**\n8. `GET /api/appointments/stats/weekly` - Weekly summary\n9. `GET /api/appointments/date/{{tomorrow_date}}` - Tomorrow's schedule\n\n**Result:** Complete daily workflow for clinic staff"
+              },
+              "response": []
+            }
+          ],
+          "description": "Complete workflow examples for common use cases"
+        }
+      ]
+    }
+  ]
+}

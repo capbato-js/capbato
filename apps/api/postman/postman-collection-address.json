@@ -1,0 +1,566 @@
+{
+  "info": {
+    "_postman_id": "cms-combined-api-collection",
+    "name": "Clinic Management System - Complete API Collection",
+    "description": "Complete comprehensive API collection for the Clinic Management System with Clean Architecture. This collection combines all individual API collections into a unified testing suite.\n\n## API Coverage\n\n### 🔐 Authentication API (/api/auth)\n- User registration with role-based access (admin, doctor, receptionist)\n- User login with email/username support\n- JWT token management and validation\n- Password strength validation\n- Doctor-specific profile fields during registration\n\n### 👥 User Management (/api/users)\n- User CRUD operations\n- Password change functionality\n- Role-based operations and filtering\n- User profile management\n\n### 👨‍⚕️ Doctor Management (/api/doctors)\n- Doctor profile CRUD operations\n- User-Doctor relationship management\n- Medical specialization tracking\n- License and experience management\n- Philippine and US phone number validation\n\n### 🏥 Patient Management (/api/patients)\n- Patient CRUD operations\n- Patient statistics and reporting\n- Structured Philippine address management\n- Guardian information handling\n- Medical history tracking\n\n### 📅 Schedule Management (/api/schedules)\n- Doctor schedule CRUD operations\n- Date and time validation\n- Schedule statistics and reporting\n- Today's doctor lookup\n- Future schedule filtering\n\n### 📋 Appointment Management (/api/appointments)\n- Appointment CRUD operations\n- Business rule validation (4 per slot, no duplicates)\n- Status management (scheduled, confirmed, cancelled)\n- Patient-Doctor association\n- Time slot management\n\n### 🧪 Laboratory Management (/api/laboratory)\n- Laboratory request management\n- Blood chemistry results tracking\n- Critical value alerting\n- Test selection and validation\n- Patient-lab request association\n\n### 📍 Address API (/api/address)\n- Philippine address hierarchy (provinces, cities, barangays)\n- Address validation and lookup\n- Geographic data management\n\n### ✅ Todo Management (/api/todos)\n- Complete todo CRUD operations\n- Priority and completion management\n- Todo filtering and statistics\n\n## Testing Strategy\n\nThis collection follows comprehensive testing best practices:\n- **Happy Path Testing**: Core functionality validation\n- **Error Handling**: Validation errors, authentication failures, not found scenarios\n- **Schema Validation**: Response structure verification\n- **Dynamic Data**: Variable management for realistic test flows\n- **Performance Testing**: Response time validations\n- **Security Testing**: Authentication and authorization flows\n- **Business Logic Testing**: Complex validation rules and constraints\n\n## Environment Variables\n\nUse the following environment variables:\n- `cms_local`: http://localhost:4000 (for local development)\n- `cms_prod`: https://capstone-api.up.railway.app (for production)\n- `baseUrl`: Base URL for backward compatibility\n- `authToken`: JWT token for authenticated requests\n- Various test data variables for dynamic testing\n\n## Collection Organization\n\nThe collection is organized into logical folders matching the API structure:\n1. 🏥 Server Health & Info\n2. 🔐 Authentication API\n3. 👥 User Management API\n4. 👨‍⚕️ Doctor Management API\n5. 🏥 Patient Management API (from copy collection)\n6. 📅 Schedule Management API\n7. 📋 Appointment Management API\n8. 🧪 Laboratory Management API\n9. 📍 Address API\n10. ✅ Todo Management API (from copy collection)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 2,
+      "minor": 3,
+      "patch": 0
+    }
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "{{cms_local}}",
+      "type": "string",
+      "description": "Base URL for the Clinic Management System API server"
+    },
+    {
+      "key": "base_url",
+      "value": "{{cms_local}}",
+      "type": "string",
+      "description": "Alias for baseUrl to support different collection formats"
+    },
+    {
+      "key": "cms_local",
+      "value": "http://localhost:4000",
+      "type": "string",
+      "description": "CMS Local environment base URL"
+    },
+    {
+      "key": "cms_prod",
+      "value": "https://capstone-api.up.railway.app",
+      "type": "string",
+      "description": "CMS Production environment base URL"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from login operations"
+    },
+    {
+      "key": "testUserId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic user ID for testing"
+    },
+    {
+      "key": "testPatientId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic patient ID for testing"
+    },
+    {
+      "key": "todoId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic todo ID for testing"
+    },
+    {
+      "key": "testDoctorId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic doctor ID for testing"
+    },
+    {
+      "key": "doctor_profile_id",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic doctor profile ID for testing"
+    },
+    {
+      "key": "appointment_id",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic appointment ID for testing"
+    },
+    {
+      "key": "sample_patient_id",
+      "value": "1",
+      "type": "string",
+      "description": "Sample patient ID for appointment testing"
+    },
+    {
+      "key": "sample_doctor_id",
+      "value": "1",
+      "type": "string",
+      "description": "Sample doctor ID for appointment testing"
+    },
+    {
+      "key": "future_date",
+      "value": "2025-08-10",
+      "type": "string",
+      "description": "Future date for appointment testing"
+    },
+    {
+      "key": "updated_date",
+      "value": "2025-08-11",
+      "type": "string",
+      "description": "Updated date for appointment testing"
+    },
+    {
+      "key": "updated_doctor_id",
+      "value": "2",
+      "type": "string",
+      "description": "Updated doctor ID for appointment testing"
+    },
+    {
+      "key": "testEmail",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic test email for registration tests"
+    },
+    {
+      "key": "loginTestEmail",
+      "value": "test.admin@clinic.com",
+      "type": "string",
+      "description": "Fixed email for login testing"
+    },
+    {
+      "key": "loginTestPassword",
+      "value": "AdminPass123",
+      "type": "string",
+      "description": "Fixed password for login testing"
+    },
+    {
+      "key": "doctorTestEmail",
+      "value": "doctor.test@clinic.com",
+      "type": "string",
+      "description": "Fixed email for doctor role testing"
+    },
+    {
+      "key": "doctorTestPassword",
+      "value": "DoctorPass123",
+      "type": "string",
+      "description": "Fixed password for doctor role testing"
+    },
+    {
+      "key": "receptionistTestEmail",
+      "value": "receptionist.test@clinic.com",
+      "type": "string",
+      "description": "Fixed email for receptionist role testing"
+    },
+    {
+      "key": "receptionistTestPassword",
+      "value": "ReceptionistPass123",
+      "type": "string",
+      "description": "Fixed password for receptionist role testing"
+    },
+    {
+      "key": "metro_manila_code",
+      "value": "METRO_MANILA",
+      "type": "string",
+      "description": "Metro Manila province code for address testing"
+    },
+    {
+      "key": "cebu_code",
+      "value": "CEBU",
+      "type": "string",
+      "description": "Cebu province code for address testing"
+    },
+    {
+      "key": "davao_code",
+      "value": "DAVAO_REGION",
+      "type": "string",
+      "description": "Davao region code for address testing"
+    }
+  ],
+  "item": [
+    {
+      "name": "📍 Address API",
+      "description": "Philippine address data endpoints for healthcare clinic\n\n## Address API Architecture\nThe API provides hierarchical Philippine address data:\n\n**Province Level:**\n- `code`: Unique province identifier (e.g., 'METRO_MANILA', 'CEBU')\n- `name`: Full province name (e.g., 'Metro Manila', 'Cebu')\n\n**City/Municipality Level:**\n- `code`: Unique city identifier (e.g., 'manila', 'quezon_city')\n- `name`: Full city/municipality name (e.g., 'Manila', 'Quezon City')\n- Filtered by province code\n\n**Barangay Level:**\n- `code`: Unique barangay identifier (e.g., 'B001', 'B002')\n- `name`: Full barangay name (e.g., 'Barangay 1', 'Poblacion')\n- Filtered by city code\n\n**Data Source:**\nAll data is loaded from a comprehensive Philippine address JSON file containing:\n- 17 regions\n- 81 provinces\n- 1,634+ cities/municipalities\n- 42,000+ barangays\n\n**API Response Structure:**\nAll endpoints return consistent response format:\n```json\n{\n  \"success\": true,\n  \"data\": [...],\n  \"message\": \"Optional message\"\n}\n```\n\n**Use Cases:**\n- **Province Selection**: Get all provinces for dropdown/select components\n- **City Selection**: Get cities based on selected province\n- **Barangay Selection**: Get barangays based on selected city\n- **Address Forms**: Build hierarchical address selection forms\n- **Data Validation**: Validate Philippine addresses\n\n**Performance Notes:**\n- Data is loaded once at startup from JSON file\n- In-memory repository provides fast response times\n- No database queries required\n- Suitable for high-frequency address lookups\n\n**Integration with Other APIs:**\nThis Address API is designed to work with Patient and Doctor APIs for complete address information in healthcare records.",
+      "item": [
+        {
+          "name": "Get All Provinces",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/provinces",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "provinces"
+              ]
+            },
+            "description": "Get all provinces in the Philippines\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"code\": \"METRO_MANILA\",\n      \"name\": \"Metro Manila\"\n    },\n    {\n      \"code\": \"CEBU\",\n      \"name\": \"Cebu\"\n    }\n  ]\n}\n```\n\n**Use Case:** Populate province dropdown in address forms"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cities - Metro Manila",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/cities/{{metro_manila_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "cities",
+                "{{metro_manila_code}}"
+              ]
+            },
+            "description": "Get all cities/municipalities in Metro Manila\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"code\": \"manila\",\n      \"name\": \"Manila\"\n    },\n    {\n      \"code\": \"quezon_city\",\n      \"name\": \"Quezon City\"\n    },\n    {\n      \"code\": \"makati\",\n      \"name\": \"Makati\"\n    }\n  ]\n}\n```\n\n**Use Case:** Populate city dropdown after province selection"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cities - Cebu Province",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/cities/{{cebu_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "cities",
+                "{{cebu_code}}"
+              ]
+            },
+            "description": "Get all cities/municipalities in Cebu Province\n\n**Expected Cities:** Cebu City, Mandaue, Lapu-Lapu, Talisay, etc."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cities - Davao Region",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/cities/{{davao_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "cities",
+                "{{davao_code}}"
+              ]
+            },
+            "description": "Get all cities/municipalities in Davao Region"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cities - Invalid Province Code (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/cities/INVALID_PROVINCE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "cities",
+                "INVALID_PROVINCE"
+              ]
+            },
+            "description": "Test error handling with invalid province code\n\n**Expected:** Empty array or error response"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cities - Empty Province Code (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/cities/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "cities",
+                ""
+              ]
+            },
+            "description": "Test validation error with empty province code\n\n**Expected:** 400 Bad Request with validation error"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barangays - Manila City",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/barangays/{{manila_city_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "barangays",
+                "{{manila_city_code}}"
+              ]
+            },
+            "description": "Get all barangays in Manila City\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"code\": \"B001\",\n      \"name\": \"Barangay 1\"\n    },\n    {\n      \"code\": \"B002\",\n      \"name\": \"Barangay 2\"\n    }\n  ]\n}\n```\n\n**Expected:** 896+ barangays (Manila has many barangays)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barangays - Quezon City",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/barangays/{{quezon_city_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "barangays",
+                "{{quezon_city_code}}"
+              ]
+            },
+            "description": "Get all barangays in Quezon City\n\n**Expected:** 142 barangays (Quezon City has exactly 142 barangays)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barangays - Makati City",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/barangays/{{makati_city_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "barangays",
+                "{{makati_city_code}}"
+              ]
+            },
+            "description": "Get all barangays in Makati City\n\n**Expected:** 33 barangays (Makati has 33 barangays)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barangays - Cebu City",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/barangays/{{cebu_city_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "barangays",
+                "{{cebu_city_code}}"
+              ]
+            },
+            "description": "Get all barangays in Cebu City"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barangays - Small Municipality",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/barangays/{{small_municipality_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "barangays",
+                "{{small_municipality_code}}"
+              ]
+            },
+            "description": "Get barangays from a smaller municipality\n\n**Expected:** Fewer barangays (rural areas typically have fewer barangays)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barangays - Invalid City Code (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/barangays/INVALID_CITY",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "barangays",
+                "INVALID_CITY"
+              ]
+            },
+            "description": "Test error handling with invalid city code\n\n**Expected:** Empty array or error response"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barangays - Empty City Code (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/barangays/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "barangays",
+                ""
+              ]
+            },
+            "description": "Test validation error with empty city code\n\n**Expected:** 400 Bad Request with validation error"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Address Flow - Metro Manila",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/provinces",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "provinces"
+              ]
+            },
+            "description": "**Complete Address Selection Flow Demo**\n\n**Step 1:** Get all provinces (this request)\n**Step 2:** User selects 'Metro Manila' → Get cities with province code\n**Step 3:** User selects 'Manila' → Get barangays with city code\n**Step 4:** User selects specific barangay\n\n**Typical Flow:**\n1. `GET /api/address/provinces`\n2. `GET /api/address/cities/METRO_MANILA`\n3. `GET /api/address/barangays/manila`\n\n**Result:** Complete hierarchical address selection"
+          },
+          "response": []
+        },
+        {
+          "name": "Performance Test - Multiple Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/address/provinces",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "address",
+                "provinces"
+              ]
+            },
+            "description": "**Performance Test Request**\n\nSince data is loaded in-memory, all requests should be very fast.\nUse this to test response times for:\n\n- Province loading (81 provinces)\n- City loading (varies by province)\n- Barangay loading (varies significantly by city)\n\n**Expected Performance:**\n- Provinces: < 10ms\n- Cities: < 10ms\n- Barangays: < 50ms (larger datasets)\n\n**Note:** Run this multiple times to test consistency"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
