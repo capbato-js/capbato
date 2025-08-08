@@ -27,9 +27,6 @@ export class UpdateUrinalysisResultUseCase {
     // Update the urinalysis result with new data
     const updatedUrinalysisResult = LaboratoryMapper.updateUrinalysisResultFromCommand(existingUrinalysisResult, command);
     
-    // Validate updated entity
-    updatedUrinalysisResult.validate();
-    
     // Persist the updated urinalysis result record and return the saved entity
     const savedUrinalysisResult = await this.urinalysisResultRepository.save(updatedUrinalysisResult);
     

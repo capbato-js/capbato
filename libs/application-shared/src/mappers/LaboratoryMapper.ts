@@ -124,43 +124,43 @@ export class LaboratoryMapper {
     const displayNames: string[] = [];
 
     // Check which tests have values and build test names
-    if (results.fbs !== undefined) {
+    if (results.results.fbs !== undefined) {
       availableTests.push('fbs');
       displayNames.push('FBS');
     }
-    if (results.bun !== undefined) {
+    if (results.results.bun !== undefined) {
       availableTests.push('bun');
       displayNames.push('BUN');
     }
-    if (results.creatinine !== undefined) {
+    if (results.results.creatinine !== undefined) {
       availableTests.push('creatinine');
       displayNames.push('Creatinine');
     }
-    if (results.uricAcid !== undefined) {
+    if (results.results.uricAcid !== undefined) {
       availableTests.push('bloodUricAcid');
       displayNames.push('Uric Acid');
     }
-    if (results.cholesterol !== undefined) {
+    if (results.results.cholesterol !== undefined) {
       availableTests.push('cholesterol');
       displayNames.push('Cholesterol');
     }
-    if (results.triglycerides !== undefined) {
+    if (results.results.triglycerides !== undefined) {
       availableTests.push('triglycerides');
       displayNames.push('Triglycerides');
     }
-    if (results.hdl !== undefined) {
+    if (results.results.hdl !== undefined) {
       availableTests.push('hdl');
       displayNames.push('HDL');
     }
-    if (results.ldl !== undefined) {
+    if (results.results.ldl !== undefined) {
       availableTests.push('ldl');
       displayNames.push('LDL');
     }
-    if (results.sgot !== undefined) {
+    if (results.results.sgot !== undefined) {
       availableTests.push('sgot');
       displayNames.push('SGOT');
     }
-    if (results.sgpt !== undefined) {
+    if (results.results.sgpt !== undefined) {
       availableTests.push('sgpt');
       displayNames.push('SGPT');
     }
@@ -755,11 +755,11 @@ export class LaboratoryMapper {
       specificGravity: result.specificGravity,
       protein: result.protein,
       glucose: result.glucose,
-      rbc: result.rbc,
-      wbc: result.wbc,
+      rbc: result.redCells,
+      wbc: result.pusCells,
       epithelialCells: result.epithelialCells,
       bacteria: result.bacteria,
-      amorphous: result.amorphous,
+      amorphous: result.amorphousUrates,
       others: result.others,
       createdAt: result.createdAt?.toISOString(),
       updatedAt: result.updatedAt?.toISOString(),

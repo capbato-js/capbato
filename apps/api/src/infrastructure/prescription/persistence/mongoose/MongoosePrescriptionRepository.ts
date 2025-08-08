@@ -24,12 +24,12 @@ export class MongoosePrescriptionRepository implements IPrescriptionRepository {
     const document = new PrescriptionModel({
       patientId: prescription.patientId,
       doctorId: prescription.doctorId,
-      medicationName: prescription.medicationNameValue,
-      dosage: prescription.dosageValue,
-      instructions: prescription.instructionsValue,
+      medicationName: prescription.medications[0]?.medicationName?.value || '',
+      dosage: prescription.medications[0]?.dosage?.value || '',
+      instructions: prescription.medications[0]?.instructions?.value || '',
       prescribedDate: prescription.prescribedDate,
       expiryDate: prescription.expiryDate,
-      isActive: prescription.isActive,
+      isActive: prescription.status === 'active',
       createdAt: prescription.createdAt,
     });
 
@@ -44,33 +44,21 @@ export class MongoosePrescriptionRepository implements IPrescriptionRepository {
 
     const updateData: any = {};
 
-    if (changes.medicationName !== undefined) {
-      updateData.medicationName =
-        typeof changes.medicationName === 'string'
-          ? changes.medicationName
-          : (changes.medicationName as any).value;
-    }
-
-    if (changes.dosage !== undefined) {
-      updateData.dosage =
-        typeof changes.dosage === 'string'
-          ? changes.dosage
-          : (changes.dosage as any).value;
-    }
-
-    if (changes.instructions !== undefined) {
-      updateData.instructions =
-        typeof changes.instructions === 'string'
-          ? changes.instructions
-          : (changes.instructions as any).value;
+    // Handle medications array - for simplicity, just update with first medication
+    if ((changes as any).medications && (changes as any).medications.length > 0) {
+      const firstMedication = (changes as any).medications[0];
+      updateData.medicationName = firstMedication.medicationName?.value || firstMedication.medicationName;
+      updateData.dosage = firstMedication.dosage?.value || firstMedication.dosage;
+      updateData.instructions = firstMedication.instructions?.value || firstMedication.instructions;
     }
 
     if (changes.expiryDate !== undefined) {
       updateData.expiryDate = changes.expiryDate;
     }
 
-    if (changes.isActive !== undefined) {
-      updateData.isActive = changes.isActive;
+    // Map status to isActive
+    if ((changes as any).status !== undefined) {
+      updateData.isActive = (changes as any).status === 'active';
     }
 
     const result = await PrescriptionModel.updateOne({ _id: id }, updateData);

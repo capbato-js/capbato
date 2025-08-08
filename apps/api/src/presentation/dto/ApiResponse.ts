@@ -5,6 +5,9 @@ import {
   ApiSuccessMessageResponse,
 } from '@nx-starter/application-shared';
 
+// Re-export types for controller use
+export { ApiSuccessResponse, ApiSuccessMessageResponse };
+
 // Response Builder Class - Factory for creating consistent API responses
 export class ApiResponseBuilder {
   /**

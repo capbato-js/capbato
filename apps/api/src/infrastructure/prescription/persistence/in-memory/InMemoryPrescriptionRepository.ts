@@ -22,11 +22,7 @@ export class InMemoryPrescriptionRepository implements IPrescriptionRepository {
     const prescriptionWithId = new Prescription(
       prescription.patientId,
       prescription.doctorId,
-      prescription.medicationName.value,
-      prescription.dosage.value,
-      prescription.instructions.value,
-      prescription.frequency,
-      prescription.duration,
+      prescription.medications,
       prescription.prescribedDate,
       id,
       prescription.expiryDate,
@@ -47,32 +43,11 @@ export class InMemoryPrescriptionRepository implements IPrescriptionRepository {
     }
 
     // Create updated prescription with changes
+    // For simplicity, we'll use the existing medications if no new ones are provided
     const updatedPrescription = new Prescription(
       existingPrescription.patientId,
       existingPrescription.doctorId,
-      changes.medicationName !== undefined
-        ? typeof changes.medicationName === 'string'
-          ? changes.medicationName
-          : changes.medicationName && typeof changes.medicationName === 'object' && 'value' in changes.medicationName
-            ? (changes.medicationName as any).value
-            : existingPrescription.medicationName.value
-        : existingPrescription.medicationName.value,
-      changes.dosage !== undefined
-        ? typeof changes.dosage === 'string'
-          ? changes.dosage
-          : changes.dosage && typeof changes.dosage === 'object' && 'value' in changes.dosage
-            ? (changes.dosage as any).value
-            : existingPrescription.dosage.value
-        : existingPrescription.dosage.value,
-      changes.instructions !== undefined
-        ? typeof changes.instructions === 'string'
-          ? changes.instructions
-          : changes.instructions && typeof changes.instructions === 'object' && 'value' in changes.instructions
-            ? (changes.instructions as any).value
-            : existingPrescription.instructions.value
-        : existingPrescription.instructions.value,
-      (changes as any).frequency !== undefined ? (changes as any).frequency : existingPrescription.frequency,
-      (changes as any).duration !== undefined ? (changes as any).duration : existingPrescription.duration,
+      (changes as any).medications !== undefined ? (changes as any).medications : existingPrescription.medications,
       existingPrescription.prescribedDate,
       id,
       changes.expiryDate !== undefined ? changes.expiryDate : existingPrescription.expiryDate,
@@ -132,7 +107,9 @@ export class InMemoryPrescriptionRepository implements IPrescriptionRepository {
   async getByMedicationName(medicationName: string): Promise<Prescription[]> {
     return Array.from(this.prescriptions.values())
       .filter(prescription => 
-        prescription.medicationName.value.toLowerCase().includes(medicationName.toLowerCase())
+        prescription.medications.some(medication => 
+          medication.medicationName.value.toLowerCase().includes(medicationName.toLowerCase())
+        )
       )
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }

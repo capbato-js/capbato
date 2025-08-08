@@ -25,7 +25,7 @@ export class CreatePrescriptionUseCase {
           "PENDING", // Temporary prescriptionId - will be set during persistence
           medicationData.medicationName,
           medicationData.dosage,
-          medicationData.instructions,
+          medicationData.instructions || "",
           medicationData.frequency,
           medicationData.duration
         )

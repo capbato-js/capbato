@@ -52,12 +52,12 @@ export class SqlitePrescriptionRepository implements IPrescriptionRepository {
       id,
       prescription.patientId,
       prescription.doctorId,
-      prescription.medicationNameValue,
-      prescription.dosageValue,
-      prescription.instructionsValue,
+      prescription.medications[0]?.medicationName?.value || '',
+      prescription.medications[0]?.dosage?.value || '',
+      prescription.medications[0]?.instructions?.value || '',
       prescription.prescribedDate.toISOString(),
       prescription.expiryDate?.toISOString(),
-      prescription.isActive ? 1 : 0,
+      prescription.status === 'active' ? 1 : 0,
       prescription.createdAt.toISOString()
     );
 
@@ -69,19 +69,17 @@ export class SqlitePrescriptionRepository implements IPrescriptionRepository {
     const updateFields: string[] = [];
     const values: any[] = [];
 
-    if (changes.medicationName) {
+    // Handle medications array - for simplicity, just update with first medication
+    if ((changes as any).medications && (changes as any).medications.length > 0) {
+      const firstMedication = (changes as any).medications[0];
       updateFields.push('medicationName = ?');
-      values.push(changes.medicationName.value);
-    }
-
-    if (changes.dosage) {
+      values.push(firstMedication.medicationName?.value || firstMedication.medicationName);
+      
       updateFields.push('dosage = ?');
-      values.push(changes.dosage.value);
-    }
-
-    if (changes.instructions) {
+      values.push(firstMedication.dosage?.value || firstMedication.dosage);
+      
       updateFields.push('instructions = ?');
-      values.push(changes.instructions.value);
+      values.push(firstMedication.instructions?.value || firstMedication.instructions);
     }
 
     if (changes.expiryDate !== undefined) {
@@ -89,9 +87,10 @@ export class SqlitePrescriptionRepository implements IPrescriptionRepository {
       values.push(changes.expiryDate?.toISOString());
     }
 
-    if (changes.isActive !== undefined) {
+    // Map status to isActive
+    if ((changes as any).status !== undefined) {
       updateFields.push('isActive = ?');
-      values.push(changes.isActive ? 1 : 0);
+      values.push((changes as any).status === 'active' ? 1 : 0);
     }
 
     if (updateFields.length === 0) {

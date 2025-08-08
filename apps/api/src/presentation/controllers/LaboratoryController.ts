@@ -56,24 +56,16 @@ import {
   CreateLabRequestRequestDto,
   UpdateLabRequestResultsRequestDto,
   CreateBloodChemistryRequestDto,
-  CreateUrinalysisResultRequestDto,
-  UpdateUrinalysisResultRequestDto,
-  CreateHematologyResultRequestDto,
-  UpdateHematologyResultRequestDto,
-  CreateFecalysisResultRequestDto,
-  UpdateFecalysisResultRequestDto,
-  CreateSerologyResultRequestDto,
-  UpdateSerologyResultRequestDto,
-  UrinalysisResultResponse,
-  UrinalysisResultListResponse,
-  HematologyResultResponse,
-  HematologyResultListResponse,
-  FecalysisResultResponse,
-  FecalysisResultListResponse,
-  SerologyResultResponse,
-  SerologyResultListResponse,
+  CreateUrinalysisResultCommand,
+  UpdateUrinalysisResultCommand,
+  CreateHematologyResultCommand,
+  UpdateHematologyResultCommand,
+  CreateFecalysisResultCommand,
+  UpdateFecalysisResultCommand,
+  CreateSerologyResultCommand,
+  UpdateSerologyResultCommand,
 } from '@nx-starter/application-shared';
-import { ApiResponseBuilder } from '../dto/ApiResponse';
+import { ApiResponseBuilder, ApiSuccessResponse } from '../dto/ApiResponse';
 
 /**
  * REST API Controller for Laboratory operations
@@ -271,7 +263,7 @@ export class LaboratoryController {
    * GET /api/laboratory/urinalysis-results - Get all urinalysis results
    */
   @Get('/urinalysis-results')
-  async getAllUrinalysisResults(): Promise<UrinalysisResultListResponse> {
+  async getAllUrinalysisResults(): Promise<ApiSuccessResponse<any[]>> {
     const urinalysisResults = await this.getAllUrinalysisResultsQueryHandler.execute();
     const urinalysisResultDtos = LaboratoryMapper.toUrinalysisResultDtoArray(urinalysisResults);
 
@@ -282,7 +274,7 @@ export class LaboratoryController {
    * GET /api/laboratory/urinalysis-results/:id - Get urinalysis result by ID
    */
   @Get('/urinalysis-results/:id')
-  async getUrinalysisResultById(@Param('id') id: string): Promise<UrinalysisResultResponse> {
+  async getUrinalysisResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
     const urinalysisResult = await this.getUrinalysisResultByIdQueryHandler.execute(id);
     const urinalysisResultDto = LaboratoryMapper.toUrinalysisResultDto(urinalysisResult);
 
@@ -293,7 +285,7 @@ export class LaboratoryController {
    * GET /api/laboratory/urinalysis-results/patient/:patientId - Get urinalysis results by patient ID
    */
   @Get('/urinalysis-results/patient/:patientId')
-  async getUrinalysisResultsByPatientId(@Param('patientId') patientId: string): Promise<UrinalysisResultListResponse> {
+  async getUrinalysisResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     const urinalysisResults = await this.getUrinalysisResultsByPatientIdQueryHandler.execute(validatedPatientId);
     const urinalysisResultDtos = LaboratoryMapper.toUrinalysisResultDtoArray(urinalysisResults);
@@ -306,7 +298,7 @@ export class LaboratoryController {
    */
   @Post('/urinalysis-results')
   @HttpCode(201)
-  async createUrinalysisResult(@Body() body: CreateUrinalysisResultRequestDto): Promise<UrinalysisResultResponse> {
+  async createUrinalysisResult(@Body() body: CreateUrinalysisResultCommand): Promise<ApiSuccessResponse<any>> {
     const validatedData = this.validationService.validateCreateUrinalysisResultCommand(body);
     const urinalysisResult = await this.createUrinalysisResultUseCase.execute(validatedData);
     const urinalysisResultDto = LaboratoryMapper.toUrinalysisResultDto(urinalysisResult);
@@ -320,8 +312,8 @@ export class LaboratoryController {
   @Put('/urinalysis-results/:id')
   async updateUrinalysisResult(
     @Param('id') id: string,
-    @Body() body: UpdateUrinalysisResultRequestDto
-  ): Promise<UrinalysisResultResponse> {
+    @Body() body: UpdateUrinalysisResultCommand
+  ): Promise<ApiSuccessResponse<any>> {
     const updateData = { ...body, id };
     const validatedData = this.validationService.validateUpdateUrinalysisResultCommand(updateData);
     const urinalysisResult = await this.updateUrinalysisResultUseCase.execute(validatedData);
@@ -335,7 +327,7 @@ export class LaboratoryController {
    */
   @Delete('/urinalysis-results/:id')
   async deleteUrinalysisResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
-    await this.deleteUrinalysisResultUseCase.execute(id);
+    await this.deleteUrinalysisResultUseCase.execute({ id });
     return ApiResponseBuilder.successWithMessage('Urinalysis result deleted successfully');
   }
 
@@ -345,7 +337,7 @@ export class LaboratoryController {
    * GET /api/laboratory/hematology-results - Get all hematology results
    */
   @Get('/hematology-results')
-  async getAllHematologyResults(): Promise<HematologyResultListResponse> {
+  async getAllHematologyResults(): Promise<ApiSuccessResponse<any[]>> {
     const hematologyResults = await this.getAllHematologyResultsQueryHandler.execute();
     const hematologyResultDtos = LaboratoryMapper.toHematologyResultDtoArray(hematologyResults);
 
@@ -356,7 +348,7 @@ export class LaboratoryController {
    * GET /api/laboratory/hematology-results/:id - Get hematology result by ID
    */
   @Get('/hematology-results/:id')
-  async getHematologyResultById(@Param('id') id: string): Promise<HematologyResultResponse> {
+  async getHematologyResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
     const hematologyResult = await this.getHematologyResultByIdQueryHandler.execute(id);
     const hematologyResultDto = LaboratoryMapper.toHematologyResultDto(hematologyResult);
 
@@ -367,7 +359,7 @@ export class LaboratoryController {
    * GET /api/laboratory/hematology-results/patient/:patientId - Get hematology results by patient ID
    */
   @Get('/hematology-results/patient/:patientId')
-  async getHematologyResultsByPatientId(@Param('patientId') patientId: string): Promise<HematologyResultListResponse> {
+  async getHematologyResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     const hematologyResults = await this.getHematologyResultsByPatientIdQueryHandler.execute(validatedPatientId);
     const hematologyResultDtos = LaboratoryMapper.toHematologyResultDtoArray(hematologyResults);
@@ -380,7 +372,7 @@ export class LaboratoryController {
    */
   @Post('/hematology-results')
   @HttpCode(201)
-  async createHematologyResult(@Body() body: CreateHematologyResultRequestDto): Promise<HematologyResultResponse> {
+  async createHematologyResult(@Body() body: CreateHematologyResultCommand): Promise<ApiSuccessResponse<any>> {
     const validatedData = this.validationService.validateCreateHematologyResultCommand(body);
     const hematologyResult = await this.createHematologyResultUseCase.execute(validatedData);
     const hematologyResultDto = LaboratoryMapper.toHematologyResultDto(hematologyResult);
@@ -394,8 +386,8 @@ export class LaboratoryController {
   @Put('/hematology-results/:id')
   async updateHematologyResult(
     @Param('id') id: string,
-    @Body() body: UpdateHematologyResultRequestDto
-  ): Promise<HematologyResultResponse> {
+    @Body() body: UpdateHematologyResultCommand
+  ): Promise<ApiSuccessResponse<any>> {
     const updateData = { ...body, id };
     const validatedData = this.validationService.validateUpdateHematologyResultCommand(updateData);
     const hematologyResult = await this.updateHematologyResultUseCase.execute(validatedData);
@@ -409,7 +401,7 @@ export class LaboratoryController {
    */
   @Delete('/hematology-results/:id')
   async deleteHematologyResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
-    await this.deleteHematologyResultUseCase.execute(id);
+    await this.deleteHematologyResultUseCase.execute({ id });
     return ApiResponseBuilder.successWithMessage('Hematology result deleted successfully');
   }
 
@@ -419,7 +411,7 @@ export class LaboratoryController {
    * GET /api/laboratory/fecalysis-results - Get all fecalysis results
    */
   @Get('/fecalysis-results')
-  async getAllFecalysisResults(): Promise<FecalysisResultListResponse> {
+  async getAllFecalysisResults(): Promise<ApiSuccessResponse<any[]>> {
     const fecalysisResults = await this.getAllFecalysisResultsQueryHandler.execute();
     const fecalysisResultDtos = LaboratoryMapper.toFecalysisResultDtoArray(fecalysisResults);
 
@@ -430,7 +422,7 @@ export class LaboratoryController {
    * GET /api/laboratory/fecalysis-results/:id - Get fecalysis result by ID
    */
   @Get('/fecalysis-results/:id')
-  async getFecalysisResultById(@Param('id') id: string): Promise<FecalysisResultResponse> {
+  async getFecalysisResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
     const fecalysisResult = await this.getFecalysisResultByIdQueryHandler.execute(id);
     const fecalysisResultDto = LaboratoryMapper.toFecalysisResultDto(fecalysisResult);
 
@@ -441,7 +433,7 @@ export class LaboratoryController {
    * GET /api/laboratory/fecalysis-results/patient/:patientId - Get fecalysis results by patient ID
    */
   @Get('/fecalysis-results/patient/:patientId')
-  async getFecalysisResultsByPatientId(@Param('patientId') patientId: string): Promise<FecalysisResultListResponse> {
+  async getFecalysisResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     const fecalysisResults = await this.getFecalysisResultsByPatientIdQueryHandler.execute(validatedPatientId);
     const fecalysisResultDtos = LaboratoryMapper.toFecalysisResultDtoArray(fecalysisResults);
@@ -454,7 +446,7 @@ export class LaboratoryController {
    */
   @Post('/fecalysis-results')
   @HttpCode(201)
-  async createFecalysisResult(@Body() body: CreateFecalysisResultRequestDto): Promise<FecalysisResultResponse> {
+  async createFecalysisResult(@Body() body: CreateFecalysisResultCommand): Promise<ApiSuccessResponse<any>> {
     const validatedData = this.validationService.validateCreateFecalysisResultCommand(body);
     const fecalysisResult = await this.createFecalysisResultUseCase.execute(validatedData);
     const fecalysisResultDto = LaboratoryMapper.toFecalysisResultDto(fecalysisResult);
@@ -468,8 +460,8 @@ export class LaboratoryController {
   @Put('/fecalysis-results/:id')
   async updateFecalysisResult(
     @Param('id') id: string,
-    @Body() body: UpdateFecalysisResultRequestDto
-  ): Promise<FecalysisResultResponse> {
+    @Body() body: UpdateFecalysisResultCommand
+  ): Promise<ApiSuccessResponse<any>> {
     const updateData = { ...body, id };
     const validatedData = this.validationService.validateUpdateFecalysisResultCommand(updateData);
     const fecalysisResult = await this.updateFecalysisResultUseCase.execute(validatedData);
@@ -483,7 +475,7 @@ export class LaboratoryController {
    */
   @Delete('/fecalysis-results/:id')
   async deleteFecalysisResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
-    await this.deleteFecalysisResultUseCase.execute(id);
+    await this.deleteFecalysisResultUseCase.execute({ id });
     return ApiResponseBuilder.successWithMessage('Fecalysis result deleted successfully');
   }
 
@@ -493,7 +485,7 @@ export class LaboratoryController {
    * GET /api/laboratory/serology-results - Get all serology results
    */
   @Get('/serology-results')
-  async getAllSerologyResults(): Promise<SerologyResultListResponse> {
+  async getAllSerologyResults(): Promise<ApiSuccessResponse<any[]>> {
     const serologyResults = await this.getAllSerologyResultsQueryHandler.execute();
     const serologyResultDtos = LaboratoryMapper.toSerologyResultDtoArray(serologyResults);
 
@@ -504,7 +496,7 @@ export class LaboratoryController {
    * GET /api/laboratory/serology-results/:id - Get serology result by ID
    */
   @Get('/serology-results/:id')
-  async getSerologyResultById(@Param('id') id: string): Promise<SerologyResultResponse> {
+  async getSerologyResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
     const serologyResult = await this.getSerologyResultByIdQueryHandler.execute(id);
     const serologyResultDto = LaboratoryMapper.toSerologyResultDto(serologyResult);
 
@@ -515,7 +507,7 @@ export class LaboratoryController {
    * GET /api/laboratory/serology-results/patient/:patientId - Get serology results by patient ID
    */
   @Get('/serology-results/patient/:patientId')
-  async getSerologyResultsByPatientId(@Param('patientId') patientId: string): Promise<SerologyResultListResponse> {
+  async getSerologyResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     const serologyResults = await this.getSerologyResultsByPatientIdQueryHandler.execute(validatedPatientId);
     const serologyResultDtos = LaboratoryMapper.toSerologyResultDtoArray(serologyResults);
@@ -528,7 +520,7 @@ export class LaboratoryController {
    */
   @Post('/serology-results')
   @HttpCode(201)
-  async createSerologyResult(@Body() body: CreateSerologyResultRequestDto): Promise<SerologyResultResponse> {
+  async createSerologyResult(@Body() body: CreateSerologyResultCommand): Promise<ApiSuccessResponse<any>> {
     const validatedData = this.validationService.validateCreateSerologyResultCommand(body);
     const serologyResult = await this.createSerologyResultUseCase.execute(validatedData);
     const serologyResultDto = LaboratoryMapper.toSerologyResultDto(serologyResult);
@@ -542,8 +534,8 @@ export class LaboratoryController {
   @Put('/serology-results/:id')
   async updateSerologyResult(
     @Param('id') id: string,
-    @Body() body: UpdateSerologyResultRequestDto
-  ): Promise<SerologyResultResponse> {
+    @Body() body: UpdateSerologyResultCommand
+  ): Promise<ApiSuccessResponse<any>> {
     const updateData = { ...body, id };
     const validatedData = this.validationService.validateUpdateSerologyResultCommand(updateData);
     const serologyResult = await this.updateSerologyResultUseCase.execute(validatedData);
@@ -557,7 +549,7 @@ export class LaboratoryController {
    */
   @Delete('/serology-results/:id')
   async deleteSerologyResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
-    await this.deleteSerologyResultUseCase.execute(id);
+    await this.deleteSerologyResultUseCase.execute({ id });
     return ApiResponseBuilder.successWithMessage('Serology result deleted successfully');
   }
 }

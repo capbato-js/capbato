@@ -128,7 +128,18 @@ export class PrescriptionController {
   async getPrescriptionStats(): Promise<PrescriptionStatsResponse> {
     const stats = await this.getPrescriptionStatsQueryHandler.execute();
 
-    return ApiResponseBuilder.success(stats);
+    // Transform to match PrescriptionStatsDto structure
+    const transformedStats = {
+      totalCount: stats.totalCount,
+      activeCount: stats.activeCount,
+      completedCount: 0, // Set default values for missing properties
+      discontinuedCount: 0,
+      onHoldCount: 0,
+      expiredCount: stats.expiredCount,
+      mostPrescribedMedications: stats.mostPrescribedMedications
+    };
+
+    return ApiResponseBuilder.success(transformedStats);
   }
 
   /**

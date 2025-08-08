@@ -34,7 +34,7 @@ export class UpdatePrescriptionUseCase {
           existingPrescription.stringId || "PENDING", // Use existing prescription ID
           medicationData.medicationName,
           medicationData.dosage,
-          medicationData.instructions,
+          medicationData.instructions || "",
           medicationData.frequency,
           medicationData.duration,
           medicationData.id
