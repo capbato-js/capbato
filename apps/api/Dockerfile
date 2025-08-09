@@ -53,7 +53,8 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S -D -H -u 1001 -h /app -s /sbin/nologin -G nodejs -g nodejs nodejs
 
 # Set proper permissions
-RUN chown -R nodejs:nodejs /app
+# Comment out for now, not working in linux, just stuck
+# RUN chown -R nodejs:nodejs /app
 
 # Switch to non-root user
 USER nodejs
