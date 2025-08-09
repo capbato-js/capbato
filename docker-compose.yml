@@ -1,4 +1,21 @@
 services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   api:
     build:
       context: .
@@ -16,9 +33,9 @@ services:
       - PRODUCTION_CORS_ORIGIN=${PRODUCTION_CORS_ORIGIN:-http://localhost:3000}
       - DB_TYPE=${DB_TYPE:-mysql}
       - DB_ORM=${DB_ORM:-typeorm}
-      - DATABASE_URL=${DATABASE_URL:-mysql://root:password@host.docker.internal:3306/cms}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - DATABASE_URL=${DATABASE_URL:-mysql://root:password@mysql:3306/cms}
+    depends_on:
+      - mysql
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/api/health"]
       interval: 30s
@@ -47,3 +64,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+volumes:
+  mysql_data:
