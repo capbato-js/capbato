@@ -431,7 +431,6 @@ const PatientDetailsLoadingSkeleton: React.FC<{
       
       {activeTab === 'appointments' && (
         <Box>
-          {/* Real title, skeleton table */}
           <Text
             style={{
               color: theme.colors.blue[9],
@@ -445,52 +444,9 @@ const PatientDetailsLoadingSkeleton: React.FC<{
           >
             Appointments
           </Text>
-          <Table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              marginTop: '12px',
-              borderRadius: '10px',
-              overflow: 'hidden'
-            }}
-          >
-            {/* Real table headers */}
-            <Table.Thead style={{ background: theme.colors.tableBlue[0] }}>
-              <Table.Tr>
-                <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Date</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Time</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Reason for Visit</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Lab Tests Done</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Prescriptions</Table.Th>
-                <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            {/* Skeleton table rows */}
-            <Table.Tbody>
-              {[1, 2, 3].map((index) => (
-                <Table.Tr key={index}>
-                  <Table.Td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                    <Skeleton height={16} width={80} />
-                  </Table.Td>
-                  <Table.Td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                    <Skeleton height={16} width={60} />
-                  </Table.Td>
-                  <Table.Td style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', borderBottom: '1px solid #ddd' }}>
-                    <Skeleton height={16} width={120} />
-                  </Table.Td>
-                  <Table.Td style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', borderBottom: '1px solid #ddd' }}>
-                    <Skeleton height={16} width={100} />
-                  </Table.Td>
-                  <Table.Td style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', borderBottom: '1px solid #ddd' }}>
-                    <Skeleton height={16} width={90} />
-                  </Table.Td>
-                  <Table.Td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                    <Skeleton height={16} width={70} />
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
+          <Text style={{ fontSize: '16px', color: '#666' }}>
+            Appointments functionality will be implemented in future iterations.
+          </Text>
         </Box>
       )}
       
