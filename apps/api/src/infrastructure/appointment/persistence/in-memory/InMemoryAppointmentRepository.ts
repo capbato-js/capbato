@@ -169,4 +169,17 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
     // Time slot conflicts are still prevented by checkTimeSlotAvailability method
     return false;
   }
+
+  async getCurrentPatientAppointment(): Promise<Appointment | undefined> {
+    const allAppointments = Array.from(this.appointments.values())
+      .sort((a, b) => {
+        // Sort by date first, then by time
+        const dateComparison = a.appointmentDate.getTime() - b.appointmentDate.getTime();
+        if (dateComparison !== 0) return dateComparison;
+        return a.appointmentTime.toMinutes() - b.appointmentTime.toMinutes();
+      });
+
+    // Find first non-completed appointment
+    return allAppointments.find(appointment => !appointment.isCompleted());
+  }
 }

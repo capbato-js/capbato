@@ -37,7 +37,7 @@ export const DashboardPage: React.FC = () => {
             icon="👥"
             title="Current Patient"
             value={stats.currentPatient}
-            subtitle="Ongoing Now"
+            subtitle={stats.currentPatient !== 'N/A' ? "Ongoing Now" : undefined}
             iconColor="#fff"
             backgroundColor="#51CF66"
           />

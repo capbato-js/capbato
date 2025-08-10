@@ -152,6 +152,7 @@ export const TOKENS = {
   GetAppointmentsByDateRangeQueryHandler: 'GetAppointmentsByDateRangeQueryHandler',
   GetWeeklyAppointmentSummaryQueryHandler: 'GetWeeklyAppointmentSummaryQueryHandler',
   GetAppointmentStatsQueryHandler: 'GetAppointmentStatsQueryHandler',
+  GetCurrentPatientAppointmentQueryHandler: 'GetCurrentPatientAppointmentQueryHandler',
 
   // Prescription Layer - Query Handlers
   GetAllPrescriptionsQueryHandler: 'GetAllPrescriptionsQueryHandler',

@@ -15,4 +15,5 @@ export interface IAppointmentRepository {
   getWeeklyAppointmentSummary(): Promise<{ date: string; count: number }[]>;
   checkTimeSlotAvailability(date: Date, time: string, excludeId?: string): Promise<boolean>;
   checkPatientDuplicateAppointment(patientId: string, date: Date, excludeId?: string): Promise<boolean>;
+  getCurrentPatientAppointment(): Promise<Appointment | undefined>;
 }

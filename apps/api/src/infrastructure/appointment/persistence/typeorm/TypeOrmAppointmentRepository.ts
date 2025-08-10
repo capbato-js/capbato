@@ -287,6 +287,16 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
     return false;
   }
 
+  async getCurrentPatientAppointment(): Promise<Appointment | undefined> {
+    const entities = await this.repository.find({
+      order: { appointmentDate: 'ASC', appointmentTime: 'ASC' },
+    });
+
+    // Find first non-completed appointment (confirmed or cancelled, but not completed)
+    const currentEntity = entities.find(entity => entity.status !== 'completed');
+    return currentEntity ? this.toDomain(currentEntity) : undefined;
+  }
+
   private toDomain(entity: AppointmentEntity): Appointment {
     // Convert HH:MM:SS back to HH:MM format if needed
     const timeValue = entity.appointmentTime.includes(':') && entity.appointmentTime.split(':').length === 3
