@@ -345,7 +345,8 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
         patientNumber: data.patient.patientNumber,
         firstName: data.patient.firstName,
         lastName: data.patient.lastName,
-        fullName: `${NameFormattingService.formatToProperCase(data.patient.firstName)} ${NameFormattingService.formatToProperCase(data.patient.lastName)}`.trim(),
+        middleName: data.patient.middleName,
+        fullName: `${NameFormattingService.formatToProperCase(data.patient.firstName)}${data.patient.middleName ? ' ' + NameFormattingService.formatToProperCase(data.patient.middleName) : ''} ${NameFormattingService.formatToProperCase(data.patient.lastName)}`.trim(),
       },
       doctor: {
         id: data.doctor.id,

@@ -40,7 +40,8 @@ export class AppointmentMapper {
         patientNumber: patientData.patientNumber,
         firstName: patientData.firstName,
         lastName: patientData.lastName,
-        fullName: `${patientData.firstName} ${patientData.lastName}`.trim(),
+        middleName: patientData.middleName,
+        fullName: `${patientData.firstName}${patientData.middleName ? ' ' + patientData.middleName : ''} ${patientData.lastName}`.trim(),
       };
       baseDto.doctor = {
         id: doctorData.id,

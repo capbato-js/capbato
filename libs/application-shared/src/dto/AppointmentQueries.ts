@@ -56,6 +56,7 @@ export interface AppointmentDto {
     patientNumber: string;
     firstName: string;
     lastName: string;
+    middleName?: string;
     fullName: string;
   };
   doctor?: {
