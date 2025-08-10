@@ -55,6 +55,7 @@ export function getEnvironmentConfig(): AppConfig {
           all: '/api/appointments',
           create: '/api/appointments',
           byId: (id: string) => `/api/appointments/${id}`,
+          byPatientId: (patientId: string) => `/api/appointments/patient/${patientId}`,
           update: (id: string) => `/api/appointments/${id}`,
           delete: (id: string) => `/api/appointments/${id}`,
           confirm: (id: string) => `/api/appointments/${id}/confirm`,

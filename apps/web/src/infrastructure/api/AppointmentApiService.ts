@@ -80,6 +80,32 @@ export class AppointmentApiService {
   }
 
   /**
+   * Gets appointments by patient ID
+   */
+  async getAppointmentsByPatientId(patientId: string): Promise<AppointmentDto[]> {
+    try {
+      const response = await this.httpClient.get<{ success: boolean; data: AppointmentDto[] }>(
+        this.apiConfig.endpoints.appointments.byPatientId(patientId)
+      );
+
+      if (!response.data.success || !response.data.data) {
+        throw new Error('Failed to fetch appointments for patient');
+      }
+
+      return response.data.data;
+    } catch (error: any) {
+      // Extract user-friendly error message from API response
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      
+      // Fallback to original error message or generic message
+      const message = error.message || 'Failed to fetch appointments for patient';
+      throw new Error(message);
+    }
+  }
+
+  /**
    * Updates an appointment
    */
   async updateAppointment(id: string, data: {

@@ -18,6 +18,7 @@ export interface AppointmentsTableConfig {
   showActions?: boolean;
   showContactColumn?: boolean;
   showDateColumn?: boolean;
+  showPatientColumns?: boolean; // Add option to hide Patient # and Patient Name columns
   compactMode?: boolean;
   maxRows?: number;
   useViewportHeight?: boolean;
@@ -49,11 +50,12 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
     showActions = true,
     showContactColumn = false,
     showDateColumn = true,
+    showPatientColumns = true, // Default to true for backward compatibility
     compactMode = false,
     maxRows,
     useViewportHeight = false,
-    bottomPadding = 90,
-    emptyStateMessage = "No appointments found"
+    bottomPadding = 20,
+    emptyStateMessage = 'No appointments found',
   } = config;
 
   const {
@@ -153,29 +155,36 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
   const displayData = maxRows ? appointments.slice(0, maxRows) : appointments;
 
   // Build columns dynamically based on configuration
-  const columns: TableColumn<BaseAppointment>[] = [
-    {
-      key: 'patientNumber',
-      header: 'Patient #',
-      width: compactMode ? '12%' : '10%',
-      align: 'center',
-      searchable: !compactMode
-    },
-    {
-      key: 'patientName',
-      header: 'Patient',
-      width: compactMode ? '20%' : '20%',
-      align: 'left',
-      searchable: !compactMode
-    },
-    {
-      key: 'reasonForVisit',
-      header: 'Reason for visit',
-      width: compactMode ? '22%' : '18%',
-      align: 'left',
-      searchable: !compactMode
-    }
-  ];
+  const columns: TableColumn<BaseAppointment>[] = [];
+
+  // Conditionally add patient columns only if showPatientColumns is true
+  if (showPatientColumns) {
+    columns.push(
+      {
+        key: 'patientNumber',
+        header: 'Patient #',
+        width: compactMode ? '12%' : '10%',
+        align: 'center',
+        searchable: !compactMode
+      },
+      {
+        key: 'patientName',
+        header: 'Patient',
+        width: compactMode ? '20%' : '20%',
+        align: 'left',
+        searchable: !compactMode
+      }
+    );
+  }
+
+  // Always add reason for visit column
+  columns.push({
+    key: 'reasonForVisit',
+    header: 'Reason for visit',
+    width: compactMode ? '22%' : (showPatientColumns ? '18%' : '30%'), // Wider if patient columns are hidden
+    align: 'left',
+    searchable: !compactMode
+  });
 
   // Add contact column if enabled
   if (showContactColumn) {
@@ -210,7 +219,7 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
   columns.push({
     key: 'doctor',
     header: 'Doctor',
-    width: compactMode ? '16%' : '17%',
+    width: compactMode ? '16%' : (showPatientColumns ? '17%' : '25%'), // Wider if patient columns are hidden
     align: 'left',
     searchable: !compactMode
   });

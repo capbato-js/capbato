@@ -45,9 +45,23 @@ export interface Appointment {
   status: 'Confirmed' | 'Pending' | 'Cancelled' | 'Completed';
 }
 
+export interface Prescription {
+  id: string;
+  medicationName: string;
+  dosage: string;
+  instructions: string;
+  frequency: string;
+  duration: string;
+  prescribedDate: string; // YYYY-MM-DD format
+  expiryDate?: string; // YYYY-MM-DD format
+  doctor?: string;
+  status: 'active' | 'completed' | 'discontinued' | 'on-hold';
+}
+
 export interface PatientDetails extends Patient {
   guardian?: GuardianDetails;
   appointments?: Appointment[];
+  prescriptions?: Prescription[];
 }
 
 export interface PatientFormData {

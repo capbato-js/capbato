@@ -163,7 +163,7 @@ export class AppointmentController {
   }
 
   /**
-   * GET /api/appointments/patient/:patientId - Get appointments by patient ID
+   * GET /api/appointments/patient/:patientId - Get appointments by patient ID with populated patient and doctor data
    */
   @Get('/patient/:patientId')
   async getAppointmentsByPatientId(@Param('patientId') patientId: string): Promise<AppointmentListResponse> {
@@ -172,7 +172,14 @@ export class AppointmentController {
     });
     
     const appointments = await this.getAppointmentsByPatientIdQueryHandler.execute(validatedQuery);
-    const appointmentDtos = AppointmentMapper.toDtoArray(appointments);
+    
+    // Map appointments to DTOs with populated patient and doctor data
+    const appointmentDtos = appointments.map(appointment => {
+      const populatedPatient = (appointment as any)._populatedPatient;
+      const populatedDoctor = (appointment as any)._populatedDoctor;
+      
+      return AppointmentMapper.toDto(appointment, populatedPatient, populatedDoctor);
+    });
 
     return ApiResponseBuilder.success(appointmentDtos);
   }

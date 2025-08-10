@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Button, Grid, Text, Table, Alert, Skeleton, useMantineTheme } from '@mantine/core';
+import { Box, Button, Grid, Text, Alert, Skeleton, useMantineTheme } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { usePatientDetailsViewModel } from '../view-models/usePatientDetailsViewModel';
-import { PatientDetails, Appointment } from '../types';
+import { usePatientDetailsViewModel, usePatientPrescriptions, usePatientAppointments } from '../view-models';
+import { PrescriptionsTable } from '../components';
+import { PatientDetails } from '../types';
 import { Icon } from '../../../components/common/Icon';
+import { BaseAppointmentsTable } from '../../../components/common';
 
 // Custom Tab Button Component that mimics legacy design
 const CustomTabButton: React.FC<{
@@ -214,18 +216,18 @@ const PatientInfoTab: React.FC<{ patient: PatientDetails }> = ({ patient }) => {
   );
 };
 
-const AppointmentsTab: React.FC<{ appointments: Appointment[] }> = ({ appointments }) => {
+const AppointmentsTab: React.FC<{ patientId: string }> = ({ patientId }) => {
   const theme = useMantineTheme();
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  };
+  const { appointments, isLoading, error } = usePatientAppointments(patientId);
 
-  const formatTime = (timeStr: string) => {
-    const [hour, minute] = timeStr.split(':');
-    const h = parseInt(hour, 10);
-    const suffix = h >= 12 ? 'PM' : 'AM';
-    const hour12 = ((h + 11) % 12 + 1);
-    return `${hour12}:${minute} ${suffix}`;
+  const config = {
+    showActions: false, // No actions in patient view for now
+    showContactColumn: false,
+    showDateColumn: true,
+    showPatientColumns: false, // Hide Patient # and Patient Name columns since we're in patient context
+    compactMode: false,
+    useViewportHeight: false,
+    emptyStateMessage: "No appointments found for this patient"
   };
 
   return (
@@ -243,83 +245,120 @@ const AppointmentsTab: React.FC<{ appointments: Appointment[] }> = ({ appointmen
       >
         Appointments
       </Text>
-      <Table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          marginTop: '12px',
-          borderRadius: '10px',
-          overflow: 'hidden'
-        }}
-      >
-        <Table.Thead style={{ background: theme.colors.tableBlue[0] }}>
-          <Table.Tr>
-            <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Date</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Time</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Reason for Visit</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Lab Tests Done</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Prescriptions</Table.Th>
-            <Table.Th style={{ padding: '12px', textAlign: 'center', color: theme.colors.tableBlue[9], fontWeight: 600 }}>Status</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {appointments.length === 0 ? (
-            <Table.Tr>
-              <Table.Td colSpan={6} style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                No appointments found.
-              </Table.Td>
-            </Table.Tr>
-          ) : (
-            appointments.map((appointment) => (
-              <Table.Tr key={appointment.id}>
-                <Table.Td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                  {formatDate(appointment.date)}
-                </Table.Td>
-                <Table.Td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                  {formatTime(appointment.time)}
-                </Table.Td>
-                <Table.Td style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', borderBottom: '1px solid #ddd' }}>
-                  {appointment.reasonForVisit}
-                </Table.Td>
-                <Table.Td style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', borderBottom: '1px solid #ddd' }}>
-                  {appointment.labTestsDone}
-                </Table.Td>
-                <Table.Td style={{ padding: '12px', textAlign: 'left', paddingLeft: '16px', borderBottom: '1px solid #ddd' }}>
-                  {appointment.prescriptions}
-                </Table.Td>
-                <Table.Td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                  {appointment.status}
-                </Table.Td>
-              </Table.Tr>
-            ))
-          )}
-        </Table.Tbody>
-      </Table>
+      
+      {isLoading && (
+        <Box style={{ padding: '20px' }}>
+          <Skeleton height={50} />
+          <Skeleton height={50} mt="md" />
+          <Skeleton height={50} mt="md" />
+        </Box>
+      )}
+      
+      {error && (
+        <Alert color="red" style={{ marginBottom: '20px' }}>
+          {error}
+        </Alert>
+      )}
+      
+      {!isLoading && !error && (
+        <BaseAppointmentsTable
+          appointments={appointments}
+          config={config}
+        />
+      )}
     </Box>
   );
 };
 
-const PlaceholderTab: React.FC<{ title: string }> = ({ title }) => {
+const PrescriptionsTab: React.FC<{ patientId: string }> = ({ patientId }) => {
+  const theme = useMantineTheme();
+  const { prescriptions, isLoading, error } = usePatientPrescriptions(patientId);
+
+  if (isLoading) {
+    return (
+      <Box style={{ padding: '0 20px' }}>
+        <Text
+          style={{
+            color: theme.colors.blue[9],
+            fontSize: '20px',
+            fontWeight: 'bold',
+            marginBottom: '20px',
+            marginTop: 0,
+            borderBottom: `2px solid ${theme.colors.blue[9]}`,
+            paddingBottom: '8px'
+          }}
+        >
+          Prescriptions
+        </Text>
+        <Skeleton height={200} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box style={{ padding: '0 20px' }}>
+        <Text
+          style={{
+            color: theme.colors.blue[9],
+            fontSize: '20px',
+            fontWeight: 'bold',
+            marginBottom: '20px',
+            marginTop: 0,
+            borderBottom: `2px solid ${theme.colors.blue[9]}`,
+            paddingBottom: '8px'
+          }}
+        >
+          Prescriptions
+        </Text>
+        <Alert color="red" title="Error loading prescriptions">
+          {error}
+        </Alert>
+      </Box>
+    );
+  }
+
+  return (
+    <Box style={{ padding: '0 20px' }}>
+      <Text
+        style={{
+          color: theme.colors.blue[9],
+          fontSize: '20px',
+          fontWeight: 'bold',
+          marginBottom: '20px',
+          marginTop: 0,
+          borderBottom: `2px solid ${theme.colors.blue[9]}`,
+          paddingBottom: '8px'
+        }}
+      >
+        Prescriptions
+      </Text>
+      <PrescriptionsTable prescriptions={prescriptions} />
+    </Box>
+  );
+};
+
+const LaboratoriesTab: React.FC = () => {
   const theme = useMantineTheme();
   return (
-  <Box style={{ padding: '0 20px' }}>
-    <Text
-      style={{
-        color: theme.colors.blue[9],
-        fontSize: '20px',
-        fontWeight: 'bold',
-        marginBottom: '20px',
-        marginTop: 0,
-        borderBottom: `2px solid ${theme.colors.blue[9]}`,
-        paddingBottom: '8px'
-      }}
-    >
-      {title}
-    </Text>
-    <Text style={{ fontSize: '16px', color: '#666' }}>
-      {title} functionality will be implemented in future iterations.
-    </Text>
-  </Box>
+    <Box style={{ padding: '0 20px' }}>
+      <Text
+        style={{
+          color: theme.colors.blue[9],
+          fontSize: '20px',
+          fontWeight: 'bold',
+          marginBottom: '20px',
+          marginTop: 0,
+          borderBottom: `2px solid ${theme.colors.blue[9]}`,
+          paddingBottom: '8px'
+        }}
+      >
+        Laboratory Requests
+      </Text>
+      <Text style={{ fontSize: '16px', color: '#666' }}>
+        Laboratory functionality will be implemented in future iterations.
+      </Text>
+    </Box>
   );
 };
 
@@ -429,27 +468,6 @@ const PatientDetailsLoadingSkeleton: React.FC<{
         </Grid>
       )}
       
-      {activeTab === 'appointments' && (
-        <Box>
-          <Text
-            style={{
-              color: theme.colors.blue[9],
-              fontSize: '20px',
-              fontWeight: 'bold',
-              marginBottom: '20px',
-              marginTop: 0,
-              borderBottom: `2px solid ${theme.colors.blue[9]}`,
-              paddingBottom: '8px'
-            }}
-          >
-            Appointments
-          </Text>
-          <Text style={{ fontSize: '16px', color: '#666' }}>
-            Appointments functionality will be implemented in future iterations.
-          </Text>
-        </Box>
-      )}
-      
       {(activeTab === 'medical-records' || activeTab === 'prescriptions' || activeTab === 'laboratories') && (
         <Box>
           <Text
@@ -463,13 +481,9 @@ const PatientDetailsLoadingSkeleton: React.FC<{
               paddingBottom: '8px'
             }}
           >
-            {/* {activeTab === 'medical-records' ? 'Medical Records' :  */}
             {activeTab === 'prescriptions' ? 'Prescriptions' : 'Laboratory Requests'}
           </Text>
-          <Text style={{ fontSize: '16px', color: '#666' }}>
-            {/* {activeTab === 'medical-records' ? 'Medical Records' :  */}
-            {activeTab === 'prescriptions' ? 'Prescriptions' : 'Laboratory Requests'} functionality will be implemented in future iterations.
-          </Text>
+          <Skeleton height={200} />
         </Box>
       )}
     </Box>
@@ -641,9 +655,9 @@ export const PatientDetailsPage: React.FC = () => {
         <Box style={{ flex: 1 }}>
           {activeTab === 'patient-info' && <PatientInfoTab patient={patient} />}
           {/* {activeTab === 'medical-records' && <PlaceholderTab title="Medical Records" />} */}
-          {activeTab === 'appointments' && <AppointmentsTab appointments={patient.appointments || []} />}
-          {activeTab === 'prescriptions' && <PlaceholderTab title="Prescriptions" />}
-          {activeTab === 'laboratories' && <PlaceholderTab title="Laboratory Requests" />}
+          {activeTab === 'appointments' && <AppointmentsTab patientId={patient.id} />}
+          {activeTab === 'prescriptions' && <PrescriptionsTab patientId={patient.id} />}
+          {activeTab === 'laboratories' && <LaboratoriesTab />}
         </Box>
     </MedicalClinicLayout>
   );

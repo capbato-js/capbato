@@ -152,7 +152,18 @@ export class PrescriptionController {
     const prescriptions = await this.getPrescriptionsByPatientIdQueryHandler.execute({ 
       patientId: validatedPatientId 
     });
-    const prescriptionDtos = PrescriptionMapper.toDtoArray(prescriptions);
+
+    // Map prescriptions to DTOs with populated patient and doctor data
+    const prescriptionDtos = await Promise.all(prescriptions.map(async (prescription) => {
+      // Fetch patient and doctor data separately to populate the response
+      const [patientData, doctorData] = await Promise.all([
+        this.getPatientByIdQueryHandler.execute({ id: prescription.patientId }),
+        this.getDoctorByIdQueryHandler.execute({ id: prescription.doctorId })
+      ]);
+      
+      // Map prescription to DTO with populated patient and doctor data
+      return PrescriptionMapper.toDto(prescription, patientData, doctorData);
+    }));
     
     return ApiResponseBuilder.success(prescriptionDtos);
   }

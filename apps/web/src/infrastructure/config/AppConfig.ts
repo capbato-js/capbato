@@ -35,6 +35,7 @@ export interface ApiConfiguration {
       all: string;
       create: string;
       byId: (id: string) => string;
+      byPatientId: (patientId: string) => string;
       update: (id: string) => string;
       delete: (id: string) => string;
       confirm: (id: string) => string;
