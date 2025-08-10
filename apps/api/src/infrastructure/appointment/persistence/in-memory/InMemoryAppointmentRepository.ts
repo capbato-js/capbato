@@ -164,19 +164,9 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
   }
 
   async checkPatientDuplicateAppointment(patientId: string, date: Date, excludeId?: string): Promise<boolean> {
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
-
-    const patientAppointments = await this.getByPatientId(patientId);
-    const duplicateAppointments = patientAppointments.filter(appointment => {
-      if (excludeId && appointment.stringId === excludeId) {
-        return false; // Exclude the appointment being updated
-      }
-      const appointmentDate = new Date(appointment.appointmentDate);
-      appointmentDate.setHours(0, 0, 0, 0);
-      return appointmentDate.getTime() === targetDate.getTime() && appointment.isConfirmed();
-    });
-
-    return duplicateAppointments.length > 0;
+    // Note: Patients are now allowed to have multiple appointments per day
+    // This method always returns false (no duplicate) to support the new business requirement
+    // Time slot conflicts are still prevented by checkTimeSlotAvailability method
+    return false;
   }
 }

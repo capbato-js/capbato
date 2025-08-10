@@ -281,23 +281,10 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
   }
 
   async checkPatientDuplicateAppointment(patientId: string, date: Date, excludeId?: string): Promise<boolean> {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    const queryBuilder = this.repository
-      .createQueryBuilder('appointment')
-      .where('appointment.patientId = :patientId', { patientId })
-      .andWhere('appointment.appointmentDate BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay })
-      .andWhere('appointment.status = :status', { status: 'confirmed' });
-
-    if (excludeId) {
-      queryBuilder.andWhere('appointment.id != :excludeId', { excludeId });
-    }
-
-    const count = await queryBuilder.getCount();
-    return count > 0;
+    // Note: Patients are now allowed to have multiple appointments per day
+    // This method always returns false (no duplicate) to support the new business requirement
+    // Time slot conflicts are still prevented by checkTimeSlotAvailability method
+    return false;
   }
 
   private toDomain(entity: AppointmentEntity): Appointment {

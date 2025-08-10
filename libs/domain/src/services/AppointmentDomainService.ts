@@ -22,12 +22,8 @@ export class AppointmentDomainService {
       appointment.timeValue
     );
 
-    await this.validateNoDuplicateAppointment(
-      appointment.patientId,
-      appointment.appointmentDate,
-      undefined,
-      patientName
-    );
+    // Note: Removed duplicate appointment validation - patients can now have multiple appointments per day
+    // Only time slot availability is validated to prevent overbooking specific times
   }
 
   /**
@@ -44,12 +40,8 @@ export class AppointmentDomainService {
       appointmentId
     );
 
-    await this.validateNoDuplicateAppointment(
-      appointment.patientId,
-      appointment.appointmentDate,
-      appointmentId,
-      patientName
-    );
+    // Note: Removed duplicate appointment validation - patients can now have multiple appointments per day
+    // Only time slot availability is validated to prevent overbooking specific times
   }
 
   /**
@@ -75,6 +67,8 @@ export class AppointmentDomainService {
 
   /**
    * Validates that patient doesn't have duplicate appointment on same date
+   * @deprecated This validation is no longer enforced - patients can have multiple appointments per day
+   * This method is kept for backward compatibility and always returns false (no duplicate)
    */
   async validateNoDuplicateAppointment(
     patientId: string,
@@ -82,18 +76,10 @@ export class AppointmentDomainService {
     excludeId?: string,
     patientName?: string
   ): Promise<void> {
-    const hasDuplicate = await this.appointmentRepository.checkPatientDuplicateAppointment(
-      patientId,
-      date,
-      excludeId
-    );
-
-    if (hasDuplicate) {
-      const displayName = patientName || patientId;
-      throw new DuplicateAppointmentException(
-        `Patient ${displayName} already has an appointment on ${date.toDateString()}`
-      );
-    }
+    // Note: This validation is no longer enforced
+    // Patients are now allowed to have multiple appointments per day
+    // Method kept for backward compatibility but does nothing
+    return;
   }
 
   /**
