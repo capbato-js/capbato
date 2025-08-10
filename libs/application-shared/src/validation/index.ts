@@ -1,12 +1,14 @@
 // Validation schemas and types
 export * from './TodoValidationSchemas';
 export * from './PrescriptionValidationSchemas';
+export * from './UserValidationSchemas';
 
 // Base validation service and utilities
 export * from './ValidationService';
 
 // Concrete validation service implementations
 export * from './TodoValidationService';
+export * from './UserValidationService';
 
 // Validation constants and messages
 export * from './constants/ValidationMessages';

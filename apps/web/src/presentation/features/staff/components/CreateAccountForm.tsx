@@ -8,7 +8,7 @@ import {
   Box,
   Group,
 } from '@mantine/core';
-import { RegisterUserCommandSchema, RegisterUserCommand } from '@nx-starter/application-shared';
+import { RegisterUserFormSchema, RegisterUserCommand, RegisterUserFormData } from '@nx-starter/application-shared';
 import { Step1Fields } from './Step1Fields';
 import { Step2Fields } from './Step2Fields';
 
@@ -43,14 +43,15 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     setValue,
     trigger,
     formState: { errors },
-  } = useForm<RegisterUserCommand>({
-    resolver: zodResolver(RegisterUserCommandSchema),
+  } = useForm<RegisterUserFormData>({
+    resolver: zodResolver(RegisterUserFormSchema) as any,
     mode: 'onBlur',
     defaultValues: {
       firstName: '',
       lastName: '',
       email: '',
       password: '',
+      confirmPassword: '',
       role: '',
       mobile: '',
       specialization: '',
@@ -64,6 +65,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
   const lastName = watch('lastName');
   const email = watch('email');
   const password = watch('password');
+  const confirmPassword = watch('confirmPassword');
   const role = watch('role');
 
   // State for multi-step form navigation
@@ -141,6 +143,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     lastName, 
     email,
     password,
+    confirmPassword,
     role,
     watch('mobile'),
     watch('specialization'),
@@ -196,6 +199,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
                       !lastName?.trim() || 
                       !email?.trim() || 
                       !password?.trim() || 
+                      !confirmPassword?.trim() ||
                       !role?.trim();
   
   const isStep2Empty = isMultiStep && (
@@ -206,8 +210,13 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     ? (currentStep === 1 ? isStep1Empty : isStep1Empty || isStep2Empty)
     : isStep1Empty;
 
-  const handleFormSubmit = handleSubmit(async (data: RegisterUserCommand) => {
-    const success = await onSubmit(data);
+  const handleFormSubmit = handleSubmit(async (data) => {
+    // Transform form data to command by excluding confirmPassword
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword, ...commandData } = data as RegisterUserFormData;
+    const command: RegisterUserCommand = commandData;
+    
+    const success = await onSubmit(command);
     
     // Only reset form on successful submission
     if (success) {

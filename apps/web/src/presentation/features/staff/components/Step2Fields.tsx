@@ -2,13 +2,13 @@ import React from 'react';
 import { Control, FieldErrors, UseFormRegister, Controller } from 'react-hook-form';
 import { Stack, Select } from '@mantine/core';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
-import { RegisterUserCommand } from '@nx-starter/application-shared';
+import { RegisterUserFormData } from '@nx-starter/application-shared';
 
 interface Step2FieldsProps {
-  control: Control<RegisterUserCommand>;
-  errors: FieldErrors<RegisterUserCommand>; 
+  control: Control<RegisterUserFormData>;
+  errors: FieldErrors<RegisterUserFormData>; 
   isLoading: boolean;
-  register: UseFormRegister<RegisterUserCommand>;
+  register: UseFormRegister<RegisterUserFormData>;
   onInputChange?: () => void;
   fieldErrors?: Record<string, string>;
 }

@@ -1,18 +1,18 @@
 import React from 'react';
 import { Control, FieldErrors, UseFormRegister, Controller, UseFormSetValue, UseFormWatch, UseFormTrigger } from 'react-hook-form';
-import { Stack, Select } from '@mantine/core';
+import { Stack, Select, Group } from '@mantine/core';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { NameFormattingService } from '@nx-starter/domain';
-import { RegisterUserCommand } from '@nx-starter/application-shared';
+import { RegisterUserFormData } from '@nx-starter/application-shared';
 
 interface Step1FieldsProps {
-  control: Control<RegisterUserCommand>;
-  errors: FieldErrors<RegisterUserCommand>; 
+  control: Control<RegisterUserFormData>;
+  errors: FieldErrors<RegisterUserFormData>; 
   isLoading: boolean;
-  register: UseFormRegister<RegisterUserCommand>;
-  setValue: UseFormSetValue<RegisterUserCommand>;
-  watch: UseFormWatch<RegisterUserCommand>;
-  trigger: UseFormTrigger<RegisterUserCommand>;
+  register: UseFormRegister<RegisterUserFormData>;
+  setValue: UseFormSetValue<RegisterUserFormData>;
+  watch: UseFormWatch<RegisterUserFormData>;
+  trigger: UseFormTrigger<RegisterUserFormData>;
   onInputChange?: () => void;
   fieldErrors?: Record<string, string>;
 }
@@ -42,35 +42,37 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
   };
   return (
     <Stack gap="md">
-      <FormTextInput
-        label="First Name"
-        placeholder="Enter first name"
-        error={errors.firstName || fieldErrors.firstName}
-        disabled={isLoading}
-        required
-        {...register('firstName', {
-          onBlur: () => handleNameFieldBlur('firstName')
-        })}
-        onChange={(e) => {
-          register('firstName').onChange(e);
-          onInputChange?.();
-        }}
-      />
-      
-      <FormTextInput
-        label="Last Name"
-        placeholder="Enter last name"
-        error={errors.lastName || fieldErrors.lastName}
-        disabled={isLoading}
-        required
-        {...register('lastName', {
-          onBlur: () => handleNameFieldBlur('lastName')
-        })}
-        onChange={(e) => {
-          register('lastName').onChange(e);
-          onInputChange?.();
-        }}
-      />
+      <Group grow>
+        <FormTextInput
+          label="First Name"
+          placeholder="Enter first name"
+          error={errors.firstName || fieldErrors.firstName}
+          disabled={isLoading}
+          required
+          {...register('firstName', {
+            onBlur: () => handleNameFieldBlur('firstName')
+          })}
+          onChange={(e) => {
+            register('firstName').onChange(e);
+            onInputChange?.();
+          }}
+        />
+        
+        <FormTextInput
+          label="Last Name"
+          placeholder="Enter last name"
+          error={errors.lastName || fieldErrors.lastName}
+          disabled={isLoading}
+          required
+          {...register('lastName', {
+            onBlur: () => handleNameFieldBlur('lastName')
+          })}
+          onChange={(e) => {
+            register('lastName').onChange(e);
+            onInputChange?.();
+          }}
+        />
+      </Group>
       
       <FormTextInput
         label="Email"
@@ -96,6 +98,20 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
         {...register('password')}
         onChange={(e) => {
           register('password').onChange(e);
+          onInputChange?.();
+        }}
+      />
+      
+      <FormTextInput
+        label="Confirm Password"
+        type="password"
+        placeholder="Confirm password"
+        error={errors.confirmPassword || fieldErrors.confirmPassword}
+        disabled={isLoading}
+        required
+        {...register('confirmPassword')}
+        onChange={(e) => {
+          register('confirmPassword').onChange(e);
           onInputChange?.();
         }}
       />

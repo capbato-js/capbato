@@ -16,6 +16,11 @@ export interface RegisterUserCommand {
   experienceYears?: number;
 }
 
+// Frontend form data that includes confirmPassword for UI validation
+export interface RegisterUserFormData extends RegisterUserCommand {
+  confirmPassword: string;
+}
+
 export interface LoginUserCommand {
   identifier: string; // Can be email or username
   password: string;

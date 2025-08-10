@@ -125,6 +125,14 @@ export const RegisterUserCommandSchema = z.object({
     }),
 });
 
+// Frontend form schema that includes confirmPassword for UI validation
+export const RegisterUserFormSchema = RegisterUserCommandSchema.extend({
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
 
 // Login user command validation schema (matches DTO interface)
 export const LoginUserCommandSchema = z.object({
@@ -187,6 +195,7 @@ export const GetAllUsersQuerySchema = z.object({});
 // Export all schemas for easy access
 export const UserValidationSchemas = {
   RegisterUserCommand: RegisterUserCommandSchema,
+  RegisterUserForm: RegisterUserFormSchema,
   LoginUserCommand: LoginUserCommandSchema,
   LoginForm: LoginFormSchema,
   ChangeUserPasswordCommand: ChangeUserPasswordCommandSchema,
