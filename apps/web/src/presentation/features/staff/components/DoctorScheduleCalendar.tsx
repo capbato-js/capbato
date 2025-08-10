@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Text, Button, Stack, Paper, Grid, Box, Group, ActionIcon, Popover, Menu, Alert, useMantineTheme } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight, IconRefresh, IconEdit, IconAlertCircle } from '@tabler/icons-react';
+import { Card, Text, Button, Stack, Paper, Grid, Box, Group, ActionIcon, Alert, useMantineTheme } from '@mantine/core';
+import { IconChevronLeft, IconChevronRight, IconRefresh, IconAlertCircle } from '@tabler/icons-react';
 import { useDoctorScheduleCalendarViewModel } from '../view-models/useDoctorScheduleCalendarViewModel';
 
 interface DoctorScheduleCalendarProps {
@@ -17,18 +17,12 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
 }) => {
   const theme = useMantineTheme();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [editPopoverOpened, setEditPopoverOpened] = useState<{ [key: string]: boolean }>({});
-  const [lastError, setLastError] = useState<string | null>(null);
   
   const {
-    appointments,
     loading,
     error,
-    availableDoctors,
     refreshData,
-    getAppointmentsForDate,
-    updateAppointmentDoctor,
-    isUpdatingDate
+    getScheduleBlocksForDate,
   } = useDoctorScheduleCalendarViewModel();
 
   // Calendar helper functions
@@ -113,48 +107,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
     }).toUpperCase();
   };
 
-  // Format appointment time for display
-  const formatTimeForDisplay = (time: string, formattedTime?: string) => {
-    if (formattedTime) return formattedTime;
-    
-    // Convert 24-hour format to 12-hour format
-    const [hours, minutes] = time.split(':');
-    const hour24 = parseInt(hours, 10);
-    const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
-    const ampm = hour24 >= 12 ? 'PM' : 'AM';
-    return `${hour12}${minutes !== '00' ? `:${minutes}` : ''} ${ampm}`;
-  };
 
-  // Helper function to get popover key for a specific date
-  const getPopoverKey = (dayInfo: any) => {
-    return `${dayInfo.date.getFullYear()}-${dayInfo.date.getMonth()}-${dayInfo.date.getDate()}`;
-  };
-
-  // Handle popover toggle
-  const togglePopover = (dayInfo: any) => {
-    const key = getPopoverKey(dayInfo);
-    setEditPopoverOpened(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  // Handle doctor assignment change
-  const handleDoctorChange = async (dayInfo: any, newDoctorId: string, newDoctorName: string) => {
-    try {
-      setLastError(null); // Clear previous errors
-      await updateAppointmentDoctor(dayInfo.date, newDoctorId, newDoctorName);
-      // Close the popover
-      const key = getPopoverKey(dayInfo);
-      setEditPopoverOpened(prev => ({
-        ...prev,
-        [key]: false
-      }));
-    } catch (error) {
-      console.error('Failed to update doctor assignment:', error);
-      setLastError('Failed to update doctor assignment. Please try again.');
-    }
-  };
 
   const calendarDays = generateCalendarDays();
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -216,17 +169,13 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
         </Text>
 
         {/* Error Alert */}
-        {(error || lastError) && (
+        {error && (
           <Alert 
             icon={<IconAlertCircle size={16} />} 
             color="red" 
             mb="md"
-            onClose={() => {
-              setLastError(null);
-            }}
-            withCloseButton
           >
-            {lastError || error}
+            {error}
           </Alert>
         )}
 
@@ -252,153 +201,74 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
           {/* Calendar Days */}
           <Grid gutter="xs">
             {calendarDays.map((dayInfo, index) => {
-              const dayAppointments = getAppointmentsForDate(dayInfo.date);
-              const popoverKey = getPopoverKey(dayInfo);
-              const hasAppointments = dayAppointments.length > 0;
-              const isUpdating = isUpdatingDate(dayInfo.date);
+              const dayScheduleBlocks = getScheduleBlocksForDate(dayInfo.date);
+              const hasScheduledDoctors = dayScheduleBlocks.length > 0;
+              
+              // Debug logging
+              if (dayInfo.isCurrentMonth && hasScheduledDoctors) {
+                console.log(`Day ${dayInfo.day} has ${dayScheduleBlocks.length} schedule blocks:`, dayScheduleBlocks);
+              }
               
               return (
                 <Grid.Col key={index} span={12/7} style={{ minWidth: 0 }}>
-                  <Popover 
-                    opened={editPopoverOpened[popoverKey] || false} 
-                    onClose={() => setEditPopoverOpened(prev => ({ ...prev, [popoverKey]: false }))}
-                    position="bottom"
-                    withArrow
-                    shadow="md"
+                  <Paper
+                    p="xs"
+                    withBorder
+                    style={{
+                      minHeight: '100px',
+                      backgroundColor: dayInfo.isCurrentMonth 
+                        ? (dayInfo.isToday ? '#e7f5ff' : 'white')
+                        : '#f8f9fa',
+                      opacity: dayInfo.isCurrentMonth ? 1 : 0.6,
+                      position: 'relative',
+                      transition: 'background-color 0.2s ease',
+                    }}
                   >
-                    <Popover.Target>
-                      <Paper
-                        p="xs"
-                        withBorder
-                        style={{
-                          minHeight: '100px',
-                          backgroundColor: dayInfo.isCurrentMonth 
-                            ? (dayInfo.isToday ? '#e7f5ff' : 'white')
-                            : '#f8f9fa',
-                          opacity: dayInfo.isCurrentMonth ? 1 : 0.6,
-                          position: 'relative',
-                          cursor: hasAppointments && dayInfo.isCurrentMonth ? 'pointer' : 'default',
-                          transition: 'background-color 0.2s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          if (hasAppointments && dayInfo.isCurrentMonth) {
-                            e.currentTarget.style.backgroundColor = dayInfo.isToday ? '#d0ebff' : '#f8f9fa';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (hasAppointments && dayInfo.isCurrentMonth) {
-                            e.currentTarget.style.backgroundColor = dayInfo.isToday ? '#e7f5ff' : 'white';
-                          }
-                        }}
+                    {/* Day Number */}
+                    <Group justify="space-between" align="flex-start" mb="xs">
+                      <Text 
+                        size="sm" 
+                        fw={dayInfo.isToday ? 700 : 400}
+                        c={dayInfo.isCurrentMonth ? (dayInfo.isToday ? 'blue' : 'dark') : 'dimmed'}
                       >
-                        {/* Day Number with Edit Icon */}
-                        <Group justify="space-between" align="flex-start" mb="xs">
-                          <Text 
-                            size="sm" 
-                            fw={dayInfo.isToday ? 700 : 400}
-                            c={dayInfo.isCurrentMonth ? (dayInfo.isToday ? 'blue' : 'dark') : 'dimmed'}
+                        {dayInfo.day}
+                      </Text>
+                    </Group>
+
+                    {/* Doctor scheduled blocks for this day */}
+                    {hasScheduledDoctors && dayInfo.isCurrentMonth && (
+                      <Stack gap={2} mt="xs">
+                        {dayScheduleBlocks.slice(0, 2).map((block) => (
+                          <Box
+                            key={block.id}
+                            p={3}
+                            style={{
+                              backgroundColor: '#f0f9ff',
+                              borderRadius: '3px',
+                              fontSize: '9px',
+                              lineHeight: 1.1,
+                              border: '1px solid #e0f2fe',
+                            }}
                           >
-                            {dayInfo.day}
-                          </Text>
-                          
-                          {hasAppointments && dayInfo.isCurrentMonth && (
-                            <ActionIcon
-                              size="xs"
-                              variant="subtle"
-                              c="blue"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                togglePopover(dayInfo);
-                              }}
-                              style={{
-                                opacity: 0.7,
-                                transition: 'opacity 0.2s ease',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.opacity = '1';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.opacity = '0.7';
-                              }}
-                            >
-                              <IconEdit size={12} />
-                            </ActionIcon>
-                          )}
-                        </Group>
-
-                        {/* Appointments for this day */}
-                        {hasAppointments && (
-                          <Stack gap={4}>
-                            {dayAppointments.slice(0, 2).map((appointment) => (
-                              <Box
-                                key={appointment.id}
-                                p={4}
-                                style={{
-                                  backgroundColor: '#e7f5ff',
-                                  borderRadius: '4px',
-                                  fontSize: '10px',
-                                  lineHeight: 1.2,
-                                }}
-                              >
-                                <Text size="xs" fw={500} style={{ color: theme.colors.blue[9] }} truncate>
-                                  Dr. {appointment.doctorName}
-                                </Text>
-                                <Text size="xs" style={{ color: theme.colors.blue[7] }} truncate>
-                                  {appointment.formattedTime}
-                                </Text>
-                              </Box>
-                            ))}
-                            {dayAppointments.length > 2 && (
-                              <Text size="xs" c="dimmed" ta="center">
-                                +{dayAppointments.length - 2} more
-                              </Text>
-                            )}
-                          </Stack>
-                        )}
-
-                        {isUpdating && dayInfo.isCurrentMonth && (
-                          <Text size="xs" c="blue" ta="center" mt="xs" fw={500}>
-                            Updating...
-                          </Text>
-                        )}
-                      </Paper>
-                    </Popover.Target>
-                    
-                    <Popover.Dropdown>
-                      <Stack gap="xs" style={{ minWidth: 200 }}>
-                        <Text size="sm" fw={500}>
-                          Change Doctor Assignment
-                        </Text>
-                        
-                        {hasAppointments && (
-                          <>
-                            <Text size="xs" c="dimmed">
-                              Currently assigned: Dr. {dayAppointments[0].doctorName}
+                            <Text size="xs" fw={500} style={{ color: theme.colors.cyan[8] }} truncate>
+                              Dr. {block.doctorName}
                             </Text>
-                            
-                            <Text size="xs" fw={500} mt="xs" mb="xs">
-                              Available Doctors:
+                            <Text size="xs" style={{ color: theme.colors.cyan[6] }} truncate>
+                              Scheduled
                             </Text>
-                            
-                            {availableDoctors
-                              .filter(doctor => doctor.id !== dayAppointments[0].doctorId)
-                              .map((doctor) => (
-                                <Button
-                                  key={doctor.id}
-                                  variant="light"
-                                  size="xs"
-                                  onClick={() => handleDoctorChange(dayInfo, doctor.id, doctor.name)}
-                                  disabled={loading || isUpdating}
-                                  loading={isUpdating}
-                                >
-                                  Dr. {doctor.name}
-                                </Button>
-                              ))}
-                          </>
+                            <Text size="xs" style={{ color: theme.colors.cyan[5] }} truncate>
+                              {block.schedulePattern}
+                            </Text>
+                          </Box>
+                        ))}
+                        {dayScheduleBlocks.length > 2 && (
+                          <Text size="xs" c="dimmed" ta="center">
+                            +{dayScheduleBlocks.length - 2} more
+                          </Text>
                         )}
                       </Stack>
-                    </Popover.Dropdown>
-                  </Popover>
+                    )}
+                  </Paper>
                 </Grid.Col>
               );
             })}

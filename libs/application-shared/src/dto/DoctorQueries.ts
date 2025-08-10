@@ -20,6 +20,10 @@ export interface DoctorDto {
   yearsOfExperience?: number;
   isActive: boolean;
   
+  // Schedule Pattern Fields
+  schedulePattern?: string; // Schedule pattern string (e.g., "MWF", "TTH")
+  schedulePatternDescription?: string; // Human-readable description
+  
   // User Information (fetched via relationship)
   firstName: string;
   lastName: string;
@@ -39,6 +43,8 @@ export interface DoctorSummaryDto {
   formattedContactNumber: string; // From User.mobile
   yearsOfExperience?: number;
   isActive: boolean;
+  schedulePattern?: string; // Schedule pattern string
+  schedulePatternDescription?: string; // Human-readable description
 }
 
 // Query Request DTOs
@@ -77,22 +83,4 @@ export interface DoctorListResponse {
 export interface DoctorSummaryListResponse {
   success: true;
   data: DoctorSummaryDto[];
-}
-
-export type DoctorOperationResponse = ApiSuccessMessageResponse;
-
-// Command DTOs for doctor profile management
-export interface CreateDoctorProfileCommand {
-  userId: string;
-  specialization: string;
-  licenseNumber?: string;
-  yearsOfExperience?: number;
-}
-
-export interface UpdateDoctorProfileCommand {
-  id: string;
-  specialization?: string;
-  licenseNumber?: string;
-  yearsOfExperience?: number;
-  isActive?: boolean;
 }

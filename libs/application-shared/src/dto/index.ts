@@ -8,6 +8,7 @@ export * from './AddressDto';
 export * from './ApiResponse';
 export * from './AppointmentCommands';
 export * from './AppointmentQueries';
+export * from './DoctorCommands';
 export * from './DoctorQueries';
 export * from './LaboratoryDto';
 export * from './PatientCommands';

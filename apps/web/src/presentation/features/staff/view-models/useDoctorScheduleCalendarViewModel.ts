@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { container } from 'tsyringe';
 import { DoctorApiService } from '../../../../infrastructure/api/DoctorApiService';
-import { AppointmentApiService } from '../../../../infrastructure/api/AppointmentApiService';
-import { useDoctorAccess } from '../../../../infrastructure/auth';
 import type { DoctorDto } from '@nx-starter/application-shared';
 
-// Helper function to format appointment date to YYYY-MM-DD
+// Helper function to format date to YYYY-MM-DD
 const formatDateToISOString = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -13,278 +11,196 @@ const formatDateToISOString = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Helper function to format time for display
-const formatTimeForDisplay = (time: string): string => {
-  const [hours, minutes] = time.split(':');
-  const hour24 = parseInt(hours, 10);
-  const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
-  const ampm = hour24 >= 12 ? 'PM' : 'AM';
-  return `${hour12}${minutes !== '00' ? `:${minutes}` : ''} ${ampm}`;
-};
-
-// Define the calendar appointment interface (converted from appointment data)
-interface CalendarAppointment {
+interface DoctorScheduleBlock {
   id: string;
-  appointmentId: string; // Track the actual appointment ID for updates
   doctorId: string;
   doctorName: string;
-  date: string; // YYYY-MM-DD format
-  time: string; // HH:MM format
-  formattedTime: string;
-  patientName?: string;
-  reasonForVisit?: string;
+  date: string;
+  schedulePattern: string;
+  schedulePatternDescription: string;
 }
 
 interface DoctorScheduleCalendarViewModel {
-  appointments: CalendarAppointment[];
+  scheduleBlocks: DoctorScheduleBlock[];
   loading: boolean;
   error: string | null;
-  availableDoctors: Array<{ id: string; name: string; }>;
+  availableDoctors: Array<{ id: string; name: string; schedulePattern?: string; }>;
   refreshData: () => Promise<void>;
-  getAppointmentsForDate: (date: Date) => CalendarAppointment[];
-  updateAppointmentDoctor: (date: Date | string, newDoctorId: string, newDoctorName: string) => Promise<void>;
-  isUpdatingDate: (date: Date | string) => boolean;
+  getScheduleBlocksForDate: (date: Date) => DoctorScheduleBlock[];
 }
 
 /**
+ * Check if a doctor is scheduled to work on a specific day based on their schedule pattern
+ */
+const isDoctorScheduledOnDay = (doctor: DoctorDto, dayOfWeek: string): boolean => {
+  console.log(`Checking if ${doctor.fullName} is scheduled on ${dayOfWeek}, pattern: ${doctor.schedulePattern}`);
+  
+  if (!doctor.schedulePattern) {
+    console.log(`No schedule pattern for ${doctor.fullName}`);
+    return false; // No schedule pattern means not scheduled
+  }
+
+  const pattern = doctor.schedulePattern.toUpperCase();
+  
+  // Handle common patterns
+  switch (pattern) {
+    case 'MWF':
+      const isMWF = ['MONDAY', 'WEDNESDAY', 'FRIDAY'].includes(dayOfWeek);
+      console.log(`MWF check for ${dayOfWeek}: ${isMWF}`);
+      return isMWF;
+    case 'TTH':
+      const isTTH = ['TUESDAY', 'THURSDAY'].includes(dayOfWeek);
+      console.log(`TTH check for ${dayOfWeek}: ${isTTH}`);
+      return isTTH;
+    case 'WEEKDAYS':
+      return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].includes(dayOfWeek);
+    case 'ALL':
+      return true;
+    default:
+      console.log(`Unknown pattern: ${pattern}`);
+      return false;
+  }
+};
+
+/**
+ * Get day of week from date
+ */
+const getDayOfWeek = (date: Date): string => {
+  const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+  return days[date.getDay()];
+};
+
+/**
+ * Generate doctor schedule blocks for a date range
+ */
+const generateDoctorScheduleBlocks = (
+  doctors: DoctorDto[],
+  startDate: Date,
+  endDate: Date
+): DoctorScheduleBlock[] => {
+  const blocks: DoctorScheduleBlock[] = [];
+  const current = new Date(startDate);
+
+  while (current <= endDate) {
+    const dateString = formatDateToISOString(current);
+    const dayOfWeek = getDayOfWeek(current);
+
+    for (const doctor of doctors) {
+      // Check if doctor is scheduled to work on this day
+      if (isDoctorScheduledOnDay(doctor, dayOfWeek)) {
+        blocks.push({
+          id: `schedule-${doctor.id}-${dateString}`,
+          doctorId: doctor.id,
+          doctorName: doctor.fullName,
+          date: dateString,
+          schedulePattern: doctor.schedulePattern || 'Unknown',
+          schedulePatternDescription: doctor.schedulePatternDescription || 'No schedule pattern',
+        });
+      }
+    }
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  return blocks;
+};
+
+/**
  * View model for Doctor Schedule Calendar
- * Uses appointments as the single source of truth for calendar data
+ * Uses doctor schedule patterns as the primary source for calendar display
  */
 export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarViewModel => {
-  const [appointments, setAppointments] = useState<CalendarAppointment[]>([]);
+  const [scheduleBlocks, setScheduleBlocks] = useState<DoctorScheduleBlock[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [availableDoctors, setAvailableDoctors] = useState<Array<{ id: string; name: string; }>>([]);
-  const [updatingDates, setUpdatingDates] = useState<Set<string>>(new Set());
-  const [doctorProfileId, setDoctorProfileId] = useState<string | null>(null);
+  const [availableDoctors, setAvailableDoctors] = useState<Array<{ id: string; name: string; schedulePattern?: string; }>>([]);
+  const [doctorsData, setDoctorsData] = useState<DoctorDto[]>([]);
 
-  // Get doctor access permissions
-  const { isDoctor, userId, shouldFilterByDoctor, canViewAllDoctorSchedules } = useDoctorAccess();
-
-  // Get the API service instances
+  // Get the API service instance
   const doctorApiService = container.resolve(DoctorApiService);
-  const appointmentApiService = container.resolve(AppointmentApiService);
 
-  // Fetch doctor profile ID for the current user (if they are a doctor)
-  const fetchDoctorProfile = useCallback(async () => {
-    if (!shouldFilterByDoctor || !userId) {
-      return;
-    }
+  // Generate schedule blocks from doctor data
+  const generateScheduleBlocks = useCallback((doctors: DoctorDto[]) => {
+    console.log('Generating schedule blocks from doctors:', doctors);
+    
+    // Generate schedule blocks for the current month
+    const currentDate = new Date();
+    const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    
+    const blocks = generateDoctorScheduleBlocks(doctors, startDate, endDate);
+    
+    console.log('Generated schedule blocks:', blocks.length);
+    setScheduleBlocks(blocks);
+  }, []);
 
-    try {
-      console.log(`Fetching doctor profile for user ID: ${userId}`);
-      const doctorProfile = await doctorApiService.getDoctorByUserId(userId);
-      console.log('Doctor profile found:', doctorProfile);
-      setDoctorProfileId(doctorProfile.id);
-    } catch (err) {
-      console.error('Error fetching doctor profile:', err);
-      // If doctor profile doesn't exist, keep doctorProfileId as null
-      // This will result in no appointments being shown, which is correct
-      setDoctorProfileId(null);
-    }
-  }, [shouldFilterByDoctor, userId, doctorApiService]);
-
-  // Fetch appointments from the API and transform to calendar format
-  const fetchAppointments = useCallback(async () => {
+  // Fetch doctors and generate schedule blocks
+  const fetchDoctorsAndSchedules = useCallback(async () => {
+    if (loading) return; // Prevent concurrent calls
+    
     setLoading(true);
     setError(null);
     
     try {
-      console.log('Fetching appointments...');
-      console.log('Doctor access info:', { isDoctor, userId, shouldFilterByDoctor, canViewAllDoctorSchedules, doctorProfileId });
+      console.log('Fetching doctors data...');
+      const doctors = await doctorApiService.getAllDoctors(true, 'full') as DoctorDto[];
+      console.log('Doctors data fetched:', doctors);
       
-      // Get all appointments
-      const appointmentsData = await appointmentApiService.getAllAppointments();
-      console.log('Raw appointments data:', appointmentsData);
+      setDoctorsData(doctors);
       
-      // Transform appointments to calendar format
-      let calendarAppointments: CalendarAppointment[] = appointmentsData.map(appointment => {
-        // Extract date from appointmentDate (handle timezone properly)
-        const appointmentDate = new Date(appointment.appointmentDate);
-        const dateString = formatDateToISOString(appointmentDate);
-        
-        return {
-          id: `appointment-${appointment.id}`, // Unique calendar ID
-          appointmentId: appointment.id, // Actual appointment ID for updates
-          doctorId: appointment.doctor?.id || '',
-          doctorName: appointment.doctor?.fullName || 'Unknown Doctor',
-          date: dateString,
-          time: appointment.appointmentTime,
-          formattedTime: formatTimeForDisplay(appointment.appointmentTime),
-          patientName: appointment.patient?.fullName,
-          reasonForVisit: appointment.reasonForVisit
-        };
-      });
-
-      // Filter appointments based on user role
-      if (shouldFilterByDoctor && doctorProfileId) {
-        console.log(`Filtering appointments for doctor profile ID: ${doctorProfileId}`);
-        calendarAppointments = calendarAppointments.filter(appointment => 
-          appointment.doctorId === doctorProfileId
-        );
-        console.log('Filtered appointments for doctor:', calendarAppointments);
-      } else if (shouldFilterByDoctor && !doctorProfileId) {
-        console.log('Doctor user but no profile found - showing no appointments');
-        calendarAppointments = []; // Doctor user but no profile, show nothing
-      } else {
-        console.log('Showing all appointments (admin/receptionist view)');
-      }
+      // Process available doctors list
+      const doctorList = doctors.map(doctor => ({
+        id: doctor.id,
+        name: doctor.fullName || `${doctor.firstName || 'Unknown'} ${doctor.lastName || 'Doctor'}`,
+        schedulePattern: doctor.schedulePattern,
+        schedulePatternDescription: doctor.schedulePatternDescription
+      }));
       
-      console.log('Final calendar appointments:', calendarAppointments);
-      setAppointments(calendarAppointments);
+      setAvailableDoctors(doctorList);
+      
+      // Generate schedule blocks
+      generateScheduleBlocks(doctors);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error fetching appointments:', err);
+      console.error('Error fetching doctors:', err);
     } finally {
       setLoading(false);
     }
-  }, [appointmentApiService, shouldFilterByDoctor, doctorProfileId, isDoctor, canViewAllDoctorSchedules, userId]);
+  }, [loading, generateScheduleBlocks]);
 
-  // Get appointments for a specific date
-  const getAppointmentsForDate = useCallback((date: Date): CalendarAppointment[] => {
+  // Get schedule blocks for a specific date
+  const getScheduleBlocksForDate = useCallback((date: Date): DoctorScheduleBlock[] => {
     const targetDateString = formatDateToISOString(date);
-    return appointments.filter(appointment => {
-      return appointment.date === targetDateString;
-    }).sort((a, b) => {
-      // Sort by time
-      return a.time.localeCompare(b.time);
-    });
-  }, [appointments]);
+    const matchingBlocks = scheduleBlocks.filter(block => block.date === targetDateString);
+    
+    // Debug logging
+    if (matchingBlocks.length > 0) {
+      console.log(`Found ${matchingBlocks.length} blocks for date ${targetDateString}:`, matchingBlocks);
+    } else {
+      console.log(`No blocks found for date ${targetDateString}. Available blocks:`, scheduleBlocks.slice(0, 3));
+    }
+    
+    return matchingBlocks;
+  }, [scheduleBlocks]);
 
   // Refresh data
   const refreshData = useCallback(async () => {
-    await fetchAppointments();
-  }, [fetchAppointments]);
+    await fetchDoctorsAndSchedules();
+  }, [fetchDoctorsAndSchedules]);
 
-  // Fetch available doctors
-  const fetchDoctors = useCallback(async () => {
-    try {
-      console.log('Fetching doctors...');
-      // Use full format to get all fields including fullName
-      const doctors = await doctorApiService.getAllDoctors(true, 'full') as DoctorDto[];
-      console.log('Raw doctors data:', doctors);
-      
-      const doctorList = doctors.map(doctor => {
-        // Use fullName field directly, with fallback
-        const fullName = doctor.fullName || `${doctor.firstName || 'Unknown'} ${doctor.lastName || 'Doctor'}`;
-        
-        console.log('Processing doctor:', {
-          id: doctor.id,
-          fullName: doctor.fullName,
-          firstName: doctor.firstName,
-          lastName: doctor.lastName,
-          finalName: fullName,
-          original: doctor
-        });
-        
-        return {
-          id: doctor.id,
-          name: fullName
-        };
-      });
-      
-      console.log('Processed doctor list:', doctorList);
-      setAvailableDoctors(doctorList);
-    } catch (err) {
-      console.error('Error fetching doctors:', err);
-    }
+  // Initial data load
+  useEffect(() => {
+    fetchDoctorsAndSchedules();
   }, []);
 
-  // Helper function to check if a date is being updated
-  const isUpdatingDate = useCallback((date: Date | string) => {
-    const dateString = typeof date === 'string' ? date : formatDateToISOString(date);
-    return updatingDates.has(dateString);
-  }, [updatingDates]);
-
-  // Update appointment doctor for a specific date
-  const updateAppointmentDoctor = useCallback(async (date: Date | string, newDoctorId: string, newDoctorName: string) => {
-    const dateString = typeof date === 'string' ? date : formatDateToISOString(date);
-    
-    try {
-      // Set loading state for this specific date
-      setUpdatingDates(prev => new Set(prev).add(dateString));
-      console.log('Updating appointment doctor:', { date: dateString, newDoctorId, newDoctorName });
-      
-      // Find appointment(s) for the given date from our current data
-      const appointmentsForDate = typeof date === 'string' 
-        ? appointments.filter(appointment => appointment.date === date)
-        : getAppointmentsForDate(date);
-      
-      if (appointmentsForDate.length === 0) {
-        console.error('No appointments found for date:', dateString);
-        setError('No appointments found for the selected date');
-        return;
-      }
-      
-      console.log('Found appointments to update:', appointmentsForDate);
-      
-      // Update all appointments for this date (in case there are multiple)
-      // This maintains the behavior where changing the doctor for a date affects all appointments
-      for (const calendarAppointment of appointmentsForDate) {
-        await appointmentApiService.updateAppointment(calendarAppointment.appointmentId, {
-          doctorId: newDoctorId
-        });
-        console.log(`Updated appointment ${calendarAppointment.appointmentId} with new doctor`);
-      }
-      
-      console.log('All appointments updated successfully');
-      
-      // Optimistically update the local state for immediate feedback
-      setAppointments(prev => prev.map(appointment => {
-        if (appointment.date === dateString) {
-          return {
-            ...appointment,
-            doctorId: newDoctorId,
-            doctorName: newDoctorName
-          };
-        }
-        return appointment;
-      }));
-      
-    } catch (err) {
-      console.error('Error updating appointment doctor:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update appointment');
-      // Refresh data to revert optimistic update on error
-      await fetchAppointments();
-    } finally {
-      // Remove loading state for this specific date
-      setUpdatingDates(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(dateString);
-        return newSet;
-      });
-    }
-  }, [appointmentApiService, fetchAppointments, getAppointmentsForDate]);
-
-  // Effect to fetch doctor profile when user changes
-  useEffect(() => {
-    fetchDoctorProfile();
-  }, [fetchDoctorProfile]);
-
-  // Effect to fetch appointments when doctor profile is resolved
-  useEffect(() => {
-    // For non-doctors, fetch immediately
-    // For doctors, wait until we have the profile ID (or confirmed it doesn't exist)
-    if (!shouldFilterByDoctor || doctorProfileId !== null) {  
-      fetchAppointments();
-    }
-  }, [fetchAppointments, shouldFilterByDoctor, doctorProfileId]);
-
-  // Initial load for doctors list
-  useEffect(() => {
-    fetchDoctors();
-  }, [fetchDoctors]);
-
   return {
-    appointments,
+    scheduleBlocks,
     loading,
     error,
     availableDoctors,
     refreshData,
-    getAppointmentsForDate,
-    updateAppointmentDoctor,
-    isUpdatingDate
+    getScheduleBlocksForDate,
   };
 };

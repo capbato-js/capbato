@@ -8,6 +8,7 @@ import {
   Param,
   Body,
   QueryParam,
+  Authorized,
 } from 'routing-controllers';
 import { CreateDoctorProfileCommandHandler } from '@nx-starter/application-api';
 import {
@@ -16,14 +17,21 @@ import {
   GetDoctorByUserIdQueryHandler,
   GetDoctorsBySpecializationQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
+  UpdateDoctorSchedulePatternUseCase,
+  RemoveDoctorSchedulePatternUseCase,
+  InitializeDoctorSchedulesUseCase,
 } from '@nx-starter/application-shared';
 import {
   DoctorListResponse,
   DoctorSummaryListResponse,
   DoctorResponse,
   DoctorOperationResponse,
+  DoctorScheduleOperationResponse,
   CreateDoctorProfileCommand,
   UpdateDoctorProfileCommand,
+  UpdateDoctorSchedulePatternCommand,
+  RemoveDoctorSchedulePatternCommand,
+  UpdateDoctorSchedulePatternRequestDto,
   GetAllDoctorsQuery,
   GetDoctorByIdQuery,
   GetDoctorByUserIdQuery,
@@ -61,6 +69,12 @@ export class DoctorController {
     private checkDoctorProfileExistsQueryHandler: CheckDoctorProfileExistsQueryHandler,
     @inject(TOKENS.CreateDoctorProfileCommandHandler)
     private createDoctorProfileCommandHandler: CreateDoctorProfileCommandHandler,
+    @inject(TOKENS.UpdateDoctorSchedulePatternUseCase)
+    private updateDoctorSchedulePatternUseCase: UpdateDoctorSchedulePatternUseCase,
+    @inject(TOKENS.RemoveDoctorSchedulePatternUseCase)
+    private removeDoctorSchedulePatternUseCase: RemoveDoctorSchedulePatternUseCase,
+    @inject(TOKENS.InitializeDoctorSchedulesUseCase)
+    private initializeDoctorSchedulesUseCase: InitializeDoctorSchedulesUseCase,
     @inject(TOKENS.DoctorValidationService)
     private validationService: DoctorValidationService
   ) {}
@@ -196,5 +210,68 @@ export class DoctorController {
     // const result = await this.deleteDoctorProfileCommandHandler.execute({ id: validatedId });
     
     return ApiResponseBuilder.successWithMessage('Doctor profile deactivated successfully');
+  }
+
+  /**
+   * PUT /api/doctors/:id/schedule - Update a doctor's schedule pattern (Admin only)
+   */
+  @Put('/:id/schedule')
+  @Authorized('admin')
+  async updateDoctorSchedulePattern(
+    @Param('id') id: string,
+    @Body() requestDto: UpdateDoctorSchedulePatternRequestDto
+  ): Promise<DoctorScheduleOperationResponse> {
+    const validatedId = DoctorIdSchema.parse(id);
+    
+    // Validate schedule pattern
+    if (!requestDto.schedulePattern || requestDto.schedulePattern.trim() === '') {
+      throw new Error('Schedule pattern is required');
+    }
+
+    const command: UpdateDoctorSchedulePatternCommand = {
+      id: validatedId,
+      schedulePattern: requestDto.schedulePattern.trim()
+    };
+
+    await this.updateDoctorSchedulePatternUseCase.execute(command);
+
+    return ApiResponseBuilder.successWithMessage(
+      `Doctor schedule pattern updated to: ${requestDto.schedulePattern}`
+    );
+  }
+
+  /**
+   * DELETE /api/doctors/:id/schedule - Remove a doctor's schedule pattern (Admin only)
+   */
+  @Delete('/:id/schedule')
+  @Authorized('admin')
+  async removeDoctorSchedulePattern(@Param('id') id: string): Promise<DoctorScheduleOperationResponse> {
+    const validatedId = DoctorIdSchema.parse(id);
+
+    const command: RemoveDoctorSchedulePatternCommand = {
+      id: validatedId
+    };
+
+    await this.removeDoctorSchedulePatternUseCase.execute(command);
+
+    return ApiResponseBuilder.successWithMessage('Doctor schedule pattern removed successfully');
+  }
+
+  /**
+   * POST /api/doctors/initialize-schedules - Initialize default schedule patterns for doctors without them (Admin only)
+   */
+  @Post('/initialize-schedules')
+  @Authorized('admin')
+  async initializeDoctorSchedules(): Promise<{
+    success: boolean;
+    message: string;
+    data: { updated: number; skipped: number; doctors: any[] };
+  }> {
+    const result = await this.initializeDoctorSchedulesUseCase.execute();
+
+    return ApiResponseBuilder.successWithMessage(
+      `Initialized schedules for ${result.updated} doctors, skipped ${result.skipped} doctors that already had schedules`,
+      result
+    );
   }
 }

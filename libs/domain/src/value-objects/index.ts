@@ -18,6 +18,7 @@ export * from './Role';
 export * from './Mobile';
 export * from './DoctorId';
 export * from './DoctorName';
+export * from './DoctorSchedulePattern';
 export * from './Specialization';
 export * from './ContactNumber';
 export * from './ProvinceCode';

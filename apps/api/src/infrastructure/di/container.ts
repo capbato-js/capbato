@@ -230,6 +230,9 @@ import {
   GetDoctorByIdQueryHandler,
   GetDoctorByUserIdQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
+  UpdateDoctorSchedulePatternUseCase,
+  RemoveDoctorSchedulePatternUseCase,
+  InitializeDoctorSchedulesUseCase,
 } from '@nx-starter/application-shared';
 import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository, IReceiptRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
@@ -365,6 +368,11 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreatePatientUseCase, CreatePatientUseCase);
   container.registerSingleton(TOKENS.UpdatePatientUseCase, UpdatePatientUseCase);
   container.registerSingleton(TOKENS.CreateDoctorProfileCommandHandler, CreateDoctorProfileCommandHandler);
+
+  // Doctor Schedule Use Cases
+  container.registerSingleton(TOKENS.UpdateDoctorSchedulePatternUseCase, UpdateDoctorSchedulePatternUseCase);
+  container.registerSingleton(TOKENS.RemoveDoctorSchedulePatternUseCase, RemoveDoctorSchedulePatternUseCase);
+  container.registerSingleton(TOKENS.InitializeDoctorSchedulesUseCase, InitializeDoctorSchedulesUseCase);
 
   // Schedule Use Cases
   container.registerSingleton(TOKENS.CreateScheduleUseCase, CreateScheduleUseCase);

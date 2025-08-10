@@ -42,3 +42,6 @@ export * from './UpdatePrescriptionUseCase';
 export * from './DeletePrescriptionUseCase';
 export * from './CreateTransactionUseCase';
 export * from './DeleteTransactionUseCase';
+export * from './UpdateDoctorSchedulePatternUseCase';
+export * from './RemoveDoctorSchedulePatternUseCase';
+export * from './InitializeDoctorSchedulesUseCase';

@@ -8,3 +8,5 @@ export * from './TodoDomainService';
 export * from './UserDomainService';
 export * from './AppointmentDomainService';
 export * from './NameFormattingService';
+export * from './ScheduleDomainService';
+export * from './DoctorScheduleService';
