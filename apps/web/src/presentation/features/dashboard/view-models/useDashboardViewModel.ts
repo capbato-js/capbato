@@ -89,10 +89,38 @@ export const useDashboardViewModel = (): DashboardViewModel => {
     return doctorName ? `${doctorName} (Assigned)` : 'No Doctor Assigned';
   };
 
-  // Simple patient detection - get current confirmed patient
+  // Simple patient detection - get current patient based on business rule
   const getCurrentPatientFromAppointments = (): string => {
-    const confirmedAppointment = todayAppointments.find(apt => apt.status === 'confirmed');
-    return confirmedAppointment?.patientName || 'N/A';
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // Get all appointments sorted by date and time (earliest first)
+    const allAppointmentsSorted = appointments
+      .map(mapToBaseAppointment)
+      .sort((a, b) => {
+        // Create date objects for comparison
+        const dateTimeA = new Date(`${a.date} ${a.time}`);
+        const dateTimeB = new Date(`${b.date} ${b.time}`);
+        return dateTimeA.getTime() - dateTimeB.getTime();
+      });
+
+    // Find first non-completed appointment that is either:
+    // 1. From the past or current time (has started or should have started)
+    // 2. Scheduled for today (regardless of time)
+    const currentAppointment = allAppointmentsSorted.find(apt => {
+      if (apt.status === 'completed') return false;
+      
+      const appointmentDate = new Date(apt.date);
+      const appointmentDateTime = new Date(`${apt.date} ${apt.time}`);
+      
+      // Check if appointment is today or in the past
+      const isToday = appointmentDate.getTime() === today.getTime();
+      const isInPastOrNow = appointmentDateTime.getTime() <= now.getTime();
+      
+      return isToday || isInPastOrNow;
+    });
+    
+    return currentAppointment?.patientName || 'N/A';
   };
 
   const loadDashboardData = async () => {
