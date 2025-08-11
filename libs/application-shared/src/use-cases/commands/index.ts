@@ -40,3 +40,5 @@ export * from './DeleteSerologyResultUseCase';
 export * from './CreatePrescriptionUseCase';
 export * from './UpdatePrescriptionUseCase';
 export * from './DeletePrescriptionUseCase';
+export * from './CreateTransactionUseCase';
+export * from './DeleteTransactionUseCase';

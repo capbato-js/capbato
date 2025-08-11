@@ -26,6 +26,7 @@ export const TOKENS = {
   FecalysisResultRepository: 'IFecalysisResultRepository',
   SerologyResultRepository: 'ISerologyResultRepository',
   PrescriptionRepository: 'IPrescriptionRepository',
+  ReceiptRepository: 'IReceiptRepository',
 
   // Infrastructure Layer - Services
   PasswordHashingService: 'IPasswordHashingService',
@@ -92,6 +93,8 @@ export const TOKENS = {
   CreatePrescriptionUseCase: 'CreatePrescriptionUseCase',
   UpdatePrescriptionUseCase: 'UpdatePrescriptionUseCase',
   DeletePrescriptionUseCase: 'DeletePrescriptionUseCase',
+  CreateTransactionUseCase: 'CreateTransactionUseCase',
+  DeleteTransactionUseCase: 'DeleteTransactionUseCase',
 
   // Application Layer - Use Cases (Queries)
   GetAllTodosQueryHandler: 'GetAllTodosQueryHandler',
@@ -163,6 +166,8 @@ export const TOKENS = {
   GetExpiredPrescriptionsQueryHandler: 'GetExpiredPrescriptionsQueryHandler',
   GetPrescriptionsByMedicationNameQueryHandler: 'GetPrescriptionsByMedicationNameQueryHandler',
   GetPrescriptionStatsQueryHandler: 'GetPrescriptionStatsQueryHandler',
+  GetAllTransactionsQueryHandler: 'GetAllTransactionsQueryHandler',
+  GetTransactionByIdQueryHandler: 'GetTransactionByIdQueryHandler',
 
   // Domain Layer - Services
   TodoDomainService: 'TodoDomainService',
@@ -235,6 +240,11 @@ export const TOKENS = {
   UpdatePrescriptionValidationService: 'UpdatePrescriptionValidationService',
   DeletePrescriptionValidationService: 'DeletePrescriptionValidationService',
   PrescriptionValidationService: 'PrescriptionValidationService',
+  CreateTransactionValidationService: 'CreateTransactionValidationService',
+  DeleteTransactionValidationService: 'DeleteTransactionValidationService',
+  GetTransactionByIdValidationService: 'GetTransactionByIdValidationService',
+  GetAllTransactionsValidationService: 'GetAllTransactionsValidationService',
+  TransactionValidationService: 'TransactionValidationService',
 } as const;
 
 // Type-safe token keys

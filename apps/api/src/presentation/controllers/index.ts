@@ -1,4 +1,5 @@
 export * from './TodoController';
+export * from './TransactionController';
 export * from './AuthController';
 export * from './UsersController';
 export * from './AddressController';

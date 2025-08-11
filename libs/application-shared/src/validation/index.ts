@@ -124,5 +124,31 @@ export * from './LaboratoryValidationService';
 export * from './PrescriptionValidationSchemas';
 export * from './PrescriptionValidationService';
 
-// Export transaction validation schemas
+// Export transaction validation schemas and services
 export * from './TransactionValidationSchemas';
+export * from './TransactionValidationService';
+
+// Re-export transaction validation schemas for convenience
+export {
+  CreateTransactionCommandSchema,
+  UpdateTransactionCommandSchema,
+  DeleteTransactionCommandSchema,
+  GetTransactionByIdQuerySchema,
+  GetAllTransactionsQuerySchema,
+  AddTransactionFormSchema,
+  TransactionItemSchema,
+  TransactionIdSchema,
+  FlexibleIdSchema,
+  PaymentMethodSchema,
+  TransactionValidationSchemas,
+  TRANSACTION_VALIDATION_ERRORS,
+  type CreateTransactionCommand,
+  type UpdateTransactionCommand,
+  type DeleteTransactionCommand,
+  type GetTransactionByIdQuery,
+  type GetAllTransactionsQuery,
+  type AddTransactionFormData,
+  type UpdateTransactionFormData,
+  type TransactionItemData,
+  type TransactionValidationErrors,
+} from './TransactionValidationSchemas';

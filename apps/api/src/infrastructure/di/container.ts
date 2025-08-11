@@ -37,6 +37,10 @@ import {
   SqlitePrescriptionRepository
 } from '../prescription/persistence';
 import {
+  InMemoryReceiptRepository,
+  TypeOrmReceiptRepository
+} from '../receipt/persistence';
+import {
   CreateTodoUseCase,
   UpdateTodoUseCase,
   DeleteTodoUseCase,
@@ -133,6 +137,12 @@ import {
   CreatePrescriptionUseCase,
   UpdatePrescriptionUseCase,
   DeletePrescriptionUseCase,
+  // Transaction Use Cases
+  CreateTransactionUseCase,
+  DeleteTransactionUseCase,
+  // Transaction Query Handlers
+  GetAllTransactionsQueryHandler,
+  GetTransactionByIdQueryHandler,
   // Prescription Query Handlers
   GetAllPrescriptionsQueryHandler,
   GetPrescriptionByIdQueryHandler,
@@ -147,6 +157,12 @@ import {
   CreatePrescriptionValidationService,
   UpdatePrescriptionValidationService,
   DeletePrescriptionValidationService,
+  // Transaction Validation Services
+  TransactionValidationService,
+  CreateTransactionValidationService,
+  DeleteTransactionValidationService,
+  GetTransactionByIdValidationService,
+  GetAllTransactionsValidationService,
 } from '@nx-starter/application-shared';
 import {
   CreateScheduleUseCase,
@@ -215,7 +231,7 @@ import {
   GetDoctorByUserIdQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
 } from '@nx-starter/application-shared';
-import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository } from '@nx-starter/domain';
+import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository, IReceiptRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
 import type { ILabRequestRepository, IBloodChemistryRepository, IUrinalysisResultRepository, IHematologyResultRepository, IFecalysisResultRepository, ISerologyResultRepository } from '@nx-starter/domain';
 import { AppointmentDomainService } from '@nx-starter/domain';
@@ -311,6 +327,12 @@ export const configureDI = async () => {
     prescriptionRepositoryImplementation
   );
 
+  const receiptRepositoryImplementation = await getReceiptRepositoryImplementation();
+  container.registerInstance<IReceiptRepository>(
+    TOKENS.ReceiptRepository,
+    receiptRepositoryImplementation
+  );
+
   // Infrastructure Layer - Services  
   container.registerSingleton(
     TOKENS.PasswordHashingService,
@@ -384,6 +406,10 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreatePrescriptionUseCase, CreatePrescriptionUseCase);
   container.registerSingleton(TOKENS.UpdatePrescriptionUseCase, UpdatePrescriptionUseCase);
   container.registerSingleton(TOKENS.DeletePrescriptionUseCase, DeletePrescriptionUseCase);
+
+  // Transaction Use Cases (Commands)
+  container.registerSingleton(TOKENS.CreateTransactionUseCase, CreateTransactionUseCase);
+  container.registerSingleton(TOKENS.DeleteTransactionUseCase, DeleteTransactionUseCase);
 
   // Application Layer - Use Cases (Queries)
   container.registerSingleton(
@@ -502,6 +528,10 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetExpiredPrescriptionsQueryHandler, GetExpiredPrescriptionsQueryHandler);
   container.registerSingleton(TOKENS.GetPrescriptionsByMedicationNameQueryHandler, GetPrescriptionsByMedicationNameQueryHandler);
   container.registerSingleton(TOKENS.GetPrescriptionStatsQueryHandler, GetPrescriptionStatsQueryHandler);
+
+  // Transaction Query Handlers
+  container.registerSingleton(TOKENS.GetAllTransactionsQueryHandler, GetAllTransactionsQueryHandler);
+  container.registerSingleton(TOKENS.GetTransactionByIdQueryHandler, GetTransactionByIdQueryHandler);
 
   // Application Layer - Validation Services
   container.registerSingleton(
@@ -627,6 +657,13 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreatePrescriptionValidationService, CreatePrescriptionValidationService);
   container.registerSingleton(TOKENS.UpdatePrescriptionValidationService, UpdatePrescriptionValidationService);
   container.registerSingleton(TOKENS.DeletePrescriptionValidationService, DeletePrescriptionValidationService);
+
+  // Transaction Validation Services
+  container.registerSingleton(TOKENS.TransactionValidationService, TransactionValidationService);
+  container.registerSingleton(TOKENS.CreateTransactionValidationService, CreateTransactionValidationService);
+  container.registerSingleton(TOKENS.DeleteTransactionValidationService, DeleteTransactionValidationService);
+  container.registerSingleton(TOKENS.GetTransactionByIdValidationService, GetTransactionByIdValidationService);
+  container.registerSingleton(TOKENS.GetAllTransactionsValidationService, GetAllTransactionsValidationService);
 
   // Domain Layer - Domain Services
   // UserDomainService is instantiated manually in use cases (Clean Architecture best practice)
@@ -1006,6 +1043,38 @@ async function getPrescriptionRepositoryImplementation(): Promise<IPrescriptionR
       );
       const dataSource = await getTypeOrmDataSource();
       return new TypeOrmPrescriptionRepository(dataSource);
+    }
+  }
+}
+
+async function getReceiptRepositoryImplementation(): Promise<IReceiptRepository> {
+  const dbConfig = getDatabaseConfig();
+  const dbType = dbConfig.type;
+  const ormType = dbConfig.orm || 'native';
+
+  console.log(`📦 Using ${ormType} ORM with ${dbType} database for receipts`);
+
+  // Handle memory database (always uses in-memory repository)
+  if (dbType === 'memory') {
+    console.log('📦 Using in-memory receipt repository');
+    return new InMemoryReceiptRepository();
+  }
+
+  // Handle SQL databases with TypeORM (for now, only TypeORM is implemented)
+  // MongoDB and SQLite implementations can be added later
+  switch (ormType) {
+    case 'typeorm': {
+      const dataSource = await getTypeOrmDataSource();
+      console.log(`📦 Using TypeORM receipt repository with ${dbType}`);
+      return new TypeOrmReceiptRepository(dataSource);
+    }
+
+    case 'native':
+    default: {
+      // For now, fallback to in-memory for non-TypeORM ORMs
+      // SQLite and other native implementations can be added later
+      console.log('📦 Falling back to in-memory receipt repository');
+      return new InMemoryReceiptRepository();
     }
   }
 }

@@ -50,3 +50,7 @@ export * from './UrinalysisResultId';
 export * from './HematologyResultId';
 export * from './FecalysisResultId';
 export * from './SerologyResultId';
+export * from './ReceiptId';
+export * from './ReceiptNumber';
+export * from './PaymentMethod';
+export * from './ReceiptItem';

@@ -3,6 +3,7 @@ import cors from 'cors';
 import { useExpressServer, useContainer } from 'routing-controllers';
 import { container } from '../infrastructure/di/container';
 import { TodoController } from '../presentation/controllers/TodoController';
+import { TransactionController } from '../presentation/controllers/TransactionController';
 import { AuthController } from '../presentation/controllers/AuthController';
 import { UsersController } from '../presentation/controllers/UsersController';
 import { PatientController } from '../presentation/controllers/PatientController';
@@ -68,7 +69,7 @@ export const createApp = (): express.Application => {
   });
 
   // Configure controllers based on environment
-  const controllers: any[] = [TodoController, AuthController, UsersController, PatientController, DoctorController, AddressController, ScheduleController, AppointmentController, LaboratoryController, PrescriptionController];
+  const controllers: any[] = [TodoController, TransactionController, AuthController, UsersController, PatientController, DoctorController, AddressController, ScheduleController, AppointmentController, LaboratoryController, PrescriptionController];
   
   // Only add TestController in non-production environments
   if (!isProduction()) {

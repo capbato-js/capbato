@@ -28,6 +28,9 @@ export const TRANSACTION_VALIDATION_ERRORS = {
   UNIT_PRICE_MAX: 'Unit price cannot exceed 999999',
 } as const;
 
+// Base validation schemas
+export const PaymentMethodSchema = z.enum(['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check']);
+
 // Enhanced service name validation
 const validateServiceName = (serviceName: string, ctx: z.RefinementCtx) => {
   if (serviceName === undefined || serviceName === null) {
@@ -70,6 +73,29 @@ const validateServiceName = (serviceName: string, ctx: z.RefinementCtx) => {
   }
 };
 
+// Enhanced validation functions
+const validateUUID = (id: string, ctx: z.RefinementCtx) => {
+  if (!id || id.trim().length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'ID cannot be empty',
+    });
+    return;
+  }
+
+  // Accept various ID formats - UUID, MongoDB ObjectId, or simple strings
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const mongoIdRegex = /^[0-9a-f]{24}$/i;
+  const simpleIdRegex = /^[0-9a-f]{32}$/i;
+  
+  if (!uuidRegex.test(id) && !mongoIdRegex.test(id) && !simpleIdRegex.test(id)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Invalid ID format',
+    });
+  }
+};
+
 // Enhanced date validation function
 const validateTransactionDate = (date: string, ctx: z.RefinementCtx) => {
   // Check if date is provided
@@ -101,6 +127,25 @@ const validateTransactionDate = (date: string, ctx: z.RefinementCtx) => {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: TRANSACTION_VALIDATION_ERRORS.FUTURE_DATE,
+    });
+  }
+};
+
+const validateDate = (dateStr: string, ctx: z.RefinementCtx) => {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Invalid date format',
+    });
+    return;
+  }
+
+  // Don't allow future dates
+  if (date > new Date()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Transaction date cannot be in the future',
     });
   }
 };
@@ -161,31 +206,22 @@ export const AddTransactionFormSchema = z.object({
     .min(1, TRANSACTION_VALIDATION_ERRORS.MISSING_ITEMS),
 });
 
-// Create Transaction Command Schema (Backend API)
+// Command Schemas (Backend API)
 export const CreateTransactionCommandSchema = z.object({
-  patientId: FlexibleIdSchema,
-  date: z.string()
-    .datetime({ message: 'Invalid date format. Must be ISO datetime' })
-    .optional()
-    .or(z.date().optional()),
-  paymentMethod: z.string()
-    .min(1, TRANSACTION_VALIDATION_ERRORS.MISSING_PAYMENT_METHOD)
-    .max(50, 'Payment method must be 50 characters or less'),
-  receivedById: FlexibleIdSchema,
+  patientId: z.string().superRefine(validateUUID),
+  date: z.string().superRefine(validateDate),
+  paymentMethod: PaymentMethodSchema,
+  receivedById: z.string().superRefine(validateUUID),
   items: z.array(z.object({
-    serviceName: z.string().superRefine(validateServiceName),
-    description: z.string()
-      .max(1000, TRANSACTION_VALIDATION_ERRORS.DESCRIPTION_TOO_LONG)
-      .optional()
-      .default(''),
-    quantity: z.number()
-      .min(1, TRANSACTION_VALIDATION_ERRORS.QUANTITY_MIN)
-      .max(999, TRANSACTION_VALIDATION_ERRORS.QUANTITY_MAX),
-    unitPrice: z.number()
-      .min(0.01, TRANSACTION_VALIDATION_ERRORS.UNIT_PRICE_MIN)
-      .max(999999, TRANSACTION_VALIDATION_ERRORS.UNIT_PRICE_MAX),
-  })).min(1, TRANSACTION_VALIDATION_ERRORS.MISSING_ITEMS),
-});
+    serviceName: z.string().min(1, 'Service name cannot be empty'),
+    description: z.string().min(1, 'Description cannot be empty'),
+    quantity: z.number().int().min(1, 'Quantity must be at least 1'),
+    unitPrice: z.number().min(0, 'Unit price cannot be negative'),
+  })).min(1, 'At least one item is required'),
+}).transform((data) => ({
+  ...data,
+  date: new Date(data.date).toISOString(),
+}));
 
 // Update Transaction Command Schema (Backend API)
 export const UpdateTransactionCommandSchema = z.object({
@@ -217,7 +253,16 @@ export const UpdateTransactionCommandSchema = z.object({
 
 // Delete Transaction Command Schema (Backend API)
 export const DeleteTransactionCommandSchema = z.object({
-  id: TransactionIdSchema,
+  id: z.string().min(1, 'Transaction ID is required'),
+});
+
+// Query Schemas
+export const GetTransactionByIdQuerySchema = z.object({
+  id: z.string().min(1, 'Transaction ID is required'),
+});
+
+export const GetAllTransactionsQuerySchema = z.object({
+  // No additional parameters for now
 });
 
 // Frontend Form Types
@@ -229,6 +274,8 @@ export type TransactionItemData = z.infer<typeof TransactionItemSchema>;
 export type CreateTransactionCommand = z.infer<typeof CreateTransactionCommandSchema>;
 export type UpdateTransactionCommand = z.infer<typeof UpdateTransactionCommandSchema>;
 export type DeleteTransactionCommand = z.infer<typeof DeleteTransactionCommandSchema>;
+export type GetTransactionByIdQuery = z.infer<typeof GetTransactionByIdQuerySchema>;
+export type GetAllTransactionsQuery = z.infer<typeof GetAllTransactionsQuerySchema>;
 
 // Error Types
 export type TransactionValidationErrors = typeof TRANSACTION_VALIDATION_ERRORS;
@@ -237,13 +284,15 @@ export type TransactionValidationErrors = typeof TRANSACTION_VALIDATION_ERRORS;
 export const TransactionValidationSchemas = {
   // Form schemas (Frontend)
   AddTransactionFormSchema,
-  UpdateTransactionCommandSchema,
   TransactionItemSchema,
   // Command schemas (Backend API)  
   CreateTransactionCommandSchema,
   UpdateTransactionCommandSchema,
   DeleteTransactionCommandSchema,
+  GetTransactionByIdQuerySchema,
+  GetAllTransactionsQuerySchema,
   // Common schemas
   TransactionIdSchema,
   FlexibleIdSchema,
+  PaymentMethodSchema,
 } as const;
