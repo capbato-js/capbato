@@ -17,7 +17,9 @@ import {
   TOKENS,
   TransactionValidationService,
   TransactionIdSchema,
+  IPatientRepository,
 } from '@nx-starter/application-shared';
+import type { IUserRepository } from '@nx-starter/domain';
 import {
   TransactionListResponse,
   TransactionResponse,
@@ -43,7 +45,11 @@ export class TransactionController {
     @inject(TOKENS.GetTransactionByIdQueryHandler)
     private getTransactionByIdQueryHandler: GetTransactionByIdQueryHandler,
     @inject(TOKENS.TransactionValidationService)
-    private validationService: TransactionValidationService
+    private validationService: TransactionValidationService,
+    @inject(TOKENS.PatientRepository)
+    private patientRepository: IPatientRepository,
+    @inject(TOKENS.UserRepository)
+    private userRepository: IUserRepository
   ) {}
 
   /**
@@ -53,21 +59,32 @@ export class TransactionController {
   async getAllTransactions(): Promise<TransactionListResponse> {
     const receipts = await this.getAllTransactionsQueryHandler.execute();
     
-    // Create transaction DTOs with placeholder patient and user data
-    const transactionDtos = receipts.map(receipt => {
-      const patientInfo = {
+    // Create transaction DTOs with real patient and user data
+    const transactionDtos = await Promise.all(receipts.map(async (receipt) => {
+      // Fetch actual patient information
+      const patient = await this.patientRepository.getById(receipt.patientId);
+      const patientInfo = patient ? {
+        id: patient.id,
+        patientNumber: patient.patientNumber || 'N/A',
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        middleName: patient.middleName || '',
+        fullName: patient.fullName,
+      } : {
         id: receipt.patientId,
-        patientNumber: 'N/A', // Would be fetched from patient service
+        patientNumber: 'N/A',
         firstName: 'N/A',
-        lastName: 'N/A', 
+        lastName: 'N/A',
         middleName: '',
         fullName: 'Patient Information Unavailable',
       };
       
-      const receivedByName = 'Staff Member'; // Would be fetched from user service
+      // Fetch actual user information for receivedBy
+      const user = await this.userRepository.getById(receipt.receivedById);
+      const receivedByName = user ? user.fullName : 'Staff Member';
       
       return TransactionMapper.toDto(receipt, patientInfo, receivedByName);
-    });
+    }));
 
     return ApiResponseBuilder.success(transactionDtos);
   }
@@ -81,8 +98,16 @@ export class TransactionController {
     const validatedId = TransactionIdSchema.parse(id);
     const receipt = await this.getTransactionByIdQueryHandler.execute({ id: validatedId });
     
-    // Create patient info placeholder
-    const patientInfo = {
+    // Fetch actual patient information
+    const patient = await this.patientRepository.getById(receipt.patientId);
+    const patientInfo = patient ? {
+      id: patient.id,
+      patientNumber: patient.patientNumber || 'N/A',
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      middleName: patient.middleName || '',
+      fullName: patient.fullName,
+    } : {
       id: receipt.patientId,
       patientNumber: 'N/A',
       firstName: 'N/A',
@@ -91,7 +116,10 @@ export class TransactionController {
       fullName: 'Patient Information Unavailable',
     };
     
-    const receivedByName = 'Staff Member';
+    // Fetch actual user information for receivedBy
+    const user = await this.userRepository.getById(receipt.receivedById);
+    const receivedByName = user ? user.fullName : 'Staff Member';
+    
     const transactionDto = TransactionMapper.toDto(receipt, patientInfo, receivedByName);
     
     return ApiResponseBuilder.success(transactionDto);
@@ -106,8 +134,16 @@ export class TransactionController {
     const validatedData = this.validationService.validateCreateCommand(body);
     const receipt = await this.createTransactionUseCase.execute(validatedData);
     
-    // Create patient info placeholder
-    const patientInfo = {
+    // Fetch actual patient information
+    const patient = await this.patientRepository.getById(receipt.patientId);
+    const patientInfo = patient ? {
+      id: patient.id,
+      patientNumber: patient.patientNumber || 'N/A',
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      middleName: patient.middleName || '',
+      fullName: patient.fullName,
+    } : {
       id: receipt.patientId,
       patientNumber: 'N/A',
       firstName: 'N/A',
@@ -116,7 +152,10 @@ export class TransactionController {
       fullName: 'Patient Information Unavailable',
     };
     
-    const receivedByName = 'Staff Member';
+    // Fetch actual user information for receivedBy
+    const user = await this.userRepository.getById(receipt.receivedById);
+    const receivedByName = user ? user.fullName : 'Staff Member';
+    
     const transactionDto = TransactionMapper.toDto(receipt, patientInfo, receivedByName);
 
     return ApiResponseBuilder.success(transactionDto);

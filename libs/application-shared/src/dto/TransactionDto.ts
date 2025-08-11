@@ -18,7 +18,7 @@ export interface PatientInfoDto {
 }
 
 export interface TransactionDto {
-  id: number;
+  id: string | null;
   receiptNumber: string;
   date: string;
   patient: PatientInfoDto;

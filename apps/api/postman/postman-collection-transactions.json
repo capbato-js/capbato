@@ -1,0 +1,1109 @@
+{
+  "info": {
+    "_postman_id": "cms-transactions-api-collection",
+    "name": "CMS - Transaction Management API",
+    "description": "Transaction Management API collection for the Clinic Management System with Clean Architecture.\n\n## 💰 Transaction Management API (/api/transactions)\n\nThis collection focuses specifically on transaction and receipt management endpoints:\n\n- **Transaction CRUD Operations**: Create, read, and delete transaction records\n- **Receipt Generation**: Automatic receipt number generation and management\n- **Payment Tracking**: Payment method tracking and validation\n- **Patient Integration**: Patient information integration in transactions\n- **Service Items**: Multiple service items per transaction with quantity and pricing\n- **Financial Records**: Complete financial transaction history\n- **Staff Tracking**: Track which staff member processed the transaction\n\n## Testing Coverage\n\n- ✅ Transaction creation with multiple service items\n- ✅ Transaction retrieval (single and list)\n- ✅ Transaction deletion\n- ✅ Receipt number validation\n- ✅ Payment method validation\n- ✅ Service item calculations (quantity × unit price)\n- ✅ Patient information integration\n- ✅ Error handling (validation, not found, invalid data)\n- ✅ Staff member tracking\n\n## Environment Variables\n\nThis collection uses the following environment variables:\n- `cms_local`: http://localhost:4000 (for local development)\n- `cms_prod`: https://capstone-api.up.railway.app (for production)\n- `baseUrl`: Base URL for API endpoints\n- `authToken`: JWT token for authenticated requests\n- Various test data variables for dynamic testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 2,
+      "minor": 3,
+      "patch": 0
+    }
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "{{cms_local}}",
+      "type": "string",
+      "description": "Base URL for the Clinic Management System API server"
+    },
+    {
+      "key": "base_url",
+      "value": "{{cms_local}}",
+      "type": "string",
+      "description": "Alias for baseUrl to support different collection formats"
+    },
+    {
+      "key": "cms_local",
+      "value": "http://localhost:4000",
+      "type": "string",
+      "description": "CMS Local environment base URL"
+    },
+    {
+      "key": "cms_prod",
+      "value": "https://capstone-api.up.railway.app",
+      "type": "string",
+      "description": "CMS Production environment base URL"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from login operations"
+    },
+    {
+      "key": "testUserId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic user ID for testing"
+    },
+    {
+      "key": "testPatientId",
+      "value": "1",
+      "type": "string",
+      "description": "Dynamic patient ID for testing"
+    },
+    {
+      "key": "testTransactionId",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic transaction ID for testing"
+    },
+    {
+      "key": "sample_patient_id",
+      "value": "1",
+      "type": "string",
+      "description": "Sample patient ID for transaction testing"
+    },
+    {
+      "key": "sample_staff_id",
+      "value": "1",
+      "type": "string",
+      "description": "Sample staff ID for transaction testing"
+    },
+    {
+      "key": "current_date",
+      "value": "2025-08-11",
+      "type": "string",
+      "description": "Current date for transaction testing"
+    },
+    {
+      "key": "loginTestEmail",
+      "value": "test.admin@clinic.com",
+      "type": "string",
+      "description": "Fixed email for login testing"
+    },
+    {
+      "key": "loginTestPassword",
+      "value": "AdminPass123",
+      "type": "string",
+      "description": "Fixed password for login testing"
+    },
+    {
+      "key": "doctorTestEmail",
+      "value": "doctor.test@clinic.com",
+      "type": "string",
+      "description": "Fixed email for doctor role testing"
+    },
+    {
+      "key": "doctorTestPassword",
+      "value": "DoctorPass123",
+      "type": "string",
+      "description": "Fixed password for doctor role testing"
+    },
+    {
+      "key": "receptionistTestEmail",
+      "value": "receptionist.test@clinic.com",
+      "type": "string",
+      "description": "Fixed email for receptionist role testing"
+    },
+    {
+      "key": "receptionistTestPassword",
+      "value": "ReceptionistPass123",
+      "type": "string",
+      "description": "Fixed password for receptionist role testing"
+    }
+  ],
+  "item": [
+    {
+      "name": "💰 Transaction Management API",
+      "description": "Transaction CRUD operations with receipt generation and payment tracking",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Transaction list has valid structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transactions = responseJson.data;",
+                  "    ",
+                  "    if (transactions.length > 0) {",
+                  "        const transaction = transactions[0];",
+                  "        pm.expect(transaction).to.have.property('id');",
+                  "        pm.expect(transaction).to.have.property('receiptNumber');",
+                  "        pm.expect(transaction).to.have.property('date');",
+                  "        pm.expect(transaction).to.have.property('patient');",
+                  "        pm.expect(transaction).to.have.property('totalAmount');",
+                  "        pm.expect(transaction).to.have.property('paymentMethod');",
+                  "        pm.expect(transaction).to.have.property('receivedBy');",
+                  "        pm.expect(transaction).to.have.property('items');",
+                  "        pm.expect(transaction).to.have.property('itemsSummary');",
+                  "        pm.expect(transaction).to.have.property('createdAt');",
+                  "        pm.expect(transaction).to.have.property('updatedAt');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Patient information is structured correctly', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transactions = responseJson.data;",
+                  "    ",
+                  "    if (transactions.length > 0) {",
+                  "        const patient = transactions[0].patient;",
+                  "        pm.expect(patient).to.have.property('id');",
+                  "        pm.expect(patient).to.have.property('patientNumber');",
+                  "        pm.expect(patient).to.have.property('firstName');",
+                  "        pm.expect(patient).to.have.property('lastName');",
+                  "        pm.expect(patient).to.have.property('fullName');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Transaction items are structured correctly', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transactions = responseJson.data;",
+                  "    ",
+                  "    if (transactions.length > 0) {",
+                  "        const items = transactions[0].items;",
+                  "        pm.expect(items).to.be.an('array');",
+                  "        ",
+                  "        if (items.length > 0) {",
+                  "            const item = items[0];",
+                  "            pm.expect(item).to.have.property('serviceName');",
+                  "            pm.expect(item).to.have.property('description');",
+                  "            pm.expect(item).to.have.property('quantity');",
+                  "            pm.expect(item).to.have.property('unitPrice');",
+                  "            pm.expect(item).to.have.property('subtotal');",
+                  "        }",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Retrieve all transactions with patient information and service items"
+          }
+        },
+        {
+          "name": "Get Transaction by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('Transaction data has valid structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction).to.have.property('id');",
+                  "    pm.expect(transaction).to.have.property('receiptNumber');",
+                  "    pm.expect(transaction).to.have.property('date');",
+                  "    pm.expect(transaction).to.have.property('patient');",
+                  "    pm.expect(transaction).to.have.property('totalAmount');",
+                  "    pm.expect(transaction).to.have.property('paymentMethod');",
+                  "    pm.expect(transaction).to.have.property('receivedBy');",
+                  "    pm.expect(transaction).to.have.property('items');",
+                  "    pm.expect(transaction).to.have.property('itemsSummary');",
+                  "    pm.expect(transaction).to.have.property('createdAt');",
+                  "    pm.expect(transaction).to.have.property('updatedAt');",
+                  "});",
+                  "",
+                  "pm.test('Patient information is complete', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const patient = responseJson.data.patient;",
+                  "    ",
+                  "    pm.expect(patient).to.have.property('id');",
+                  "    pm.expect(patient).to.have.property('patientNumber');",
+                  "    pm.expect(patient).to.have.property('firstName');",
+                  "    pm.expect(patient).to.have.property('lastName');",
+                  "    pm.expect(patient).to.have.property('fullName');",
+                  "});",
+                  "",
+                  "pm.test('Transaction items are detailed', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const items = responseJson.data.items;",
+                  "    ",
+                  "    pm.expect(items).to.be.an('array');",
+                  "    ",
+                  "    if (items.length > 0) {",
+                  "        const item = items[0];",
+                  "        pm.expect(item).to.have.property('serviceName');",
+                  "        pm.expect(item).to.have.property('description');",
+                  "        pm.expect(item).to.have.property('quantity');",
+                  "        pm.expect(item).to.have.property('unitPrice');",
+                  "        pm.expect(item).to.have.property('subtotal');",
+                  "        ",
+                  "        // Verify calculation",
+                  "        const expectedSubtotal = item.quantity * item.unitPrice;",
+                  "        pm.expect(item.subtotal).to.equal(expectedSubtotal);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/{{testTransactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions",
+                "{{testTransactionId}}"
+              ]
+            },
+            "description": "Retrieve a specific transaction by ID with complete details"
+          }
+        },
+        {
+          "name": "Create Transaction - Single Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('Created transaction has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction).to.have.property('id');",
+                  "    pm.expect(transaction).to.have.property('receiptNumber');",
+                  "    pm.expect(transaction).to.have.property('date');",
+                  "    pm.expect(transaction).to.have.property('patient');",
+                  "    pm.expect(transaction).to.have.property('totalAmount');",
+                  "    pm.expect(transaction).to.have.property('paymentMethod', 'Cash');",
+                  "    pm.expect(transaction).to.have.property('receivedBy');",
+                  "    pm.expect(transaction).to.have.property('items');",
+                  "    pm.expect(transaction).to.have.property('createdAt');",
+                  "    pm.expect(transaction).to.have.property('updatedAt');",
+                  "});",
+                  "",
+                  "pm.test('Receipt number is generated', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction.receiptNumber).to.be.a('string');",
+                  "    pm.expect(transaction.receiptNumber).to.have.length.above(0);",
+                  "});",
+                  "",
+                  "pm.test('Transaction items are correctly processed', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const items = responseJson.data.items;",
+                  "    ",
+                  "    pm.expect(items).to.be.an('array');",
+                  "    pm.expect(items).to.have.length(1);",
+                  "    ",
+                  "    const item = items[0];",
+                  "    pm.expect(item).to.have.property('serviceName', 'General Consultation');",
+                  "    pm.expect(item).to.have.property('description', 'Initial consultation with doctor');",
+                  "    pm.expect(item).to.have.property('quantity', 1);",
+                  "    pm.expect(item).to.have.property('unitPrice', 500.00);",
+                  "    pm.expect(item).to.have.property('subtotal', 500.00);",
+                  "});",
+                  "",
+                  "pm.test('Total amount is calculated correctly', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction.totalAmount).to.equal(500.00);",
+                  "});",
+                  "",
+                  "pm.test('Transaction ID is generated and stored', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction.id).to.be.a('number');",
+                  "    pm.expect(transaction.id).to.be.above(0);",
+                  "    pm.collectionVariables.set('testTransactionId', transaction.id.toString());",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"date\": \"{{current_date}}\",\n  \"paymentMethod\": \"Cash\",\n  \"receivedById\": \"{{sample_staff_id}}\",\n  \"items\": [\n    {\n      \"serviceName\": \"General Consultation\",\n      \"description\": \"Initial consultation with doctor\",\n      \"quantity\": 1,\n      \"unitPrice\": 500.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Create a new transaction with a single service item"
+          }
+        },
+        {
+          "name": "Create Transaction - Multiple Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('Transaction has multiple items', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const items = responseJson.data.items;",
+                  "    ",
+                  "    pm.expect(items).to.be.an('array');",
+                  "    pm.expect(items).to.have.length(3);",
+                  "});",
+                  "",
+                  "pm.test('All items have correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const items = responseJson.data.items;",
+                  "    ",
+                  "    items.forEach((item, index) => {",
+                  "        pm.expect(item).to.have.property('serviceName');",
+                  "        pm.expect(item).to.have.property('description');",
+                  "        pm.expect(item).to.have.property('quantity');",
+                  "        pm.expect(item).to.have.property('unitPrice');",
+                  "        pm.expect(item).to.have.property('subtotal');",
+                  "        ",
+                  "        // Verify calculation for each item",
+                  "        const expectedSubtotal = item.quantity * item.unitPrice;",
+                  "        pm.expect(item.subtotal).to.equal(expectedSubtotal, `Item ${index + 1} subtotal calculation`);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Total amount is sum of all subtotals', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    const expectedTotal = transaction.items.reduce((sum, item) => sum + item.subtotal, 0);",
+                  "    pm.expect(transaction.totalAmount).to.equal(expectedTotal);",
+                  "});",
+                  "",
+                  "pm.test('Payment method is Credit Card', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction.paymentMethod).to.equal('Credit Card');",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"date\": \"{{current_date}}\",\n  \"paymentMethod\": \"Credit Card\",\n  \"receivedById\": \"{{sample_staff_id}}\",\n  \"items\": [\n    {\n      \"serviceName\": \"Blood Chemistry Panel\",\n      \"description\": \"Complete blood chemistry analysis\",\n      \"quantity\": 1,\n      \"unitPrice\": 1500.00\n    },\n    {\n      \"serviceName\": \"X-Ray Chest PA\",\n      \"description\": \"Chest X-ray posterior-anterior view\",\n      \"quantity\": 1,\n      \"unitPrice\": 800.00\n    },\n    {\n      \"serviceName\": \"Consultation Fee\",\n      \"description\": \"Follow-up consultation\",\n      \"quantity\": 1,\n      \"unitPrice\": 350.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Create a new transaction with multiple service items and different payment method"
+          }
+        },
+        {
+          "name": "Create Transaction - Cash Payment with Quantities",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('Quantity calculations are correct', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const items = responseJson.data.items;",
+                  "    ",
+                  "    // First item: 2 × 250 = 500",
+                  "    pm.expect(items[0].quantity).to.equal(2);",
+                  "    pm.expect(items[0].unitPrice).to.equal(250.00);",
+                  "    pm.expect(items[0].subtotal).to.equal(500.00);",
+                  "    ",
+                  "    // Second item: 3 × 150 = 450",
+                  "    pm.expect(items[1].quantity).to.equal(3);",
+                  "    pm.expect(items[1].unitPrice).to.equal(150.00);",
+                  "    pm.expect(items[1].subtotal).to.equal(450.00);",
+                  "});",
+                  "",
+                  "pm.test('Total amount is correct (950.00)', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction.totalAmount).to.equal(950.00);",
+                  "});",
+                  "",
+                  "pm.test('Payment method is Cash', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const transaction = responseJson.data;",
+                  "    ",
+                  "    pm.expect(transaction.paymentMethod).to.equal('Cash');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"date\": \"{{current_date}}\",\n  \"paymentMethod\": \"Cash\",\n  \"receivedById\": \"{{sample_staff_id}}\",\n  \"items\": [\n    {\n      \"serviceName\": \"Medication\",\n      \"description\": \"Paracetamol 500mg tablets\",\n      \"quantity\": 2,\n      \"unitPrice\": 250.00\n    },\n    {\n      \"serviceName\": \"Supplies\",\n      \"description\": \"Medical gauze pads\",\n      \"quantity\": 3,\n      \"unitPrice\": 150.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Create a transaction with items that have quantities greater than 1"
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', true);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});",
+                  "",
+                  "pm.test('Success message is correct', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.equal('Transaction deleted successfully');",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/{{testTransactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions",
+                "{{testTransactionId}}"
+              ]
+            },
+            "description": "Delete a transaction by ID"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 Error Handling & Edge Cases",
+      "description": "Test error scenarios and edge cases for transaction operations",
+      "item": [
+        {
+          "name": "Get Transaction with Invalid ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Error response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions",
+                "99999"
+              ]
+            },
+            "description": "Test error handling for non-existent transaction ID"
+          }
+        },
+        {
+          "name": "Create Transaction with Invalid Patient ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 or 404', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Error response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"invalid-patient-id\",\n  \"date\": \"{{current_date}}\",\n  \"paymentMethod\": \"Cash\",\n  \"receivedById\": \"{{sample_staff_id}}\",\n  \"items\": [\n    {\n      \"serviceName\": \"Test Service\",\n      \"description\": \"Test description\",\n      \"quantity\": 1,\n      \"unitPrice\": 100.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Test error handling for invalid patient ID"
+          }
+        },
+        {
+          "name": "Create Transaction with Missing Required Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Validation error response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"date\": \"{{current_date}}\"\n  // Missing paymentMethod, receivedById, and items\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Test validation error handling for missing required fields"
+          }
+        },
+        {
+          "name": "Create Transaction with Empty Items Array",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Validation error response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"date\": \"{{current_date}}\",\n  \"paymentMethod\": \"Cash\",\n  \"receivedById\": \"{{sample_staff_id}}\",\n  \"items\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Test validation error handling for empty items array"
+          }
+        },
+        {
+          "name": "Create Transaction with Invalid Quantity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Validation error response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"date\": \"{{current_date}}\",\n  \"paymentMethod\": \"Cash\",\n  \"receivedById\": \"{{sample_staff_id}}\",\n  \"items\": [\n    {\n      \"serviceName\": \"Test Service\",\n      \"description\": \"Test description\",\n      \"quantity\": 0,\n      \"unitPrice\": 100.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Test validation error handling for invalid quantity (zero or negative)"
+          }
+        },
+        {
+          "name": "Create Transaction with Invalid Unit Price",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Validation error response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{sample_patient_id}}\",\n  \"date\": \"{{current_date}}\",\n  \"paymentMethod\": \"Cash\",\n  \"receivedById\": \"{{sample_staff_id}}\",\n  \"items\": [\n    {\n      \"serviceName\": \"Test Service\",\n      \"description\": \"Test description\",\n      \"quantity\": 1,\n      \"unitPrice\": -100.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Test validation error handling for invalid unit price (negative)"
+          }
+        },
+        {
+          "name": "Delete Transaction with Invalid ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "pm.test('Error response has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('success', false);",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions",
+                "99999"
+              ]
+            },
+            "description": "Test error handling for deleting non-existent transaction"
+          }
+        }
+      ]
+    }
+  ]
+}

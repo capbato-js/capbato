@@ -1,20 +1,33 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  BeforeInsert,
 } from 'typeorm';
 import { ReceiptEntity } from './ReceiptEntity';
 
 @Entity('receipt_items')
 export class ReceiptItemEntity {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryColumn({ type: 'varchar', length: 32 })
+  id!: string;
 
-  @Column({ type: 'int', name: 'receipt_id' })
-  receiptId!: number;
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      // Generate dashless UUID (32 character hex string)
+      this.id = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+  }
+
+  @Column({ type: 'varchar', length: 36, name: 'receipt_id' })
+  receiptId!: string;
 
   @Column({ type: 'varchar', length: 255, name: 'service_name' })
   serviceName!: string;

@@ -1,17 +1,30 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  BeforeInsert,
 } from 'typeorm';
 import { ReceiptItemEntity } from './ReceiptItemEntity';
 
 @Entity('receipts')
 export class ReceiptEntity {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryColumn({ type: 'varchar', length: 32 })
+  id!: string;
+
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      // Generate dashless UUID (32 character hex string)
+      this.id = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+  }
 
   @Column({ type: 'varchar', length: 50, unique: true, name: 'receipt_number' })
   receiptNumber!: string;

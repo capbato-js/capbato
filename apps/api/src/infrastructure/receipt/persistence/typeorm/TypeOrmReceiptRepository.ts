@@ -28,7 +28,7 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
 
   async getById(id: string): Promise<Receipt | null> {
     const entity = await this.repository.findOne({
-      where: { id: parseInt(id) },
+      where: { id },
       relations: ['items'],
     });
     return entity ? this.toDomain(entity) : null;
@@ -61,8 +61,7 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const numericId = parseInt(id);
-    const result = await this.repository.delete(numericId);
+    const result = await this.repository.delete(id);
     if (result.affected === 0) {
       throw new Error(`Receipt with ID ${id} not found`);
     }
@@ -121,16 +120,21 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
       })
     );
 
+    // Ensure dates are Date objects, not strings
+    const date = entity.date instanceof Date ? entity.date : new Date(entity.date);
+    const createdAt = entity.createdAt instanceof Date ? entity.createdAt : new Date(entity.createdAt);
+    const updatedAt = entity.updatedAt instanceof Date ? entity.updatedAt : new Date(entity.updatedAt);
+
     return new Receipt(
       entity.receiptNumber,
-      entity.date,
+      date,
       entity.patientId,
-      entity.paymentMethod as any,
+      entity.paymentMethod,
       entity.receivedById,
       items,
-      entity.createdAt,
-      entity.updatedAt,
-      entity.id.toString()
+      createdAt,
+      updatedAt,
+      entity.id
     );
   }
 }

@@ -29,7 +29,7 @@ export class TransactionMapper {
     }));
 
     return {
-      id: parseInt(receipt.stringId || '0'),
+      id: receipt.stringId || null,
       receiptNumber: receipt.receiptNumberValue,
       date: receipt.date.toISOString().split('T')[0], // YYYY-MM-DD format
       patient: patientInfo || {

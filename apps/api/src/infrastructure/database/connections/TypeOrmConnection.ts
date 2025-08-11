@@ -14,6 +14,8 @@ import { SerologyResultEntity } from '../../laboratory/persistence/typeorm/Serol
 import { PrescriptionEntity } from '../../prescription/persistence/typeorm/PrescriptionEntity';
 import { MedicationEntity } from '../../prescription/persistence/typeorm/MedicationEntity';
 import { DoctorScheduleOverrideEntity } from '../../schedule-override/persistence/typeorm/DoctorScheduleOverrideEntity';
+import { ReceiptEntity } from '../../receipt/persistence/typeorm/ReceiptEntity';
+import { ReceiptItemEntity } from '../../receipt/persistence/typeorm/ReceiptItemEntity';
 import { getDatabaseConfig, isDevelopment, isProduction } from '../../../config';
 
 /**
@@ -61,7 +63,9 @@ export const createTypeOrmDataSource = (): DataSource => {
       SerologyResultEntity,
       PrescriptionEntity,
       MedicationEntity,
-      DoctorScheduleOverrideEntity
+      DoctorScheduleOverrideEntity,
+      ReceiptEntity,
+      ReceiptItemEntity
     ],
     synchronize: shouldSynchronize,
     logging: isDevelopment() || (isProduction() && allowProductionAutoMigration), // Extra logging for production debug
