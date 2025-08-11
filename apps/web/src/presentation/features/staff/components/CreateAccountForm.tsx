@@ -57,6 +57,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
       specialization: '',
       licenseNumber: '',
       experienceYears: undefined,
+      schedulePattern: '',
     },
   });
 
@@ -149,6 +150,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     watch('specialization'),
     watch('licenseNumber'),
     watch('experienceYears'),
+    watch('schedulePattern'),
     // Add error dependencies (safe stringify)
     Object.keys(errors).length,
     Object.keys(fieldErrors).length

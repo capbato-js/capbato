@@ -14,6 +14,7 @@ export interface RegisterUserCommand {
   specialization?: string;
   licenseNumber?: string;
   experienceYears?: number;
+  schedulePattern?: string; // Schedule pattern for doctor role (e.g., "MWF", "TTh")
 }
 
 // Frontend form data that includes confirmPassword for UI validation

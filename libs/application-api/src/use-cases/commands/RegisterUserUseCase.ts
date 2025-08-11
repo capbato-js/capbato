@@ -56,6 +56,7 @@ export class RegisterUserUseCase {
         specialization: command.specialization || 'General Medicine',
         licenseNumber: command.licenseNumber || undefined,
         yearsOfExperience: command.experienceYears || undefined,
+        schedulePattern: command.schedulePattern || undefined, // Include schedulePattern if provided
       };
 
       // Validate doctor profile data using the same validation as the dedicated endpoint

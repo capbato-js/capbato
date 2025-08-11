@@ -58,6 +58,21 @@ export const YearsOfExperienceSchema = z.number()
 // Optional years of experience for commands
 export const OptionalYearsOfExperienceSchema = YearsOfExperienceSchema.optional();
 
+// Schedule pattern validation schema
+export const SchedulePatternSchema = z.string()
+  .min(1, 'Schedule pattern cannot be empty')
+  .refine((pattern) => {
+    // Validate against known patterns
+    const validPatterns = ['MWF', 'TTH', 'WEEKDAYS', 'ALL'];
+    return validPatterns.includes(pattern.toUpperCase().trim());
+  }, {
+    message: 'Invalid schedule pattern. Valid options are: MWF, TTH, WEEKDAYS, ALL'
+  })
+  .transform(str => str.toUpperCase().trim());
+
+// Optional schedule pattern for commands
+export const OptionalSchedulePatternSchema = SchedulePatternSchema.optional();
+
 // Query validation schemas
 export const GetDoctorByIdQuerySchema = z.object({
   id: DoctorIdSchema
@@ -81,6 +96,7 @@ export const CreateDoctorProfileCommandSchema = z.object({
   specialization: SpecializationSchema,
   licenseNumber: OptionalLicenseNumberSchema,
   yearsOfExperience: OptionalYearsOfExperienceSchema,
+  schedulePattern: OptionalSchedulePatternSchema,
 });
 
 export const UpdateDoctorProfileCommandSchema = z.object({

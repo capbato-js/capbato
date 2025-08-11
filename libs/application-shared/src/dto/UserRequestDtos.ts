@@ -14,6 +14,7 @@ export interface RegisterUserRequestDto {
   specialization?: string;
   licenseNumber?: string;
   experienceYears?: number;
+  schedulePattern?: string; // Schedule pattern for doctor role (e.g., "MWF", "TTh")
 }
 
 export interface LoginUserRequestDto {

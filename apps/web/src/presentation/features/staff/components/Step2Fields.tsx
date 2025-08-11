@@ -53,6 +53,24 @@ export const Step2Fields: React.FC<Step2FieldsProps> = ({
         )}
       />
       
+      <Controller
+        name="schedulePattern"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Select
+            label="Schedule Pattern"
+            placeholder="Select schedule pattern"
+            error={fieldState.error?.message || fieldErrors.schedulePattern}
+            data={[
+              { value: 'MWF', label: 'MWF (Monday, Wednesday, Friday)' },
+              { value: 'TTH', label: 'TTH (Tuesday, Thursday)' }
+            ]}
+            disabled={isLoading}
+            description="Choose the days when this doctor will be available"
+            {...field}
+          />
+        )}
+      />
       
       <FormTextInput
         label="License Number"
