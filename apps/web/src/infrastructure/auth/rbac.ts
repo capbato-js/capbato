@@ -25,6 +25,7 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   '/patients': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
   '/laboratory': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
   '/prescriptions': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
+  '/transactions': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
   '/doctors': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
   '/accounts': [UserRole.ADMIN], // Only admin can access accounts
   '/todo': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
@@ -117,6 +118,7 @@ export const permissions = {
     canAccessPatients: (userRole: string) => hasRouteAccess(userRole, '/patients'),
     canAccessLaboratory: (userRole: string) => hasRouteAccess(userRole, '/laboratory'),
     canAccessPrescriptions: (userRole: string) => hasRouteAccess(userRole, '/prescriptions'),
+    canAccessTransactions: (userRole: string) => hasRouteAccess(userRole, '/transactions'),
     canAccessDoctors: (userRole: string) => hasRouteAccess(userRole, '/doctors'),
   },
   

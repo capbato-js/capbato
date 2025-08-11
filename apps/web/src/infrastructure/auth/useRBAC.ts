@@ -44,6 +44,7 @@ export const useRouteAccess = () => {
     canAccessPatients: () => permissions.routes.canAccessPatients(userRole),
     canAccessLaboratory: () => permissions.routes.canAccessLaboratory(userRole),
     canAccessPrescriptions: () => permissions.routes.canAccessPrescriptions(userRole),
+    canAccessTransactions: () => permissions.routes.canAccessTransactions(userRole),
     canAccessDoctors: () => permissions.routes.canAccessDoctors(userRole),
   }), [userRole]);
 };
@@ -129,6 +130,13 @@ export const useNavigationAccess = () => {
         icon: 'fas fa-prescription-bottle',
         color: theme.colors.navIcons[0], // Unified dark color
         hasAccess: routeAccess.canAccessPrescriptions(),
+      },
+      {
+        path: '/transactions',
+        label: 'Transactions',
+        icon: 'fas fa-receipt',
+        color: theme.colors.navIcons[0], // Unified dark color
+        hasAccess: routeAccess.canAccessTransactions(),
       },
       {
         path: '/doctors',
