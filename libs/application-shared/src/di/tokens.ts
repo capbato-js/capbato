@@ -248,6 +248,27 @@ export const TOKENS = {
   GetTransactionByIdValidationService: 'GetTransactionByIdValidationService',
   GetAllTransactionsValidationService: 'GetAllTransactionsValidationService',
   TransactionValidationService: 'TransactionValidationService',
+
+  // Schedule Override Layer - Repositories
+  ScheduleOverrideRepository: 'IScheduleOverrideRepository',
+
+  // Schedule Override Layer - Use Cases
+  CreateScheduleOverrideUseCase: 'CreateScheduleOverrideUseCase',
+  UpdateScheduleOverrideUseCase: 'UpdateScheduleOverrideUseCase',
+  DeleteScheduleOverrideUseCase: 'DeleteScheduleOverrideUseCase',
+
+  // Schedule Override Layer - Query Handlers
+  GetAllScheduleOverridesQueryHandler: 'GetAllScheduleOverridesQueryHandler',
+  GetScheduleOverrideByIdQueryHandler: 'GetScheduleOverrideByIdQueryHandler',
+  GetScheduleOverrideByDateQueryHandler: 'GetScheduleOverrideByDateQueryHandler',
+  GetScheduleOverridesByDateRangeQueryHandler: 'GetScheduleOverridesByDateRangeQueryHandler',
+  GetScheduleOverridesByDoctorQueryHandler: 'GetScheduleOverridesByDoctorQueryHandler',
+  GetScheduleOverridesByDatesQueryHandler: 'GetScheduleOverridesByDatesQueryHandler',
+
+  // Schedule Override Layer - Validation Services
+  CreateScheduleOverrideValidationService: 'CreateScheduleOverrideValidationService',
+  UpdateScheduleOverrideValidationService: 'UpdateScheduleOverrideValidationService',
+  ScheduleOverrideValidationService: 'ScheduleOverrideValidationService',
 } as const;
 
 // Type-safe token keys

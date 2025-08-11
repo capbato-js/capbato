@@ -15,4 +15,5 @@ export interface ScheduleEntry {
   date: string; // YYYY-MM-DD format
   note: string;
   details?: string;
+  doctorId?: string; // Add doctor ID for filtering
 }

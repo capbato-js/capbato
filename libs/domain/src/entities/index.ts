@@ -24,3 +24,4 @@ export * from './SerologyResult';
 export * from './Prescription';
 export * from './Medication';
 export * from './Receipt';
+export * from './DoctorScheduleOverride';

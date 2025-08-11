@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { container } from 'tsyringe';
 import { DoctorApiService } from '../../../../infrastructure/api/DoctorApiService';
-import type { DoctorDto } from '@nx-starter/application-shared';
+import type { DoctorDto, ScheduleOverrideDto } from '@nx-starter/application-shared';
 
 // Helper function to format date to YYYY-MM-DD
 const formatDateToISOString = (date: Date): string => {
@@ -18,6 +18,8 @@ interface DoctorScheduleBlock {
   date: string;
   schedulePattern: string;
   schedulePatternDescription: string;
+  isOverride?: boolean; // New field to indicate if this is an override
+  originalDoctorId?: string; // Track original doctor if this is an override
 }
 
 interface DoctorScheduleCalendarViewModel {
@@ -44,14 +46,16 @@ const isDoctorScheduledOnDay = (doctor: DoctorDto, dayOfWeek: string): boolean =
   
   // Handle common patterns
   switch (pattern) {
-    case 'MWF':
+    case 'MWF': {
       const isMWF = ['MONDAY', 'WEDNESDAY', 'FRIDAY'].includes(dayOfWeek);
       console.log(`MWF check for ${dayOfWeek}: ${isMWF}`);
       return isMWF;
-    case 'TTH':
+    }
+    case 'TTH': {
       const isTTH = ['TUESDAY', 'THURSDAY'].includes(dayOfWeek);
       console.log(`TTH check for ${dayOfWeek}: ${isTTH}`);
       return isTTH;
+    }
     case 'WEEKDAYS':
       return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].includes(dayOfWeek);
     case 'ALL':
@@ -76,31 +80,87 @@ const getDayOfWeek = (date: Date): string => {
 const generateDoctorScheduleBlocks = (
   doctors: DoctorDto[],
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  scheduleOverrides: ScheduleOverrideDto[] = []
 ): DoctorScheduleBlock[] => {
+  console.log('🔄 [DEBUG] Starting generateDoctorScheduleBlocks with:', {
+    doctorCount: doctors.length,
+    startDate: startDate.toDateString(),
+    endDate: endDate.toDateString(),
+    overrideCount: scheduleOverrides.length,
+    doctors: doctors.map(d => ({ name: d.fullName, pattern: d.schedulePattern })),
+    overrides: scheduleOverrides.map(o => ({ date: o.date, assignedDoctorId: o.assignedDoctorId }))
+  });
+
   const blocks: DoctorScheduleBlock[] = [];
   const current = new Date(startDate);
 
+  let dayCount = 0;
   while (current <= endDate) {
+    dayCount++;
     const dateString = formatDateToISOString(current);
     const dayOfWeek = getDayOfWeek(current);
 
-    for (const doctor of doctors) {
-      // Check if doctor is scheduled to work on this day
-      if (isDoctorScheduledOnDay(doctor, dayOfWeek)) {
-        blocks.push({
-          id: `schedule-${doctor.id}-${dateString}`,
-          doctorId: doctor.id,
-          doctorName: doctor.fullName,
+    console.log(`📅 [DEBUG] Processing day ${dayCount}: ${dateString} (${dayOfWeek})`);
+
+    // Check if there's a schedule override for this date
+    const scheduleOverride = scheduleOverrides.find(override => override.date === dateString);
+    
+    if (scheduleOverride) {
+      // Use schedule override
+      const assignedDoctor = doctors.find(d => d.id === scheduleOverride.assignedDoctorId);
+      if (assignedDoctor) {
+        const block = {
+          id: `schedule-override-${assignedDoctor.id}-${dateString}`,
+          doctorId: assignedDoctor.id,
+          doctorName: assignedDoctor.fullName,
           date: dateString,
-          schedulePattern: doctor.schedulePattern || 'Unknown',
-          schedulePatternDescription: doctor.schedulePatternDescription || 'No schedule pattern',
+          schedulePattern: 'OVERRIDE',
+          schedulePatternDescription: `Schedule Override: ${scheduleOverride.reason}`,
+        };
+        
+        console.log(`🔄 [DEBUG] Using schedule override:`, {
+          date: dateString,
+          originalDoctorId: scheduleOverride.originalDoctorId,
+          assignedDoctorId: scheduleOverride.assignedDoctorId,
+          assignedDoctorName: assignedDoctor.fullName,
+          reason: scheduleOverride.reason
         });
+        blocks.push(block);
+      }
+    } else {
+      // Use default schedule patterns
+      for (const doctor of doctors) {
+        // Check if doctor is scheduled to work on this day
+        const isScheduled = isDoctorScheduledOnDay(doctor, dayOfWeek);
+        console.log(`👨‍⚕️ [DEBUG] ${doctor.fullName} on ${dayOfWeek}: ${isScheduled ? 'SCHEDULED' : 'not scheduled'}`);
+        
+        if (isScheduled) {
+          const block = {
+            id: `schedule-${doctor.id}-${dateString}`,
+            doctorId: doctor.id,
+            doctorName: doctor.fullName,
+            date: dateString,
+            schedulePattern: doctor.schedulePattern || 'Unknown',
+            schedulePatternDescription: doctor.schedulePatternDescription || 'No schedule pattern',
+          };
+          
+          console.log(`✅ [DEBUG] Created schedule block:`, block);
+          blocks.push(block);
+        }
       }
     }
 
     current.setDate(current.getDate() + 1);
   }
+
+  console.log('🏁 [DEBUG] Finished generating schedule blocks:', {
+    totalBlocks: blocks.length,
+    blocksByDate: blocks.reduce((acc, block) => {
+      acc[block.date] = (acc[block.date] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  });
 
   return blocks;
 };
@@ -114,23 +174,39 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [availableDoctors, setAvailableDoctors] = useState<Array<{ id: string; name: string; schedulePattern?: string; }>>([]);
-  const [doctorsData, setDoctorsData] = useState<DoctorDto[]>([]);
 
   // Get the API service instance
   const doctorApiService = container.resolve(DoctorApiService);
 
   // Generate schedule blocks from doctor data
-  const generateScheduleBlocks = useCallback((doctors: DoctorDto[]) => {
-    console.log('Generating schedule blocks from doctors:', doctors);
+  const generateScheduleBlocks = useCallback((doctors: DoctorDto[], scheduleOverrides: ScheduleOverrideDto[] = []) => {
+    console.log('🗓️ [DEBUG] Generating schedule blocks from doctors:', doctors);
+    console.log('🔄 [DEBUG] Using schedule overrides:', scheduleOverrides);
     
     // Generate schedule blocks for the current month
     const currentDate = new Date();
     const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
     
-    const blocks = generateDoctorScheduleBlocks(doctors, startDate, endDate);
+    console.log('📅 [DEBUG] Date range for schedule generation:', {
+      currentDate: currentDate.toDateString(),
+      startDate: startDate.toDateString(),
+      endDate: endDate.toDateString(),
+      currentMonth: currentDate.getMonth() + 1,
+      currentYear: currentDate.getFullYear()
+    });
     
-    console.log('Generated schedule blocks:', blocks.length);
+    const blocks = generateDoctorScheduleBlocks(doctors, startDate, endDate, scheduleOverrides);
+    
+    console.log('✨ [DEBUG] Generated schedule blocks:', {
+      totalBlocks: blocks.length,
+      sampleBlocks: blocks.slice(0, 5),
+      blocksByDoctor: blocks.reduce((acc, block) => {
+        acc[block.doctorName] = (acc[block.doctorName] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
+    });
+    
     setScheduleBlocks(blocks);
   }, []);
 
@@ -142,11 +218,32 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
     setError(null);
     
     try {
-      console.log('Fetching doctors data...');
-      const doctors = await doctorApiService.getAllDoctors(true, 'full') as DoctorDto[];
-      console.log('Doctors data fetched:', doctors);
+      console.log('🔄 [DEBUG] Starting to fetch doctors data...');
       
-      setDoctorsData(doctors);
+      // Fetch doctors
+      const doctors = await doctorApiService.getAllDoctors(true, 'full') as DoctorDto[];
+      console.log('✅ [DEBUG] Doctors data fetched successfully:', {
+        count: doctors.length,
+        doctors: doctors.map(d => ({
+          id: d.id,
+          name: d.fullName,
+          schedulePattern: d.schedulePattern,
+          schedulePatternDescription: d.schedulePatternDescription
+        }))
+      });
+
+      // Fetch schedule overrides
+      console.log('🔄 [DEBUG] Starting to fetch schedule overrides...');
+      const scheduleOverrides = await doctorApiService.getAllScheduleOverrides();
+      console.log('✅ [DEBUG] Schedule overrides fetched successfully:', {
+        count: scheduleOverrides.length,
+        overrides: scheduleOverrides.map(o => ({
+          id: o.id,
+          assignedDoctorId: o.assignedDoctorId,
+          date: o.date,
+          reason: o.reason
+        }))
+      });
       
       // Process available doctors list
       const doctorList = doctors.map(doctor => ({
@@ -156,17 +253,20 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
         schedulePatternDescription: doctor.schedulePatternDescription
       }));
       
+      console.log('📋 [DEBUG] Processed available doctors list:', doctorList);
       setAvailableDoctors(doctorList);
       
       // Generate schedule blocks
-      generateScheduleBlocks(doctors);
+      console.log('🗓️ [DEBUG] About to generate schedule blocks...');
+      generateScheduleBlocks(doctors, scheduleOverrides);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      console.error('❌ [DEBUG] Error fetching doctors:', err);
       setError(errorMessage);
-      console.error('Error fetching doctors:', err);
     } finally {
       setLoading(false);
+      console.log('🏁 [DEBUG] Finished fetching doctors and schedules');
     }
   }, [loading, generateScheduleBlocks]);
 
@@ -175,12 +275,14 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
     const targetDateString = formatDateToISOString(date);
     const matchingBlocks = scheduleBlocks.filter(block => block.date === targetDateString);
     
-    // Debug logging
-    if (matchingBlocks.length > 0) {
-      console.log(`Found ${matchingBlocks.length} blocks for date ${targetDateString}:`, matchingBlocks);
-    } else {
-      console.log(`No blocks found for date ${targetDateString}. Available blocks:`, scheduleBlocks.slice(0, 3));
-    }
+    // Debug logging with more detail
+    console.log(`🔍 [DEBUG] getScheduleBlocksForDate for ${targetDateString} (${date.toDateString()}):`, {
+      requestedDate: targetDateString,
+      totalAvailableBlocks: scheduleBlocks.length,
+      matchingBlocks: matchingBlocks.length,
+      matches: matchingBlocks.map(b => ({ doctor: b.doctorName, pattern: b.schedulePattern })),
+      allBlockDates: [...new Set(scheduleBlocks.map(b => b.date))].slice(0, 10)
+    });
     
     return matchingBlocks;
   }, [scheduleBlocks]);

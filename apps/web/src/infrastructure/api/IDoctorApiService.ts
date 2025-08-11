@@ -1,4 +1,12 @@
-import { DoctorDto, DoctorSummaryDto, CreateDoctorProfileCommand, DoctorOperationResponse } from '@nx-starter/application-shared';
+import { 
+  DoctorDto, 
+  DoctorSummaryDto, 
+  CreateDoctorProfileCommand, 
+  DoctorOperationResponse,
+  CreateScheduleOverrideRequestDto,
+  UpdateScheduleOverrideRequestDto,
+  ScheduleOverrideDto
+} from '@nx-starter/application-shared';
 
 /**
  * Interface for Doctor API Service
@@ -36,4 +44,24 @@ export interface IDoctorApiService {
    * Create a new doctor profile
    */
   createDoctorProfile(command: CreateDoctorProfileCommand): Promise<DoctorOperationResponse>;
+
+  /**
+   * Get all schedule overrides
+   */
+  getAllScheduleOverrides(): Promise<ScheduleOverrideDto[]>;
+
+  /**
+   * Create a schedule override
+   */
+  createScheduleOverride(request: CreateScheduleOverrideRequestDto): Promise<DoctorOperationResponse>;
+
+  /**
+   * Update an existing schedule override
+   */
+  updateScheduleOverride(id: string, request: UpdateScheduleOverrideRequestDto): Promise<DoctorOperationResponse>;
+
+  /**
+   * Delete a schedule override by date
+   */
+  deleteScheduleOverride(date: string): Promise<DoctorOperationResponse>;
 }

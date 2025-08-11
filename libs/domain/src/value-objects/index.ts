@@ -55,3 +55,5 @@ export * from './ReceiptId';
 export * from './ReceiptNumber';
 export * from './PaymentMethod';
 export * from './ReceiptItem';
+export * from './OverrideDate';
+export * from './OverrideReason';

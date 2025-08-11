@@ -25,6 +25,15 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
     getScheduleBlocksForDate,
   } = useDoctorScheduleCalendarViewModel();
 
+  // Debug logging for component state
+  console.log('🏥 [DEBUG] DoctorScheduleCalendar render state:', {
+    loading,
+    error,
+    currentDate: currentDate.toDateString(),
+    currentMonth: currentDate.getMonth() + 1,
+    currentYear: currentDate.getFullYear()
+  });
+
   // Calendar helper functions
   const getFirstDayOfMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth(), 1);
@@ -204,9 +213,13 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
               const dayScheduleBlocks = getScheduleBlocksForDate(dayInfo.date);
               const hasScheduledDoctors = dayScheduleBlocks.length > 0;
               
-              // Debug logging
-              if (dayInfo.isCurrentMonth && hasScheduledDoctors) {
-                console.log(`Day ${dayInfo.day} has ${dayScheduleBlocks.length} schedule blocks:`, dayScheduleBlocks);
+              // Debug logging for current month days only
+              if (dayInfo.isCurrentMonth) {
+                console.log(`📊 [DEBUG] Calendar day ${dayInfo.day} (${dayInfo.date.toDateString()}):`, {
+                  hasScheduledDoctors,
+                  blockCount: dayScheduleBlocks.length,
+                  blocks: dayScheduleBlocks.map(b => ({ doctor: b.doctorName, pattern: b.schedulePattern }))
+                });
               }
               
               return (
@@ -238,29 +251,32 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
                     {/* Doctor scheduled blocks for this day */}
                     {hasScheduledDoctors && dayInfo.isCurrentMonth && (
                       <Stack gap={2} mt="xs">
-                        {dayScheduleBlocks.slice(0, 2).map((block) => (
-                          <Box
-                            key={block.id}
-                            p={3}
-                            style={{
-                              backgroundColor: '#f0f9ff',
-                              borderRadius: '3px',
-                              fontSize: '9px',
-                              lineHeight: 1.1,
-                              border: '1px solid #e0f2fe',
-                            }}
-                          >
-                            <Text size="xs" fw={500} style={{ color: theme.colors.cyan[8] }} truncate>
-                              Dr. {block.doctorName}
-                            </Text>
-                            <Text size="xs" style={{ color: theme.colors.cyan[6] }} truncate>
-                              Scheduled
-                            </Text>
-                            <Text size="xs" style={{ color: theme.colors.cyan[5] }} truncate>
-                              {block.schedulePattern}
-                            </Text>
-                          </Box>
-                        ))}
+                        {dayScheduleBlocks.slice(0, 2).map((block) => {
+                          console.log(`🎨 [DEBUG] Rendering schedule block for ${dayInfo.date.toDateString()}:`, block);
+                          return (
+                            <Box
+                              key={block.id}
+                              p={3}
+                              style={{
+                                backgroundColor: '#f0f9ff',
+                                borderRadius: '3px',
+                                fontSize: '9px',
+                                lineHeight: 1.1,
+                                border: '1px solid #e0f2fe',
+                              }}
+                            >
+                              <Text size="xs" fw={500} style={{ color: theme.colors.cyan[8] }} truncate>
+                                Dr. {block.doctorName}
+                              </Text>
+                              <Text size="xs" style={{ color: theme.colors.cyan[6] }} truncate>
+                                Scheduled
+                              </Text>
+                              <Text size="xs" style={{ color: theme.colors.cyan[5] }} truncate>
+                                {block.schedulePattern}
+                              </Text>
+                            </Box>
+                          );
+                        })}
                         {dayScheduleBlocks.length > 2 && (
                           <Text size="xs" c="dimmed" ta="center">
                             +{dayScheduleBlocks.length - 2} more

@@ -12,7 +12,8 @@ export class DoctorId {
     return this._value;
   }
 
-  equals(other: DoctorId): boolean {
+  equals(other: DoctorId | null): boolean {
+    if (!other) return false;
     return this._value === other._value;
   }
 

@@ -22,6 +22,8 @@ export * from './PrescriptionRequestDtos';
 export * from './ScheduleCommands';
 export * from './ScheduleDto';
 export * from './ScheduleQueries';
+export * from './ScheduleOverrideCommands';
+export * from './ScheduleOverrideQueries';
 export * from './ScheduleRequestDtos';
 export * from './TodoCommands';
 export * from './TodoDto';

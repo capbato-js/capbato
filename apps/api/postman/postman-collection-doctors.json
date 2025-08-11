@@ -2,11 +2,11 @@
   "info": {
     "_postman_id": "cms-doctors-api-collection",
     "name": "CMS - Doctor Management API",
-    "description": "Doctor Management API collection for the Clinic Management System with Clean Architecture.\n\n## 👨‍⚕️ Doctor Management API (/api/doctors)\n\nThis collection focuses specifically on doctor management endpoints:\n\n- **Doctor Profile CRUD**: Create, read, update, and delete doctor profiles\n- **User-Doctor Relationship**: Manage associations between users and doctor profiles\n- **Medical Specializations**: Track and manage doctor specializations\n- **License Management**: Medical license validation and tracking\n- **Experience Tracking**: Years of experience and professional background\n- **Contact Information**: Philippine and US phone number validation\n- **Professional Details**: Medical degree, certifications, and qualifications\n\n## Testing Coverage\n\n- ✅ Doctor profile creation with all required fields\n- ✅ Doctor retrieval (single and list)\n- ✅ Doctor profile updates and modifications\n- ✅ Doctor profile deletion\n- ✅ User-Doctor relationship management\n- ✅ Specialization validation\n- ✅ License number validation\n- ✅ Phone number validation (PH/US formats)\n- ✅ Error handling (validation, not found, duplicates)\n- ✅ Professional details management\n\n## Environment Variables\n\nThis collection uses the following environment variables:\n- `cms_local`: http://localhost:4000 (for local development)\n- `cms_prod`: https://capstone-api.up.railway.app (for production)\n- `baseUrl`: Base URL for API endpoints\n- `authToken`: JWT token for authenticated requests\n- Various test data variables for dynamic testing",
+    "description": "Doctor Management API collection for the Clinic Management System with Clean Architecture.\n\n## 👨‍⚕️ Doctor Management API (/api/doctors)\n\nThis collection focuses specifically on doctor management endpoints:\n\n- **Doctor Profile CRUD**: Create, read, update, and delete doctor profiles\n- **User-Doctor Relationship**: Manage associations between users and doctor profiles\n- **Medical Specializations**: Track and manage doctor specializations\n- **License Management**: Medical license validation and tracking\n- **Experience Tracking**: Years of experience and professional background\n- **Contact Information**: Philippine and US phone number validation\n- **Professional Details**: Medical degree, certifications, and qualifications\n- **Schedule Management**: Manage doctor working hours and schedule patterns\n- **Schedule Overrides**: Handle exceptions, holidays, and special schedules\n\n## Schedule Management Features\n\n- **Schedule Patterns**: Define regular working hours for each day of the week\n- **Schedule Overrides**: Create exceptions for specific dates (holidays, sick days, special hours)\n- **Bulk Initialization**: Set default schedules for all doctors\n- **Flexible Queries**: Filter overrides by doctor, date range, or availability\n\n## Testing Coverage\n\n- ✅ Doctor profile creation with all required fields\n- ✅ Doctor retrieval (single and list)\n- ✅ Doctor profile updates and modifications\n- ✅ Doctor profile deletion\n- ✅ User-Doctor relationship management\n- ✅ Specialization validation\n- ✅ License number validation\n- ✅ Phone number validation (PH/US formats)\n- ✅ Error handling (validation, not found, duplicates)\n- ✅ Professional details management\n- ✅ Schedule pattern management (CRUD operations)\n- ✅ Schedule override management (create, update, delete, query)\n- ✅ Bulk schedule initialization\n- ✅ Schedule validation and conflict detection\n\n## Environment Variables\n\nThis collection uses the following environment variables:\n- `cms_local`: http://localhost:4000 (for local development)\n- `cms_prod`: https://capstone-api.up.railway.app (for production)\n- `baseUrl`: Base URL for API endpoints\n- `authToken`: JWT token for authenticated requests\n- Various test data variables for dynamic testing",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "version": {
       "major": 2,
-      "minor": 3,
+      "minor": 5,
       "patch": 0
     }
   },
@@ -70,6 +70,12 @@
       "value": "",
       "type": "string",
       "description": "Dynamic doctor profile ID for testing"
+    },
+    {
+      "key": "schedule_override_id",
+      "value": "",
+      "type": "string",
+      "description": "Dynamic schedule override ID for testing"
     },
     {
       "key": "appointment_id",
@@ -814,6 +820,327 @@
               ]
             },
             "description": "Delete doctor profile (typically sets isActive=false rather than hard delete)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Doctor Schedule Patterns",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schedulePatterns\": [\n    {\n      \"dayOfWeek\": \"MONDAY\",\n      \"startTime\": \"08:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": \"TUESDAY\",\n      \"startTime\": \"08:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": \"WEDNESDAY\",\n      \"startTime\": \"08:00\",\n      \"endTime\": \"12:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": \"THURSDAY\",\n      \"startTime\": \"08:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": \"FRIDAY\",\n      \"startTime\": \"08:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/doctors/{{doctor_profile_id}}/schedule",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctor_profile_id}}",
+                "schedule"
+              ]
+            },
+            "description": "Update schedule patterns for a specific doctor. Allows setting working hours for each day of the week."
+          },
+          "response": []
+        },
+        {
+          "name": "Clear Doctor Schedule Patterns",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/doctors/{{doctor_profile_id}}/schedule",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctor_profile_id}}",
+                "schedule"
+              ]
+            },
+            "description": "Clear all schedule patterns for a specific doctor."
+          },
+          "response": []
+        },
+        {
+          "name": "Initialize Schedules for All Doctors",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"defaultSchedule\": {\n    \"MONDAY\": { \"startTime\": \"08:00\", \"endTime\": \"17:00\", \"isActive\": true },\n    \"TUESDAY\": { \"startTime\": \"08:00\", \"endTime\": \"17:00\", \"isActive\": true },\n    \"WEDNESDAY\": { \"startTime\": \"08:00\", \"endTime\": \"17:00\", \"isActive\": true },\n    \"THURSDAY\": { \"startTime\": \"08:00\", \"endTime\": \"17:00\", \"isActive\": true },\n    \"FRIDAY\": { \"startTime\": \"08:00\", \"endTime\": \"17:00\", \"isActive\": true },\n    \"SATURDAY\": { \"startTime\": \"08:00\", \"endTime\": \"12:00\", \"isActive\": false },\n    \"SUNDAY\": { \"startTime\": \"08:00\", \"endTime\": \"12:00\", \"isActive\": false }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/doctors/initialize-schedules",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "initialize-schedules"
+              ]
+            },
+            "description": "Initialize default schedule patterns for all doctors in the system. Admin-only endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Schedule Override",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctorId\": \"{{doctor_profile_id}}\",\n  \"date\": \"2024-12-25\",\n  \"startTime\": \"10:00\",\n  \"endTime\": \"14:00\",\n  \"isAvailable\": false,\n  \"reason\": \"Christmas Holiday - Clinic Closed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/doctors/schedule-override",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "schedule-override"
+              ]
+            },
+            "description": "Create a schedule override for a specific doctor on a specific date. Can be used for holidays, sick days, or special hours."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Schedule Override - Special Hours",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctorId\": \"{{doctor_profile_id}}\",\n  \"date\": \"2024-12-31\",\n  \"startTime\": \"08:00\",\n  \"endTime\": \"12:00\",\n  \"isAvailable\": true,\n  \"reason\": \"New Year's Eve - Half Day Schedule\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/doctors/schedule-override",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "schedule-override"
+              ]
+            },
+            "description": "Create a schedule override with modified hours (half day on New Year's Eve)."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Schedule Override",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/doctors/schedule-override/2024-12-25?doctorId={{doctor_profile_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "schedule-override",
+                "2024-12-25"
+              ],
+              "query": [
+                {
+                  "key": "doctorId",
+                  "value": "{{doctor_profile_id}}"
+                }
+              ]
+            },
+            "description": "Delete a specific schedule override for a doctor on a specific date."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Schedule Override",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctorId\": \"{{doctor_profile_id}}\",\n  \"date\": \"2025-08-15\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"17:00\",\n  \"reason\": \"Updated schedule override - Full day coverage\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/doctors/schedule-override/{{schedule_override_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "schedule-override",
+                "{{schedule_override_id}}"
+              ]
+            },
+            "description": "Update an existing schedule override by ID. This endpoint allows modification of doctor assignments, times, and reasons for specific dates."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Schedule Overrides - All Doctors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/doctors/schedule-overrides",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "schedule-overrides"
+              ]
+            },
+            "description": "Get all schedule overrides for all doctors."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Schedule Overrides - Specific Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/doctors/schedule-overrides?doctorId={{doctor_profile_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "schedule-overrides"
+              ],
+              "query": [
+                {
+                  "key": "doctorId",
+                  "value": "{{doctor_profile_id}}"
+                }
+              ]
+            },
+            "description": "Get schedule overrides for a specific doctor."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Schedule Overrides - Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/doctors/schedule-overrides?startDate=2024-12-01&endDate=2024-12-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "schedule-overrides"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-12-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            },
+            "description": "Get schedule overrides within a specific date range."
           },
           "response": []
         }

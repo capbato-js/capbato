@@ -45,3 +45,6 @@ export * from './DeleteTransactionUseCase';
 export * from './UpdateDoctorSchedulePatternUseCase';
 export * from './RemoveDoctorSchedulePatternUseCase';
 export * from './InitializeDoctorSchedulesUseCase';
+export * from './CreateScheduleOverrideUseCase';
+export * from './UpdateScheduleOverrideUseCase';
+export * from './DeleteScheduleOverrideUseCase';
