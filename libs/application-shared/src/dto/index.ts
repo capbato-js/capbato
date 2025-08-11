@@ -9,28 +9,6 @@ export * from './ApiResponse';
 export * from './AppointmentCommands';
 export * from './AppointmentQueries';
 export * from './DoctorQueries';
-// Export specific types from LaboratoryCommands to avoid conflicts
-export { 
-  CreateLabRequestCommand,
-  UpdateLabRequestCommand,
-  DeleteLabRequestCommand,
-  UpdateLabRequestResultsCommand,
-  CreateBloodChemistryCommand,
-  UpdateBloodChemistryCommand,
-  DeleteBloodChemistryCommand,
-  CompletedLabTestDto,
-  CompletedLabTestListResponse,
-  LabRequestOperationResponse,
-  CreateLabRequestCommandSchema,
-  UpdateLabRequestCommandSchema,
-  DeleteLabRequestCommandSchema,
-  UpdateLabRequestResultsCommandSchema,
-  CreateBloodChemistryCommandSchema,
-  UpdateBloodChemistryCommandSchema,
-  DeleteBloodChemistryCommandSchema,
-  LaboratoryValidationSchemas
-} from './LaboratoryCommands';
-// Export main types from LaboratoryDto (these will override any conflicting names)
 export * from './LaboratoryDto';
 export * from './PatientCommands';
 export * from './PatientDto';
