@@ -68,6 +68,13 @@ export interface ApiConfiguration {
       byDoctorId: (doctorId: string) => string;
       byMedicationName: (medicationName: string) => string;
     };
+    transactions: {
+      base: string;
+      all: string;
+      byId: (id: string) => string;
+      create: string;
+      delete: (id: string) => string;
+    };
   };
 }
 

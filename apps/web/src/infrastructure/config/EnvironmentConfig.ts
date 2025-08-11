@@ -88,6 +88,13 @@ export function getEnvironmentConfig(): AppConfig {
           byDoctorId: (doctorId: string) => `/api/prescriptions/doctor/${doctorId}`,
           byMedicationName: (medicationName: string) => `/api/prescriptions/medication/${medicationName}`,
         },
+        transactions: {
+          base: '/api/transactions',
+          all: '/api/transactions',
+          byId: (id: string) => `/api/transactions/${id}`,
+          create: '/api/transactions',
+          delete: (id: string) => `/api/transactions/${id}`,
+        },
       },
     },
     features: {

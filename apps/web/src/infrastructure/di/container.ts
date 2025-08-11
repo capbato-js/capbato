@@ -30,6 +30,8 @@ import { LaboratoryApiService } from '../api/LaboratoryApiService';
 import { IPrescriptionApiService } from '../api/IPrescriptionApiService';
 import { PrescriptionApiService } from '../api/PrescriptionApiService';
 import { ApiPrescriptionRepository } from '../api/ApiPrescriptionRepository';
+import { ITransactionApiService } from '../api/ITransactionApiService';
+import { TransactionApiService } from '../api/TransactionApiService';
 import { WebUserQueryService } from '../services/WebUserQueryService';
 import { getFeatureFlags, configProvider } from '../config';
 import {
@@ -95,6 +97,7 @@ export const configureDI = () => {
   container.registerSingleton<IAddressApiService>(TOKENS.AddressApiService, AddressApiService);
   container.registerSingleton<ILaboratoryApiService>(TOKENS.LaboratoryApiService, LaboratoryApiService);
   container.registerSingleton<IPrescriptionApiService>(TOKENS.PrescriptionApiService, PrescriptionApiService);
+  container.registerSingleton<ITransactionApiService>('TransactionApiService', TransactionApiService);
   container.registerSingleton(AppointmentApiService, AppointmentApiService);
   container.registerSingleton(ScheduleApiService, ScheduleApiService);
   

@@ -214,7 +214,7 @@ export const CreateTransactionCommandSchema = z.object({
   receivedById: z.string().superRefine(validateUUID),
   items: z.array(z.object({
     serviceName: z.string().min(1, 'Service name cannot be empty'),
-    description: z.string().min(1, 'Description cannot be empty'),
+    description: z.string().optional(),
     quantity: z.number().int().min(1, 'Quantity must be at least 1'),
     unitPrice: z.number().min(0, 'Unit price cannot be negative'),
   })).min(1, 'At least one item is required'),
