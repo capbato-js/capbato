@@ -123,3 +123,6 @@ export * from './LaboratoryValidationService';
 // Export prescription validation schemas and services
 export * from './PrescriptionValidationSchemas';
 export * from './PrescriptionValidationService';
+
+// Export transaction validation schemas
+export * from './TransactionValidationSchemas';

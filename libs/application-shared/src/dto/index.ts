@@ -26,6 +26,7 @@ export * from './TodoCommands';
 export * from './TodoDto';
 export * from './TodoQueries';
 export * from './TodoRequestDtos';
+export * from './TransactionCommands';
 export * from './UserCommands';
 export * from './UserDto';
 export * from './UserRequestDtos';

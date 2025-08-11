@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { TransactionsTable } from '../components';
+import { TransactionsTable, AddReceiptModal } from '../components';
 import { useTransactionViewModel } from '../view-models';
 
 export const TransactionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { transactions, isLoading, error, loadTransactions, clearError } = useTransactionViewModel();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -21,8 +22,17 @@ export const TransactionsPage: React.FC = () => {
   }, [loadTransactions]);
 
   const handleAddTransaction = () => {
-    // TODO: Navigate to add transaction page when implemented
-    console.log('Add new transaction');
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const handleReceiptCreated = (transaction: any) => {
+    // Refresh the transactions list
+    loadTransactions();
+    console.log('Receipt created:', transaction);
   };
 
   return (
@@ -44,6 +54,12 @@ export const TransactionsPage: React.FC = () => {
         transactions={transactions}
         onAddTransaction={handleAddTransaction}
         isLoading={isLoading}
+      />
+
+      <AddReceiptModal
+        opened={isAddModalOpen}
+        onClose={handleCloseModal}
+        onReceiptCreated={handleReceiptCreated}
       />
     </MedicalClinicLayout>
   );
