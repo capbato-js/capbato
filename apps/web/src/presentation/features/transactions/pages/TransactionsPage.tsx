@@ -7,7 +7,7 @@ import { useTransactionViewModel } from '../view-models';
 
 export const TransactionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { transactions, isLoading, error, loadTransactions, clearError } = useTransactionViewModel();
+  const { transactions, isLoading, error, refetch, clearError } = useTransactionViewModel();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export const TransactionsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
+    // loadTransactions is no longer needed - the view model handles loading automatically
+  }, []);
 
   const handleAddTransaction = () => {
     setIsAddModalOpen(true);
@@ -31,7 +31,7 @@ export const TransactionsPage: React.FC = () => {
 
   const handleReceiptCreated = (transaction: any) => {
     // Refresh the transactions list
-    loadTransactions();
+    refetch();
     console.log('Receipt created:', transaction);
   };
 
@@ -54,6 +54,7 @@ export const TransactionsPage: React.FC = () => {
         transactions={transactions}
         onAddTransaction={handleAddTransaction}
         isLoading={isLoading}
+        onRefresh={refetch}
       />
 
       <AddReceiptModal

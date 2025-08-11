@@ -19,6 +19,7 @@ import { AddTransactionFormSchema, type AddTransactionFormData } from '@nx-start
 import { Icon } from '../../../components/common';
 import { FormSelect } from '../../../components/ui/FormSelect';
 import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
+import { useAuthStore } from '../../../../infrastructure/state/AuthStore';
 import { TransactionItemData } from '@nx-starter/application-shared';
 
 export interface AddReceiptFormProps {
@@ -66,8 +67,24 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
   // State for patients
   const [patients, setPatients] = useState<Array<{ value: string; label: string; patientNumber: string }>>([]);
   const [selectedPatientNumber, setSelectedPatientNumber] = useState<string>('');
-  const [currentStaffId] = useState<string>('current-staff-id'); // This should come from auth context
-  const [currentStaffName] = useState<string>('Dr. Current Staff'); // This should come from auth context
+  
+  // Get current user from auth store
+  const currentUser = useAuthStore((state) => state.user);
+  
+  // Fallback to get user from localStorage if auth store is not populated
+  const getUserFromLocalStorage = () => {
+    try {
+      const userJson = localStorage.getItem('auth_user');
+      return userJson ? JSON.parse(userJson) : null;
+    } catch (error) {
+      console.error('Failed to parse user from localStorage:', error);
+      return null;
+    }
+  };
+  
+  const effectiveUser = currentUser || getUserFromLocalStorage();
+  const currentStaffId = effectiveUser?.id || '';
+  const currentStaffName = effectiveUser ? `${effectiveUser.firstName} ${effectiveUser.lastName}` : '';
   
   // Get stores with selectors to prevent unnecessary re-renders
   const patientStorePatients = usePatientStore((state) => state.patients);
@@ -155,10 +172,30 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
   }, [patientId, date, paymentMethod, items, error, onClearError]);
 
   const handleFormSubmit = async (data: AddTransactionFormData) => {
-    // Filter out empty items
-    const validItems = data.items.filter(item => 
-      item.serviceName.trim() && item.quantity > 0 && item.unitPrice > 0
-    );
+    // Filter out empty items and only include description if it's not empty
+    const validItems = data.items
+      .filter(item => 
+        item.serviceName.trim() && item.quantity > 0 && item.unitPrice > 0
+      )
+      .map(item => {
+        const cleanItem: {
+          serviceName: string;
+          quantity: number;
+          unitPrice: number;
+          description?: string;
+        } = {
+          serviceName: item.serviceName.trim(),
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        };
+        
+        // Only include description if it's not empty
+        if (item.description && item.description.trim()) {
+          cleanItem.description = item.description.trim();
+        }
+        
+        return cleanItem;
+      });
 
     if (validItems.length === 0) {
       return false;
@@ -168,7 +205,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
       ...data,
       receivedById: currentStaffId,
       items: validItems,
-    };
+    } as AddTransactionFormData;
 
     return await onSubmit(formData);
   };
@@ -180,7 +217,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
   const addCommonService = (service: typeof COMMON_SERVICES[0]) => {
     append({
       serviceName: service.name,
-      description: '',
+      description: '', // No default description - user can add if needed
       quantity: 1,
       unitPrice: service.unitPrice,
     });
@@ -225,7 +262,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
             render={({ field }) => (
               <FormSelect
                 {...field}
-                label="Patient *"
+                label="Patient"
                 placeholder="Select a patient"
                 data={patients}
                 searchable
@@ -248,7 +285,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
           render={({ field }) => (
             <DateInput
               {...field}
-              label="Date *"
+              label="Date"
               placeholder="Select date"
               value={field.value ? new Date(field.value) : null}
               onChange={(date) => {
@@ -268,6 +305,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
               }}
               maxDate={new Date()}
               error={errors.date?.message}
+              required
               leftSection={<Icon icon="fas fa-calendar" />}
             />
           )}
@@ -276,7 +314,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
         {/* Services/Items Section */}
         <Box>
           <Group justify="space-between" align="center" mb="sm">
-            <Text fw={500}>Services/Items *</Text>
+            <Text fw={500}>Services/Items</Text>
             <Button
               variant="light"
               size="compact-sm"
@@ -288,7 +326,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
           </Group>
 
           {/* Quick add common services */}
-          <Box mb="md">
+          {/* <Box mb="md">
             <Text size="sm" c="dimmed" mb="xs">Quick add common services:</Text>
             <Group gap="xs">
               {COMMON_SERVICES.slice(0, 3).map((service) => (
@@ -302,7 +340,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
                 </Button>
               ))}
             </Group>
-          </Box>
+          </Box> */}
 
           <Stack gap="md">
             {fields.map((field, index) => (
@@ -328,7 +366,7 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
                     render={({ field }) => (
                       <FormSelect
                         {...field}
-                        label="Service/Item Name *"
+                        label="Service/Item Name"
                         placeholder="Select or type service"
                         data={serviceOptions}
                         searchable
@@ -359,13 +397,14 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
                       render={({ field }) => (
                         <NumberInput
                           {...field}
-                          label="Quantity *"
+                          label="Quantity"
                           placeholder="1"
                           min={1}
                           max={999}
                           value={field.value}
                           onChange={(value) => field.onChange(Number(value) || 1)}
                           error={errors.items?.[index]?.quantity?.message}
+                          required
                         />
                       )}
                     />
@@ -375,14 +414,14 @@ export const AddReceiptForm: React.FC<AddReceiptFormProps> = ({
                       render={({ field }) => (
                         <NumberInput
                           {...field}
-                          label="Unit Price *"
+                          label="Unit Price"
                           placeholder="0.00"
-                          min={0.01}
+                          min={0}
                           max={999999}
                           decimalScale={2}
                           fixedDecimalScale
                           prefix="₱"
-                          value={field.value}
+                          value={field.value || undefined}
                           onChange={(value) => field.onChange(Number(value) || 0)}
                           error={errors.items?.[index]?.unitPrice?.message}
                         />

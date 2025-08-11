@@ -22,10 +22,6 @@ export class ReceiptItem {
       throw new Error('Service name cannot be empty');
     }
 
-    if (!data.description || data.description.trim().length === 0) {
-      throw new Error('Description cannot be empty');
-    }
-
     if (data.quantity <= 0) {
       throw new Error('Quantity must be greater than zero');
     }

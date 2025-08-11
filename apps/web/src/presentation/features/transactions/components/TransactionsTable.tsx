@@ -3,20 +3,24 @@ import { Box, Text, useMantineTheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common';
 import { Transaction } from '../types';
+import { useTransactionItemViewModel } from '../view-models/useTransactionItemViewModel';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
   onAddTransaction?: () => void;
   isLoading?: boolean;
+  onRefresh?: () => void;
 }
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   transactions,
   onAddTransaction,
-  isLoading = false
+  isLoading = false,
+  onRefresh
 }) => {
   const theme = useMantineTheme();
   const navigate = useNavigate();
+  const { handleDelete, isDeleting } = useTransactionItemViewModel();
 
   // Enhance transactions with flattened search fields
   const enhancedTransactions = transactions.map(transaction => ({
@@ -25,14 +29,27 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     patientName: transaction.patient.fullName,
   }));
 
-  const handleTransactionClick = (transactionId: number) => {
+  const handleTransactionClick = (transactionId: string | null) => {
+    if (!transactionId) return;
     // TODO: Navigate to transaction details page when implemented
     console.log('View transaction details:', transactionId);
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
+    if (!transaction.id) return;
     // TODO: Navigate to edit transaction page when implemented
     console.log('Edit transaction:', transaction.id);
+  };
+
+  const handleDeleteTransaction = async (transaction: Transaction) => {
+    if (!transaction.id) return;
+    
+    if (window.confirm(`Are you sure you want to delete transaction ${transaction.receiptNumber}?`)) {
+      const success = await handleDelete(transaction.id);
+      if (success && onRefresh) {
+        onRefresh();
+      }
+    }
   };
 
   const actions: TableActions<typeof enhancedTransactions[0]> = {
@@ -46,6 +63,13 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
         icon: 'fas fa-edit',
         tooltip: 'Edit Transaction',
         onClick: handleEditTransaction
+      },
+      {
+        icon: 'fas fa-trash',
+        tooltip: 'Delete Transaction',
+        onClick: handleDeleteTransaction,
+        disabled: isDeleting,
+        color: 'red'
       }
     ]
   };
