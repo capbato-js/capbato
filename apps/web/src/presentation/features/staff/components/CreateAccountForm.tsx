@@ -57,6 +57,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
       specialization: '',
       licenseNumber: '',
       experienceYears: undefined,
+      schedulePattern: '',
     },
   });
 
@@ -149,6 +150,7 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
     watch('specialization'),
     watch('licenseNumber'),
     watch('experienceYears'),
+    watch('schedulePattern'),
     // Add error dependencies (safe stringify)
     Object.keys(errors).length,
     Object.keys(fieldErrors).length
@@ -203,7 +205,8 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
                       !role?.trim();
   
   const isStep2Empty = isMultiStep && (
-    !watch('specialization')?.trim()
+    !watch('specialization')?.trim() ||
+    !watch('schedulePattern')?.trim()
   );
   
   const isFormEmpty = isMultiStep 

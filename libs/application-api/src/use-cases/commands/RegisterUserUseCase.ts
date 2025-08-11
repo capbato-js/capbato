@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { User, IUserRepository, UserDomainService } from '@nx-starter/domain';
+import { User, IUserRepository, UserDomainService, IDoctorRepository } from '@nx-starter/domain';
 import { generateUUID } from '@nx-starter/utils-core';
 import { RegisterUserCommand, TOKENS, CreateDoctorProfileCommandSchema, CreateDoctorProfileCommand } from '@nx-starter/application-shared';
 import { NameFormattingService } from '@nx-starter/domain';
@@ -17,6 +17,8 @@ export class RegisterUserUseCase {
     private userRepository: IUserRepository,
     @inject(TOKENS.PasswordHashingService)
     private passwordHashingService: IPasswordHashingService,
+    @inject(TOKENS.DoctorRepository)
+    private doctorRepository: IDoctorRepository,
     private createDoctorProfileCommandHandler: CreateDoctorProfileCommandHandler
   ) {
     // Domain services are instantiated manually, not injected
@@ -50,12 +52,18 @@ export class RegisterUserUseCase {
     // 4. If role is 'doctor', validate doctor profile data FIRST (before creating user)
     let validatedDoctorCommand: CreateDoctorProfileCommand | null = null;
     if (command.role === 'doctor') {
+      // schedulePattern is now required from frontend - no auto-assignment
+      if (!command.schedulePattern) {
+        throw new Error('schedulePattern is required when creating a user with doctor role');
+      }
+
       // Prepare doctor profile command with required fields
       const doctorProfileCommand = {
         userId: userId, // Use the generated UUID for validation
         specialization: command.specialization || 'General Medicine',
         licenseNumber: command.licenseNumber || undefined,
         yearsOfExperience: command.experienceYears || undefined,
+        schedulePattern: command.schedulePattern, // Required from frontend
       };
 
       // Validate doctor profile data using the same validation as the dedicated endpoint

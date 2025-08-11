@@ -19,6 +19,11 @@ export interface CreateAccountData {
   password: string;
   role: string;
   mobile?: string;
+  // Doctor profile fields (optional, only required when role is 'doctor')
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
+  schedulePattern?: string;
 }
 
 // Dummy data for accounts
@@ -77,7 +82,12 @@ export const useAccountsViewModel = () => {
         email: data.email,
         password: data.password,
         role: data.role,
-        mobile: data.mobile
+        mobile: data.mobile,
+        // Doctor profile fields (backend will handle when role is 'doctor')
+        specialization: data.specialization,
+        licenseNumber: data.licenseNumber,
+        experienceYears: data.experienceYears,
+        schedulePattern: data.schedulePattern,
       };
       
       // Call the API to create the account

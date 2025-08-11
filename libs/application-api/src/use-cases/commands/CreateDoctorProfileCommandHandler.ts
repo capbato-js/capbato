@@ -3,7 +3,6 @@ import {
   Doctor, 
   IDoctorRepository, 
   IUserRepository,
-  DoctorScheduleService,
   DoctorSchedulePattern
 } from '@nx-starter/domain';
 
@@ -16,7 +15,7 @@ export interface CreateDoctorProfileCommand {
   specialization: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
-  schedulePattern?: string; // Optional override for default schedule assignment
+  schedulePattern: string; // Required schedule pattern for doctors
 }
 
 /**
@@ -43,20 +42,13 @@ export class CreateDoctorProfileCommandHandler {
       throw new Error(`Doctor profile already exists for user ${command.userId}`);
     }
 
-    // Determine schedule pattern
-    let schedulePattern: DoctorSchedulePattern | undefined;
+    // Validate and parse the required schedule pattern
+    let schedulePattern: DoctorSchedulePattern;
     
-    if (command.schedulePattern) {
-      // Use provided schedule pattern
-      try {
-        schedulePattern = DoctorSchedulePattern.fromString(command.schedulePattern);
-      } catch (error) {
-        throw new Error(`Invalid schedule pattern: ${command.schedulePattern}`);
-      }
-    } else {
-      // Auto-assign based on doctor count using domain service
-      const activeDoctorCount = await this.doctorRepository.getActiveCount();
-      schedulePattern = DoctorScheduleService.getDefaultSchedulePattern(activeDoctorCount);
+    try {
+      schedulePattern = DoctorSchedulePattern.fromString(command.schedulePattern);
+    } catch {
+      throw new Error(`Invalid schedule pattern: ${command.schedulePattern}`);
     }
 
     // Create doctor domain entity using constructor

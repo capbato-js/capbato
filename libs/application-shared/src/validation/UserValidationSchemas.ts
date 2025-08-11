@@ -123,6 +123,27 @@ export const RegisterUserCommandSchema = z.object({
     }, {
       message: 'Years of experience must be a number between 0 and 50',
     }),
+  schedulePattern: z.string()
+    .optional()
+    .refine((pattern) => {
+      // Skip validation if undefined (optional field)
+      if (!pattern) return true;
+      // Validate against known patterns (only MWF and TTH supported)
+      const validPatterns = ['MWF', 'TTH'];
+      return validPatterns.includes(pattern.toUpperCase().trim());
+    }, {
+      message: 'Invalid schedule pattern. Valid options are: MWF, TTH'
+    })
+    .transform((pattern) => pattern ? pattern.toUpperCase().trim() : undefined),
+}).refine((data) => {
+  // Make schedulePattern required when role is 'doctor'
+  if (data.role === 'doctor') {
+    return !!data.schedulePattern;
+  }
+  return true;
+}, {
+  message: 'Schedule pattern is required when creating a user with doctor role',
+  path: ['schedulePattern'],
 });
 
 // Frontend form schema that includes confirmPassword for UI validation

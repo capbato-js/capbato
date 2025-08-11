@@ -9,14 +9,18 @@ export class DoctorScheduleService {
    * Assigns default schedule pattern based on doctor creation order
    * First doctor gets MWF (Monday, Wednesday, Friday)
    * Second doctor gets TTH (Tuesday, Thursday)
-   * Subsequent doctors get WEEKDAYS pattern
+   * Only supports up to 2 doctors with MWF and TTH patterns
    * 
-   * @param doctorIndex - Zero-based index indicating the order of doctor creation (0 = first doctor, 1 = second doctor, etc.)
+   * @param doctorIndex - Zero-based index indicating the order of doctor creation (0 = first doctor, 1 = second doctor)
    * @returns Default schedule pattern for the doctor
    */
   public static getDefaultSchedulePattern(doctorIndex: number): DoctorSchedulePattern {
     if (doctorIndex < 0) {
       throw new Error('Doctor index cannot be negative');
+    }
+
+    if (doctorIndex > 1) {
+      throw new Error('Only supports up to 2 doctors with MWF and TTH patterns');
     }
 
     switch (doctorIndex) {
@@ -27,8 +31,7 @@ export class DoctorScheduleService {
         // Second doctor gets TTH schedule
         return DoctorSchedulePattern.TTH;
       default:
-        // Additional doctors get weekdays schedule
-        return DoctorSchedulePattern.WEEKDAYS;
+        throw new Error('Invalid doctor index');
     }
   }
 
@@ -127,13 +130,18 @@ export class DoctorScheduleService {
 
   /**
    * Suggests optimal schedule patterns for a given number of doctors
+   * Only supports up to 2 doctors with MWF and TTH patterns
    * 
-   * @param numberOfDoctors - Number of doctors to create patterns for
+   * @param numberOfDoctors - Number of doctors to create patterns for (max 2)
    * @returns Array of suggested schedule patterns
    */
   public static suggestOptimalPatterns(numberOfDoctors: number): DoctorSchedulePattern[] {
     if (numberOfDoctors < 1) {
       throw new Error('Number of doctors must be at least 1');
+    }
+
+    if (numberOfDoctors > 2) {
+      throw new Error('Only supports up to 2 doctors with MWF and TTH patterns');
     }
 
     const patterns: DoctorSchedulePattern[] = [];
