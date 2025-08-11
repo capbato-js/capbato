@@ -34,6 +34,11 @@ export interface IDoctorRepository {
   getActiveDoctors(): Promise<Doctor[]>;
 
   /**
+   * Get the count of active doctors
+   */
+  getActiveCount(): Promise<number>;
+
+  /**
    * Create a new doctor profile (must be linked to existing user with 'doctor' role)
    */
   create(doctor: Doctor): Promise<Doctor>;

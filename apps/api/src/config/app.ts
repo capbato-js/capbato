@@ -16,6 +16,7 @@ import { PrescriptionController } from '../presentation/controllers/Prescription
 import { TestController } from '../presentation/controllers/TestController';
 import { RoutingControllersErrorHandler } from '../shared/middleware/RoutingControllersErrorHandler';
 import { requestLogger } from '../presentation/middleware/errorHandler';
+import { authorizationChecker, currentUserChecker } from '../presentation/middleware/authMiddleware';
 import { 
   getSecurityConfig, 
   getApplicationConfig, 
@@ -81,6 +82,8 @@ export const createApp = (): express.Application => {
     routePrefix: apiConfig.prefix,
     controllers,
     middlewares: [RoutingControllersErrorHandler],
+    authorizationChecker: authorizationChecker,
+    currentUserChecker: currentUserChecker,
     defaultErrorHandler: false, // We'll use our custom error handler
   });
 

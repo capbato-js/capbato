@@ -2,7 +2,9 @@ import { injectable, inject } from 'tsyringe';
 import { 
   Doctor, 
   IDoctorRepository, 
-  IUserRepository
+  IUserRepository,
+  DoctorScheduleService,
+  DoctorSchedulePattern
 } from '@nx-starter/domain';
 
 /**
@@ -14,6 +16,7 @@ export interface CreateDoctorProfileCommand {
   specialization: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
+  schedulePattern?: string; // Optional override for default schedule assignment
 }
 
 /**
@@ -40,6 +43,22 @@ export class CreateDoctorProfileCommandHandler {
       throw new Error(`Doctor profile already exists for user ${command.userId}`);
     }
 
+    // Determine schedule pattern
+    let schedulePattern: DoctorSchedulePattern | undefined;
+    
+    if (command.schedulePattern) {
+      // Use provided schedule pattern
+      try {
+        schedulePattern = DoctorSchedulePattern.fromString(command.schedulePattern);
+      } catch (error) {
+        throw new Error(`Invalid schedule pattern: ${command.schedulePattern}`);
+      }
+    } else {
+      // Auto-assign based on doctor count using domain service
+      const activeDoctorCount = await this.doctorRepository.getActiveCount();
+      schedulePattern = DoctorScheduleService.getDefaultSchedulePattern(activeDoctorCount);
+    }
+
     // Create doctor domain entity using constructor
     const doctor = new Doctor(
       command.userId,
@@ -47,7 +66,8 @@ export class CreateDoctorProfileCommandHandler {
       undefined, // id will be generated
       command.licenseNumber,
       command.yearsOfExperience,
-      true // isActive defaults to true
+      true, // isActive defaults to true
+      schedulePattern
     );
 
     // Save to repository

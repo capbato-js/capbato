@@ -1,6 +1,19 @@
 import { injectable, inject } from 'tsyringe';
 import { IDoctorApiService } from './IDoctorApiService';
-import { DoctorDto, DoctorSummaryDto, DoctorListResponse, DoctorSummaryListResponse, DoctorResponse, DoctorOperationResponse, CreateDoctorProfileCommand, TOKENS } from '@nx-starter/application-shared';
+import { 
+  DoctorDto, 
+  DoctorSummaryDto, 
+  DoctorListResponse, 
+  DoctorSummaryListResponse, 
+  DoctorResponse, 
+  DoctorOperationResponse, 
+  CreateDoctorProfileCommand, 
+  CreateScheduleOverrideRequestDto,
+  UpdateScheduleOverrideRequestDto,
+  ScheduleOverrideDto,
+  ScheduleOverrideListResponse,
+  TOKENS 
+} from '@nx-starter/application-shared';
 import { IHttpClient } from '../http/IHttpClient';
 import { getApiConfig } from './config/ApiConfig';
 
@@ -141,6 +154,88 @@ export class DoctorApiService implements IDoctorApiService {
     } catch (error) {
       console.error('Error creating doctor profile:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to create doctor profile');
+    }
+  }
+
+  /**
+   * Get all schedule overrides
+   */
+  async getAllScheduleOverrides(): Promise<ScheduleOverrideDto[]> {
+    try {
+      const response = await this.httpClient.get<ScheduleOverrideListResponse>(
+        `${this.apiConfig.endpoints.doctors.all}/schedule-overrides`
+      );
+
+      if (!response.data.success) {
+        throw new Error('Failed to fetch schedule overrides');
+      }
+
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching schedule overrides:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to fetch schedule overrides');
+    }
+  }
+
+  /**
+   * Create a schedule override
+   */
+  async createScheduleOverride(request: CreateScheduleOverrideRequestDto): Promise<DoctorOperationResponse> {
+    try {
+      const response = await this.httpClient.post<DoctorOperationResponse>(
+        `${this.apiConfig.endpoints.doctors.all}/schedule-override`,
+        request
+      );
+
+      if (!response.data.success) {
+        throw new Error('Failed to create schedule override');
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('Error creating schedule override:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to create schedule override');
+    }
+  }
+
+  /**
+   * Update an existing schedule override
+   */
+  async updateScheduleOverride(id: string, request: UpdateScheduleOverrideRequestDto): Promise<DoctorOperationResponse> {
+    try {
+      const response = await this.httpClient.put<DoctorOperationResponse>(
+        `${this.apiConfig.endpoints.doctors.all}/schedule-override/${id}`,
+        request
+      );
+
+      if (!response.data.success) {
+        throw new Error('Failed to update schedule override');
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('Error updating schedule override:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to update schedule override');
+    }
+  }
+
+  /**
+   * Delete a schedule override by date
+   */
+  async deleteScheduleOverride(date: string): Promise<DoctorOperationResponse> {
+    try {
+      const response = await this.httpClient.delete<DoctorOperationResponse>(
+        `${this.apiConfig.endpoints.doctors.all}/schedule-override/${date}`
+      );
+
+      if (!response.data.success) {
+        throw new Error('Failed to delete schedule override');
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting schedule override:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to delete schedule override');
     }
   }
 }

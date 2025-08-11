@@ -29,6 +29,9 @@ export class DoctorEntity {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive!: boolean;
 
+  @Column({ name: 'schedule_pattern', type: 'varchar', length: 20, nullable: true })
+  schedulePattern?: string;
+
   // Note: We don't create a TypeORM relationship to UserEntity to avoid circular dependencies
   // The relationship is managed at the application layer through repositories
 }

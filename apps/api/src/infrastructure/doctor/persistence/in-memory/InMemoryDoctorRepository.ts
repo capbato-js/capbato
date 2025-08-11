@@ -42,6 +42,12 @@ export class InMemoryDoctorRepository implements IDoctorRepository {
     );
   }
 
+  async getActiveCount(): Promise<number> {
+    return Array.from(this.doctors.values()).filter(
+      doctor => doctor.isActive
+    ).length;
+  }
+
   async getBySpecialization(specialization: string): Promise<Doctor[]> {
     return Array.from(this.doctors.values()).filter(
       doctor => doctor.specializationValue === specialization

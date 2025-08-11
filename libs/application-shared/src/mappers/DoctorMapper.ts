@@ -35,6 +35,10 @@ export class DoctorMapper {
       yearsOfExperience: doctor.yearsOfExperience,
       isActive: doctor.isActive,
       
+      // Schedule Pattern Fields
+      schedulePattern: doctor.schedulePatternString,
+      schedulePatternDescription: doctor.schedulePatternDescription,
+      
       // User Information
       firstName: NameFormattingService.formatToProperCase(user.firstName.value),
       lastName: NameFormattingService.formatToProperCase(user.lastName.value),
@@ -58,6 +62,8 @@ export class DoctorMapper {
       formattedContactNumber: user.mobile?.value || '',
       yearsOfExperience: doctor.yearsOfExperience,
       isActive: doctor.isActive,
+      schedulePattern: doctor.schedulePatternString,
+      schedulePatternDescription: doctor.schedulePatternDescription,
     };
   }
 
@@ -93,6 +99,8 @@ export class DoctorMapper {
     years_of_experience?: number;
     isActive?: boolean;
     is_active?: boolean;
+    schedulePattern?: string;
+    schedule_pattern?: string;
   }): Doctor {
     // Handle different field naming conventions (camelCase, snake_case, PascalCase)
     const id = data.id || data.doctorId || data.DoctorID;
@@ -102,6 +110,7 @@ export class DoctorMapper {
     const yearsOfExperience = data.yearsOfExperience || data.years_of_experience;
     const isActive = data.isActive !== undefined ? data.isActive : 
                      data.is_active !== undefined ? data.is_active : true;
+    const schedulePattern = data.schedulePattern || data.schedule_pattern;
 
     if (!userId || !specialization) {
       throw new Error('Invalid doctor profile data: missing required fields (userId, specialization)');
@@ -113,7 +122,8 @@ export class DoctorMapper {
       id,
       licenseNumber,
       yearsOfExperience,
-      isActive
+      isActive,
+      schedulePattern
     );
   }
 
@@ -127,6 +137,7 @@ export class DoctorMapper {
     licenseNumber?: string;
     yearsOfExperience?: number;
     isActive: boolean;
+    schedulePattern?: string;
   } {
     return {
       id: doctor.stringId,
@@ -135,6 +146,7 @@ export class DoctorMapper {
       licenseNumber: doctor.licenseNumber,
       yearsOfExperience: doctor.yearsOfExperience,
       isActive: doctor.isActive,
+      schedulePattern: doctor.schedulePatternString,
     };
   }
 

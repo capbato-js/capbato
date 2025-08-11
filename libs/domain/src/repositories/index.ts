@@ -18,3 +18,4 @@ export * from './IFecalysisResultRepository';
 export * from './ISerologyResultRepository';
 export * from './IPrescriptionRepository';
 export * from './IReceiptRepository';
+export * from './IDoctorScheduleOverrideRepository';

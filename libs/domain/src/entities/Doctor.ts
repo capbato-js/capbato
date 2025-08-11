@@ -1,5 +1,6 @@
 import { DoctorId } from '../value-objects/DoctorId';
 import { Specialization } from '../value-objects/Specialization';
+import { DoctorSchedulePattern } from '../value-objects/DoctorSchedulePattern';
 
 interface IDoctor {
   id?: DoctorId;
@@ -8,6 +9,7 @@ interface IDoctor {
   licenseNumber?: string;
   yearsOfExperience?: number;
   isActive: boolean;
+  schedulePattern?: DoctorSchedulePattern;
 }
 
 /**
@@ -27,6 +29,7 @@ export class Doctor implements IDoctor {
   private readonly _licenseNumber?: string;
   private readonly _yearsOfExperience?: number;
   private readonly _isActive: boolean;
+  private readonly _schedulePattern?: DoctorSchedulePattern;
 
   constructor(
     userId: string,
@@ -34,7 +37,8 @@ export class Doctor implements IDoctor {
     id?: string | DoctorId,
     licenseNumber?: string,
     yearsOfExperience?: number,
-    isActive = true
+    isActive = true,
+    schedulePattern?: DoctorSchedulePattern | string
   ) {
     if (!userId || userId.trim().length === 0) {
       throw new Error('User ID is required for Doctor entity');
@@ -46,6 +50,15 @@ export class Doctor implements IDoctor {
     this._licenseNumber = licenseNumber?.trim();
     this._yearsOfExperience = yearsOfExperience;
     this._isActive = isActive;
+    
+    // Handle schedule pattern
+    if (schedulePattern) {
+      if (typeof schedulePattern === 'string') {
+        this._schedulePattern = DoctorSchedulePattern.fromString(schedulePattern);
+      } else {
+        this._schedulePattern = schedulePattern;
+      }
+    }
   }
 
   get id(): DoctorId | undefined {
@@ -73,6 +86,10 @@ export class Doctor implements IDoctor {
     return this._isActive;
   }
 
+  get schedulePattern(): DoctorSchedulePattern | undefined {
+    return this._schedulePattern;
+  }
+
   // For backwards compatibility with existing code that expects string ID
   get stringId(): string | undefined {
     return this._id?.value;
@@ -80,6 +97,14 @@ export class Doctor implements IDoctor {
 
   get specializationValue(): string {
     return this._specialization.value;
+  }
+
+  get schedulePatternString(): string | undefined {
+    return this._schedulePattern?.toString();
+  }
+
+  get schedulePatternDescription(): string {
+    return this._schedulePattern?.getDescription() || 'No schedule assigned';
   }
 
 
@@ -111,6 +136,68 @@ export class Doctor implements IDoctor {
   }
 
   /**
+   * Update the doctor's schedule pattern
+   */
+  updateSchedulePattern(newSchedulePattern: DoctorSchedulePattern | string): Doctor {
+    const schedulePattern = typeof newSchedulePattern === 'string' 
+      ? DoctorSchedulePattern.fromString(newSchedulePattern)
+      : newSchedulePattern;
+    return this.createCopy({ schedulePattern });
+  }
+
+  /**
+   * Remove the doctor's schedule pattern
+   */
+  removeSchedulePattern(): Doctor {
+    return this.createCopy({ schedulePattern: undefined });
+  }
+
+  /**
+   * Check if doctor is available on a specific day
+   */
+  isAvailableOnDay(day: string): boolean {
+    if (!this._schedulePattern) {
+      return false; // No schedule pattern means not available
+    }
+    
+    // Convert day string to DayOfWeek format
+    const dayMap: Record<string, string> = {
+      'monday': 'MONDAY',
+      'tuesday': 'TUESDAY', 
+      'wednesday': 'WEDNESDAY',
+      'thursday': 'THURSDAY',
+      'friday': 'FRIDAY',
+      'saturday': 'SATURDAY',
+      'sunday': 'SUNDAY',
+      'mon': 'MONDAY',
+      'tue': 'TUESDAY',
+      'wed': 'WEDNESDAY',
+      'thu': 'THURSDAY',
+      'fri': 'FRIDAY',
+      'sat': 'SATURDAY',
+      'sun': 'SUNDAY'
+    };
+    
+    const normalizedDay = dayMap[day.toLowerCase()];
+    if (!normalizedDay) {
+      return false;
+    }
+    
+    return this._schedulePattern.includesDay(normalizedDay as any);
+  }
+
+  /**
+   * Check if doctor is available on a specific date
+   */
+  isAvailableOnDate(date: Date): boolean {
+    if (!this._schedulePattern) {
+      return false; // No schedule pattern means not available
+    }
+    
+    return this._schedulePattern.includesDate(date);
+  }
+
+  /**
    * Creates a copy of this doctor with modified properties
    * Immutable entity pattern - all changes create new instances
    */
@@ -119,6 +206,7 @@ export class Doctor implements IDoctor {
     licenseNumber?: string;
     yearsOfExperience?: number;
     isActive?: boolean;
+    schedulePattern?: DoctorSchedulePattern;
   }): Doctor {
     return new Doctor(
       this._userId,
@@ -126,7 +214,8 @@ export class Doctor implements IDoctor {
       this._id,
       updates.licenseNumber !== undefined ? updates.licenseNumber : this._licenseNumber,
       updates.yearsOfExperience !== undefined ? updates.yearsOfExperience : this._yearsOfExperience,
-      updates.isActive !== undefined ? updates.isActive : this._isActive
+      updates.isActive !== undefined ? updates.isActive : this._isActive,
+      updates.schedulePattern !== undefined ? updates.schedulePattern : this._schedulePattern
     );
   }
 

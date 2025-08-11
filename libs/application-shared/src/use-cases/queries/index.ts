@@ -38,3 +38,6 @@ export * from './GetSerologyResultsByPatientIdQueryHandler';
 export * from './GetBloodChemistryByPatientIdQueryHandler';
 export * from './PrescriptionQueryHandlers';
 export * from './TransactionQueryHandlers';
+export * from './GetAllScheduleOverridesQueryHandler';
+export * from './GetScheduleOverrideByDateQueryHandler';
+export * from './GetScheduleOverrideByIdQueryHandler';

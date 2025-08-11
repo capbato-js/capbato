@@ -381,3 +381,48 @@ export class InvalidPrescriptionDateException extends DomainException {
     super(`Invalid prescription date: ${reason}`, 'INVALID_PRESCRIPTION_DATE');
   }
 }
+
+/**
+ * Doctor Schedule Override-specific domain exceptions
+ */
+export class ScheduleOverrideNotFoundException extends DomainException {
+  constructor(identifier: string) {
+    super(`Schedule override with identifier ${identifier} not found`, 'SCHEDULE_OVERRIDE_NOT_FOUND', 404);
+  }
+}
+
+export class ScheduleOverrideAlreadyExistsException extends DomainException {
+  constructor(date: string) {
+    super(`Schedule override already exists for date ${date}`, 'SCHEDULE_OVERRIDE_ALREADY_EXISTS', 409);
+  }
+}
+
+export class InvalidOverrideDateException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid override date: ${reason}`, 'INVALID_OVERRIDE_DATE');
+  }
+}
+
+export class InvalidOverrideReasonException extends DomainException {
+  constructor(reason: string) {
+    super(`Invalid override reason: ${reason}`, 'INVALID_OVERRIDE_REASON');
+  }
+}
+
+export class PastDateOverrideException extends DomainException {
+  constructor() {
+    super('Cannot create override for past dates', 'PAST_DATE_OVERRIDE');
+  }
+}
+
+export class SameDoctorOverrideException extends DomainException {
+  constructor() {
+    super('Cannot override with the same doctor', 'SAME_DOCTOR_OVERRIDE');
+  }
+}
+
+export class DoctorNotAvailableForOverrideException extends DomainException {
+  constructor(doctorId: string, date: string) {
+    super(`Doctor ${doctorId} is not available for override on ${date}`, 'DOCTOR_NOT_AVAILABLE_FOR_OVERRIDE', 409);
+  }
+}

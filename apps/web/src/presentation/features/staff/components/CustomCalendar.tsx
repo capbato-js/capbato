@@ -26,6 +26,16 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [hoveredTile, setHoveredTile] = useState<number | null>(null);
 
+  // Debug logging for CustomCalendar
+  console.log('📅 [DEBUG] CustomCalendar render:', {
+    schedulesCount: schedules.length,
+    availableDoctorsCount: availableDoctors.length,
+    currentMonth: currentDate.getMonth() + 1,
+    currentYear: currentDate.getFullYear(),
+    sampleSchedules: schedules.slice(0, 3),
+    hasOnDoctorChange: !!onDoctorChange
+  });
+
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
 
@@ -58,7 +68,28 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
 
   const getScheduleForDate = (day: number) => {
     const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return schedules.find(schedule => schedule.date === dateString);
+    const foundSchedule = schedules.find(schedule => schedule.date === dateString);
+    
+    // Debug logging for schedule lookup
+    if (foundSchedule) {
+      console.log(`🎯 [DEBUG] Found schedule for ${dateString}:`, foundSchedule);
+    } else if (day <= 15) { // Only log for first half of month to reduce noise
+      console.log(`❌ [DEBUG] No schedule found for ${dateString}`);
+    }
+    
+    return foundSchedule;
+  };
+
+  // Helper function to check if a date is in the past
+  const isDateInPast = (day: number) => {
+    const dateToCheck = new Date(currentYear, currentMonth, day);
+    const today = new Date();
+    
+    // Reset time to compare only dates (not time)
+    today.setHours(0, 0, 0, 0);
+    dateToCheck.setHours(0, 0, 0, 0);
+    
+    return dateToCheck < today;
   };
 
   return (
@@ -184,6 +215,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
           const schedule = getScheduleForDate(day);
           const hasSchedule = !!schedule;
           const tileIndex = day; // Using day as unique identifier for this month
+          const isPastDate = isDateInPast(day);
           
           return (
             <Box
@@ -194,12 +226,14 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                 padding: '10px',
                 minHeight: '100px',
                 fontWeight: 500,
-                color: '#333',
+                color: isPastDate ? '#999' : '#333', // Dimmed color for past dates
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
                 position: 'relative',
-                transition: 'background-color 0.2s ease'
+                transition: 'background-color 0.2s ease',
+                opacity: isPastDate ? 0.6 : 1, // Reduce opacity for past dates
+                cursor: isPastDate ? 'default' : 'pointer'
               }}
-              onMouseEnter={() => setHoveredTile(tileIndex)}
+              onMouseEnter={() => !isPastDate && setHoveredTile(tileIndex)}
               onMouseLeave={() => setHoveredTile(null)}
             >
               <Box
@@ -212,7 +246,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                 }}
               >
                 <span style={{ height: '24px', fontSize: '16px' }}>{day}</span>
-                {hasSchedule && (hoveredTile === tileIndex) && (
+                {hasSchedule && (hoveredTile === tileIndex) && !isDateInPast(day) && (
                   <Menu
                     position="bottom-end"
                     withArrow
@@ -249,9 +283,8 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                           </Box>
                           {availableDoctors
                             .filter(doctor => {
-                              // Compare without "Dr." prefix
-                              const currentDoctorName = schedule?.details?.replace(/^Dr\.\s*/, '') || '';
-                              return doctor.name !== currentDoctorName;
+                              // Filter out the currently assigned doctor using doctor ID
+                              return doctor.id !== schedule?.doctorId;
                             })
                             .map(doctor => (
                               <Menu.Item
@@ -291,7 +324,8 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                     wordBreak: 'break-word'
                   }}
                 >
-                  {schedule.details && (
+                  {/* Show only doctor name, not MWF/TTH/OVERRIDE labels */}
+                  {schedule.details && !['MWF', 'TTH', 'OVERRIDE'].includes(schedule.details) && (
                     <Box
                       component="strong"
                       style={{
@@ -303,7 +337,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                       {schedule.details}
                     </Box>
                   )}
-                  {schedule.note}
+                  {schedule.note && !['MWF', 'TTH', 'OVERRIDE'].includes(schedule.note) && schedule.note}
                 </Box>
               )}
             </Box>

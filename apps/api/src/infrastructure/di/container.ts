@@ -36,6 +36,8 @@ import {
   MongoosePrescriptionRepository,
   SqlitePrescriptionRepository
 } from '../prescription/persistence';
+import { InMemoryDoctorScheduleOverrideRepository } from '../schedule-override/persistence/in-memory/InMemoryDoctorScheduleOverrideRepository';
+import { TypeOrmDoctorScheduleOverrideRepository } from '../schedule-override/persistence/typeorm/TypeOrmDoctorScheduleOverrideRepository';
 import {
   InMemoryReceiptRepository,
   TypeOrmReceiptRepository
@@ -230,8 +232,20 @@ import {
   GetDoctorByIdQueryHandler,
   GetDoctorByUserIdQueryHandler,
   CheckDoctorProfileExistsQueryHandler,
+  UpdateDoctorSchedulePatternUseCase,
+  RemoveDoctorSchedulePatternUseCase,
+  InitializeDoctorSchedulesUseCase,
+  CreateScheduleOverrideUseCase,
+  UpdateScheduleOverrideUseCase,
+  DeleteScheduleOverrideUseCase,
+  GetAllScheduleOverridesQueryHandler,
+  GetScheduleOverrideByDateQueryHandler,
+  GetScheduleOverrideByIdQueryHandler,
+  ScheduleOverrideValidationService,
+  CreateScheduleOverrideValidationService,
+  UpdateScheduleOverrideValidationService,
 } from '@nx-starter/application-shared';
-import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository, IReceiptRepository } from '@nx-starter/domain';
+import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository, IReceiptRepository, IDoctorScheduleOverrideRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
 import type { ILabRequestRepository, IBloodChemistryRepository, IUrinalysisResultRepository, IHematologyResultRepository, IFecalysisResultRepository, ISerologyResultRepository } from '@nx-starter/domain';
 import { AppointmentDomainService } from '@nx-starter/domain';
@@ -333,6 +347,12 @@ export const configureDI = async () => {
     receiptRepositoryImplementation
   );
 
+  const scheduleOverrideRepositoryImplementation = await getScheduleOverrideRepositoryImplementation();
+  container.registerInstance<IDoctorScheduleOverrideRepository>(
+    TOKENS.ScheduleOverrideRepository,
+    scheduleOverrideRepositoryImplementation
+  );
+
   // Infrastructure Layer - Services  
   container.registerSingleton(
     TOKENS.PasswordHashingService,
@@ -365,6 +385,21 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreatePatientUseCase, CreatePatientUseCase);
   container.registerSingleton(TOKENS.UpdatePatientUseCase, UpdatePatientUseCase);
   container.registerSingleton(TOKENS.CreateDoctorProfileCommandHandler, CreateDoctorProfileCommandHandler);
+
+  // Doctor Schedule Use Cases
+  container.registerSingleton(TOKENS.UpdateDoctorSchedulePatternUseCase, UpdateDoctorSchedulePatternUseCase);
+  container.registerSingleton(TOKENS.RemoveDoctorSchedulePatternUseCase, RemoveDoctorSchedulePatternUseCase);
+  container.registerSingleton(TOKENS.InitializeDoctorSchedulesUseCase, InitializeDoctorSchedulesUseCase);
+
+  // Doctor Schedule Override Use Cases
+  container.registerSingleton(TOKENS.CreateScheduleOverrideUseCase, CreateScheduleOverrideUseCase);
+  container.registerSingleton(TOKENS.UpdateScheduleOverrideUseCase, UpdateScheduleOverrideUseCase);
+  container.registerSingleton(TOKENS.DeleteScheduleOverrideUseCase, DeleteScheduleOverrideUseCase);
+
+  // Doctor Schedule Override Query Handlers
+  container.registerSingleton(TOKENS.GetAllScheduleOverridesQueryHandler, GetAllScheduleOverridesQueryHandler);
+  container.registerSingleton(TOKENS.GetScheduleOverrideByDateQueryHandler, GetScheduleOverrideByDateQueryHandler);
+  container.registerSingleton(TOKENS.GetScheduleOverrideByIdQueryHandler, GetScheduleOverrideByIdQueryHandler);
 
   // Schedule Use Cases
   container.registerSingleton(TOKENS.CreateScheduleUseCase, CreateScheduleUseCase);
@@ -598,6 +633,11 @@ export const configureDI = async () => {
     TOKENS.DoctorValidationService,
     DoctorValidationService
   );
+
+  // Schedule Override Validation Services
+  container.registerSingleton(TOKENS.CreateScheduleOverrideValidationService, CreateScheduleOverrideValidationService);
+  container.registerSingleton(TOKENS.UpdateScheduleOverrideValidationService, UpdateScheduleOverrideValidationService);
+  container.registerSingleton(TOKENS.ScheduleOverrideValidationService, ScheduleOverrideValidationService);
   container.registerSingleton(
     TOKENS.GetCitiesValidationService,
     GetCitiesValidationService
@@ -1077,6 +1117,21 @@ async function getReceiptRepositoryImplementation(): Promise<IReceiptRepository>
       return new InMemoryReceiptRepository();
     }
   }
+}
+
+async function getScheduleOverrideRepositoryImplementation(): Promise<IDoctorScheduleOverrideRepository> {
+  const dbType = process.env.DATABASE_TYPE || 'typeorm';
+
+  // Handle in-memory mode (for testing)
+  if (dbType === 'memory') {
+    console.log('📦 Using in-memory schedule override repository');
+    return new InMemoryDoctorScheduleOverrideRepository();
+  }
+
+  // For all database types, use TypeORM for now
+  const dataSource = await getTypeOrmDataSource();
+  console.log(`📦 Using TypeORM schedule override repository with ${dbType}`);
+  return new TypeOrmDoctorScheduleOverrideRepository(dataSource);
 }
 
 async function getUrinalysisResultRepositoryImplementation(): Promise<IUrinalysisResultRepository> {

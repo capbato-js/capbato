@@ -53,6 +53,12 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
     return entities.map(entity => this.entityToDomain(entity));
   }
 
+  async getActiveCount(): Promise<number> {
+    return await this.repository.count({
+      where: { isActive: true }
+    });
+  }
+
   async getBySpecialization(specialization: string): Promise<Doctor[]> {
     const entities = await this.repository.find({
       where: { specialization }
@@ -69,6 +75,7 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
       licenseNumber: plainObject.licenseNumber,
       yearsOfExperience: plainObject.yearsOfExperience,
       isActive: plainObject.isActive,
+      schedulePattern: plainObject.schedulePattern,
     });
     
     const savedEntity = await this.repository.save(entity);
@@ -86,6 +93,7 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
       licenseNumber: plainObject.licenseNumber,
       yearsOfExperience: plainObject.yearsOfExperience,
       isActive: plainObject.isActive,
+      schedulePattern: plainObject.schedulePattern,
     });
 
     const updatedEntity = await this.repository.findOne({
@@ -121,6 +129,7 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
       licenseNumber: entity.licenseNumber,
       yearsOfExperience: entity.yearsOfExperience,
       isActive: entity.isActive,
+      schedulePattern: entity.schedulePattern,
     });
   }
 }
