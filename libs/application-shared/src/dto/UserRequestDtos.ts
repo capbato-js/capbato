@@ -10,11 +10,11 @@ export interface RegisterUserRequestDto {
   password: string;
   role: string;
   mobile?: string;
-  // Doctor profile fields (optional, only required when role is 'doctor')
+  // Doctor profile fields (optional, but schedulePattern is required when role is 'doctor')
   specialization?: string;
   licenseNumber?: string;
   experienceYears?: number;
-  schedulePattern?: string; // Schedule pattern for doctor role (e.g., "MWF", "TTh")
+  schedulePattern?: string; // Required when role is 'doctor' (e.g., "MWF", "TTh")
 }
 
 export interface LoginUserRequestDto {

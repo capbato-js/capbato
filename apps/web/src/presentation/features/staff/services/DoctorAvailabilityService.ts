@@ -141,30 +141,15 @@ export class DoctorAvailabilityService {
 
     const pattern = doctor.schedulePattern.toUpperCase();
     
-    // Handle common patterns
+    // Handle supported patterns (only MWF and TTH)
     switch (pattern) {
       case 'MWF':
         return ['MONDAY', 'WEDNESDAY', 'FRIDAY'].includes(dayOfWeek);
       case 'TTH':
         return ['TUESDAY', 'THURSDAY'].includes(dayOfWeek);
-      case 'WEEKDAYS':
-        return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].includes(dayOfWeek);
-      case 'ALL':
-        return true;
       default:
-        // Parse individual day codes (e.g., "MRF" = Monday, Thursday, Friday)
-        const dayMap: Record<string, string> = {
-          'M': 'MONDAY',
-          'T': 'TUESDAY',
-          'W': 'WEDNESDAY',
-          'R': 'THURSDAY',
-          'F': 'FRIDAY',
-          'S': 'SATURDAY',
-          'U': 'SUNDAY'
-        };
-        
-        const availableDays = pattern.split('').map(char => dayMap[char]).filter(Boolean);
-        return availableDays.includes(dayOfWeek);
+        console.warn(`Unsupported schedule pattern: ${pattern}. Only MWF and TTH are supported.`);
+        return false;
     }
   }
 

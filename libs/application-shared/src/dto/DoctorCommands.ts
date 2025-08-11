@@ -10,7 +10,7 @@ export interface CreateDoctorProfileCommand {
   specialization: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
-  schedulePattern?: string; // Optional schedule pattern (e.g., "MWF", "TTH")
+  schedulePattern: string; // Required schedule pattern (e.g., "MWF", "TTH")
 }
 
 export interface UpdateDoctorProfileCommand {
@@ -40,7 +40,7 @@ export interface CreateDoctorProfileRequestDto {
   specialization: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
-  schedulePattern?: string;
+  schedulePattern: string;
 }
 
 export interface UpdateDoctorProfileRequestDto {

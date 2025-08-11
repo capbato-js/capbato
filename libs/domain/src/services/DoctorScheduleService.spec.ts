@@ -15,18 +15,12 @@ describe('DoctorScheduleService', () => {
       expect(pattern.toString()).toBe('TTH');
     });
 
-    it('should assign WEEKDAYS pattern to third doctor (index 2)', () => {
-      const pattern = DoctorScheduleService.getDefaultSchedulePattern(2);
-      expect(pattern.equals(DoctorSchedulePattern.WEEKDAYS)).toBe(true);
-      expect(pattern.toString()).toBe('WEEKDAYS');
-    });
-
-    it('should assign WEEKDAYS pattern to additional doctors', () => {
-      const pattern3 = DoctorScheduleService.getDefaultSchedulePattern(3);
-      const pattern4 = DoctorScheduleService.getDefaultSchedulePattern(4);
+    it('should throw error for third doctor (index 2) and beyond', () => {
+      expect(() => DoctorScheduleService.getDefaultSchedulePattern(2))
+        .toThrow('Only supports up to 2 doctors with MWF and TTH patterns');
       
-      expect(pattern3.equals(DoctorSchedulePattern.WEEKDAYS)).toBe(true);
-      expect(pattern4.equals(DoctorSchedulePattern.WEEKDAYS)).toBe(true);
+      expect(() => DoctorScheduleService.getDefaultSchedulePattern(3))
+        .toThrow('Only supports up to 2 doctors with MWF and TTH patterns');
     });
 
     it('should throw error for negative index', () => {
@@ -79,8 +73,9 @@ describe('DoctorScheduleService', () => {
       expect(result.issues).toHaveLength(0);
     });
 
-    it('should suggest MWF/TTH for non-ideal 2-doctor setup', () => {
-      const patterns = [DoctorSchedulePattern.WEEKDAYS, DoctorSchedulePattern.WEEKDAYS];
+    it('should suggest MWF/TTH for any 2-doctor setup', () => {
+      // Since we only support MWF and TTH patterns, any validation should suggest this ideal split
+      const patterns = [DoctorSchedulePattern.MWF, DoctorSchedulePattern.MWF]; // duplicate patterns
       const result = DoctorScheduleService.validateSchedulePatterns(patterns);
       
       expect(result.suggestions).toContain('For optimal coverage with 2 doctors, consider using MWF and TTH patterns');
@@ -109,12 +104,12 @@ describe('DoctorScheduleService', () => {
       expect(patterns[1].equals(DoctorSchedulePattern.TTH)).toBe(true);
     });
 
-    it('should suggest appropriate patterns for three doctors', () => {
-      const patterns = DoctorScheduleService.suggestOptimalPatterns(3);
-      expect(patterns).toHaveLength(3);
-      expect(patterns[0].equals(DoctorSchedulePattern.MWF)).toBe(true);
-      expect(patterns[1].equals(DoctorSchedulePattern.TTH)).toBe(true);
-      expect(patterns[2].equals(DoctorSchedulePattern.WEEKDAYS)).toBe(true);
+    it('should throw error for more than two doctors', () => {
+      expect(() => DoctorScheduleService.suggestOptimalPatterns(3))
+        .toThrow('Only supports up to 2 doctors with MWF and TTH patterns');
+      
+      expect(() => DoctorScheduleService.suggestOptimalPatterns(4))
+        .toThrow('Only supports up to 2 doctors with MWF and TTH patterns');
     });
 
     it('should throw error for invalid number of doctors', () => {
@@ -146,8 +141,10 @@ describe('DoctorScheduleService', () => {
       expect(complement.includesDay('WEDNESDAY')).toBe(false);
     });
 
-    it('should return TTH fallback for WEEKDAYS pattern', () => {
-      const complement = DoctorScheduleService.getComplementaryPattern(DoctorSchedulePattern.WEEKDAYS);
+              it('should return TTH fallback for non-standard patterns', () => {
+      // Test with a custom pattern since WEEKDAYS no longer exists
+      const customPattern = new DoctorSchedulePattern(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY']);
+      const complement = DoctorScheduleService.getComplementaryPattern(customPattern);
       expect(complement.equals(DoctorSchedulePattern.TTH)).toBe(true);
     });
   });
@@ -156,7 +153,6 @@ describe('DoctorScheduleService', () => {
     it('should return true for appropriate patterns', () => {
       expect(DoctorScheduleService.isPatternAppropriateForPosition(0, DoctorSchedulePattern.MWF)).toBe(true);
       expect(DoctorScheduleService.isPatternAppropriateForPosition(1, DoctorSchedulePattern.TTH)).toBe(true);
-      expect(DoctorScheduleService.isPatternAppropriateForPosition(2, DoctorSchedulePattern.WEEKDAYS)).toBe(true);
     });
 
     it('should return false for inappropriate patterns', () => {

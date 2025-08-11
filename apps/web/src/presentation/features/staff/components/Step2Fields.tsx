@@ -3,6 +3,7 @@ import { Control, FieldErrors, UseFormRegister, Controller } from 'react-hook-fo
 import { Stack, Select } from '@mantine/core';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { RegisterUserFormData } from '@nx-starter/application-shared';
+import { useAvailableSchedulePatterns } from '../hooks/useAvailableSchedulePatterns';
 
 interface Step2FieldsProps {
   control: Control<RegisterUserFormData>;
@@ -21,6 +22,17 @@ export const Step2Fields: React.FC<Step2FieldsProps> = ({
   onInputChange,
   fieldErrors = {}
 }) => {
+  const { scheduleOptions, loading: scheduleLoading } = useAvailableSchedulePatterns();
+
+  // Filter to show only available options, but include all options with disabled state
+  const schedulePatternData = scheduleOptions.map(option => ({
+    value: option.value,
+    label: option.available 
+      ? option.label 
+      : `${option.label} (Taken by ${option.takenBy})`,
+    disabled: !option.available
+  }));
+
   return (
     <Stack gap="md">
       <Controller
@@ -61,11 +73,9 @@ export const Step2Fields: React.FC<Step2FieldsProps> = ({
             label="Schedule Pattern"
             placeholder="Select schedule pattern"
             error={fieldState.error?.message || fieldErrors.schedulePattern}
-            data={[
-              { value: 'MWF', label: 'MWF (Monday, Wednesday, Friday)' },
-              { value: 'TTH', label: 'TTH (Tuesday, Thursday)' }
-            ]}
-            disabled={isLoading}
+            data={schedulePatternData}
+            disabled={isLoading || scheduleLoading}
+            required
             description="Choose the days when this doctor will be available"
             {...field}
           />

@@ -96,7 +96,7 @@ export const CreateDoctorProfileCommandSchema = z.object({
   specialization: SpecializationSchema,
   licenseNumber: OptionalLicenseNumberSchema,
   yearsOfExperience: OptionalYearsOfExperienceSchema,
-  schedulePattern: OptionalSchedulePatternSchema,
+  schedulePattern: SchedulePatternSchema, // Required for doctor creation
 });
 
 export const UpdateDoctorProfileCommandSchema = z.object({

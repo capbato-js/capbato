@@ -44,7 +44,7 @@ const isDoctorScheduledOnDay = (doctor: DoctorDto, dayOfWeek: string): boolean =
 
   const pattern = doctor.schedulePattern.toUpperCase();
   
-  // Handle common patterns
+  // Handle supported patterns (only MWF and TTH)
   switch (pattern) {
     case 'MWF': {
       const isMWF = ['MONDAY', 'WEDNESDAY', 'FRIDAY'].includes(dayOfWeek);
@@ -56,12 +56,8 @@ const isDoctorScheduledOnDay = (doctor: DoctorDto, dayOfWeek: string): boolean =
       console.log(`TTH check for ${dayOfWeek}: ${isTTH}`);
       return isTTH;
     }
-    case 'WEEKDAYS':
-      return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].includes(dayOfWeek);
-    case 'ALL':
-      return true;
     default:
-      console.log(`Unknown pattern: ${pattern}`);
+      console.log(`Unsupported pattern: ${pattern}. Only MWF and TTH are supported.`);
       return false;
   }
 };

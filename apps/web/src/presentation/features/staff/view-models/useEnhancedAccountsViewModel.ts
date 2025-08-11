@@ -49,6 +49,7 @@ export interface CreateAccountData {
   specialization?: string;
   licenseNumber?: string;
   experienceYears?: number;
+  schedulePattern?: string;
 }
 
 /**
@@ -136,6 +137,7 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
         specialization: data.specialization,
         licenseNumber: data.licenseNumber,
         experienceYears: data.experienceYears,
+        schedulePattern: data.schedulePattern,
       };
       
       // Call the API to create the user account (backend handles doctor profile creation)

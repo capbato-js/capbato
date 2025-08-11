@@ -42,6 +42,7 @@ export class DoctorSchedulePattern extends ValueObject<DayOfWeek[]> {
 
   /**
    * Create a pattern from a string representation (e.g., "MWF", "TTH")
+   * Only supports MWF and TTH patterns for the 2-doctor system
    */
   public static fromString(pattern: string): DoctorSchedulePattern {
     const upperPattern = pattern.toUpperCase().trim();
@@ -51,32 +52,8 @@ export class DoctorSchedulePattern extends ValueObject<DayOfWeek[]> {
         return DoctorSchedulePattern.MWF;
       case 'TTH':
         return DoctorSchedulePattern.TTH;
-      case 'WEEKDAYS':
-        return DoctorSchedulePattern.WEEKDAYS;
-      case 'ALL':
-        return DoctorSchedulePattern.ALL_DAYS;
       default:
-        // Try to parse as individual day codes
-        const dayMap: Record<string, DayOfWeek> = {
-          'M': 'MONDAY',
-          'T': 'TUESDAY',
-          'W': 'WEDNESDAY',
-          'R': 'THURSDAY', // R for Thursday to avoid conflict with Tuesday
-          'F': 'FRIDAY',
-          'S': 'SATURDAY',
-          'U': 'SUNDAY' // U for Sunday
-        };
-        
-        const days: DayOfWeek[] = [];
-        for (const char of upperPattern) {
-          if (dayMap[char]) {
-            days.push(dayMap[char]);
-          } else {
-            throw new Error(`Invalid schedule pattern: ${pattern}`);
-          }
-        }
-        
-        return new DoctorSchedulePattern(days);
+        throw new Error(`Invalid schedule pattern: ${pattern}. Only MWF and TTH patterns are supported.`);
     }
   }
 
@@ -147,23 +124,18 @@ export class DoctorSchedulePattern extends ValueObject<DayOfWeek[]> {
 
   /**
    * Get a string representation of the pattern
+   * Only supports MWF and TTH patterns
    */
   public override toString(): string {
-    // Check for common patterns
+    // Check for supported patterns
     if (this.equals(DoctorSchedulePattern.MWF)) {
       return 'MWF';
     }
     if (this.equals(DoctorSchedulePattern.TTH)) {
       return 'TTH';
     }
-    if (this.equals(DoctorSchedulePattern.WEEKDAYS)) {
-      return 'WEEKDAYS';
-    }
-    if (this.equals(DoctorSchedulePattern.ALL_DAYS)) {
-      return 'ALL';
-    }
 
-    // Create abbreviated string
+    // Fallback: create abbreviated string for custom patterns
     const dayAbbr: Record<DayOfWeek, string> = {
       'MONDAY': 'M',
       'TUESDAY': 'T',
@@ -179,6 +151,7 @@ export class DoctorSchedulePattern extends ValueObject<DayOfWeek[]> {
 
   /**
    * Get a human-readable description of the pattern
+   * Only supports MWF and TTH patterns
    */
   public getDescription(): string {
     if (this.equals(DoctorSchedulePattern.MWF)) {
@@ -187,14 +160,8 @@ export class DoctorSchedulePattern extends ValueObject<DayOfWeek[]> {
     if (this.equals(DoctorSchedulePattern.TTH)) {
       return 'Tuesday, Thursday';
     }
-    if (this.equals(DoctorSchedulePattern.WEEKDAYS)) {
-      return 'Weekdays';
-    }
-    if (this.equals(DoctorSchedulePattern.ALL_DAYS)) {
-      return 'All days';
-    }
 
-    // Create full description
+    // Create full description for custom patterns
     const dayNames: Record<DayOfWeek, string> = {
       'MONDAY': 'Monday',
       'TUESDAY': 'Tuesday',
