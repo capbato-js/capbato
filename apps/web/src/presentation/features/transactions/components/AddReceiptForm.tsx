@@ -34,9 +34,6 @@ const COMMON_SERVICES = [
   { name: 'Consultation', unitPrice: 800.0 },
   { name: 'Lab Tests', unitPrice: 350.0 },
   { name: 'Medication', unitPrice: 100.0 },
-  { name: 'X-Ray', unitPrice: 500.0 },
-  { name: 'Blood Test', unitPrice: 200.0 },
-  { name: 'Vaccination', unitPrice: 300.0 },
 ];
 
 const PAYMENT_METHOD_OPTIONS = [
