@@ -4,7 +4,9 @@
  */
 export interface UserListResponseDto {
   id: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  fullName: string; // Keep for backward compatibility
   role: string;
   email: string;
   mobile?: string | null;

@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useUserStore } from '../../../../infrastructure/state/UserStore';
 import { container, TOKENS } from '../../../../infrastructure/di/container';
-import { IAuthCommandService, RegisterUserCommand, UserDto } from '@nx-starter/application-shared';
+import { IAuthCommandService, RegisterUserCommand, UserDto, UpdateUserDetailsCommand, DoctorDto } from '@nx-starter/application-shared';
 import { extractErrorMessage, isApiError } from '../../../../infrastructure/utils/ErrorMapping';
+import { UserCommandService } from '../../../../infrastructure/services/UserCommandService';
+import { IDoctorApiService } from '../../../../infrastructure/api/IDoctorApiService';
 
 // Utility function to parse validation error details
 const parseValidationErrors = (error: unknown): Record<string, string> => {
@@ -36,6 +38,11 @@ export interface Account {
   role: 'admin' | 'doctor' | 'receptionist';
   email: string;
   mobile?: string;
+  // Doctor profile fields (optional)
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
+  schedulePattern?: string;
 }
 
 export interface CreateAccountData {
@@ -43,6 +50,20 @@ export interface CreateAccountData {
   lastName: string;
   email: string;
   password: string;
+  role: string;
+  mobile?: string;
+  // Doctor profile fields (optional, only required when role is 'doctor')
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
+  schedulePattern?: string;
+}
+
+export interface UpdateAccountData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   role: string;
   mobile?: string;
   // Doctor profile fields (optional, only required when role is 'doctor')
@@ -66,11 +87,13 @@ export interface IAccountsViewModel {
   // Actions
   loadAccounts: () => Promise<void>;
   createAccount: (data: CreateAccountData) => Promise<boolean>;
+  updateAccount: (data: UpdateAccountData) => Promise<boolean>;
   changeAccountPassword: (accountId: string, newPassword: string) => Promise<boolean>;
   deleteAccount: (accountId: string) => Promise<void>;
   clearError: () => void;
   clearFieldErrors: () => void;
   refreshAccounts: () => Promise<void>;
+  getDoctorDetails: (userId: string) => Promise<DoctorDto | null>;
 }
 
 /**
@@ -91,6 +114,11 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
     role: user.role as 'admin' | 'doctor' | 'receptionist',
     email: user.email,
     mobile: user.mobile,
+    // TODO: Add doctor profile fields when available in UserDto
+    specialization: undefined,
+    licenseNumber: undefined,
+    experienceYears: undefined,
+    schedulePattern: undefined,
   }), []);
 
   // Convert users to accounts for the view
@@ -170,6 +198,59 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
     }
   }, [refreshAccounts]);
 
+  const updateAccount = useCallback(async (data: UpdateAccountData): Promise<boolean> => {
+    setLocalLoading(true);
+    setLocalError(null);
+    setFieldErrors({});
+    
+    try {
+      // Get the user command service from the container
+      const userCommandService = container.resolve<UserCommandService>(TOKENS.UserCommandService);
+      
+      // Create the update command with all data
+      const updateCommand: UpdateUserDetailsCommand = {
+        id: data.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        role: data.role,
+        mobile: data.mobile,
+        // Doctor profile fields
+        specialization: data.specialization,
+        licenseNumber: data.licenseNumber,
+        experienceYears: data.experienceYears,
+        schedulePattern: data.schedulePattern,
+      };
+      
+      // Call the command service to update the user
+      await userCommandService.updateUserDetails(updateCommand);
+      
+      // Refresh the accounts list to show the updated account
+      await refreshAccounts();
+      
+      return true;
+    } catch (err) {
+      // Parse validation errors first
+      const validationErrors = parseValidationErrors(err);
+      
+      if (Object.keys(validationErrors).length > 0) {
+        // Set field-specific errors
+        setFieldErrors(validationErrors);
+        // Don't set generic error message when we have field-specific errors
+        setLocalError(null);
+      } else {
+        // For non-validation errors or validation errors without field details
+        const errorMessage = extractErrorMessage(err);
+        setLocalError(errorMessage);
+        // Clear any previous field errors
+        setFieldErrors({});
+      }
+      
+      return false;
+    } finally {
+      setLocalLoading(false);
+    }
+  }, [refreshAccounts]);
   const changeAccountPassword = useCallback(async (accountId: string, newPassword: string): Promise<boolean> => {
     setLocalLoading(true);
     setLocalError(null);
@@ -224,6 +305,18 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
     clearStoreError();
   }, [clearStoreError]);
 
+  const getDoctorDetails = useCallback(async (userId: string): Promise<DoctorDto | null> => {
+    try {
+      const doctorApiService = container.resolve<IDoctorApiService>(TOKENS.DoctorApiService);
+      const doctorDetails = await doctorApiService.getDoctorByUserId(userId);
+      return doctorDetails;
+    } catch (error) {
+      // Return null if doctor profile not found or any error occurs
+      console.warn(`Could not fetch doctor details for user ${userId}:`, error);
+      return null;
+    }
+  }, []);
+
   return {
     accounts,
     isLoading,
@@ -231,10 +324,12 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
     fieldErrors,
     loadAccounts,
     createAccount,
+    updateAccount,
     changeAccountPassword,
     deleteAccount,
     clearError,
     clearFieldErrors,
     refreshAccounts,
+    getDoctorDetails,
   };
 };

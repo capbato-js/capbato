@@ -7,8 +7,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { useAccountsViewModel, type CreateAccountData, type Account } from '../view-models/useEnhancedAccountsViewModel';
-import { CreateAccountForm, ChangePasswordForm } from '../components';
+import { useAccountsViewModel, type CreateAccountData, type UpdateAccountData, type Account } from '../view-models/useEnhancedAccountsViewModel';
+import { CreateAccountForm, ChangePasswordForm, UpdateUserDetailsForm } from '../components';
+import { UpdateUserDetailsCommand, DoctorDto } from '@nx-starter/application-shared';
+
+// Modal animation duration constant to ensure consistent timing
+const MODAL_ANIMATION_DURATION = 300;
 
 export const AccountsPage: React.FC = () => {
   const {
@@ -17,9 +21,11 @@ export const AccountsPage: React.FC = () => {
     error,
     fieldErrors,
     createAccount,
+    updateAccount,
     changeAccountPassword,
     clearError,
-    clearFieldErrors
+    clearFieldErrors,
+    getDoctorDetails
   } = useAccountsViewModel();
 
   useEffect(() => {
@@ -30,8 +36,10 @@ export const AccountsPage: React.FC = () => {
   }, []);
   
   const [opened, { open, close }] = useDisclosure(false);
+  const [updateModalOpened, { open: openUpdateModal, close: closeUpdateModal }] = useDisclosure(false);
   const [passwordModalOpened, { open: openPasswordModal, close: closePasswordModal }] = useDisclosure(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [doctorDetails, setDoctorDetails] = useState<DoctorDto | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const handleCreateAccount = async (data: CreateAccountData): Promise<boolean> => {
@@ -52,9 +60,54 @@ export const AccountsPage: React.FC = () => {
     openPasswordModal();
   };
 
-  const handleEditUserDetails = (account: Account) => {
-    // TODO: Implement edit user details functionality
-    console.log('Edit user details:', account);
+  const handleEditUserDetails = async (account: Account) => {
+    setSelectedAccount(account);
+    setDoctorDetails(null); // Reset doctor details
+    
+    // If the account is a doctor, fetch their doctor profile details
+    if (account.role === 'doctor') {
+      try {
+        const details = await getDoctorDetails(account.id);
+        setDoctorDetails(details);
+      } catch (error) {
+        console.warn('Could not fetch doctor details:', error);
+        // Continue opening the modal even if doctor details fetch fails
+        setDoctorDetails(null);
+      }
+    }
+    
+    openUpdateModal();
+  };
+
+  const handleUpdateUserDetails = async (data: UpdateUserDetailsCommand): Promise<boolean> => {
+    // Convert UpdateUserDetailsCommand to UpdateAccountData for the view model
+    const updateAccountData: UpdateAccountData = {
+      id: data.id,
+      firstName: data.firstName || '',
+      lastName: data.lastName || '',
+      email: data.email || '',
+      role: data.role || '',
+      mobile: data.mobile,
+      specialization: data.specialization,
+      licenseNumber: data.licenseNumber,
+      experienceYears: data.experienceYears,
+      schedulePattern: data.schedulePattern,
+    };
+    
+    const success = await updateAccount(updateAccountData);
+    
+    if (success) {
+      closeUpdateModal(); // Close modal first
+      // Delay clearing the account data until after modal animation completes
+      setTimeout(() => {
+        setSelectedAccount(null);
+        setDoctorDetails(null); // Also clear doctor details
+      }, MODAL_ANIMATION_DURATION); // Match Mantine's default modal animation duration
+      // Accounts list will refresh automatically via view model
+    }
+    // Error handling is managed by the view model and displayed via error state
+    
+    return success;
   };
 
   // Transform accounts to include full name for consistency
@@ -86,8 +139,11 @@ export const AccountsPage: React.FC = () => {
     const success = await changeAccountPassword(selectedAccount.id, newPassword);
     
     if (success) {
-      closePasswordModal();
-      setSelectedAccount(null);
+      closePasswordModal(); // Close modal first
+      // Delay clearing the account data until after modal animation completes
+      setTimeout(() => {
+        setSelectedAccount(null);
+      }, 300); // Match Mantine's default modal animation duration
       // Show success message - you might want to use a notification system instead
       // alert('Password changed successfully!');
     } else if (error) {
@@ -152,10 +208,23 @@ export const AccountsPage: React.FC = () => {
     close();
   };
 
+  const handleCloseUpdateModal = () => {
+    clearError(); // Clear any view model errors
+    clearFieldErrors(); // Clear field-specific errors
+    closeUpdateModal(); // Close modal first
+    // Delay clearing the account data until after modal animation completes
+    setTimeout(() => {
+      setSelectedAccount(null);
+      setDoctorDetails(null); // Clear doctor details
+    }, MODAL_ANIMATION_DURATION); // Match Mantine's default modal animation duration
+  };
   const handleClosePasswordModal = () => {
     setPasswordError(null);
-    setSelectedAccount(null);
-    closePasswordModal();
+    closePasswordModal(); // Close modal first
+    // Delay clearing the account data until after modal animation completes
+    setTimeout(() => {
+      setSelectedAccount(null);
+    }, 300); // Match Mantine's default modal animation duration
   };
 
   return (
@@ -204,6 +273,36 @@ export const AccountsPage: React.FC = () => {
           fieldErrors={fieldErrors}
           onClearFieldErrors={clearFieldErrors}
         />
+      </Modal>
+
+      {/* Update User Details Modal */}
+      <Modal
+        opened={updateModalOpened}
+        onClose={handleCloseUpdateModal}
+        title="Update User Details"
+      >
+        {selectedAccount && (
+          <UpdateUserDetailsForm
+            userData={{
+              id: selectedAccount.id,
+              firstName: selectedAccount.firstName,
+              lastName: selectedAccount.lastName,
+              email: selectedAccount.email,
+              mobile: selectedAccount.mobile || '',
+              role: selectedAccount.role,
+              specialization: doctorDetails?.specialization || selectedAccount.specialization,
+              licenseNumber: doctorDetails?.licenseNumber || selectedAccount.licenseNumber,
+              experienceYears: doctorDetails?.yearsOfExperience || selectedAccount.experienceYears,
+              schedulePattern: doctorDetails?.schedulePattern || selectedAccount.schedulePattern,
+            }}
+            onSubmit={handleUpdateUserDetails}
+            isLoading={isLoading}
+            error={error}
+            onClearError={clearError}
+            fieldErrors={fieldErrors}
+            onClearFieldErrors={clearFieldErrors}
+          />
+        )}
       </Modal>
 
       {/* Change Password Modal */}

@@ -1,4 +1,4 @@
-import { UserDto } from '@nx-starter/application-shared';
+import { UserDto, UpdateUserDetailsRequestDto } from '@nx-starter/application-shared';
 
 /**
  * User API Service Interface
@@ -6,4 +6,5 @@ import { UserDto } from '@nx-starter/application-shared';
  */
 export interface IUserApiService {
   getAllUsers(): Promise<UserDto[]>;
+  updateUserDetails(id: string, data: UpdateUserDetailsRequestDto): Promise<UserDto>;
 }
