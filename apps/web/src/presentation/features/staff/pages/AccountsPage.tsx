@@ -9,7 +9,10 @@ import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../
 import { MedicalClinicLayout } from '../../../components/layout';
 import { useAccountsViewModel, type CreateAccountData, type UpdateAccountData, type Account } from '../view-models/useEnhancedAccountsViewModel';
 import { CreateAccountForm, ChangePasswordForm, UpdateUserDetailsForm } from '../components';
-import { UpdateUserDetailsFormData, DoctorDto } from '@nx-starter/application-shared';
+import { UpdateUserDetailsCommand, DoctorDto } from '@nx-starter/application-shared';
+
+// Modal animation duration constant to ensure consistent timing
+const MODAL_ANIMATION_DURATION = 300;
 
 export const AccountsPage: React.FC = () => {
   const {
@@ -76,12 +79,30 @@ export const AccountsPage: React.FC = () => {
     openUpdateModal();
   };
 
-  const handleUpdateUserDetails = async (data: UpdateAccountData): Promise<boolean> => {
-    const success = await updateAccount(data);
+  const handleUpdateUserDetails = async (data: UpdateUserDetailsCommand): Promise<boolean> => {
+    // Convert UpdateUserDetailsCommand to UpdateAccountData for the view model
+    const updateAccountData: UpdateAccountData = {
+      id: data.id,
+      firstName: data.firstName || '',
+      lastName: data.lastName || '',
+      email: data.email || '',
+      role: data.role || '',
+      mobile: data.mobile,
+      specialization: data.specialization,
+      licenseNumber: data.licenseNumber,
+      experienceYears: data.experienceYears,
+      schedulePattern: data.schedulePattern,
+    };
+    
+    const success = await updateAccount(updateAccountData);
     
     if (success) {
-      closeUpdateModal(); // Close modal
-      setSelectedAccount(null);
+      closeUpdateModal(); // Close modal first
+      // Delay clearing the account data until after modal animation completes
+      setTimeout(() => {
+        setSelectedAccount(null);
+        setDoctorDetails(null); // Also clear doctor details
+      }, MODAL_ANIMATION_DURATION); // Match Mantine's default modal animation duration
       // Accounts list will refresh automatically via view model
     }
     // Error handling is managed by the view model and displayed via error state
@@ -118,8 +139,11 @@ export const AccountsPage: React.FC = () => {
     const success = await changeAccountPassword(selectedAccount.id, newPassword);
     
     if (success) {
-      closePasswordModal();
-      setSelectedAccount(null);
+      closePasswordModal(); // Close modal first
+      // Delay clearing the account data until after modal animation completes
+      setTimeout(() => {
+        setSelectedAccount(null);
+      }, 300); // Match Mantine's default modal animation duration
       // Show success message - you might want to use a notification system instead
       // alert('Password changed successfully!');
     } else if (error) {
@@ -187,14 +211,20 @@ export const AccountsPage: React.FC = () => {
   const handleCloseUpdateModal = () => {
     clearError(); // Clear any view model errors
     clearFieldErrors(); // Clear field-specific errors
-    setSelectedAccount(null);
-    setDoctorDetails(null); // Clear doctor details
-    closeUpdateModal();
+    closeUpdateModal(); // Close modal first
+    // Delay clearing the account data until after modal animation completes
+    setTimeout(() => {
+      setSelectedAccount(null);
+      setDoctorDetails(null); // Clear doctor details
+    }, MODAL_ANIMATION_DURATION); // Match Mantine's default modal animation duration
   };
   const handleClosePasswordModal = () => {
     setPasswordError(null);
-    setSelectedAccount(null);
-    closePasswordModal();
+    closePasswordModal(); // Close modal first
+    // Delay clearing the account data until after modal animation completes
+    setTimeout(() => {
+      setSelectedAccount(null);
+    }, 300); // Match Mantine's default modal animation duration
   };
 
   return (
