@@ -34,10 +34,12 @@ export class UsersController {
   @Get('/')
   async getAllUsers(): Promise<{ success: boolean; data: UserListResponseDto[] }> {
     const users = await this.getAllUsersQueryHandler.execute();
-    // Map to response DTOs (id, fullName, role, email, mobile)
+    // Map to response DTOs (id, firstName, lastName, fullName, role, email, mobile)
     const userList: UserListResponseDto[] = users.map(user => ({
       id: user.id,
-      fullName: user.fullName,
+      firstName: user.firstName.value,
+      lastName: user.lastName.value,
+      fullName: user.fullName, // Keep for backward compatibility
       role: user.role.value,
       email: user.email.value,
       mobile: user.mobile?.value || null,

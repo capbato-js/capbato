@@ -34,6 +34,7 @@ import { ITransactionApiService } from '../api/ITransactionApiService';
 import { TransactionApiService } from '../api/TransactionApiService';
 import { WebUserQueryService } from '../services/WebUserQueryService';
 import { DoctorAssignmentService } from '../../presentation/features/appointments/services/DoctorAssignmentService';
+import { UserCommandService } from '../services/UserCommandService';
 import { getFeatureFlags, configProvider } from '../config';
 import {
   TodoCommandService,
@@ -235,6 +236,10 @@ export const configureDI = () => {
   container.registerSingleton<IPatientCommandService>(
     TOKENS.PatientCommandService,
     PatientCommandService
+  );
+  container.registerSingleton(
+    TOKENS.UserCommandService,
+    UserCommandService
   );
   container.registerSingleton<IPatientQueryService>(
     TOKENS.PatientQueryService,

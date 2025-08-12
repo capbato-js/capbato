@@ -194,11 +194,123 @@ export const UpdateUserDetailsCommandSchema = z.object({
   email: EmailSchema.optional(),
   mobile: MobileSchema,
   role: RoleSchema.optional(),
+  // Doctor profile fields (optional)
+  specialization: z.string().optional(),
+  licenseNumber: z.string().optional(),
+  experienceYears: z
+    .union([z.string(), z.number(), z.undefined(), z.null()])
+    .optional()
+    .transform((val) => {
+      // Handle empty string, null, or undefined values
+      if (val === '' || val === null || val === undefined) {
+        return undefined;
+      }
+      // Convert string numbers to actual numbers
+      if (typeof val === 'string') {
+        const parsed = parseInt(val, 10);
+        return isNaN(parsed) ? undefined : parsed;
+      }
+      // Handle NaN values from form inputs  
+      if (typeof val === 'number' && isNaN(val)) {
+        return undefined;
+      }
+      return val;
+    })
+    .refine((val) => {
+      // Skip validation if undefined (optional field)
+      if (val === undefined) return true;
+      // Validate that it's a valid number
+      return typeof val === 'number' && !isNaN(val) && Number.isInteger(val) && val >= 0 && val <= 50;
+    }, {
+      message: 'Years of experience must be a number between 0 and 50',
+    }),
+  schedulePattern: z.string()
+    .optional()
+    .refine((pattern) => {
+      // Skip validation if undefined (optional field)
+      if (!pattern) return true;
+      // Validate against known patterns (only MWF and TTH supported)
+      const validPatterns = ['MWF', 'TTH'];
+      return validPatterns.includes(pattern.toUpperCase().trim());
+    }, {
+      message: 'Invalid schedule pattern. Valid options are: MWF, TTH'
+    })
+    .transform((pattern) => pattern ? pattern.toUpperCase().trim() : undefined),
 }).refine((data) => {
   // At least one field must be provided for update
-  return data.firstName || data.lastName || data.email || data.mobile || data.role;
+  return data.firstName || data.lastName || data.email || data.mobile || data.role || data.specialization || data.licenseNumber || data.experienceYears || data.schedulePattern;
 }, {
   message: 'At least one field must be provided for update',
+}).refine((data) => {
+  // Make schedulePattern required when role is being updated to 'doctor'
+  if (data.role === 'doctor') {
+    return !!data.schedulePattern;
+  }
+  return true;
+}, {
+  message: 'Schedule pattern is required when updating role to doctor',
+  path: ['schedulePattern'],
+});
+
+// Frontend form schema for updating user details (without password fields)
+export const UpdateUserDetailsFormSchema = z.object({
+  id: z.string().min(1, 'User ID is required'),
+  firstName: FirstNameSchema,
+  lastName: LastNameSchema,
+  email: EmailSchema,
+  mobile: MobileSchema,
+  role: RoleSchema,
+  // Doctor profile fields (optional, validated conditionally)
+  specialization: z.string().optional(),
+  licenseNumber: z.string().optional(),
+  experienceYears: z
+    .union([z.string(), z.number(), z.undefined(), z.null()])
+    .optional()
+    .transform((val) => {
+      // Handle empty string, null, or undefined values
+      if (val === '' || val === null || val === undefined) {
+        return undefined;
+      }
+      // Convert string numbers to actual numbers
+      if (typeof val === 'string') {
+        const parsed = parseInt(val, 10);
+        return isNaN(parsed) ? undefined : parsed;
+      }
+      // Handle NaN values from form inputs  
+      if (typeof val === 'number' && isNaN(val)) {
+        return undefined;
+      }
+      return val;
+    })
+    .refine((val) => {
+      // Skip validation if undefined (optional field)
+      if (val === undefined) return true;
+      // Validate that it's a valid number
+      return typeof val === 'number' && !isNaN(val) && Number.isInteger(val) && val >= 0 && val <= 50;
+    }, {
+      message: 'Years of experience must be a number between 0 and 50',
+    }),
+  schedulePattern: z.string()
+    .optional()
+    .refine((pattern) => {
+      // Skip validation if undefined (optional field)
+      if (!pattern) return true;
+      // Validate against known patterns (only MWF and TTH supported)
+      const validPatterns = ['MWF', 'TTH'];
+      return validPatterns.includes(pattern.toUpperCase().trim());
+    }, {
+      message: 'Invalid schedule pattern. Valid options are: MWF, TTH'
+    })
+    .transform((pattern) => pattern ? pattern.toUpperCase().trim() : undefined),
+}).refine((data) => {
+  // Make doctor fields required when role is 'doctor'
+  if (data.role === 'doctor') {
+    return !!data.specialization && !!data.schedulePattern;
+  }
+  return true;
+}, {
+  message: 'Specialization and schedule pattern are required for doctor role',
+  path: ['specialization'],
 });
 
 // Change password form validation schema (with confirmation)
@@ -221,6 +333,7 @@ export const UserValidationSchemas = {
   LoginForm: LoginFormSchema,
   ChangeUserPasswordCommand: ChangeUserPasswordCommandSchema,
   UpdateUserDetailsCommand: UpdateUserDetailsCommandSchema,
+  UpdateUserDetailsForm: UpdateUserDetailsFormSchema,
   ChangePasswordForm: ChangePasswordFormSchema,
   GetAllUsersQuery: GetAllUsersQuerySchema,
   FirstName: FirstNameSchema,

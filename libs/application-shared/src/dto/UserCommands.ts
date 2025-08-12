@@ -42,4 +42,24 @@ export interface UpdateUserDetailsCommand {
   email?: string;
   mobile?: string;
   role?: string;
+  // Doctor profile fields (optional)
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
+  schedulePattern?: string;
+}
+
+// Frontend form data for updating user details (includes all fields required for UI)
+export interface UpdateUserDetailsFormData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobile?: string;
+  role: string;
+  // Doctor profile fields (optional, validated conditionally)
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
+  schedulePattern?: string;
 }

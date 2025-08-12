@@ -29,4 +29,9 @@ export interface UpdateUserDetailsRequestDto {
   email?: string;
   mobile?: string;
   role?: string;
+  // Doctor profile fields (optional)
+  specialization?: string;
+  licenseNumber?: string;
+  experienceYears?: number;
+  schedulePattern?: string;
 }

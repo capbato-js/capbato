@@ -4,3 +4,4 @@
  */
 
 export { WebUserQueryService } from './WebUserQueryService';
+export { UserCommandService } from './UserCommandService';
