@@ -14,6 +14,7 @@ import { FormSelect } from '../../../components/ui/FormSelect';
 import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 import { useDoctorStore } from '../../../../infrastructure/state/DoctorStore';
 import { useAppointmentStore } from '../../../../infrastructure/state/AppointmentStore';
+import { doctorAssignmentService } from '../services/DoctorAssignmentService';
 
 export interface AddAppointmentFormProps {
   onSubmit: (data: AddAppointmentFormData) => Promise<boolean>;
@@ -41,7 +42,8 @@ export interface AddAppointmentFormProps {
  * 
  * Features:
  * - Real patient data from backend
- * - Automatic doctor assignment based on date (MWF = Doctor 1, TTh = Doctor 2)
+ * - Schedule-aware doctor assignment that follows Doctor Schedule Calendar logic
+ * - Considers doctor schedule patterns (MWF, TTH) and override schedules from API
  * - Patient number display
  * - Edit mode support for modifying existing appointments
  */
@@ -68,6 +70,9 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Clear the doctor assignment cache to ensure fresh data
+        doctorAssignmentService.getInstance().clearCache();
+        
         // Load patients
         await patientStore.loadPatients();
         
@@ -96,35 +101,35 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     }
   }, [patientStore.patients]);
 
-  // Doctor assignment logic based on day of week
-  const getDoctorForDate = (date: Date): string => {
+  // Doctor assignment logic using schedule calendar logic
+  const getDoctorForDate = async (date: Date): Promise<string> => {
     // Ensure we have a valid Date object
     if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
       console.error('Invalid date passed to getDoctorForDate:', date);
-      return 'Dr. Smith (General Physician)'; // Default fallback
+      return 'Invalid date selected'; // Default fallback
     }
     
-    // Check if doctors are loaded
-    if (doctorStore.doctorSummaries.length === 0) {
-      return 'Loading doctor assignment...';
+    try {
+      // Use the doctor assignment service to get the correct doctor
+      const displayName = await doctorAssignmentService.getInstance().getAssignedDoctorDisplayName(date);
+      return displayName;
+    } catch (error) {
+      console.error('Error getting doctor assignment:', error);
+      return 'Error loading doctor assignment';
     }
+  };
 
-    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  // Helper function to get doctor ID for form submission
+  const getDoctorIdForDate = async (date: Date): Promise<string | null> => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return null;
+    }
     
-    // MWF (Monday=1, Wednesday=3, Friday=5) = Doctor 1
-    // TTh (Tuesday=2, Thursday=4) = Doctor 2
-    if ([1, 3, 5].includes(dayOfWeek)) {
-      // Find first doctor (assuming they are ordered)
-      const doctor1 = doctorStore.doctorSummaries[0];
-      return doctor1 ? `${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
-    } else if ([2, 4].includes(dayOfWeek)) {
-      // Find second doctor
-      const doctor2 = doctorStore.doctorSummaries[1];  
-      return doctor2 ? `${doctor2.fullName} - ${doctor2.specialization}` : 'Dr. Johnson (General Physician)';
-    } else {
-      // Weekend - default to first doctor
-      const doctor1 = doctorStore.doctorSummaries[0];
-      return doctor1 ? `${doctor1.fullName} - ${doctor1.specialization}` : 'Dr. Smith (General Physician)';
+    try {
+      return await doctorAssignmentService.getInstance().getAssignedDoctorId(date);
+    } catch (error) {
+      console.error('Error getting doctor ID:', error);
+      return null;
     }
   };
 
@@ -248,28 +253,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
         setTimeSlots(newTimeSlots);
       }
     }
-  }, [editMode, initialData, reset]);
-
-  // Initialize form in edit mode
-  useEffect(() => {
-    if (editMode && initialData) {
-      // Set patient number if provided
-      if (initialData.patientNumber) {
-        setSelectedPatientNumber(initialData.patientNumber);
-      }
-      
-      // Set assigned doctor display if provided
-      if (initialData.doctorName) {
-        setAssignedDoctor(initialData.doctorName);
-      }
-      
-      // If we have a date, update time slots
-      if (initialData.appointmentDate) {
-        const newTimeSlots = getAvailableTimeSlots(initialData.appointmentDate, currentAppointmentId);
-        setTimeSlots(newTimeSlots);
-      }
-    }
-  }, [editMode, initialData]);
+  }, [editMode, initialData, reset, currentAppointmentId]);
 
   // Handle patient selection to show patient number
   const handlePatientChange = (patientId: string) => {
@@ -281,7 +265,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   };
 
   // Handle date change to auto-assign doctor
-  const handleDateChange = (selectedDate: Date | null) => {
+  const handleDateChange = async (selectedDate: Date | null) => {
     if (selectedDate && selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
       const dateString = selectedDate.toISOString().split('T')[0];
       
@@ -295,26 +279,26 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
         setValue('time', '');
       }
       
-      const doctor = getDoctorForDate(selectedDate);
-      setAssignedDoctor(doctor);
-      
-      // For backend compatibility, we'll use the doctor ID instead of name
-      // Find the actual doctor ID based on the day
-      const dayOfWeek = selectedDate.getDay();
-      let doctorId = '';
-      
-      if ([1, 3, 5].includes(dayOfWeek)) {
-        // MWF - Doctor 1
-        doctorId = doctorStore.doctorSummaries[0]?.id || 'doctor1';
-      } else if ([2, 4].includes(dayOfWeek)) {
-        // TTh - Doctor 2  
-        doctorId = doctorStore.doctorSummaries[1]?.id || 'doctor2';
-      } else {
-        // Weekend - default to first doctor
-        doctorId = doctorStore.doctorSummaries[0]?.id || 'doctor1';
+      // Get the correct doctor assignment using the service
+      try {
+        const [doctor, doctorId] = await Promise.all([
+          getDoctorForDate(selectedDate),
+          getDoctorIdForDate(selectedDate)
+        ]);
+        
+        setAssignedDoctor(doctor);
+        setValue('doctor', doctorId || '');
+        
+        // Clear any previous doctor assignment errors
+        if (onClearError) {
+          onClearError();
+        }
+      } catch (error) {
+        console.error('Error assigning doctor for date:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        setAssignedDoctor(`Error: ${errorMessage}`);
+        setValue('doctor', '');
       }
-      
-      setValue('doctor', doctorId);
     } else {
       // Clear doctor assignment if no valid date is selected
       setAssignedDoctor('');
@@ -325,7 +309,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   };
 
   // Check if form is valid and complete
-  const isFormValid = patientName && reasonForVisit && date && time;
+  const isFormValid = patientName && reasonForVisit && date && time && assignedDoctor && !assignedDoctor.startsWith('Error') && assignedDoctor !== 'No doctor assigned';
 
   // Form submission handler
   const handleFormSubmit = handleSubmit(async (data) => {
@@ -450,9 +434,24 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
         {/* Assigned Doctor Display */}
         {assignedDoctor && (
           <Box>
-            <Text size="sm" c="dimmed" mt={4}>
+            <Text 
+              size="sm" 
+              c={assignedDoctor.startsWith('Error') ? 'red' : 
+                 assignedDoctor === 'No doctor assigned' ? 'orange' : 
+                 'dimmed'} 
+              mt={4}
+            >
+              {assignedDoctor.startsWith('Error') ? '⚠️ ' : ''}
+              {assignedDoctor === 'No doctor assigned' ? '⚠️ ' : ''}
               Assigned Doctor: {assignedDoctor}
             </Text>
+            {(assignedDoctor.startsWith('Error') || assignedDoctor === 'No doctor assigned') && (
+              <Text size="xs" c="dimmed" mt={2}>
+                {assignedDoctor === 'No doctor assigned' 
+                  ? 'No doctor is scheduled for this day. Please select a different date or contact an administrator.'
+                  : 'There was an issue determining doctor availability. Please try selecting the date again or contact support.'}
+              </Text>
+            )}
           </Box>
         )}
 

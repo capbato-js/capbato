@@ -1,0 +1,1 @@
+export { DoctorAssignmentService, doctorAssignmentService } from './DoctorAssignmentService';
