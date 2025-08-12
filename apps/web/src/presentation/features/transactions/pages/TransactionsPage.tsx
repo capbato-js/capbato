@@ -2,13 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Alert } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { TransactionsTable, AddReceiptModal } from '../components';
+import { TransactionsTable, AddReceiptModal, ViewTransactionModal, DeleteTransactionModal } from '../components';
 import { useTransactionViewModel } from '../view-models';
+import { useTransactionItemViewModel } from '../view-models/useTransactionItemViewModel';
+import type { Transaction } from '../types';
 
 export const TransactionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { transactions, isLoading, error, refetch, clearError } = useTransactionViewModel();
+  const { handleDelete, isDeleting } = useTransactionItemViewModel();
+  
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -27,6 +34,36 @@ export const TransactionsPage: React.FC = () => {
 
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
+  };
+
+  const handleViewTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsViewModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedTransaction(null);
+  };
+
+  const handleDeleteTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedTransaction(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedTransaction?.id) return;
+    
+    const success = await handleDelete(selectedTransaction.id);
+    if (success) {
+      handleCloseDeleteModal();
+      refetch(); // Refresh the transactions list
+    }
   };
 
   const handleReceiptCreated = (transaction: any) => {
@@ -55,12 +92,28 @@ export const TransactionsPage: React.FC = () => {
         onAddTransaction={handleAddTransaction}
         isLoading={isLoading}
         onRefresh={refetch}
+        onViewTransaction={handleViewTransaction}
+        onDeleteTransaction={handleDeleteTransaction}
       />
 
       <AddReceiptModal
         opened={isAddModalOpen}
         onClose={handleCloseModal}
         onReceiptCreated={handleReceiptCreated}
+      />
+
+      <ViewTransactionModal
+        opened={isViewModalOpen}
+        onClose={handleCloseViewModal}
+        transaction={selectedTransaction}
+      />
+
+      <DeleteTransactionModal
+        opened={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        transaction={selectedTransaction}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
       />
     </MedicalClinicLayout>
   );

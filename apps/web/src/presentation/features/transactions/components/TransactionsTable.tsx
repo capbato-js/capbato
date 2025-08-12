@@ -3,24 +3,26 @@ import { Box, Text, useMantineTheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common';
 import { Transaction } from '../types';
-import { useTransactionItemViewModel } from '../view-models/useTransactionItemViewModel';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
   onAddTransaction?: () => void;
   isLoading?: boolean;
   onRefresh?: () => void;
+  onViewTransaction?: (transaction: Transaction) => void;
+  onDeleteTransaction?: (transaction: Transaction) => void;
 }
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   transactions,
   onAddTransaction,
   isLoading = false,
-  onRefresh
+  onRefresh,
+  onViewTransaction,
+  onDeleteTransaction
 }) => {
   const theme = useMantineTheme();
   const navigate = useNavigate();
-  const { handleDelete, isDeleting } = useTransactionItemViewModel();
 
   // Enhance transactions with flattened search fields
   const enhancedTransactions = transactions.map(transaction => ({
@@ -31,8 +33,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
 
   const handleTransactionClick = (transactionId: string | null) => {
     if (!transactionId) return;
-    // TODO: Navigate to transaction details page when implemented
-    console.log('View transaction details:', transactionId);
+    const transaction = transactions.find(t => t.id === transactionId);
+    if (transaction && onViewTransaction) {
+      onViewTransaction(transaction);
+    }
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
@@ -41,14 +45,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     console.log('Edit transaction:', transaction.id);
   };
 
-  const handleDeleteTransaction = async (transaction: Transaction) => {
+  const handleDeleteTransaction = (transaction: Transaction) => {
     if (!transaction.id) return;
-    
-    if (window.confirm(`Are you sure you want to delete transaction ${transaction.receiptNumber}?`)) {
-      const success = await handleDelete(transaction.id);
-      if (success && onRefresh) {
-        onRefresh();
-      }
+    if (onDeleteTransaction) {
+      onDeleteTransaction(transaction);
     }
   };
 
@@ -59,17 +59,15 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
         tooltip: 'View Transaction Details',
         onClick: (transaction) => handleTransactionClick(transaction.id)
       },
-      {
-        icon: 'fas fa-edit',
-        tooltip: 'Edit Transaction',
-        onClick: handleEditTransaction
-      },
+      // {
+      //   icon: 'fas fa-edit',
+      //   tooltip: 'Edit Transaction',
+      //   onClick: handleEditTransaction
+      // },
       {
         icon: 'fas fa-trash',
         tooltip: 'Delete Transaction',
-        onClick: handleDeleteTransaction,
-        disabled: isDeleting,
-        color: 'red'
+        onClick: handleDeleteTransaction
       }
     ]
   };
