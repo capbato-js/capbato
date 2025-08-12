@@ -70,6 +70,9 @@ export class TransactionController {
         lastName: patient.lastName,
         middleName: patient.middleName || '',
         fullName: patient.fullName,
+        address: patient.address || 'N/A',
+        contactNumber: patient.contactNumber || 'N/A',
+        email: undefined, // Email not available in current patient entity
       } : {
         id: receipt.patientId,
         patientNumber: 'N/A',
@@ -77,6 +80,9 @@ export class TransactionController {
         lastName: 'N/A',
         middleName: '',
         fullName: 'Patient Information Unavailable',
+        address: 'N/A',
+        contactNumber: 'N/A',
+        email: undefined,
       };
       
       // Fetch actual user information for receivedBy
@@ -107,6 +113,9 @@ export class TransactionController {
       lastName: patient.lastName,
       middleName: patient.middleName || '',
       fullName: patient.fullName,
+      address: patient.address || 'N/A',
+      contactNumber: patient.contactNumber || 'N/A',
+      email: undefined, // Email not available in current patient entity
     } : {
       id: receipt.patientId,
       patientNumber: 'N/A',
@@ -114,6 +123,9 @@ export class TransactionController {
       lastName: 'N/A',
       middleName: '',
       fullName: 'Patient Information Unavailable',
+      address: 'N/A',
+      contactNumber: 'N/A',
+      email: undefined,
     };
     
     // Fetch actual user information for receivedBy
@@ -143,6 +155,9 @@ export class TransactionController {
       lastName: patient.lastName,
       middleName: patient.middleName || '',
       fullName: patient.fullName,
+      address: patient.address || 'N/A',
+      contactNumber: patient.contactNumber || 'N/A',
+      email: undefined, // Email not available in current patient entity
     } : {
       id: receipt.patientId,
       patientNumber: 'N/A',
@@ -150,6 +165,9 @@ export class TransactionController {
       lastName: 'N/A',
       middleName: '',
       fullName: 'Patient Information Unavailable',
+      address: 'N/A',
+      contactNumber: 'N/A',
+      email: undefined,
     };
     
     // Fetch actual user information for receivedBy

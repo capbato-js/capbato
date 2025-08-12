@@ -110,9 +110,9 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
           {/* Business Information Section */}
           <Group justify="space-between" mb="md">
             <Box>
-              <Text fw={600} size="sm">[YOUR BUSINESS NAME HERE]</Text>
-              <Text size="sm">[BUSINESS ADDRESS]</Text>
-              <Text size="sm">[BUSINESS ADDRESS LINE 2]</Text>
+              <Text fw={600} size="sm">M.G. Amores Medical Clinic </Text>
+              <Text size="sm">[CLINIC ADDRESS]</Text>
+              <Text size="sm">[CLINIC ADDRESS LINE 2]</Text>
               <Text size="sm">[PHONE NUMBER]</Text>
             </Box>
             <Box ta="right">
@@ -140,17 +140,18 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
             </Group>
             <Box mt="sm">
               <Text size="sm" fw={500}>ADDRESS:</Text>
-              <Text size="sm">[CUSTOMER ADDRESS]</Text>
+              <Text size="sm">{transaction.patient.address || 'N/A'}</Text>
             </Box>
             <Group gap="xl" mt="sm">
               <Box>
                 <Text size="sm" fw={500}>PHONE:</Text>
-                <Text size="sm">[CUSTOMER PHONE]</Text>
+                <Text size="sm">{transaction.patient.contactNumber || 'N/A'}</Text>
               </Box>
-              <Box>
+              {/* Patients have no email */}
+              {/* <Box>
                 <Text size="sm" fw={500}>EMAIL:</Text>
-                <Text size="sm">[CUSTOMER EMAIL]</Text>
-              </Box>
+                <Text size="sm">{transaction.patient.email || 'N/A'}</Text>
+              </Box> */}
             </Group>
           </Box>
 
@@ -222,44 +223,28 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
               <Text fw={600} size="sm" mb="sm">PAYMENT INFORMATION</Text>
               <Stack gap="xs">
                 <Group gap="xs">
-                  <Text size="sm" fw={500} style={{ width: '120px' }}>PAYMENT METHOD:</Text>
+                  <Text size="sm" fw={500} style={{ width: '150px' }}>PAYMENT METHOD:</Text>
                   <Text size="sm">{transaction.paymentMethod}</Text>
                 </Group>
                 <Group gap="xs">
-                  <Text size="sm" fw={500} style={{ width: '120px' }}>PAYMENT INFO:</Text>
-                  <Text size="sm">[PAYMENT DETAILS]</Text>
-                </Group>
-                <Group gap="xs">
-                  <Text size="sm" fw={500} style={{ width: '120px' }}>AMOUNT PAID:</Text>
+                  <Text size="sm" fw={500} style={{ width: '150px' }}>AMOUNT PAID:</Text>
                   <Text size="sm">{formatCurrency(transaction.totalAmount)}</Text>
                 </Group>
-                <Group gap="xs">
-                  <Text size="sm" fw={500} style={{ width: '120px' }}>BALANCE:</Text>
+                {/* <Group gap="xs">
+                  <Text size="sm" fw={500} style={{ width: '150px' }}>BALANCE:</Text>
                   <Text size="sm">₱0.00</Text>
-                </Group>
+                </Group> */}
               </Stack>
             </Box>
 
             {/* Total Summary */}
             <Box style={{ width: '45%' }}>
               <Stack gap="xs" ta="right">
-                <Group justify="space-between">
+                {/* <Group justify="space-between">
                   <Text size="sm" fw={500}>SUBTOTAL:</Text>
                   <Text size="sm">{formatCurrency(transaction.totalAmount)}</Text>
-                </Group>
-                <Group justify="space-between">
-                  <Text size="sm" fw={500}>TAX:</Text>
-                  <Text size="sm">₱0.00</Text>
-                </Group>
-                <Group justify="space-between">
-                  <Text size="sm" fw={500}>SHIPPING:</Text>
-                  <Text size="sm">₱0.00</Text>
-                </Group>
-                <Group justify="space-between">
-                  <Text size="sm" fw={500}>DISCOUNT:</Text>
-                  <Text size="sm">₱0.00</Text>
-                </Group>
-                <div className="print-total-divider" />
+                </Group> */}
+                {/* <div className="print-total-divider" /> */}
                 <Group justify="space-between">
                   <Text size="sm" fw={700}>TOTAL:</Text>
                   <Text size="sm" fw={700}>{formatCurrency(transaction.totalAmount)}</Text>
@@ -269,16 +254,16 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
           </Group>
 
           {/* Additional Information */}
-          <Box mb="md">
+          {/* <Box mb="md">
             <Text fw={600} size="sm" mb="sm">ADDITIONAL INFORMATION</Text>
             <Box style={{ border: '1px solid #dee2e6', minHeight: '40px', padding: '8px' }}>
               <Text size="sm" c="dimmed">[ADDITIONAL NOTES OR INFORMATION]</Text>
             </Box>
-          </Box>
+          </Box> */}
 
           {/* Footer */}
           <Box ta="center" mt="md">
-            <Text size="xs" c="dimmed">Thank you for your business!</Text>
+            {/* <Text size="xs" c="dimmed">Thank you for your business!</Text> */}
             <Text size="xs" c="dimmed">Received by: {transaction.receivedBy}</Text>
           </Box>
         </Paper>
