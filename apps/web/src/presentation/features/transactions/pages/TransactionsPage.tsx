@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { TransactionsTable, AddReceiptModal, ViewTransactionModal, DeleteTransactionModal } from '../components';
+import { TransactionsTable, AddReceiptModal, ViewTransactionModal, DeleteTransactionModal, PrintReceiptModal } from '../components';
 import { useTransactionViewModel } from '../view-models';
 import { useTransactionItemViewModel } from '../view-models/useTransactionItemViewModel';
 import type { Transaction } from '../types';
@@ -15,6 +15,7 @@ export const TransactionsPage: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
   useEffect(() => {
@@ -44,6 +45,16 @@ export const TransactionsPage: React.FC = () => {
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false);
     setSelectedTransaction(null);
+  };
+
+  const handleClosePrintModal = () => {
+    setIsPrintModalOpen(false);
+    setSelectedTransaction(null);
+  };
+
+  const handlePrintTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsPrintModalOpen(true);
   };
 
   const handleDeleteTransaction = (transaction: Transaction) => {
@@ -94,6 +105,7 @@ export const TransactionsPage: React.FC = () => {
         onRefresh={refetch}
         onViewTransaction={handleViewTransaction}
         onDeleteTransaction={handleDeleteTransaction}
+        onPrintTransaction={handlePrintTransaction}
       />
 
       <AddReceiptModal
@@ -114,6 +126,12 @@ export const TransactionsPage: React.FC = () => {
         transaction={selectedTransaction}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
+      />
+
+      <PrintReceiptModal
+        opened={isPrintModalOpen}
+        onClose={handleClosePrintModal}
+        transaction={selectedTransaction}
       />
     </MedicalClinicLayout>
   );

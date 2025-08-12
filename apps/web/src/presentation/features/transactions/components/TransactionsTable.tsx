@@ -11,6 +11,7 @@ interface TransactionsTableProps {
   onRefresh?: () => void;
   onViewTransaction?: (transaction: Transaction) => void;
   onDeleteTransaction?: (transaction: Transaction) => void;
+  onPrintTransaction?: (transaction: Transaction) => void;
 }
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
@@ -19,7 +20,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   isLoading = false,
   onRefresh,
   onViewTransaction,
-  onDeleteTransaction
+  onDeleteTransaction,
+  onPrintTransaction
 }) => {
   const theme = useMantineTheme();
   const navigate = useNavigate();
@@ -45,6 +47,13 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     console.log('Edit transaction:', transaction.id);
   };
 
+  const handlePrintTransaction = (transaction: Transaction) => {
+    if (!transaction.id) return;
+    if (onPrintTransaction) {
+      onPrintTransaction(transaction);
+    }
+  };
+
   const handleDeleteTransaction = (transaction: Transaction) => {
     if (!transaction.id) return;
     if (onDeleteTransaction) {
@@ -58,6 +67,11 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
         icon: 'fas fa-eye',
         tooltip: 'View Transaction Details',
         onClick: (transaction) => handleTransactionClick(transaction.id)
+      },
+      {
+        icon: 'fas fa-print',
+        tooltip: 'Print Receipt',
+        onClick: handlePrintTransaction
       },
       // {
       //   icon: 'fas fa-edit',
