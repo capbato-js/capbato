@@ -60,6 +60,71 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
     return this.toDomain(savedEntity);
   }
 
+  async createWithAtomicSequence(
+    date: Date,
+    patientId: string,
+    paymentMethod: string,
+    receivedById: string,
+    items: Array<{
+      serviceName: string;
+      description: string;
+      quantity: number;
+      unitPrice: number;
+    }>
+  ): Promise<Receipt> {
+    console.log('🔒 Starting atomic receipt creation transaction...');
+    return await this.repository.manager.transaction(async manager => {
+      const year = date.getFullYear();
+      
+      console.log('🔍 Getting sequence number with FOR UPDATE lock...');
+      // Get next sequence number atomically within the same transaction
+      // Instead of COUNT, get the MAX sequence number to avoid gaps
+      const result = await manager.query(`
+        SELECT COALESCE(
+          MAX(CAST(SUBSTRING(receipt_number, 8) AS UNSIGNED)), 
+          0
+        ) as max_sequence
+        FROM receipts 
+        WHERE receipt_number LIKE 'R-${year}-%'
+        FOR UPDATE
+      `);
+      
+      const maxSequence = parseInt(result[0].max_sequence, 10);
+      const sequenceNumber = maxSequence + 1;
+      const receiptNumber = `R-${year}-${sequenceNumber.toString().padStart(3, '0')}`;
+      
+      console.log(`📊 Max sequence: ${maxSequence}, Next sequence: ${sequenceNumber}, Receipt number: ${receiptNumber}`);
+
+      // Create the receipt entity
+      const entity = new ReceiptEntity();
+      entity.receiptNumber = receiptNumber;
+      entity.date = date;
+      entity.patientId = patientId;
+      entity.paymentMethod = paymentMethod;
+      entity.receivedById = receivedById;
+
+      // Create receipt items and calculate total
+      const itemEntities = items.map(item => {
+        const itemEntity = new ReceiptItemEntity();
+        itemEntity.serviceName = item.serviceName;
+        itemEntity.description = item.description;
+        itemEntity.quantity = item.quantity;
+        itemEntity.unitPrice = item.unitPrice;
+        itemEntity.subtotal = item.quantity * item.unitPrice;
+        return itemEntity;
+      });
+
+      entity.totalAmount = itemEntities.reduce((total, item) => total + item.subtotal, 0);
+      entity.items = itemEntities;
+
+      console.log('💾 Saving receipt within same transaction...');
+      // Save within the same transaction
+      const savedEntity = await manager.save(ReceiptEntity, entity);
+      console.log('✅ Receipt saved successfully, transaction will commit');
+      return this.toDomain(savedEntity);
+    });
+  }
+
   async delete(id: string): Promise<void> {
     const result = await this.repository.delete(id);
     if (result.affected === 0) {

@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { Receipt, ReceiptNumber } from '@nx-starter/domain';
+import { Receipt, ReceiptItem } from '@nx-starter/domain';
 import type { IReceiptRepository } from '@nx-starter/domain';
 import { generateId } from '@nx-starter/utils-core';
 
@@ -76,5 +76,52 @@ export class InMemoryReceiptRepository implements IReceiptRepository {
     return Array.from(this.receipts.values()).some(
       receipt => receipt.receiptNumberValue === receiptNumber
     );
+  }
+
+  async createWithAtomicSequence(
+    date: Date,
+    patientId: string,
+    paymentMethod: string,
+    receivedById: string,
+    items: Array<{
+      serviceName: string;
+      description: string;
+      quantity: number;
+      unitPrice: number;
+    }>
+  ): Promise<Receipt> {
+    const year = date.getFullYear();
+    const currentSequence = this.sequenceNumbers.get(year) || 0;
+    const sequenceNumber = currentSequence + 1;
+    const receiptNumber = `R-${year}-${sequenceNumber.toString().padStart(3, '0')}`;
+    
+    // Create receipt items
+    const receiptItems = items.map(item => 
+      new ReceiptItem({
+        serviceName: item.serviceName,
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })
+    );
+
+    // Create receipt entity
+    const id = generateId();
+    const receipt = new Receipt(
+      receiptNumber,
+      date,
+      patientId,
+      paymentMethod,
+      receivedById,
+      receiptItems,
+      new Date(),
+      new Date(),
+      id
+    );
+
+    this.receipts.set(id, receipt);
+    this.sequenceNumbers.set(year, sequenceNumber);
+
+    return receipt;
   }
 }

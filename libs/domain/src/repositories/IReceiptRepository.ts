@@ -40,4 +40,21 @@ export interface IReceiptRepository {
    * Check if receipt number exists
    */
   existsByReceiptNumber(receiptNumber: string): Promise<boolean>;
+
+  /**
+   * Create a receipt with atomically generated sequence number
+   * This method handles sequence number generation and receipt creation in a single transaction
+   */
+  createWithAtomicSequence(
+    date: Date,
+    patientId: string,
+    paymentMethod: string,
+    receivedById: string,
+    items: Array<{
+      serviceName: string;
+      description: string;
+      quantity: number;
+      unitPrice: number;
+    }>
+  ): Promise<Receipt>;
 }
