@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMantineTheme } from '@mantine/core';
 
 export const DashboardPage: React.FC = () => {
-  const { stats, todayAppointments, isLoading, loadDashboardData } = useDashboardViewModel();
+  const { stats, todayAppointments, isLoading, isDoctorLoading, loadDashboardData } = useDashboardViewModel();
   const navigate = useNavigate();
   const theme = useMantineTheme();
 
@@ -30,6 +30,7 @@ export const DashboardPage: React.FC = () => {
             value={stats.doctorName}
             iconColor="#fff"
             backgroundColor="#4263EB"
+            isLoading={isDoctorLoading}
           />
         </Grid.Col>
         <Grid.Col span={4}>

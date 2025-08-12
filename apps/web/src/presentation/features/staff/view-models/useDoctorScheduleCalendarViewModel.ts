@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { container } from 'tsyringe';
-import { DoctorApiService } from '../../../../infrastructure/api/DoctorApiService';
+import { TOKENS } from '@nx-starter/application-shared';
+import type { IDoctorApiService } from '../../../../infrastructure/api/IDoctorApiService';
 import type { DoctorDto, ScheduleOverrideDto } from '@nx-starter/application-shared';
 
 // Helper function to format date to YYYY-MM-DD
@@ -172,7 +173,7 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
   const [availableDoctors, setAvailableDoctors] = useState<Array<{ id: string; name: string; schedulePattern?: string; }>>([]);
 
   // Get the API service instance
-  const doctorApiService = container.resolve(DoctorApiService);
+  const doctorApiService = container.resolve<IDoctorApiService>(TOKENS.DoctorApiService);
 
   // Generate schedule blocks from doctor data
   const generateScheduleBlocks = useCallback((doctors: DoctorDto[], scheduleOverrides: ScheduleOverrideDto[] = []) => {
@@ -233,7 +234,7 @@ export const useDoctorScheduleCalendarViewModel = (): DoctorScheduleCalendarView
       const scheduleOverrides = await doctorApiService.getAllScheduleOverrides();
       console.log('✅ [DEBUG] Schedule overrides fetched successfully:', {
         count: scheduleOverrides.length,
-        overrides: scheduleOverrides.map(o => ({
+        overrides: scheduleOverrides.map((o: ScheduleOverrideDto) => ({
           id: o.id,
           assignedDoctorId: o.assignedDoctorId,
           date: o.date,

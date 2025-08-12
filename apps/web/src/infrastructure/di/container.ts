@@ -33,6 +33,7 @@ import { ApiPrescriptionRepository } from '../api/ApiPrescriptionRepository';
 import { ITransactionApiService } from '../api/ITransactionApiService';
 import { TransactionApiService } from '../api/TransactionApiService';
 import { WebUserQueryService } from '../services/WebUserQueryService';
+import { DoctorAssignmentService } from '../../presentation/features/appointments/services/DoctorAssignmentService';
 import { getFeatureFlags, configProvider } from '../config';
 import {
   TodoCommandService,
@@ -100,6 +101,9 @@ export const configureDI = () => {
   container.registerSingleton<ITransactionApiService>('TransactionApiService', TransactionApiService);
   container.registerSingleton(AppointmentApiService, AppointmentApiService);
   container.registerSingleton(ScheduleApiService, ScheduleApiService);
+  
+  // Presentation Layer - Services
+  container.registerSingleton(DoctorAssignmentService, DoctorAssignmentService);
   
   // Auth API Service - use mock in development if auth is not enabled
   if (enableAuth && useApiBackend) {

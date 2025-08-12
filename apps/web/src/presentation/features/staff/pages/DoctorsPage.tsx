@@ -3,7 +3,8 @@ import { container } from 'tsyringe';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { DoctorsTable, DoctorScheduleCalendar } from '../components';
 import { useDoctorScheduleCalendarViewModel } from '../view-models/useDoctorScheduleCalendarViewModel';
-import { DoctorApiService } from '../../../../infrastructure/api/DoctorApiService';
+import { TOKENS } from '@nx-starter/application-shared';
+import type { IDoctorApiService } from '../../../../infrastructure/api/IDoctorApiService';
 import type { ScheduleEntry } from '../types';
 
 export const DoctorsPage: React.FC = () => {
@@ -16,7 +17,7 @@ export const DoctorsPage: React.FC = () => {
   } = useDoctorScheduleCalendarViewModel();
 
   // Get DoctorApiService instance
-  const doctorApiService = container.resolve(DoctorApiService);
+  const doctorApiService = container.resolve<IDoctorApiService>(TOKENS.DoctorApiService);
 
   // Convert doctor schedule blocks to DoctorScheduleCalendar format
   const convertToScheduleEntries = (): ScheduleEntry[] => {

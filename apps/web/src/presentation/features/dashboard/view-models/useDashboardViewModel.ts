@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAppointmentStore } from '../../../../infrastructure/state/AppointmentStore';
 import { AppointmentDto } from '@nx-starter/application-shared';
 import { BaseAppointment } from '../../../components/common';
+import { doctorAssignmentService } from '../../appointments/services/DoctorAssignmentService';
 
 export interface DashboardStats {
   doctorName: string;
@@ -14,12 +15,14 @@ export interface DashboardViewModel {
   stats: DashboardStats;
   todayAppointments: BaseAppointment[];
   isLoading: boolean;
+  isDoctorLoading: boolean;
   error: string | null;
   loadDashboardData: () => Promise<void>;
 }
 
 export const useDashboardViewModel = (): DashboardViewModel => {
   const { appointments, fetchAllAppointments, isLoading, error } = useAppointmentStore();
+  const [isDoctorLoading, setIsDoctorLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     doctorName: 'No Doctor Assigned',
     currentPatient: 'N/A',
@@ -71,22 +74,27 @@ export const useDashboardViewModel = (): DashboardViewModel => {
   // Get today's appointments - simplified approach
   const todayAppointments = sortAppointmentsByTime(todaysRawAppointments.map(mapToBaseAppointment));
 
-  // Simple doctor detection - get from first appointment
-  const getDoctorFromAppointments = (): string => {
-    if (appointments.length === 0) {
-      return 'No Doctor Assigned';
+  // Get assigned doctor for today using the DoctorAssignmentService
+  const getAssignedDoctorForToday = async (): Promise<string> => {
+    setIsDoctorLoading(true);
+    try {
+      // Always clear cache to ensure fresh data when viewing dashboard
+      doctorAssignmentService.getInstance().clearCache();
+      
+      const today = new Date();
+      const assignedDoctor = await doctorAssignmentService.getInstance().getAssignedDoctorForDate(today);
+      
+      if (assignedDoctor) {
+        return `${assignedDoctor.fullName} (Assigned)`;
+      } else {
+        return 'No Doctor Assigned';
+      }
+    } catch (error) {
+      console.error('Error getting assigned doctor for today:', error);
+      return 'Error loading doctor assignment';
+    } finally {
+      setIsDoctorLoading(false);
     }
-    
-    if (todayAppointments.length === 0) {
-      // If no today's appointments, get doctor from any recent appointment
-      const recentAppointment = appointments[0];
-      const doctorName = recentAppointment?.doctor?.fullName;
-      return doctorName ? `${doctorName} (Assigned)` : 'No Doctor Assigned';
-    }
-    
-    // Get doctor from today's first appointment
-    const doctorName = todayAppointments[0].doctor;
-    return doctorName ? `${doctorName} (Assigned)` : 'No Doctor Assigned';
   };
 
   // Simple patient detection - get current patient based on business rule
@@ -125,6 +133,9 @@ export const useDashboardViewModel = (): DashboardViewModel => {
 
   const loadDashboardData = async () => {
     try {
+      // Clear the doctor assignment cache to ensure we get fresh data
+      doctorAssignmentService.getInstance().clearCache();
+      
       await fetchAllAppointments();
       // useEffect will handle stats update when appointments change
     } catch (err) {
@@ -134,22 +145,40 @@ export const useDashboardViewModel = (): DashboardViewModel => {
 
   // Update stats when appointments change
   useEffect(() => {
-    const doctorName = getDoctorFromAppointments();
-    const currentPatient = getCurrentPatientFromAppointments();
-    const appointmentCount = todayAppointments.length;
-    
-    setStats(prev => ({
-      ...prev,
-      doctorName,
-      currentPatient,
-      totalAppointments: appointmentCount
-    }));
+    const updateStats = async () => {
+      const doctorName = await getAssignedDoctorForToday();
+      const currentPatient = getCurrentPatientFromAppointments();
+      const appointmentCount = todayAppointments.length;
+      
+      setStats(prev => ({
+        ...prev,
+        doctorName,
+        currentPatient,
+        totalAppointments: appointmentCount
+      }));
+    };
+
+    updateStats();
   }, [appointments]);
+
+  // Also update doctor assignment when component mounts (for navigation scenarios)
+  useEffect(() => {
+    const updateDoctorAssignment = async () => {
+      const doctorName = await getAssignedDoctorForToday();
+      setStats(prev => ({
+        ...prev,
+        doctorName
+      }));
+    };
+
+    updateDoctorAssignment();
+  }, []); // Run only on mount
 
   return {
     stats,
     todayAppointments,
     isLoading,
+    isDoctorLoading,
     error,
     loadDashboardData
   };
