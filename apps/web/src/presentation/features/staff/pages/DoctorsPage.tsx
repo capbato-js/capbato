@@ -1,7 +1,7 @@
 import React from 'react';
 import { container } from 'tsyringe';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { DoctorsTable, CustomCalendar } from '../components';
+import { DoctorsTable, DoctorScheduleCalendar } from '../components';
 import { useDoctorScheduleCalendarViewModel } from '../view-models/useDoctorScheduleCalendarViewModel';
 import { DoctorApiService } from '../../../../infrastructure/api/DoctorApiService';
 import type { ScheduleEntry } from '../types';
@@ -18,7 +18,7 @@ export const DoctorsPage: React.FC = () => {
   // Get DoctorApiService instance
   const doctorApiService = container.resolve(DoctorApiService);
 
-  // Convert doctor schedule blocks to CustomCalendar format
+  // Convert doctor schedule blocks to DoctorScheduleCalendar format
   const convertToScheduleEntries = (): ScheduleEntry[] => {
     const entries = scheduleBlocks?.map(block => ({
       date: block.date, // Already in YYYY-MM-DD format
@@ -86,7 +86,7 @@ export const DoctorsPage: React.FC = () => {
       <DoctorsTable />
       
       {/* Doctor's Schedule Calendar - Shows doctor availability based on schedule patterns */}
-      <CustomCalendar 
+      <DoctorScheduleCalendar 
         schedules={error ? [] : scheduleEntries}
         availableDoctors={availableDoctors}
         onDoctorChange={handleDoctorChange}

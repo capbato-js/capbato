@@ -1,298 +1,349 @@
 import React, { useState } from 'react';
-import { Card, Text, Button, Stack, Paper, Grid, Box, Group, ActionIcon, Alert, useMantineTheme } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight, IconRefresh, IconAlertCircle } from '@tabler/icons-react';
-import { useDoctorScheduleCalendarViewModel } from '../view-models/useDoctorScheduleCalendarViewModel';
+import { Box, Button, Title, Menu, Text, ActionIcon, Tooltip, useMantineTheme } from '@mantine/core';
+import { IconEdit, IconUser } from '@tabler/icons-react';
+import { Icon } from '../../../components/common';
+import { ScheduleEntry } from '../types';
 
 interface DoctorScheduleCalendarProps {
-  className?: string;
+  schedules: ScheduleEntry[];
+  availableDoctors?: Array<{ id: string; name: string; }>;
+  onDoctorChange?: (date: string, newDoctorId: string, newDoctorName: string) => void;
 }
 
-/**
- * Doctor Schedule Calendar Component
- * Displays appointments in a monthly calendar grid view
- * Shows doctor names and appointment times on each day
- */
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({ 
-  className 
+  schedules, 
+  availableDoctors = [],
+  onDoctorChange 
 }) => {
   const theme = useMantineTheme();
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  
-  const {
-    loading,
-    error,
-    refreshData,
-    getScheduleBlocksForDate,
-  } = useDoctorScheduleCalendarViewModel();
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [hoveredTile, setHoveredTile] = useState<number | null>(null);
 
-  // Debug logging for component state
-  console.log('🏥 [DEBUG] DoctorScheduleCalendar render state:', {
-    loading,
-    error,
-    currentDate: currentDate.toDateString(),
+  // Debug logging for DoctorScheduleCalendar
+  console.log('📅 [DEBUG] DoctorScheduleCalendar render:', {
+    schedulesCount: schedules.length,
+    availableDoctorsCount: availableDoctors.length,
     currentMonth: currentDate.getMonth() + 1,
-    currentYear: currentDate.getFullYear()
+    currentYear: currentDate.getFullYear(),
+    sampleSchedules: schedules.slice(0, 3),
+    hasOnDoctorChange: !!onDoctorChange
   });
 
-  // Calendar helper functions
-  const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1);
-  };
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
 
-  const getLastDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  };
+  // Get first day of the month and number of days
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+  const firstDayWeekday = firstDayOfMonth.getDay();
+  const daysInMonth = lastDayOfMonth.getDate();
 
-  const getStartingDayOfWeek = (date: Date) => {
-    return getFirstDayOfMonth(date).getDay();
-  };
+  // Generate calendar grid
+  const calendarDays = [];
+  
+  // Add empty cells for days before the first day of the month
+  for (let i = 0; i < firstDayWeekday; i++) {
+    calendarDays.push(null);
+  }
+  
+  // Add all days of the month
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarDays.push(day);
+  }
 
-  const getDaysInMonth = (date: Date) => {
-    return getLastDayOfMonth(date).getDate();
-  };
-
-  const generateCalendarDays = () => {
-    const startingDayOfWeek = getStartingDayOfWeek(currentDate);
-    const daysInMonth = getDaysInMonth(currentDate);
-    const daysInPrevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
-
-    const days = [];
-
-    // Previous month's trailing days
-    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-      const day = daysInPrevMonth - i;
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, day);
-      days.push({
-        day,
-        date,
-        isCurrentMonth: false,
-        isToday: false,
-      });
-    }
-
-    // Current month's days
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      const today = new Date();
-      const isToday = date.toDateString() === today.toDateString();
-      
-      days.push({
-        day,
-        date,
-        isCurrentMonth: true,
-        isToday,
-      });
-    }
-
-    // Next month's leading days to fill the grid
-    const remainingCells = 42 - days.length; // 6 rows × 7 days
-    for (let day = 1; day <= remainingCells; day++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, day);
-      days.push({
-        day,
-        date,
-        isCurrentMonth: false,
-        isToday: false,
-      });
-    }
-
-    return days;
-  };
-
-  // Navigation functions
   const goToPreviousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(new Date(currentYear, currentMonth - 1, 1));
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(new Date(currentYear, currentMonth + 1, 1));
   };
 
-  // Format month/year header
-  const formatMonthYear = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'long', 
-      year: 'numeric' 
-    }).toUpperCase();
+  const getScheduleForDate = (day: number) => {
+    const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const foundSchedule = schedules.find(schedule => schedule.date === dateString);
+    
+    // Debug logging for schedule lookup
+    if (foundSchedule) {
+      console.log(`🎯 [DEBUG] Found schedule for ${dateString}:`, foundSchedule);
+    } else if (day <= 15) { // Only log for first half of month to reduce noise
+      console.log(`❌ [DEBUG] No schedule found for ${dateString}`);
+    }
+    
+    return foundSchedule;
   };
 
-
-
-  const calendarDays = generateCalendarDays();
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  if (error) {
-    return (
-      <Card className={className} p="md">
-        <Text c="red" size="sm">
-          Error loading appointments: {error}
-        </Text>
-        <Button size="xs" variant="light" onClick={refreshData} mt="sm">
-          Retry
-        </Button>
-      </Card>
-    );
-  }
+  // Helper function to check if a date is in the past
+  const isDateInPast = (day: number) => {
+    const dateToCheck = new Date(currentYear, currentMonth, day);
+    const today = new Date();
+    
+    // Reset time to compare only dates (not time)
+    today.setHours(0, 0, 0, 0);
+    dateToCheck.setHours(0, 0, 0, 0);
+    
+    return dateToCheck < today;
+  };
 
   return (
-    <div className={className} style={{ width: '100%' }}>
-      <Card p="lg" withBorder>
-        {/* Header */}
-        <Group justify="space-between" mb="md">
-          <Group>
-            <ActionIcon 
-              variant="light" 
-              onClick={goToPreviousMonth}
-              disabled={loading}
-            >
-              <IconChevronLeft size={16} />
-            </ActionIcon>
-            
-            <Text size="xl" fw={600} c="blue">
-              Doctor's Schedule
-            </Text>
-            
-            <ActionIcon 
-              variant="light" 
-              onClick={goToNextMonth}
-              disabled={loading}
-            >
-              <IconChevronRight size={16} />
-            </ActionIcon>
-          </Group>
-          
-          <Group>
-            <ActionIcon 
-              variant="light" 
-              onClick={refreshData}
-              loading={loading}
-            >
-              <IconRefresh size={16} />
-            </ActionIcon>
-          </Group>
-        </Group>
+    <Box style={{ marginTop: '30px' }}>
+      {/* Top Row: Title + Edit */}
+      <Box 
+        style={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginBottom: '8px',
+          position: 'relative'
+        }}
+      >
+        <Title 
+          order={2}
+          style={{
+            color: '#0F0F0F',
+            fontSize: '28px',
+            fontWeight: 'bold',
+            margin: 0,
+            width: '100%',
+            textAlign: 'center'
+          }}
+        >
+          Doctor's Schedule
+        </Title>
+      </Box>
 
-        {/* Month/Year Display */}
-        <Text size="lg" fw={500} ta="center" mb="md" c="blue">
-          {formatMonthYear(currentDate)}
-        </Text>
-
-        {/* Error Alert */}
-        {error && (
-          <Alert 
-            icon={<IconAlertCircle size={16} />} 
-            color="red" 
-            mb="md"
-          >
-            {error}
-          </Alert>
-        )}
-
-        {/* Calendar Grid */}
-        <Box>
-          {/* Week Day Headers */}
-          <Grid gutter="xs" mb="xs">
-            {weekDays.map((day) => (
-              <Grid.Col key={day} span={12/7} style={{ minWidth: 0, backgroundColor: theme.colors.gray[1]  }}>
-                <Text 
-                  ta="center" 
-                  fw={600} 
-                  size="sm" 
-                  style={{ color: theme.colors.tableBlue[9] }}
-                  p="xs"
-                >
-                  {day}
-                </Text>
-              </Grid.Col>
-            ))}
-          </Grid>
-
-          {/* Calendar Days */}
-          <Grid gutter="xs">
-            {calendarDays.map((dayInfo, index) => {
-              const dayScheduleBlocks = getScheduleBlocksForDate(dayInfo.date);
-              const hasScheduledDoctors = dayScheduleBlocks.length > 0;
-              
-              // Debug logging for current month days only
-              if (dayInfo.isCurrentMonth) {
-                console.log(`📊 [DEBUG] Calendar day ${dayInfo.day} (${dayInfo.date.toDateString()}):`, {
-                  hasScheduledDoctors,
-                  blockCount: dayScheduleBlocks.length,
-                  blocks: dayScheduleBlocks.map(b => ({ doctor: b.doctorName, pattern: b.schedulePattern }))
-                });
-              }
-              
-              return (
-                <Grid.Col key={index} span={12/7} style={{ minWidth: 0 }}>
-                  <Paper
-                    p="xs"
-                    withBorder
-                    style={{
-                      minHeight: '100px',
-                      backgroundColor: dayInfo.isCurrentMonth 
-                        ? (dayInfo.isToday ? '#e7f5ff' : 'white')
-                        : '#f8f9fa',
-                      opacity: dayInfo.isCurrentMonth ? 1 : 0.6,
-                      position: 'relative',
-                      transition: 'background-color 0.2s ease',
-                    }}
-                  >
-                    {/* Day Number */}
-                    <Group justify="space-between" align="flex-start" mb="xs">
-                      <Text 
-                        size="sm" 
-                        fw={dayInfo.isToday ? 700 : 400}
-                        c={dayInfo.isCurrentMonth ? (dayInfo.isToday ? 'blue' : 'dark') : 'dimmed'}
-                      >
-                        {dayInfo.day}
-                      </Text>
-                    </Group>
-
-                    {/* Doctor scheduled blocks for this day */}
-                    {hasScheduledDoctors && dayInfo.isCurrentMonth && (
-                      <Stack gap={2} mt="xs">
-                        {dayScheduleBlocks.slice(0, 2).map((block) => {
-                          console.log(`🎨 [DEBUG] Rendering schedule block for ${dayInfo.date.toDateString()}:`, block);
-                          return (
-                            <Box
-                              key={block.id}
-                              p={3}
-                              style={{
-                                backgroundColor: '#f0f9ff',
-                                borderRadius: '3px',
-                                fontSize: '9px',
-                                lineHeight: 1.1,
-                                border: '1px solid #e0f2fe',
-                              }}
-                            >
-                              <Text size="xs" fw={500} style={{ color: theme.colors.cyan[8] }} truncate>
-                                Dr. {block.doctorName}
-                              </Text>
-                              <Text size="xs" style={{ color: theme.colors.cyan[6] }} truncate>
-                                Scheduled
-                              </Text>
-                              <Text size="xs" style={{ color: theme.colors.cyan[5] }} truncate>
-                                {block.schedulePattern}
-                              </Text>
-                            </Box>
-                          );
-                        })}
-                        {dayScheduleBlocks.length > 2 && (
-                          <Text size="xs" c="dimmed" ta="center">
-                            +{dayScheduleBlocks.length - 2} more
-                          </Text>
-                        )}
-                      </Stack>
-                    )}
-                  </Paper>
-                </Grid.Col>
-              );
-            })}
-          </Grid>
+      {/* Second Row: Arrows + Month */}
+      <Box 
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '12px'
+        }}
+      >
+        <Button
+          variant="light"
+          onClick={goToPreviousMonth}
+          style={{
+            fontSize: '20px',
+            padding: '4px 10px'
+          }}
+        >
+          <Icon icon="fas fa-chevron-left" />
+        </Button>
+        
+        <Box
+          style={{
+            fontWeight: 'bold',
+            textAlign: 'center',
+            color: theme.colors.blue[9],
+            textTransform: 'uppercase',
+            fontSize: '1.25rem',
+            flexGrow: 1
+          }}
+        >
+          {MONTHS[currentMonth]} {currentYear}
         </Box>
-      </Card>
-    </div>
+        
+        <Button
+          variant="light"
+          onClick={goToNextMonth}
+          style={{
+            fontSize: '20px',
+            padding: '4px 10px'
+          }}
+        >
+          <Icon icon="fas fa-chevron-right" />
+        </Button>
+      </Box>
+
+      {/* Calendar Headers */}
+      <Box
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          color: theme.colors.tableBlue[9],
+          backgroundColor: theme.colors.tableBlue[0],
+          borderRadius: '12px 12px 0 0',
+          overflow: 'hidden'
+        }}
+      >
+        {DAYS.map((day, index) => (
+          <Box
+            key={day}
+            style={{
+              padding: '12px 0',
+              borderRight: index < DAYS.length - 1 ? '1px solid #c0d6f7' : 'none'
+            }}
+          >
+            {day}
+          </Box>
+        ))}
+      </Box>
+
+      {/* Calendar Grid */}
+      <Box
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: '12px',
+          paddingTop: '12px'
+        }}
+      >
+        {calendarDays.map((day, index) => {
+          if (day === null) {
+            return (
+              <Box
+                key={`empty-${index}`}
+                style={{
+                  background: 'transparent',
+                  minHeight: '100px'
+                }}
+              />
+            );
+          }
+
+          const schedule = getScheduleForDate(day);
+          const hasSchedule = !!schedule;
+          const tileIndex = day; // Using day as unique identifier for this month
+          const isPastDate = isDateInPast(day);
+          
+          return (
+            <Box
+              key={day}
+              style={{
+                backgroundColor: hoveredTile === tileIndex ? theme.colors.tableBlue[1] : theme.colors.tableBlue[0],
+                borderRadius: '12px',
+                padding: '10px',
+                minHeight: '100px',
+                fontWeight: 500,
+                color: isPastDate ? '#999' : '#333', // Dimmed color for past dates
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                position: 'relative',
+                transition: 'background-color 0.2s ease',
+                opacity: isPastDate ? 0.6 : 1, // Reduce opacity for past dates
+                cursor: isPastDate ? 'default' : 'pointer'
+              }}
+              onMouseEnter={() => !isPastDate && setHoveredTile(tileIndex)}
+              onMouseLeave={() => setHoveredTile(null)}
+            >
+              <Box
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <span style={{ height: '24px', fontSize: '16px' }}>{day}</span>
+                {hasSchedule && (hoveredTile === tileIndex) && !isDateInPast(day) && (
+                  <Menu
+                    position="bottom-end"
+                    withArrow
+                    shadow="md"
+                  >
+                    <Menu.Target>
+                      <Tooltip label="Update Assigned Doctor" position="top">
+                        <ActionIcon
+                          size="sm"
+                          variant="subtle"
+                          color={theme.colors.customGray[8]}
+                          style={{ cursor: 'pointer', height: '24px' }}
+                        >
+                          <IconEdit size={16} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Menu.Target>
+                    
+                    <Menu.Dropdown
+                      style={{
+                        background: 'white',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+                        border: '1px solid #e0e7ff',
+                        minWidth: '200px'
+                      }}
+                    >
+                      {availableDoctors.length > 0 && (
+                        <>
+                          <Box style={{ padding: '8px 16px 4px' }}>
+                            <Text size="xs" c="dimmed" fw={600}>
+                              Change to:
+                            </Text>
+                          </Box>
+                          {availableDoctors
+                            .filter(doctor => {
+                              // Filter out the currently assigned doctor using doctor ID
+                              return doctor.id !== schedule?.doctorId;
+                            })
+                            .map(doctor => (
+                              <Menu.Item
+                                key={doctor.id}
+                                leftSection={<IconUser size={16} />}
+                                onClick={() => {
+                                  if (onDoctorChange) {
+                                    const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                                    onDoctorChange(dateStr, doctor.id, doctor.name);
+                                  }
+                                }}
+                                style={{
+                                  fontSize: '14px',
+                                  padding: '8px 16px',
+                                  borderRadius: '8px',
+                                }}
+                              >
+                                {doctor.name}
+                              </Menu.Item>
+                            ))}
+                        </>
+                      )}
+                    </Menu.Dropdown>
+                  </Menu>
+                )}
+              </Box>
+              
+              {schedule && (
+                <Box
+                  style={{
+                    marginTop: '6px',
+                    fontSize: '12px',
+                    backgroundColor: 'transparent',
+                    color: theme.colors.blue[7],
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                    wordBreak: 'break-word'
+                  }}
+                >
+                  {/* Show only doctor name, not MWF/TTH/OVERRIDE labels */}
+                  {schedule.details && !['MWF', 'TTH', 'OVERRIDE'].includes(schedule.details) && (
+                    <Box
+                      component="strong"
+                      style={{
+                        display: 'block',
+                        fontSize: '13px',
+                        color: theme.colors.blue[9]
+                      }}
+                    >
+                      {schedule.details}
+                    </Box>
+                  )}
+                  {schedule.note && !['MWF', 'TTH', 'OVERRIDE'].includes(schedule.note) && schedule.note}
+                </Box>
+              )}
+            </Box>
+          );
+        })}
+      </Box>
+    </Box>
   );
 };
-
-export default DoctorScheduleCalendar;
