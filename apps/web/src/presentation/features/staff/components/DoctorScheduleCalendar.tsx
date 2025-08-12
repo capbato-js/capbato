@@ -3,6 +3,7 @@ import { Box, Button, Title, Menu, Text, ActionIcon, Tooltip, useMantineTheme } 
 import { IconEdit, IconUser } from '@tabler/icons-react';
 import { Icon } from '../../../components/common';
 import { ScheduleEntry } from '../types';
+import { useUserRole } from '../../../../infrastructure/auth';
 
 interface DoctorScheduleCalendarProps {
   schedules: ScheduleEntry[];
@@ -25,6 +26,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
   const theme = useMantineTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [hoveredTile, setHoveredTile] = useState<number | null>(null);
+  const { isAdmin } = useUserRole();
 
   // Debug logging for DoctorScheduleCalendar
   console.log('📅 [DEBUG] DoctorScheduleCalendar render:', {
@@ -90,6 +92,13 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
     dateToCheck.setHours(0, 0, 0, 0);
     
     return dateToCheck < today;
+  };
+
+  // Helper function to check if a date is a weekend (Saturday = 6, Sunday = 0)
+  const isWeekend = (day: number) => {
+    const dateToCheck = new Date(currentYear, currentMonth, day);
+    const dayOfWeek = dateToCheck.getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6; // Sunday = 0, Saturday = 6
   };
 
   return (
@@ -216,6 +225,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
           const hasSchedule = !!schedule;
           const tileIndex = day; // Using day as unique identifier for this month
           const isPastDate = isDateInPast(day);
+          const isWeekendDate = isWeekend(day);
           
           return (
             <Box
@@ -231,9 +241,9 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
                 position: 'relative',
                 transition: 'background-color 0.2s ease',
                 opacity: isPastDate ? 0.6 : 1, // Reduce opacity for past dates
-                cursor: isPastDate ? 'default' : 'pointer'
+                cursor: isPastDate || isWeekendDate || !isAdmin ? 'default' : 'pointer'
               }}
-              onMouseEnter={() => !isPastDate && setHoveredTile(tileIndex)}
+              onMouseEnter={() => !isPastDate && !isWeekendDate && setHoveredTile(tileIndex)}
               onMouseLeave={() => setHoveredTile(null)}
             >
               <Box
@@ -246,7 +256,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
                 }}
               >
                 <span style={{ height: '24px', fontSize: '16px' }}>{day}</span>
-                {hasSchedule && (hoveredTile === tileIndex) && !isDateInPast(day) && (
+                {hasSchedule && (hoveredTile === tileIndex) && !isDateInPast(day) && !isWeekendDate && isAdmin && (
                   <Menu
                     position="bottom-end"
                     withArrow
@@ -258,7 +268,7 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
                           size="sm"
                           variant="subtle"
                           color={theme.colors.customGray[8]}
-                          style={{ cursor: 'pointer', height: '24px' }}
+                          style={{ cursor: isAdmin ? 'pointer' : 'default', height: '24px' }}
                         >
                           <IconEdit size={16} />
                         </ActionIcon>
