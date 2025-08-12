@@ -131,7 +131,6 @@ export class DoctorController {
    * GET /api/doctors/schedule-overrides - Get all schedule overrides (Admin only)
    */
   @Get('/schedule-overrides')
-  @Authorized('admin')
   async getScheduleOverrides(): Promise<ScheduleOverrideListResponse> {
     const overrides = await this.getAllScheduleOverridesQueryHandler.execute();
     const overrideDtos = ScheduleOverrideMapper.toDtoArray(overrides);
