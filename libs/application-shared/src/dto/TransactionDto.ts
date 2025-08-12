@@ -15,6 +15,9 @@ export interface PatientInfoDto {
   lastName: string;
   middleName: string;
   fullName: string;
+  address: string;
+  contactNumber: string;
+  email?: string; // Email is not available in current patient entity, so optional
 }
 
 export interface TransactionDto {
