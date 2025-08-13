@@ -5,6 +5,7 @@ export * from './TypeOrmHematologyResultRepository';
 export * from './TypeOrmFecalysisResultRepository';
 export * from './TypeOrmSerologyResultRepository';
 export * from './LabRequestEntity';
+export * from './LabTestResultEntity';
 export * from './BloodChemistryEntity';
 export * from './UrinalysisResultEntity';
 export * from './HematologyResultEntity';
