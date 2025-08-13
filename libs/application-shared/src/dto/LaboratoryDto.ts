@@ -50,51 +50,62 @@ export {
 
 // Request DTOs for API endpoints
 export interface CreateLabRequestRequestDto {
-  patient_id: string;
-  patient_name: string;
-  age_gender: string;
-  request_date: string;
+  patientId: string;
+  requestDate: string;
   others?: string;
   
-  // Basic Tests
-  cbc_with_platelet?: string;
-  pregnancy_test?: string;
-  urinalysis?: string;
-  fecalysis?: string;
-  occult_blood_test?: string;
+  // Grouped test categories
+  routine?: {
+    cbcWithPlatelet?: boolean;
+    pregnancyTest?: boolean;
+    urinalysis?: boolean;
+    fecalysis?: boolean;
+    occultBloodTest?: boolean;
+  };
   
-  // Hepatitis Tests
-  hepa_b_screening?: string;
-  hepa_a_screening?: string;
-  hepatitis_profile?: string;
+  serology?: {
+    hepatitisBScreening?: boolean;
+    hepatitisAScreening?: boolean;
+    hepatitisCScreening?: boolean;
+    hepatitisProfile?: boolean;
+    vdrlRpr?: boolean;
+    crp?: boolean;
+    dengueNs1?: boolean;
+    aso?: boolean;
+    crf?: boolean;
+    raRf?: boolean;
+    tumorMarkers?: boolean;
+    ca125?: boolean;
+    cea?: boolean;
+    psa?: boolean;
+    betaHcg?: boolean;
+  };
   
-  // STD Tests
-  vdrl_rpr?: string;
+  bloodChemistry?: {
+    fbs?: boolean;
+    bun?: boolean;
+    creatinine?: boolean;
+    bloodUricAcid?: boolean;
+    lipidProfile?: boolean;
+    sgot?: boolean;
+    sgpt?: boolean;
+    alkalinePhosphatase?: boolean;
+    sodium?: boolean;
+    potassium?: boolean;
+    hba1c?: boolean;
+  };
   
-  // Other Tests
-  dengue_ns1?: string;
-  ca_125_cea_psa?: string;
+  miscellaneous?: {
+    ecg?: boolean;
+  };
   
-  // Blood Chemistry Results
-  fbs?: string;
-  bun?: string;
-  creatinine?: string;
-  blood_uric_acid?: string;
-  lipid_profile?: string;
-  sgot?: string;
-  sgpt?: string;
-  alp?: string;
-  sodium_na?: string;
-  potassium_k?: string;
-  hbalc?: string;
-  
-  // Other Tests
-  ecg?: string;
-  t3?: string;
-  t4?: string;
-  ft3?: string;
-  ft4?: string;
-  tsh?: string;
+  thyroid?: {
+    t3?: boolean;
+    t4?: boolean;
+    ft3?: boolean;
+    ft4?: boolean;
+    tsh?: boolean;
+  };
 }
 
 export interface UpdateLabRequestRequestDto {

@@ -86,7 +86,7 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
 
   async findCompleted(): Promise<LabRequest[]> {
     const entities = await this.repository.find({
-      where: { status: 'complete' },
+      where: { status: 'completed' },
       order: { requestDate: 'DESC' }
     });
     return Promise.all(entities.map(entity => this.entityToDomain(entity)));
@@ -118,8 +118,6 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
   private domainToEntity(labRequest: LabRequest): Partial<LabRequestEntity> {
     const entity: Partial<LabRequestEntity> = {
       patientId: labRequest.patientInfo.patientId,
-      patientName: labRequest.patientInfo.patientName,
-      ageGender: labRequest.patientInfo.ageGender,
       requestDate: labRequest.requestDate,
       status: labRequest.status.value,
       dateTaken: labRequest.dateTaken,
@@ -128,36 +126,55 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       updatedAt: labRequest.updatedAt
     };
 
-    // Map tests to entity fields
+    // Map grouped tests to individual entity boolean fields
     const tests = labRequest.tests.tests;
-    entity.cbcWithPlatelet = tests.cbcWithPlatelet;
-    entity.pregnancyTest = tests.pregnancyTest;
-    entity.urinalysis = tests.urinalysis;
-    entity.fecalysis = tests.fecalysis;
-    entity.occultBloodTest = tests.occultBloodTest;
-    entity.hepaBScreening = tests.hepaBScreening;
-    entity.hepaAScreening = tests.hepaAScreening;
-    entity.hepatitisProfile = tests.hepatitisProfile;
-    entity.vdrlRpr = tests.vdrlRpr;
-    entity.dengueNs1 = tests.dengueNs1;
-    entity.ca125CeaPsa = tests.ca125CeaPsa;
-    entity.fbs = tests.fbs;
-    entity.bun = tests.bun;
-    entity.creatinine = tests.creatinine;
-    entity.bloodUricAcid = tests.bloodUricAcid;
-    entity.lipidProfile = tests.lipidProfile;
-    entity.sgot = tests.sgot;
-    entity.sgpt = tests.sgpt;
-    entity.alp = tests.alp;
-    entity.sodiumNa = tests.sodiumNa;
-    entity.potassiumK = tests.potassiumK;
-    entity.hbalc = tests.hbalc;
-    entity.ecg = tests.ecg;
-    entity.t3 = tests.t3;
-    entity.t4 = tests.t4;
-    entity.ft3 = tests.ft3;
-    entity.ft4 = tests.ft4;
-    entity.tsh = tests.tsh;
+    
+    // Routine Tests
+    entity.routineCbcWithPlatelet = tests.routine.cbcWithPlatelet;
+    entity.routinePregnancyTest = tests.routine.pregnancyTest;
+    entity.routineUrinalysis = tests.routine.urinalysis;
+    entity.routineFecalysis = tests.routine.fecalysis;
+    entity.routineOccultBloodTest = tests.routine.occultBloodTest;
+    
+    // Serology Tests
+    entity.serologyHepatitisBScreening = tests.serology.hepatitisBScreening;
+    entity.serologyHepatitisAScreening = tests.serology.hepatitisAScreening;
+    entity.serologyHepatitisCScreening = tests.serology.hepatitisCScreening;
+    entity.serologyHepatitisProfile = tests.serology.hepatitisProfile;
+    entity.serologyVdrlRpr = tests.serology.vdrlRpr;
+    entity.serologyCrp = tests.serology.crp;
+    entity.serologyDengueNs1 = tests.serology.dengueNs1;
+    entity.serologyAso = tests.serology.aso;
+    entity.serologyCrf = tests.serology.crf;
+    entity.serologyRaRf = tests.serology.raRf;
+    entity.serologyTumorMarkers = tests.serology.tumorMarkers;
+    entity.serologyCa125 = tests.serology.ca125;
+    entity.serologyCea = tests.serology.cea;
+    entity.serologyPsa = tests.serology.psa;
+    entity.serologyBetaHcg = tests.serology.betaHcg;
+    
+    // Blood Chemistry Tests
+    entity.bloodChemistryFbs = tests.bloodChemistry.fbs;
+    entity.bloodChemistryBun = tests.bloodChemistry.bun;
+    entity.bloodChemistryCreatinine = tests.bloodChemistry.creatinine;
+    entity.bloodChemistryBloodUricAcid = tests.bloodChemistry.bloodUricAcid;
+    entity.bloodChemistryLipidProfile = tests.bloodChemistry.lipidProfile;
+    entity.bloodChemistrySgot = tests.bloodChemistry.sgot;
+    entity.bloodChemistrySgpt = tests.bloodChemistry.sgpt;
+    entity.bloodChemistryAlkalinePhosphatase = tests.bloodChemistry.alkalinePhosphatase;
+    entity.bloodChemistrySodium = tests.bloodChemistry.sodium;
+    entity.bloodChemistryPotassium = tests.bloodChemistry.potassium;
+    entity.bloodChemistryHba1c = tests.bloodChemistry.hba1c;
+    
+    // Miscellaneous Tests
+    entity.miscEcg = tests.miscellaneous.ecg;
+    
+    // Thyroid Tests
+    entity.thyroidT3 = tests.thyroid.t3;
+    entity.thyroidT4 = tests.thyroid.t4;
+    entity.thyroidFt3 = tests.thyroid.ft3;
+    entity.thyroidFt4 = tests.thyroid.ft4;
+    entity.thyroidTsh = tests.thyroid.tsh;
 
     if (labRequest.id) {
       entity.id = labRequest.id.value;
@@ -176,8 +193,8 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
         // Create enriched patient info with complete data
         patientInfo = LabRequestPatientInfo.create({
           patientId: entity.patientId,
-          patientName: entity.patientName,
-          ageGender: entity.ageGender,
+          patientName: `${patient.firstName} ${patient.lastName}`.trim() || 'Unknown Patient',
+          ageGender: 'Age/Gender', // TODO: Calculate from patient.dateOfBirth and patient.gender
           patientNumber: patient.patientNumber,
           firstName: patient.firstName,
           lastName: patient.lastName
@@ -186,8 +203,8 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
         // Fallback to basic patient info if patient not found
         patientInfo = LabRequestPatientInfo.create({
           patientId: entity.patientId,
-          patientName: entity.patientName,
-          ageGender: entity.ageGender
+          patientName: 'Unknown Patient',
+          ageGender: 'Unknown Age/Gender'
         });
       }
     } catch (error) {
@@ -195,43 +212,62 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
       console.warn(`Failed to fetch patient data for ID ${entity.patientId}:`, error);
       patientInfo = LabRequestPatientInfo.create({
         patientId: entity.patientId,
-        patientName: entity.patientName,
-        ageGender: entity.ageGender
+        patientName: 'Unknown Patient',
+        ageGender: 'Unknown Age/Gender'
       });
     }
 
     const tests = LabRequestTests.create({
-      cbcWithPlatelet: entity.cbcWithPlatelet,
-      pregnancyTest: entity.pregnancyTest,
-      urinalysis: entity.urinalysis,
-      fecalysis: entity.fecalysis,
-      occultBloodTest: entity.occultBloodTest,
-      hepaBScreening: entity.hepaBScreening,
-      hepaAScreening: entity.hepaAScreening,
-      hepatitisProfile: entity.hepatitisProfile,
-      vdrlRpr: entity.vdrlRpr,
-      dengueNs1: entity.dengueNs1,
-      ca125CeaPsa: entity.ca125CeaPsa,
-      fbs: entity.fbs,
-      bun: entity.bun,
-      creatinine: entity.creatinine,
-      bloodUricAcid: entity.bloodUricAcid,
-      lipidProfile: entity.lipidProfile,
-      sgot: entity.sgot,
-      sgpt: entity.sgpt,
-      alp: entity.alp,
-      sodiumNa: entity.sodiumNa,
-      potassiumK: entity.potassiumK,
-      hbalc: entity.hbalc,
-      ecg: entity.ecg,
-      t3: entity.t3,
-      t4: entity.t4,
-      ft3: entity.ft3,
-      ft4: entity.ft4,
-      tsh: entity.tsh
+      routine: {
+        cbcWithPlatelet: entity.routineCbcWithPlatelet,
+        pregnancyTest: entity.routinePregnancyTest,
+        urinalysis: entity.routineUrinalysis,
+        fecalysis: entity.routineFecalysis,
+        occultBloodTest: entity.routineOccultBloodTest,
+      },
+      serology: {
+        hepatitisBScreening: entity.serologyHepatitisBScreening,
+        hepatitisAScreening: entity.serologyHepatitisAScreening,
+        hepatitisCScreening: entity.serologyHepatitisCScreening,
+        hepatitisProfile: entity.serologyHepatitisProfile,
+        vdrlRpr: entity.serologyVdrlRpr,
+        crp: entity.serologyCrp,
+        dengueNs1: entity.serologyDengueNs1,
+        aso: entity.serologyAso,
+        crf: entity.serologyCrf,
+        raRf: entity.serologyRaRf,
+        tumorMarkers: entity.serologyTumorMarkers,
+        ca125: entity.serologyCa125,
+        cea: entity.serologyCea,
+        psa: entity.serologyPsa,
+        betaHcg: entity.serologyBetaHcg,
+      },
+      bloodChemistry: {
+        fbs: entity.bloodChemistryFbs,
+        bun: entity.bloodChemistryBun,
+        creatinine: entity.bloodChemistryCreatinine,
+        bloodUricAcid: entity.bloodChemistryBloodUricAcid,
+        lipidProfile: entity.bloodChemistryLipidProfile,
+        sgot: entity.bloodChemistrySgot,
+        sgpt: entity.bloodChemistrySgpt,
+        alkalinePhosphatase: entity.bloodChemistryAlkalinePhosphatase,
+        sodium: entity.bloodChemistrySodium,
+        potassium: entity.bloodChemistryPotassium,
+        hba1c: entity.bloodChemistryHba1c,
+      },
+      miscellaneous: {
+        ecg: entity.miscEcg,
+      },
+      thyroid: {
+        t3: entity.thyroidT3,
+        t4: entity.thyroidT4,
+        ft3: entity.thyroidFt3,
+        ft4: entity.thyroidFt4,
+        tsh: entity.thyroidTsh,
+      },
     });
 
-    const status = LabRequestStatus.create(entity.status as 'pending' | 'complete' | 'cancelled');
+    const status = LabRequestStatus.create(entity.status as 'pending' | 'in_progress' | 'completed' | 'cancelled');
 
     return new LabRequest(
       patientInfo,

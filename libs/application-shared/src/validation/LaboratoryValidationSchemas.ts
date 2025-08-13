@@ -6,81 +6,83 @@ import { z } from 'zod';
  */
 
 // Lab Request Status Schema
-export const LabRequestStatusSchema = z.enum(['pending', 'complete', 'cancelled']);
+export const LabRequestStatusSchema = z.enum(['pending', 'in_progress', 'completed', 'cancelled']);
 
-// Lab Request Test Fields Schema
-const LabTestFieldSchema = z.string().optional();
+// Test Category Schemas
+const RoutineTestsSchema = z.object({
+  cbcWithPlatelet: z.boolean().optional().default(false),
+  pregnancyTest: z.boolean().optional().default(false),
+  urinalysis: z.boolean().optional().default(false),
+  fecalysis: z.boolean().optional().default(false),
+  occultBloodTest: z.boolean().optional().default(false),
+}).optional();
+
+const SerologyTestsSchema = z.object({
+  hepatitisBScreening: z.boolean().optional().default(false),
+  hepatitisAScreening: z.boolean().optional().default(false),
+  hepatitisCScreening: z.boolean().optional().default(false),
+  hepatitisProfile: z.boolean().optional().default(false),
+  vdrlRpr: z.boolean().optional().default(false),
+  crp: z.boolean().optional().default(false),
+  dengueNs1: z.boolean().optional().default(false),
+  aso: z.boolean().optional().default(false),
+  crf: z.boolean().optional().default(false),
+  raRf: z.boolean().optional().default(false),
+  tumorMarkers: z.boolean().optional().default(false),
+  ca125: z.boolean().optional().default(false),
+  cea: z.boolean().optional().default(false),
+  psa: z.boolean().optional().default(false),
+  betaHcg: z.boolean().optional().default(false),
+}).optional();
+
+const BloodChemistryTestsSchema = z.object({
+  fbs: z.boolean().optional().default(false),
+  bun: z.boolean().optional().default(false),
+  creatinine: z.boolean().optional().default(false),
+  bloodUricAcid: z.boolean().optional().default(false),
+  lipidProfile: z.boolean().optional().default(false),
+  sgot: z.boolean().optional().default(false),
+  sgpt: z.boolean().optional().default(false),
+  alkalinePhosphatase: z.boolean().optional().default(false),
+  sodium: z.boolean().optional().default(false),
+  potassium: z.boolean().optional().default(false),
+  hba1c: z.boolean().optional().default(false),
+}).optional();
+
+const MiscellaneousTestsSchema = z.object({
+  ecg: z.boolean().optional().default(false),
+}).optional();
+
+const ThyroidTestsSchema = z.object({
+  t3: z.boolean().optional().default(false),
+  t4: z.boolean().optional().default(false),
+  ft3: z.boolean().optional().default(false),
+  ft4: z.boolean().optional().default(false),
+  tsh: z.boolean().optional().default(false),
+}).optional();
 
 // Lab Request Validation Schemas
 export const CreateLabRequestCommandSchema = z.object({
   patientId: z.string().min(1, 'Patient ID is required'),
-  patientName: z.string().min(1, 'Patient name is required').max(255, 'Patient name cannot exceed 255 characters'),
-  ageGender: z.string().min(1, 'Age and gender information is required'),
   requestDate: z.string().datetime('Invalid date format').transform((val) => new Date(val)),
   others: z.string().optional(),
   
-  // Basic Tests
-  cbcWithPlatelet: LabTestFieldSchema,
-  pregnancyTest: LabTestFieldSchema,
-  urinalysis: LabTestFieldSchema,
-  fecalysis: LabTestFieldSchema,
-  occultBloodTest: LabTestFieldSchema,
-  
-  // Hepatitis Tests
-  hepaBScreening: LabTestFieldSchema,
-  hepaAScreening: LabTestFieldSchema,
-  hepaCScreening: LabTestFieldSchema,
-  hepatitisProfile: LabTestFieldSchema,
-  
-  // STD Tests
-  vdrlRpr: LabTestFieldSchema,
-  
-  // Serology Tests
-  crp: LabTestFieldSchema,
-  dengueNs1: LabTestFieldSchema,
-  aso: LabTestFieldSchema,
-  raRf: LabTestFieldSchema,
-  tumorMarkers: LabTestFieldSchema,
-  ca125CeaPsa: LabTestFieldSchema,
-  betaHcg: LabTestFieldSchema,
-  
-  // Blood Chemistry Results
-  fbs: LabTestFieldSchema,
-  bun: LabTestFieldSchema,
-  creatinine: LabTestFieldSchema,
-  bloodUricAcid: LabTestFieldSchema,
-  lipidProfile: LabTestFieldSchema,
-  sgot: LabTestFieldSchema,
-  sgpt: LabTestFieldSchema,
-  alp: LabTestFieldSchema,
-  sodiumNa: LabTestFieldSchema,
-  potassiumK: LabTestFieldSchema,
-  hbalc: LabTestFieldSchema,
-  
-  // Other Tests
-  ecg: LabTestFieldSchema,
-  t3: LabTestFieldSchema,
-  t4: LabTestFieldSchema,
-  ft3: LabTestFieldSchema,
-  ft4: LabTestFieldSchema,
-  tsh: LabTestFieldSchema,
+  // Grouped test categories
+  routine: RoutineTestsSchema,
+  serology: SerologyTestsSchema,
+  bloodChemistry: BloodChemistryTestsSchema,
+  miscellaneous: MiscellaneousTestsSchema,
+  thyroid: ThyroidTestsSchema,
 }).refine((data) => {
-  // Check if at least one test is selected
-  const testFields = [
-    data.cbcWithPlatelet, data.pregnancyTest, data.urinalysis, data.fecalysis,
-    data.occultBloodTest, data.hepaBScreening, data.hepaAScreening, data.hepaCScreening,
-    data.hepatitisProfile, data.vdrlRpr, data.crp, data.dengueNs1, data.aso, data.raRf,
-    data.tumorMarkers, data.ca125CeaPsa, data.betaHcg,
-    data.fbs, data.bun, data.creatinine, data.bloodUricAcid, data.lipidProfile,
-    data.sgot, data.sgpt, data.alp, data.sodiumNa, data.potassiumK, data.hbalc,
-    data.ecg, data.t3, data.t4, data.ft3, data.ft4, data.tsh
-  ];
+  // Check if at least one test is selected across all categories
+  const hasAnyTest = 
+    (data.routine && Object.values(data.routine).some(v => v === true)) ||
+    (data.serology && Object.values(data.serology).some(v => v === true)) ||
+    (data.bloodChemistry && Object.values(data.bloodChemistry).some(v => v === true)) ||
+    (data.miscellaneous && Object.values(data.miscellaneous).some(v => v === true)) ||
+    (data.thyroid && Object.values(data.thyroid).some(v => v === true));
   
-  const hasSelectedTest = testFields.some(field => 
-    field && field.trim() !== '' && field.toLowerCase() !== 'no'
-  );
-  
-  return hasSelectedTest;
+  return hasAnyTest;
 }, {
   message: 'At least one laboratory test must be selected',
 });
@@ -88,48 +90,17 @@ export const CreateLabRequestCommandSchema = z.object({
 export const UpdateLabRequestCommandSchema = z.object({
   id: z.string().min(1, 'ID cannot be empty'),
   patientId: z.string().min(1, 'Patient ID is required').optional(),
-  patientName: z.string().min(1, 'Patient name is required').max(255).optional(),
-  ageGender: z.string().min(1, 'Age and gender information is required').optional(),
   requestDate: z.string().datetime().transform((val) => new Date(val)).optional(),
   status: LabRequestStatusSchema.optional(),
   dateTaken: z.string().datetime().transform((val) => new Date(val)).optional(),
   others: z.string().optional(),
   
-  // Test fields - same as create but all optional
-  cbcWithPlatelet: LabTestFieldSchema,
-  pregnancyTest: LabTestFieldSchema,
-  urinalysis: LabTestFieldSchema,
-  fecalysis: LabTestFieldSchema,
-  occultBloodTest: LabTestFieldSchema,
-  hepaBScreening: LabTestFieldSchema,
-  hepaAScreening: LabTestFieldSchema,
-  hepaCScreening: LabTestFieldSchema,
-  hepatitisProfile: LabTestFieldSchema,
-  vdrlRpr: LabTestFieldSchema,
-  crp: LabTestFieldSchema,
-  dengueNs1: LabTestFieldSchema,
-  aso: LabTestFieldSchema,
-  raRf: LabTestFieldSchema,
-  tumorMarkers: LabTestFieldSchema,
-  ca125CeaPsa: LabTestFieldSchema,
-  betaHcg: LabTestFieldSchema,
-  fbs: LabTestFieldSchema,
-  bun: LabTestFieldSchema,
-  creatinine: LabTestFieldSchema,
-  bloodUricAcid: LabTestFieldSchema,
-  lipidProfile: LabTestFieldSchema,
-  sgot: LabTestFieldSchema,
-  sgpt: LabTestFieldSchema,
-  alp: LabTestFieldSchema,
-  sodiumNa: LabTestFieldSchema,
-  potassiumK: LabTestFieldSchema,
-  hbalc: LabTestFieldSchema,
-  ecg: LabTestFieldSchema,
-  t3: LabTestFieldSchema,
-  t4: LabTestFieldSchema,
-  ft3: LabTestFieldSchema,
-  ft4: LabTestFieldSchema,
-  tsh: LabTestFieldSchema,
+  // Grouped test categories - all optional for updates
+  routine: RoutineTestsSchema.optional(),
+  serology: SerologyTestsSchema.optional(),
+  bloodChemistry: BloodChemistryTestsSchema.optional(),
+  miscellaneous: MiscellaneousTestsSchema.optional(),
+  thyroid: ThyroidTestsSchema.optional(),
 });
 
 export const DeleteLabRequestCommandSchema = z.object({
@@ -142,24 +113,12 @@ export const UpdateLabRequestResultsCommandSchema = z.object({
   status: LabRequestStatusSchema.optional(),
   dateTaken: z.string().datetime().transform((val) => new Date(val)).optional(),
   
-  // Result fields
-  fbs: LabTestFieldSchema,
-  bun: LabTestFieldSchema,
-  creatinine: LabTestFieldSchema,
-  bloodUricAcid: LabTestFieldSchema,
-  lipidProfile: LabTestFieldSchema,
-  sgot: LabTestFieldSchema,
-  sgpt: LabTestFieldSchema,
-  alp: LabTestFieldSchema,
-  sodiumNa: LabTestFieldSchema,
-  potassiumK: LabTestFieldSchema,
-  hbalc: LabTestFieldSchema,
-  ecg: LabTestFieldSchema,
-  t3: LabTestFieldSchema,
-  t4: LabTestFieldSchema,
-  ft3: LabTestFieldSchema,
-  ft4: LabTestFieldSchema,
-  tsh: LabTestFieldSchema,
+  // Grouped test categories for result updates
+  routine: RoutineTestsSchema.optional(),
+  serology: SerologyTestsSchema.optional(),
+  bloodChemistry: BloodChemistryTestsSchema.optional(),
+  miscellaneous: MiscellaneousTestsSchema.optional(),
+  thyroid: ThyroidTestsSchema.optional(),
 });
 
 // Blood Chemistry Validation Schemas

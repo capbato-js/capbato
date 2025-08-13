@@ -23,7 +23,7 @@ import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 
 // Type for add lab test form
 interface AddLabTestFormData {
-  patientName: string; // This will be patient ID
+  patientName: string;  // This will contain the patient ID selected from dropdown
   ageGender: string;
   requestDate: string;
   selectedTests: string[];
@@ -106,7 +106,7 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
   const requestDate = watch('requestDate');
 
   // Check if form fields are empty
-  const isFormEmpty = !patientName?.trim() || !ageGender?.trim() || !requestDate || selectedTests.length === 0;
+  const isFormEmpty = !patientName || !ageGender || !requestDate || selectedTests.length === 0;
 
   // Handle patient selection to show patient number and auto-populate age/gender
   const handlePatientChange = (patientId: string) => {

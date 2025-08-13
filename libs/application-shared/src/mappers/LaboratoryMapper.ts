@@ -45,13 +45,21 @@ export class LaboratoryMapper {
         name: labRequest.patientInfo.patientName,
         ageGender: labRequest.patientInfo.ageGender,
       },
-      requestDate: labRequest.requestDate.toISOString(),
+      requestDate: labRequest.requestDate instanceof Date 
+        ? labRequest.requestDate.toISOString() 
+        : new Date(labRequest.requestDate).toISOString(),
       status: labRequest.status.value,
       dateTaken: labRequest.dateTaken ? (labRequest.dateTaken instanceof Date ? labRequest.dateTaken.toISOString() : new Date(labRequest.dateTaken).toISOString()) : undefined,
       others: labRequest.others,
       selectedTests: labRequest.tests.getSelectedTests(),
-      createdAt: labRequest.createdAt.toISOString(),
-      updatedAt: labRequest.updatedAt?.toISOString(),
+      createdAt: labRequest.createdAt instanceof Date 
+        ? labRequest.createdAt.toISOString() 
+        : new Date(labRequest.createdAt).toISOString(),
+      updatedAt: labRequest.updatedAt 
+        ? (labRequest.updatedAt instanceof Date 
+          ? labRequest.updatedAt.toISOString() 
+          : new Date(labRequest.updatedAt).toISOString()) 
+        : undefined,
     };
   }
 
@@ -98,9 +106,11 @@ export class LaboratoryMapper {
       testCategory,
       tests: selectedTests,
       testDisplayNames,
-      date: labRequest.requestDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      date: labRequest.requestDate instanceof Date 
+        ? labRequest.requestDate.toISOString().split('T')[0] 
+        : new Date(labRequest.requestDate).toISOString().split('T')[0], // Format as YYYY-MM-DD
       status,
-      results: labRequest.status.value === 'complete' ? 'Available' : undefined,
+      results: labRequest.status.value === 'completed' ? 'Available' : undefined,
       patientId: labRequest.patientInfo.patientId,
       // Backward compatibility
       testName,
@@ -175,7 +185,9 @@ export class LaboratoryMapper {
       testCategory: 'BLOOD_CHEMISTRY',
       tests: availableTests,
       testDisplayNames: displayNames,
-      date: bloodChemistry.dateTaken.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      date: bloodChemistry.dateTaken instanceof Date 
+        ? bloodChemistry.dateTaken.toISOString().split('T')[0] 
+        : new Date(bloodChemistry.dateTaken).toISOString().split('T')[0], // Format as YYYY-MM-DD
       status: 'Complete', // Blood chemistry results are always complete once created
       results: 'Available',
       patientId: bloodChemistry.patientInfo.patientId || bloodChemistry.patientInfo.patientName, // Use patient ID if available, fallback to name
@@ -186,7 +198,7 @@ export class LaboratoryMapper {
   /**
    * Generate a human-readable test name from selected tests
    */
-  private static generateTestName(selectedTests: string[], tests: LabRequestTests): string {
+  private static generateTestName(selectedTests: string[]): string {
     if (selectedTests.length === 0) {
       return 'Lab Test';
     }
@@ -329,8 +341,14 @@ export class LaboratoryMapper {
       results: bloodChemistry.results.results as Record<string, number | undefined>,
       hasAbnormalValues: bloodChemistry.hasAbnormalResults(),
       criticalValues: bloodChemistry.results.getCriticalValues(),
-      createdAt: bloodChemistry.createdAt.toISOString(),
-      updatedAt: bloodChemistry.updatedAt?.toISOString(),
+      createdAt: bloodChemistry.createdAt instanceof Date 
+        ? bloodChemistry.createdAt.toISOString() 
+        : new Date(bloodChemistry.createdAt).toISOString(),
+      updatedAt: bloodChemistry.updatedAt 
+        ? (bloodChemistry.updatedAt instanceof Date 
+            ? bloodChemistry.updatedAt.toISOString() 
+            : new Date(bloodChemistry.updatedAt).toISOString()) 
+        : undefined,
     };
   }
 
@@ -347,39 +365,59 @@ export class LaboratoryMapper {
   static fromCreateLabRequestCommand(command: CreateLabRequestCommand): LabRequest {
     const patientInfo = new LabRequestPatientInfo({
       patientId: command.patientId,
-      patientName: command.patientName,
-      ageGender: command.ageGender,
+      // TODO: Fetch these from Patient entity by patientId in a proper implementation
+      patientName: 'Patient Name', // Placeholder - should be fetched from Patient entity
+      ageGender: 'Age/Gender', // Placeholder - should be fetched from Patient entity
     });
 
     const tests = new LabRequestTests({
-      cbcWithPlatelet: command.cbcWithPlatelet,
-      pregnancyTest: command.pregnancyTest,
-      urinalysis: command.urinalysis,
-      fecalysis: command.fecalysis,
-      occultBloodTest: command.occultBloodTest,
-      hepaBScreening: command.hepaBScreening,
-      hepaAScreening: command.hepaAScreening,
-      hepatitisProfile: command.hepatitisProfile,
-      vdrlRpr: command.vdrlRpr,
-      dengueNs1: command.dengueNs1,
-      ca125CeaPsa: command.ca125CeaPsa,
-      fbs: command.fbs,
-      bun: command.bun,
-      creatinine: command.creatinine,
-      bloodUricAcid: command.bloodUricAcid,
-      lipidProfile: command.lipidProfile,
-      sgot: command.sgot,
-      sgpt: command.sgpt,
-      alp: command.alp,
-      sodiumNa: command.sodiumNa,
-      potassiumK: command.potassiumK,
-      hbalc: command.hbalc,
-      ecg: command.ecg,
-      t3: command.t3,
-      t4: command.t4,
-      ft3: command.ft3,
-      ft4: command.ft4,
-      tsh: command.tsh,
+      routine: {
+        cbcWithPlatelet: command.routine?.cbcWithPlatelet || false,
+        pregnancyTest: command.routine?.pregnancyTest || false,
+        urinalysis: command.routine?.urinalysis || false,
+        fecalysis: command.routine?.fecalysis || false,
+        occultBloodTest: command.routine?.occultBloodTest || false,
+      },
+      serology: {
+        hepatitisBScreening: command.serology?.hepatitisBScreening || false,
+        hepatitisAScreening: command.serology?.hepatitisAScreening || false,
+        hepatitisCScreening: command.serology?.hepatitisCScreening || false,
+        hepatitisProfile: command.serology?.hepatitisProfile || false,
+        vdrlRpr: command.serology?.vdrlRpr || false,
+        crp: command.serology?.crp || false,
+        dengueNs1: command.serology?.dengueNs1 || false,
+        aso: command.serology?.aso || false,
+        crf: command.serology?.crf || false,
+        raRf: command.serology?.raRf || false,
+        tumorMarkers: command.serology?.tumorMarkers || false,
+        ca125: command.serology?.ca125 || false,
+        cea: command.serology?.cea || false,
+        psa: command.serology?.psa || false,
+        betaHcg: command.serology?.betaHcg || false,
+      },
+      bloodChemistry: {
+        fbs: command.bloodChemistry?.fbs || false,
+        bun: command.bloodChemistry?.bun || false,
+        creatinine: command.bloodChemistry?.creatinine || false,
+        bloodUricAcid: command.bloodChemistry?.bloodUricAcid || false,
+        lipidProfile: command.bloodChemistry?.lipidProfile || false,
+        sgot: command.bloodChemistry?.sgot || false,
+        sgpt: command.bloodChemistry?.sgpt || false,
+        alkalinePhosphatase: command.bloodChemistry?.alkalinePhosphatase || false,
+        sodium: command.bloodChemistry?.sodium || false,
+        potassium: command.bloodChemistry?.potassium || false,
+        hba1c: command.bloodChemistry?.hba1c || false,
+      },
+      miscellaneous: {
+        ecg: command.miscellaneous?.ecg || false,
+      },
+      thyroid: {
+        t3: command.thyroid?.t3 || false,
+        t4: command.thyroid?.t4 || false,
+        ft3: command.thyroid?.ft3 || false,
+        ft4: command.thyroid?.ft4 || false,
+        tsh: command.thyroid?.tsh || false,
+      },
     });
 
     const status = LabRequestStatus.create('pending');
@@ -460,34 +498,53 @@ export class LaboratoryMapper {
     });
 
     const tests = new LabRequestTests({
-      cbcWithPlatelet: data['cbc_with_platelet'] as string,
-      pregnancyTest: data['pregnancy_test'] as string,
-      urinalysis: data['urinalysis'] as string,
-      fecalysis: data['fecalysis'] as string,
-      occultBloodTest: data['occult_blood_test'] as string,
-      hepaBScreening: data['hepa_b_screening'] as string,
-      hepaAScreening: data['hepa_a_screening'] as string,
-      hepatitisProfile: data['hepatitis_profile'] as string,
-      vdrlRpr: data['vdrl_rpr'] as string,
-      dengueNs1: data['dengue_ns1'] as string,
-      ca125CeaPsa: data['ca_125_cea_psa'] as string,
-      fbs: data['fbs'] as string,
-      bun: data['bun'] as string,
-      creatinine: data['creatinine'] as string,
-      bloodUricAcid: data['blood_uric_acid'] as string,
-      lipidProfile: data['lipid_profile'] as string,
-      sgot: data['sgot'] as string,
-      sgpt: data['sgpt'] as string,
-      alp: data['alp'] as string,
-      sodiumNa: data['sodium_na'] as string,
-      potassiumK: data['potassium_k'] as string,
-      hbalc: data['hbalc'] as string,
-      ecg: data['ecg'] as string,
-      t3: data['t3'] as string,
-      t4: data['t4'] as string,
-      ft3: data['ft3'] as string,
-      ft4: data['ft4'] as string,
-      tsh: data['tsh'] as string,
+      routine: {
+        cbcWithPlatelet: Boolean(data['cbc_with_platelet']),
+        pregnancyTest: Boolean(data['pregnancy_test']),
+        urinalysis: Boolean(data['urinalysis']),
+        fecalysis: Boolean(data['fecalysis']),
+        occultBloodTest: Boolean(data['occult_blood_test']),
+      },
+      serology: {
+        hepatitisBScreening: Boolean(data['hepa_b_screening']),
+        hepatitisAScreening: Boolean(data['hepa_a_screening']),
+        hepatitisCScreening: false,
+        hepatitisProfile: Boolean(data['hepatitis_profile']),
+        vdrlRpr: Boolean(data['vdrl_rpr']),
+        crp: false,
+        dengueNs1: Boolean(data['dengue_ns1']),
+        aso: false,
+        crf: false,
+        raRf: false,
+        tumorMarkers: Boolean(data['ca_125_cea_psa']),
+        ca125: false,
+        cea: false,
+        psa: false,
+        betaHcg: false,
+      },
+      bloodChemistry: {
+        fbs: Boolean(data['fbs']),
+        bun: Boolean(data['bun']),
+        creatinine: Boolean(data['creatinine']),
+        bloodUricAcid: Boolean(data['blood_uric_acid']),
+        lipidProfile: Boolean(data['lipid_profile']),
+        sgot: Boolean(data['sgot']),
+        sgpt: Boolean(data['sgpt']),
+        alkalinePhosphatase: Boolean(data['alp']),
+        sodium: Boolean(data['sodium_na']),
+        potassium: Boolean(data['potassium_k']),
+        hba1c: Boolean(data['hbalc']),
+      },
+      miscellaneous: {
+        ecg: Boolean(data['ecg']),
+      },
+      thyroid: {
+        t3: Boolean(data['t3']),
+        t4: Boolean(data['t4']),
+        ft3: Boolean(data['ft3']),
+        ft4: Boolean(data['ft4']),
+        tsh: Boolean(data['tsh']),
+      },
     });
 
     const status = LabRequestStatus.create(String(data['status'] || 'pending'));
@@ -518,35 +575,35 @@ export class LaboratoryMapper {
       status: labRequest.status.value,
       date_taken: labRequest.dateTaken,
       others: labRequest.others,
-      // Test fields
-      cbc_with_platelet: labRequest.tests.tests.cbcWithPlatelet,
-      pregnancy_test: labRequest.tests.tests.pregnancyTest,
-      urinalysis: labRequest.tests.tests.urinalysis,
-      fecalysis: labRequest.tests.tests.fecalysis,
-      occult_blood_test: labRequest.tests.tests.occultBloodTest,
-      hepa_b_screening: labRequest.tests.tests.hepaBScreening,
-      hepa_a_screening: labRequest.tests.tests.hepaAScreening,
-      hepatitis_profile: labRequest.tests.tests.hepatitisProfile,
-      vdrl_rpr: labRequest.tests.tests.vdrlRpr,
-      dengue_ns1: labRequest.tests.tests.dengueNs1,
-      ca_125_cea_psa: labRequest.tests.tests.ca125CeaPsa,
-      fbs: labRequest.tests.tests.fbs,
-      bun: labRequest.tests.tests.bun,
-      creatinine: labRequest.tests.tests.creatinine,
-      blood_uric_acid: labRequest.tests.tests.bloodUricAcid,
-      lipid_profile: labRequest.tests.tests.lipidProfile,
-      sgot: labRequest.tests.tests.sgot,
-      sgpt: labRequest.tests.tests.sgpt,
-      alp: labRequest.tests.tests.alp,
-      sodium_na: labRequest.tests.tests.sodiumNa,
-      potassium_k: labRequest.tests.tests.potassiumK,
-      hbalc: labRequest.tests.tests.hbalc,
-      ecg: labRequest.tests.tests.ecg,
-      t3: labRequest.tests.tests.t3,
-      t4: labRequest.tests.tests.t4,
-      ft3: labRequest.tests.tests.ft3,
-      ft4: labRequest.tests.tests.ft4,
-      tsh: labRequest.tests.tests.tsh,
+      // Test fields (map from grouped structure to flat entity fields)
+      cbc_with_platelet: labRequest.tests.tests.routine.cbcWithPlatelet,
+      pregnancy_test: labRequest.tests.tests.routine.pregnancyTest,
+      urinalysis: labRequest.tests.tests.routine.urinalysis,
+      fecalysis: labRequest.tests.tests.routine.fecalysis,
+      occult_blood_test: labRequest.tests.tests.routine.occultBloodTest,
+      hepa_b_screening: labRequest.tests.tests.serology.hepatitisBScreening,
+      hepa_a_screening: labRequest.tests.tests.serology.hepatitisAScreening,
+      hepatitis_profile: labRequest.tests.tests.serology.hepatitisProfile,
+      vdrl_rpr: labRequest.tests.tests.serology.vdrlRpr,
+      dengue_ns1: labRequest.tests.tests.serology.dengueNs1,
+      ca_125_cea_psa: labRequest.tests.tests.serology.tumorMarkers,
+      fbs: labRequest.tests.tests.bloodChemistry.fbs,
+      bun: labRequest.tests.tests.bloodChemistry.bun,
+      creatinine: labRequest.tests.tests.bloodChemistry.creatinine,
+      blood_uric_acid: labRequest.tests.tests.bloodChemistry.bloodUricAcid,
+      lipid_profile: labRequest.tests.tests.bloodChemistry.lipidProfile,
+      sgot: labRequest.tests.tests.bloodChemistry.sgot,
+      sgpt: labRequest.tests.tests.bloodChemistry.sgpt,
+      alp: labRequest.tests.tests.bloodChemistry.alkalinePhosphatase,
+      sodium_na: labRequest.tests.tests.bloodChemistry.sodium,
+      potassium_k: labRequest.tests.tests.bloodChemistry.potassium,
+      hbalc: labRequest.tests.tests.bloodChemistry.hba1c,
+      ecg: labRequest.tests.tests.miscellaneous.ecg,
+      t3: labRequest.tests.tests.thyroid.t3,
+      t4: labRequest.tests.tests.thyroid.t4,
+      ft3: labRequest.tests.tests.thyroid.ft3,
+      ft4: labRequest.tests.tests.thyroid.ft4,
+      tsh: labRequest.tests.tests.thyroid.tsh,
       created_at: labRequest.createdAt,
       updated_at: labRequest.updatedAt,
     };
@@ -761,8 +818,16 @@ export class LaboratoryMapper {
       bacteria: result.bacteria,
       amorphous: result.amorphousUrates,
       others: result.others,
-      createdAt: result.createdAt?.toISOString(),
-      updatedAt: result.updatedAt?.toISOString(),
+      createdAt: result.createdAt 
+        ? (result.createdAt instanceof Date 
+            ? result.createdAt.toISOString() 
+            : new Date(result.createdAt).toISOString()) 
+        : undefined,
+      updatedAt: result.updatedAt 
+        ? (result.updatedAt instanceof Date 
+            ? result.updatedAt.toISOString() 
+            : new Date(result.updatedAt).toISOString()) 
+        : undefined,
     };
   }
 
@@ -799,8 +864,16 @@ export class LaboratoryMapper {
       mch: result.mch,
       mchc: result.mchc,
       esr: result.esr,
-      createdAt: result.createdAt?.toISOString(),
-      updatedAt: result.updatedAt?.toISOString(),
+      createdAt: result.createdAt 
+        ? (result.createdAt instanceof Date 
+            ? result.createdAt.toISOString() 
+            : new Date(result.createdAt).toISOString()) 
+        : undefined,
+      updatedAt: result.updatedAt 
+        ? (result.updatedAt instanceof Date 
+            ? result.updatedAt.toISOString() 
+            : new Date(result.updatedAt).toISOString()) 
+        : undefined,
     };
   }
 
@@ -830,8 +903,16 @@ export class LaboratoryMapper {
       occultBlood: result.occultBlood,
       urobilinogen: result.urobilinogen,
       others: result.others,
-      createdAt: result.createdAt?.toISOString(),
-      updatedAt: result.updatedAt?.toISOString(),
+      createdAt: result.createdAt 
+        ? (result.createdAt instanceof Date 
+            ? result.createdAt.toISOString() 
+            : new Date(result.createdAt).toISOString()) 
+        : undefined,
+      updatedAt: result.updatedAt 
+        ? (result.updatedAt instanceof Date 
+            ? result.updatedAt.toISOString() 
+            : new Date(result.updatedAt).toISOString()) 
+        : undefined,
     };
   }
 
@@ -867,8 +948,16 @@ export class LaboratoryMapper {
       bloodType: result.bloodType,
       rhFactor: result.rhFactor,
       others: result.others,
-      createdAt: result.createdAt?.toISOString(),
-      updatedAt: result.updatedAt?.toISOString(),
+      createdAt: result.createdAt 
+        ? (result.createdAt instanceof Date 
+            ? result.createdAt.toISOString() 
+            : new Date(result.createdAt).toISOString()) 
+        : undefined,
+      updatedAt: result.updatedAt 
+        ? (result.updatedAt instanceof Date 
+            ? result.updatedAt.toISOString() 
+            : new Date(result.updatedAt).toISOString()) 
+        : undefined,
     };
   }
 

@@ -1,4 +1,4 @@
-export type LabRequestStatusType = 'pending' | 'complete' | 'cancelled';
+export type LabRequestStatusType = 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
 export class LabRequestStatus {
   private readonly _value: LabRequestStatusType;
@@ -13,14 +13,18 @@ export class LabRequestStatus {
     switch (normalizedValue) {
       case 'pending':
         return new LabRequestStatus('pending');
+      case 'in_progress':
+      case 'in-progress':
+      case 'inprogress':
+        return new LabRequestStatus('in_progress');
       case 'complete':
       case 'completed':
-        return new LabRequestStatus('complete');
+        return new LabRequestStatus('completed');
       case 'cancelled':
       case 'canceled':
         return new LabRequestStatus('cancelled');
       default:
-        throw new Error(`Invalid lab request status: ${value}. Must be pending, complete, or cancelled`);
+        throw new Error(`Invalid lab request status: ${value}. Must be pending, in_progress, completed, or cancelled`);
     }
   }
 
@@ -29,7 +33,7 @@ export class LabRequestStatus {
   }
 
   validate(): void {
-    const validStatuses: LabRequestStatusType[] = ['pending', 'complete', 'cancelled'];
+    const validStatuses: LabRequestStatusType[] = ['pending', 'completed', 'cancelled'];
     if (!validStatuses.includes(this._value)) {
       throw new Error(`Invalid status: ${this._value}`);
     }
@@ -48,7 +52,7 @@ export class LabRequestStatus {
   }
 
   isComplete(): boolean {
-    return this._value === 'complete';
+    return this._value === 'completed';
   }
 
   isCancelled(): boolean {

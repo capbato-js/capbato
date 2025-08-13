@@ -147,9 +147,9 @@ export class LaboratoryController {
   ) {}
 
   /**
-   * GET /api/laboratory/lab-requests - Get all lab requests
+   * GET /api/laboratory/requests - Get all lab requests
    */
-  @Get('/lab-requests')
+  @Get('/requests')
   async getAllLabRequests(): Promise<LabRequestListResponse> {
     const labRequests = await this.getAllLabRequestsQueryHandler.execute();
     const labRequestDtos = LaboratoryMapper.toLabRequestDtoArray(labRequests);
@@ -158,9 +158,9 @@ export class LaboratoryController {
   }
 
   /**
-   * GET /api/laboratory/lab-requests/completed - Get completed lab requests
+   * GET /api/laboratory/requests/completed - Get completed lab requests
    */
-  @Get('/lab-requests/completed')
+  @Get('/requests/completed')
   async getCompletedLabRequests(): Promise<LabRequestListResponse> {
     const labRequests = await this.getCompletedLabRequestsQueryHandler.execute();
     const labRequestDtos = LaboratoryMapper.toLabRequestDtoArray(labRequests);
@@ -169,9 +169,9 @@ export class LaboratoryController {
   }
 
   /**
-   * GET /api/laboratory/lab-requests/:patientId - Get lab request by patient ID (most recent)
+   * GET /api/laboratory/requests/:patientId - Get lab request by patient ID (most recent)
    */
-  @Get('/lab-requests/:patientId')
+  @Get('/requests/:patientId')
   async getLabRequestByPatientId(@Param('patientId') patientId: string): Promise<LabRequestResponse> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     const labRequest = await this.getLabRequestByPatientIdQueryHandler.execute(validatedPatientId);
@@ -210,9 +210,9 @@ export class LaboratoryController {
   }
 
   /**
-   * POST /api/laboratory/lab-requests - Create a new lab request
+   * POST /api/laboratory/requests - Create a new lab request
    */
-  @Post('/lab-requests')
+  @Post('/requests')
   @HttpCode(201)
   async createLabRequest(@Body() body: CreateLabRequestRequestDto): Promise<LabRequestResponse> {
     const validatedData = this.validationService.validateCreateLabRequestCommand(body);
@@ -223,9 +223,9 @@ export class LaboratoryController {
   }
 
   /**
-   * PUT /api/laboratory/lab-requests/:patientId/:requestDate - Update lab request results
+   * PUT /api/laboratory/requests/:patientId/:requestDate - Update lab request results
    */
-  @Put('/lab-requests/:patientId/:requestDate')
+  @Put('/requests/:patientId/:requestDate')
   async updateLabRequestResults(
     @Param('patientId') patientId: string,
     @Param('requestDate') requestDate: string,

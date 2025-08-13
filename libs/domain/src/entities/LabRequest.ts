@@ -90,7 +90,7 @@ export class LabRequest implements ILabRequest {
       this._patientInfo,
       this._requestDate,
       this._tests,
-      LabRequestStatus.create('complete'),
+      LabRequestStatus.create('completed'),
       this._id,
       dateTaken,
       this._others,
@@ -128,7 +128,7 @@ export class LabRequest implements ILabRequest {
   }
 
   isCompleted(): boolean {
-    return this._status.value === 'complete';
+    return this._status.value === 'completed';
   }
 
   isPending(): boolean {

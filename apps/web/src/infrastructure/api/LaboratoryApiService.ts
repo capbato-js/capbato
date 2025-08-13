@@ -29,7 +29,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
     try {
       console.log('📋 Creating lab request:', command);
       
-      const response = await this.httpClient.post<LabRequestResponse>('/api/laboratory/lab-requests', command);
+      const response = await this.httpClient.post<LabRequestResponse>('/api/laboratory/requests', command);
       
       console.log('✅ Lab request created successfully:', response.data);
       
@@ -50,9 +50,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async getAllLabRequests(): Promise<LabRequestListResponse> {
     try {
-      console.log('📋 Fetching all lab requests from:', '/api/laboratory/lab-requests');
+      console.log('📋 Fetching all lab requests from:', '/api/laboratory/requests');
       
-      const response = await this.httpClient.get<LabRequestListResponse>('/api/laboratory/lab-requests');
+      const response = await this.httpClient.get<LabRequestListResponse>('/api/laboratory/requests');
       
       console.log('🔍 Raw API response:', response);
       console.log('📊 Response data:', response.data);
@@ -84,7 +84,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
     try {
       console.log('📋 Fetching lab request for patient:', patientId);
       
-      const response = await this.httpClient.get<LabRequestResponse>(`/api/laboratory/lab-requests/${patientId}`);
+      const response = await this.httpClient.get<LabRequestResponse>(`/api/laboratory/requests/${patientId}`);
       
       console.log('✅ Lab request fetched successfully for patient:', patientId);
       return response.data;
@@ -136,7 +136,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.log('📋 Updating lab results for patient:', patientId, 'date:', requestDate);
       
       const response = await this.httpClient.put<{ message: string }>(
-        `/api/laboratory/lab-requests/${patientId}/results`,
+        `/api/laboratory/requests/${patientId}/results`,
         { requestDate, results }
       );
       
@@ -161,7 +161,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
     try {
       console.log('📋 Fetching completed lab requests');
       
-      const response = await this.httpClient.get<LabRequestListResponse>('/api/laboratory/lab-requests/completed');
+      const response = await this.httpClient.get<LabRequestListResponse>('/api/laboratory/requests/completed');
       
       console.log('✅ Completed lab requests fetched successfully:', response.data?.data?.length || 0, 'items');
       return response.data;
