@@ -34,7 +34,7 @@ export interface LaboratoryResult {
 export interface LabTest {
   id: string;
   testCategory: 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'CBC' | 'THYROID_FUNCTION';
-  tests: string[]; // Array of test IDs like ['fbs', 'bun', 'creatinine']
+  tests: string[]; // Array of test IDs like ['blood_chemistry_fbs', 'blood_chemistry_bun', 'blood_chemistry_creatinine']
   testDisplayNames?: string[]; // Optional formatted names like ['FBS', 'BUN', 'Creatinine']
   date: string;
   status: 'Complete' | 'Confirmed' | 'Pending' | 'In Progress';

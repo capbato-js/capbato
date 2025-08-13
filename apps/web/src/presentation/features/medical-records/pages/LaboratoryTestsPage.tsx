@@ -250,7 +250,7 @@ export const LaboratoryTestsPage: React.FC = () => {
       // Check if this is a blood chemistry test by looking at the selected tests
       const isBloodChemistryTest = selectedLabTest.testName.toLowerCase().includes('blood chemistry') ||
                                    selectedLabTest.selectedTests.some(test => 
-                                     ['fbs', 'bun', 'creatinine', 'uric_acid', 'cholesterol', 'triglycerides', 'hdl', 'ldl', 'sgot', 'sgpt']
+                                     ['blood_chemistry_fbs', 'blood_chemistry_bun', 'blood_chemistry_creatinine', 'blood_chemistry_blood_uric_acid', 'blood_chemistry_cholesterol', 'blood_chemistry_triglycerides', 'blood_chemistry_hdl', 'blood_chemistry_ldl', 'blood_chemistry_sgot', 'blood_chemistry_sgpt']
                                        .includes(test.toLowerCase())
                                    );
 

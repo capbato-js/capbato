@@ -18,7 +18,7 @@ import { AddLabTestFormSchema } from '@nx-starter/application-shared';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { FormSelect } from '../../../components/ui/FormSelect';
 import { Icon } from '../../../components/common';
-import { LAB_TEST_ITEMS } from '../constants/labTestConstants';
+import { LAB_TEST_ITEMS, formatTestLabel, calculateTotalPrice, formatTestPrice } from '../constants/labTestConstants';
 import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 
 // Type for add lab test form
@@ -252,11 +252,53 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
           </Grid>
         </Box>
 
-        {/* Lab Tests Selection Section - Two Column Layout */}
+        {/* Lab Tests Selection Section - Three Column Layout */}
         <Box>
           <Grid gutter="lg">
-            {/* Left Column */}
-            <Grid.Col span={6}>
+            {/* Column 1: BLOOD CHEMISTRY */}
+            <Grid.Col span={4}>
+              <Box>
+                <Title order={5} mb="sm" style={{ textDecoration: 'underline', fontSize: '16px' }}>
+                  BLOOD CHEMISTRY
+                </Title>
+                <Stack gap="xs">
+                  {bloodChemistryTests.map((test) => (
+                    <Checkbox
+                      key={test.id}
+                      label={formatTestLabel(test.name, test.price)}
+                      checked={selectedTests.includes(test.id)}
+                      onChange={(event) => handleTestSelection(test.id, event.currentTarget.checked)}
+                      disabled={isLoading}
+                      size="sm"
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            </Grid.Col>
+
+            {/* Column 2: SEROLOGY & IMMUNOLOGY */}
+            <Grid.Col span={4}>
+              <Box>
+                <Title order={5} mb="sm" style={{ textDecoration: 'underline', fontSize: '16px' }}>
+                  SEROLOGY & IMMUNOLOGY
+                </Title>
+                <Stack gap="xs">
+                  {serologyTests.map((test) => (
+                    <Checkbox
+                      key={test.id}
+                      label={formatTestLabel(test.name, test.price)}
+                      checked={selectedTests.includes(test.id)}
+                      onChange={(event) => handleTestSelection(test.id, event.currentTarget.checked)}
+                      disabled={isLoading}
+                      size="sm"
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            </Grid.Col>
+
+            {/* Column 3: ROUTINE, THYROID FUNCTION TEST, MISCELLANEOUS TEST */}
+            <Grid.Col span={4}>
               {/* ROUTINE */}
               <Box mb="lg">
                 <Title order={5} mb="sm" style={{ textDecoration: 'underline', fontSize: '16px' }}>
@@ -266,7 +308,7 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
                   {routineTests.map((test) => (
                     <Checkbox
                       key={test.id}
-                      label={`${test.name} (${test.price})`}
+                      label={formatTestLabel(test.name, test.price)}
                       checked={selectedTests.includes(test.id)}
                       onChange={(event) => handleTestSelection(test.id, event.currentTarget.checked)}
                       disabled={isLoading}
@@ -276,16 +318,16 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
                 </Stack>
               </Box>
 
-              {/* SEROLOGY & IMMUNOLOGY */}
+              {/* THYROID FUNCTION TEST */}
               <Box mb="lg">
                 <Title order={5} mb="sm" style={{ textDecoration: 'underline', fontSize: '16px' }}>
-                  SEROLOGY & IMMUNOLOGY
+                  THYROID FUNCTION TEST
                 </Title>
                 <Stack gap="xs">
-                  {serologyTests.map((test) => (
+                  {thyroidTests.map((test) => (
                     <Checkbox
                       key={test.id}
-                      label={`${test.name} (${test.price})`}
+                      label={formatTestLabel(test.name, test.price)}
                       checked={selectedTests.includes(test.id)}
                       onChange={(event) => handleTestSelection(test.id, event.currentTarget.checked)}
                       disabled={isLoading}
@@ -304,48 +346,7 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
                   {miscellaneousTests.map((test) => (
                     <Checkbox
                       key={test.id}
-                      label={`${test.name} (${test.price})`}
-                      checked={selectedTests.includes(test.id)}
-                      onChange={(event) => handleTestSelection(test.id, event.currentTarget.checked)}
-                      disabled={isLoading}
-                      size="sm"
-                    />
-                  ))}
-                </Stack>
-              </Box>
-            </Grid.Col>
-
-            {/* Right Column */}
-            <Grid.Col span={6}>
-              {/* BLOOD CHEMISTRY */}
-              <Box mb="lg">
-                <Title order={5} mb="sm" style={{ textDecoration: 'underline', fontSize: '16px' }}>
-                  BLOOD CHEMISTRY
-                </Title>
-                <Stack gap="xs">
-                  {bloodChemistryTests.map((test) => (
-                    <Checkbox
-                      key={test.id}
-                      label={`${test.name} (${test.price})`}
-                      checked={selectedTests.includes(test.id)}
-                      onChange={(event) => handleTestSelection(test.id, event.currentTarget.checked)}
-                      disabled={isLoading}
-                      size="sm"
-                    />
-                  ))}
-                </Stack>
-              </Box>
-
-              {/* THYROID FUNCTION TEST */}
-              <Box>
-                <Title order={5} mb="sm" style={{ textDecoration: 'underline', fontSize: '16px' }}>
-                  THYROID FUNCTION TEST
-                </Title>
-                <Stack gap="xs">
-                  {thyroidTests.map((test) => (
-                    <Checkbox
-                      key={test.id}
-                      label={`${test.name} (${test.price})`}
+                      label={formatTestLabel(test.name, test.price)}
                       checked={selectedTests.includes(test.id)}
                       onChange={(event) => handleTestSelection(test.id, event.currentTarget.checked)}
                       disabled={isLoading}
@@ -373,6 +374,15 @@ export const AddLabTestForm: React.FC<AddLabTestFormProps> = ({
           <Alert color="red" mt="sm">
             {errors.selectedTests.message}
           </Alert>
+        )}
+
+        {/* Total Price Display */}
+        {selectedTests.length > 0 && (
+          <Box style={{ alignSelf: 'center' }}>
+            <Text size="lg" fw={500} ta="center">
+              Total: {formatTestPrice(calculateTotalPrice(selectedTests))}
+            </Text>
+          </Box>
         )}
 
         {/* Submit Button */}
