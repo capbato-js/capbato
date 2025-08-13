@@ -27,12 +27,8 @@ export class OverrideDate {
       throw new Error('Invalid override date');
     }
 
-    // Validate that date is not in the past (optional business rule)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (parsedDate < today) {
-      throw new Error('Cannot create override for past dates');
-    }
+    // Note: Past date validation moved to CreateScheduleOverrideUseCase
+    // This allows reading/displaying existing past overrides from database
   }
 
   get value(): string {
