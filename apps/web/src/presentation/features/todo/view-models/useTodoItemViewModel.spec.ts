@@ -23,7 +23,9 @@ describe('useTodoItemViewModel', () => {
 
   beforeEach(() => {
     // Create spy after setup.ts has run
-    consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+      // Mock implementation for console.error
+    });
     
     mockStore = {
       toggleTodo: vi.fn(),

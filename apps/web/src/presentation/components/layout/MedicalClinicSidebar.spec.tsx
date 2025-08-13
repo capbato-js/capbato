@@ -9,7 +9,7 @@ const isNavigationItemActive = (currentPath: string, itemPath: string): boolean 
   
   // For nested routes, check if current path starts with the item path
   // This handles cases like /patients/new or /patients/:id under /patients
-  const itemsWithNestedRoutes = ['/patients', '/doctors', '/appointments'];
+  const itemsWithNestedRoutes = ['/patients', '/doctors', '/appointments', '/laboratory'];
   
   if (itemsWithNestedRoutes.includes(itemPath)) {
     return currentPath.startsWith(itemPath + '/') || currentPath === itemPath;
@@ -73,15 +73,24 @@ describe('MedicalClinicSidebar - Navigation Active Logic', () => {
     });
   });
 
+  describe('Laboratory navigation', () => {
+    it('should be active on /laboratory', () => {
+      expect(isNavigationItemActive('/laboratory', '/laboratory')).toBe(true);
+    });
+
+    it('should be active on /laboratory/new', () => {
+      expect(isNavigationItemActive('/laboratory/new', '/laboratory')).toBe(true);
+    });
+
+    it('should be active on /laboratory/tests/123', () => {
+      expect(isNavigationItemActive('/laboratory/tests/123', '/laboratory')).toBe(true);
+    });
+  });
+
   describe('Other navigation items (exact match only)', () => {
     it('dashboard should only be active on exact /dashboard', () => {
       expect(isNavigationItemActive('/dashboard', '/dashboard')).toBe(true);
       expect(isNavigationItemActive('/dashboard/something', '/dashboard')).toBe(false);
-    });
-
-    it('laboratory should only be active on exact /laboratory', () => {
-      expect(isNavigationItemActive('/laboratory', '/laboratory')).toBe(true);
-      expect(isNavigationItemActive('/laboratory/something', '/laboratory')).toBe(false);
     });
 
     it('prescriptions should only be active on exact /prescriptions', () => {

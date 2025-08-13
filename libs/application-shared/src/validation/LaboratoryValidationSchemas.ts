@@ -29,14 +29,20 @@ export const CreateLabRequestCommandSchema = z.object({
   // Hepatitis Tests
   hepaBScreening: LabTestFieldSchema,
   hepaAScreening: LabTestFieldSchema,
+  hepaCScreening: LabTestFieldSchema,
   hepatitisProfile: LabTestFieldSchema,
   
   // STD Tests
   vdrlRpr: LabTestFieldSchema,
   
-  // Other Tests
+  // Serology Tests
+  crp: LabTestFieldSchema,
   dengueNs1: LabTestFieldSchema,
+  aso: LabTestFieldSchema,
+  raRf: LabTestFieldSchema,
+  tumorMarkers: LabTestFieldSchema,
   ca125CeaPsa: LabTestFieldSchema,
+  betaHcg: LabTestFieldSchema,
   
   // Blood Chemistry Results
   fbs: LabTestFieldSchema,
@@ -62,8 +68,9 @@ export const CreateLabRequestCommandSchema = z.object({
   // Check if at least one test is selected
   const testFields = [
     data.cbcWithPlatelet, data.pregnancyTest, data.urinalysis, data.fecalysis,
-    data.occultBloodTest, data.hepaBScreening, data.hepaAScreening,
-    data.hepatitisProfile, data.vdrlRpr, data.dengueNs1, data.ca125CeaPsa,
+    data.occultBloodTest, data.hepaBScreening, data.hepaAScreening, data.hepaCScreening,
+    data.hepatitisProfile, data.vdrlRpr, data.crp, data.dengueNs1, data.aso, data.raRf,
+    data.tumorMarkers, data.ca125CeaPsa, data.betaHcg,
     data.fbs, data.bun, data.creatinine, data.bloodUricAcid, data.lipidProfile,
     data.sgot, data.sgpt, data.alp, data.sodiumNa, data.potassiumK, data.hbalc,
     data.ecg, data.t3, data.t4, data.ft3, data.ft4, data.tsh
@@ -96,10 +103,16 @@ export const UpdateLabRequestCommandSchema = z.object({
   occultBloodTest: LabTestFieldSchema,
   hepaBScreening: LabTestFieldSchema,
   hepaAScreening: LabTestFieldSchema,
+  hepaCScreening: LabTestFieldSchema,
   hepatitisProfile: LabTestFieldSchema,
   vdrlRpr: LabTestFieldSchema,
+  crp: LabTestFieldSchema,
   dengueNs1: LabTestFieldSchema,
+  aso: LabTestFieldSchema,
+  raRf: LabTestFieldSchema,
+  tumorMarkers: LabTestFieldSchema,
   ca125CeaPsa: LabTestFieldSchema,
+  betaHcg: LabTestFieldSchema,
   fbs: LabTestFieldSchema,
   bun: LabTestFieldSchema,
   creatinine: LabTestFieldSchema,

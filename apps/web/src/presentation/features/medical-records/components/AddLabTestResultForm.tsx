@@ -24,7 +24,7 @@ export type AddLabTestResultFormData = Record<string, string | undefined>;
 
 interface AddLabTestResultFormProps {
   testType?: LabTestType;
-  enabledFields?: string[]; // Array of field IDs that should be enabled (e.g., ['fbs', 'bun'])
+  enabledFields?: string[]; // Array of field IDs that should be enabled (e.g., ['blood_chemistry_fbs', 'blood_chemistry_bun'])
   viewMode?: boolean; // If true, all fields are read-only and form shows existing data
   existingData?: AddLabTestResultFormData; // Pre-populate form with existing results
   patientData?: {

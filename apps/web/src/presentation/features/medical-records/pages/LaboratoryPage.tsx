@@ -1,20 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMantineTheme } from '@mantine/core';
-import { Modal } from '../../../components/common';
 import { DataTable, DataTableHeader, TableColumn, TableActions } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
 import { LaboratoryResult } from '../types';
-import { AddLabTestForm } from '../components';
 import { useLaboratoryStore } from '../../../../infrastructure/state/LaboratoryStore';
-import { CreateLabRequestCommand } from '@nx-starter/application-shared';
 
 export const LaboratoryPage: React.FC = () => {
-  // Modal state
-  const [modalOpened, setModalOpened] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -29,7 +21,6 @@ export const LaboratoryPage: React.FC = () => {
   const { 
     labRequests, 
     fetchAllLabRequests, 
-    createLabRequest,
     loadingStates, 
     errorStates 
   } = useLaboratoryStore();
@@ -105,93 +96,7 @@ export const LaboratoryPage: React.FC = () => {
   }, [labRequests]);
 
   const handleAddTest = () => {
-    setModalOpened(true);
-    setError(null);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpened(false);
-    setError(null);
-  };
-
-  const handleLabTestSubmit = async (data: {
-    patientName: string;
-    ageGender: string;
-    requestDate: string;
-    selectedTests: string[];
-    otherTests?: string;
-  }) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      console.log('🔍 Form data received:', data);
-      console.log('🔍 Selected tests:', data.selectedTests);
-      
-      // Use the real laboratory API through the store
-      
-      // Convert to CreateLabRequestCommand format
-      const command: CreateLabRequestCommand = {
-        patientId: `2025-${Date.now()}`, // Generate temporary ID
-        patientName: data.patientName,
-        ageGender: data.ageGender,
-        requestDate: new Date(data.requestDate),
-        others: data.otherTests || '',
-        
-        // Map selected tests to command fields using the correct test IDs
-        cbcWithPlatelet: data.selectedTests.includes('cbc') ? 'Yes' : undefined,
-        pregnancyTest: data.selectedTests.includes('pregnancy') ? 'Yes' : undefined,
-        urinalysis: data.selectedTests.includes('urinalysis') ? 'Yes' : undefined,
-        fecalysis: data.selectedTests.includes('fecalysis') ? 'Yes' : undefined,
-        occultBloodTest: data.selectedTests.includes('occult_blood') ? 'Yes' : undefined,
-        hepaBScreening: data.selectedTests.includes('hepa_b') ? 'Yes' : undefined,
-        hepaAScreening: data.selectedTests.includes('hepa_a') ? 'Yes' : undefined,
-        hepatitisProfile: data.selectedTests.includes('hepatitis_profile') ? 'Yes' : undefined,
-        vdrlRpr: data.selectedTests.includes('vdrl_rpr') ? 'Yes' : undefined,
-        dengueNs1: data.selectedTests.includes('dengue_ns1') ? 'Yes' : undefined,
-        ca125CeaPsa: data.selectedTests.includes('ca_markers') ? 'Yes' : undefined,
-        fbs: data.selectedTests.includes('fbs') ? 'Yes' : undefined,
-        bun: data.selectedTests.includes('bun') ? 'Yes' : undefined,
-        creatinine: data.selectedTests.includes('creatinine') ? 'Yes' : undefined,
-        bloodUricAcid: data.selectedTests.includes('uric_acid') ? 'Yes' : undefined,
-        lipidProfile: data.selectedTests.includes('lipid_profile') ? 'Yes' : undefined,
-        sgot: data.selectedTests.includes('sgot') ? 'Yes' : undefined,
-        sgpt: data.selectedTests.includes('sgpt') ? 'Yes' : undefined,
-        alp: data.selectedTests.includes('alp') ? 'Yes' : undefined,
-        sodiumNa: data.selectedTests.includes('sodium') ? 'Yes' : undefined,
-        potassiumK: data.selectedTests.includes('potassium') ? 'Yes' : undefined,
-        hbalc: data.selectedTests.includes('hba1c') ? 'Yes' : undefined,
-        ecg: data.selectedTests.includes('ecg') ? 'Yes' : undefined,
-        t3: data.selectedTests.includes('t3') ? 'Yes' : undefined,
-        t4: data.selectedTests.includes('t4') ? 'Yes' : undefined,
-        ft3: data.selectedTests.includes('ft3') ? 'Yes' : undefined,
-        ft4: data.selectedTests.includes('ft4') ? 'Yes' : undefined,
-        tsh: data.selectedTests.includes('tsh') ? 'Yes' : undefined,
-      };
-      
-      console.log('🔍 Command to be sent:', command);
-      
-      const success = await createLabRequest(command);
-      
-      console.log('🔍 Create lab request returned:', success);
-      
-      if (success) {
-        // Close modal on success
-        setModalOpened(false);
-        
-        // Refresh the lab tests list
-        await fetchAllLabRequests();
-        
-        console.log('Lab test request submitted successfully!');
-      } else {
-        throw new Error('Failed to submit lab test request');
-      }
-      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit lab test request');
-    } finally {
-      setIsLoading(false);
-    }
+    navigate('/laboratory/new');
   };
 
   const handleViewResult = (result: LaboratoryResult) => {
@@ -310,25 +215,6 @@ export const LaboratoryPage: React.FC = () => {
           Error loading laboratory results: {errorStates.fetchError}
         </div>
       )}
-
-      {/* Add Lab Test Modal */}
-      <Modal
-        opened={modalOpened}
-        onClose={handleCloseModal}
-        title=""
-        size="xl"
-        customStyles={{
-          body: {
-            padding: '10px 24px 24px', // Reduced top padding to prevent border overlap
-          }
-        }}
-      >
-        <AddLabTestForm
-          onSubmit={handleLabTestSubmit}
-          isLoading={isLoading}
-          error={error}
-        />
-      </Modal>
     </MedicalClinicLayout>
   );
 };

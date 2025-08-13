@@ -18,7 +18,7 @@ const isNavigationItemActive = (currentPath: string, itemPath: string): boolean 
   
   // For nested routes, check if current path starts with the item path
   // This handles cases like /patients/new or /patients/:id under /patients
-  const itemsWithNestedRoutes = ['/patients', '/doctors', '/appointments'];
+  const itemsWithNestedRoutes = ['/patients', '/doctors', '/appointments', '/laboratory'];
   
   if (itemsWithNestedRoutes.includes(itemPath)) {
     return currentPath.startsWith(itemPath + '/') || currentPath === itemPath;
