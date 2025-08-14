@@ -32,7 +32,7 @@ export class UpdateLabRequestResultsUseCase {
 
     // Update status if provided
     if (command.status) {
-      if (command.status === 'complete') {
+      if (command.status === 'completed') {
         updatedLabRequest = updatedLabRequest.complete(command.dateTaken || new Date());
       } else if (command.status === 'cancelled') {
         updatedLabRequest = updatedLabRequest.cancel();
@@ -41,23 +41,29 @@ export class UpdateLabRequestResultsUseCase {
 
     // Update test results if provided
     const testUpdates: Record<string, string> = {};
-    if (command.fbs) testUpdates['fbs'] = command.fbs;
-    if (command.bun) testUpdates['bun'] = command.bun;
-    if (command.creatinine) testUpdates['creatinine'] = command.creatinine;
-    if (command.bloodUricAcid) testUpdates['bloodUricAcid'] = command.bloodUricAcid;
-    if (command.lipidProfile) testUpdates['lipidProfile'] = command.lipidProfile;
-    if (command.sgot) testUpdates['sgot'] = command.sgot;
-    if (command.sgpt) testUpdates['sgpt'] = command.sgpt;
-    if (command.alp) testUpdates['alp'] = command.alp;
-    if (command.sodiumNa) testUpdates['sodiumNa'] = command.sodiumNa;
-    if (command.potassiumK) testUpdates['potassiumK'] = command.potassiumK;
-    if (command.hbalc) testUpdates['hbalc'] = command.hbalc;
-    if (command.ecg) testUpdates['ecg'] = command.ecg;
-    if (command.t3) testUpdates['t3'] = command.t3;
-    if (command.t4) testUpdates['t4'] = command.t4;
-    if (command.ft3) testUpdates['ft3'] = command.ft3;
-    if (command.ft4) testUpdates['ft4'] = command.ft4;
-    if (command.tsh) testUpdates['tsh'] = command.tsh;
+    
+    // Blood chemistry tests
+    if (command.bloodChemistry?.fbs) testUpdates['fbs'] = 'true';
+    if (command.bloodChemistry?.bun) testUpdates['bun'] = 'true';
+    if (command.bloodChemistry?.creatinine) testUpdates['creatinine'] = 'true';
+    if (command.bloodChemistry?.bloodUricAcid) testUpdates['bloodUricAcid'] = 'true';
+    if (command.bloodChemistry?.lipidProfile) testUpdates['lipidProfile'] = 'true';
+    if (command.bloodChemistry?.sgot) testUpdates['sgot'] = 'true';
+    if (command.bloodChemistry?.sgpt) testUpdates['sgpt'] = 'true';
+    if (command.bloodChemistry?.alkalinePhosphatase) testUpdates['alp'] = 'true';
+    if (command.bloodChemistry?.sodium) testUpdates['sodiumNa'] = 'true';
+    if (command.bloodChemistry?.potassium) testUpdates['potassiumK'] = 'true';
+    if (command.bloodChemistry?.hba1c) testUpdates['hbalc'] = 'true';
+    
+    // Miscellaneous tests
+    if (command.miscellaneous?.ecg) testUpdates['ecg'] = 'true';
+    
+    // Thyroid tests
+    if (command.thyroid?.t3) testUpdates['t3'] = 'true';
+    if (command.thyroid?.t4) testUpdates['t4'] = 'true';
+    if (command.thyroid?.ft3) testUpdates['ft3'] = 'true';
+    if (command.thyroid?.ft4) testUpdates['ft4'] = 'true';
+    if (command.thyroid?.tsh) testUpdates['tsh'] = 'true';
 
     if (Object.keys(testUpdates).length > 0) {
       const updatedTests = updatedLabRequest.tests.updateResults(testUpdates);

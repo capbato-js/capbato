@@ -85,7 +85,7 @@ export class InMemoryLabRequestRepository implements ILabRequestRepository {
 
   async findCompleted(): Promise<LabRequest[]> {
     const results = Array.from(this.labRequests.values())
-      .filter(lab => lab.status.value === 'complete');
+      .filter(lab => lab.status.value === 'completed');
 
     return results.sort((a, b) => b.requestDate.getTime() - a.requestDate.getTime());
   }

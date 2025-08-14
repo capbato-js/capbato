@@ -119,34 +119,43 @@ export class MongooseLabRequestRepository implements ILabRequestRepository {
 
     // Map tests to document fields
     const tests = labRequest.tests.tests;
-    doc.cbcWithPlatelet = tests.cbcWithPlatelet;
-    doc.pregnancyTest = tests.pregnancyTest;
-    doc.urinalysis = tests.urinalysis;
-    doc.fecalysis = tests.fecalysis;
-    doc.occultBloodTest = tests.occultBloodTest;
-    doc.hepaBScreening = tests.hepaBScreening;
-    doc.hepaAScreening = tests.hepaAScreening;
-    doc.hepatitisProfile = tests.hepatitisProfile;
-    doc.vdrlRpr = tests.vdrlRpr;
-    doc.dengueNs1 = tests.dengueNs1;
-    doc.ca125CeaPsa = tests.ca125CeaPsa;
-    doc.fbs = tests.fbs;
-    doc.bun = tests.bun;
-    doc.creatinine = tests.creatinine;
-    doc.bloodUricAcid = tests.bloodUricAcid;
-    doc.lipidProfile = tests.lipidProfile;
-    doc.sgot = tests.sgot;
-    doc.sgpt = tests.sgpt;
-    doc.alp = tests.alp;
-    doc.sodiumNa = tests.sodiumNa;
-    doc.potassiumK = tests.potassiumK;
-    doc.hbalc = tests.hbalc;
-    doc.ecg = tests.ecg;
-    doc.t3 = tests.t3;
-    doc.t4 = tests.t4;
-    doc.ft3 = tests.ft3;
-    doc.ft4 = tests.ft4;
-    doc.tsh = tests.tsh;
+    // Routine tests
+    doc.cbcWithPlatelet = tests.routine.cbcWithPlatelet ? 'true' : '';
+    doc.pregnancyTest = tests.routine.pregnancyTest ? 'true' : '';
+    doc.urinalysis = tests.routine.urinalysis ? 'true' : '';
+    doc.fecalysis = tests.routine.fecalysis ? 'true' : '';
+    doc.occultBloodTest = tests.routine.occultBloodTest ? 'true' : '';
+    
+    // Serology tests
+    doc.hepaBScreening = tests.serology.hepatitisBScreening ? 'true' : '';
+    doc.hepaAScreening = tests.serology.hepatitisAScreening ? 'true' : '';
+    doc.hepatitisProfile = tests.serology.hepatitisProfile ? 'true' : '';
+    doc.vdrlRpr = tests.serology.vdrlRpr ? 'true' : '';
+    doc.dengueNs1 = tests.serology.dengueNs1 ? 'true' : '';
+    doc.ca125CeaPsa = (tests.serology.ca125 || tests.serology.cea || tests.serology.psa) ? 'true' : '';
+    
+    // Blood chemistry tests
+    doc.fbs = tests.bloodChemistry.fbs ? 'true' : '';
+    doc.bun = tests.bloodChemistry.bun ? 'true' : '';
+    doc.creatinine = tests.bloodChemistry.creatinine ? 'true' : '';
+    doc.bloodUricAcid = tests.bloodChemistry.bloodUricAcid ? 'true' : '';
+    doc.lipidProfile = tests.bloodChemistry.lipidProfile ? 'true' : '';
+    doc.sgot = tests.bloodChemistry.sgot ? 'true' : '';
+    doc.sgpt = tests.bloodChemistry.sgpt ? 'true' : '';
+    doc.alp = tests.bloodChemistry.alkalinePhosphatase ? 'true' : '';
+    doc.sodiumNa = tests.bloodChemistry.sodium ? 'true' : '';
+    doc.potassiumK = tests.bloodChemistry.potassium ? 'true' : '';
+    doc.hbalc = tests.bloodChemistry.hba1c ? 'true' : '';
+    
+    // Miscellaneous tests
+    doc.ecg = tests.miscellaneous.ecg ? 'true' : '';
+    
+    // Thyroid tests
+    doc.t3 = tests.thyroid.t3 ? 'true' : '';
+    doc.t4 = tests.thyroid.t4 ? 'true' : '';
+    doc.ft3 = tests.thyroid.ft3 ? 'true' : '';
+    doc.ft4 = tests.thyroid.ft4 ? 'true' : '';
+    doc.tsh = tests.thyroid.tsh ? 'true' : '';
 
     if (labRequest.id) {
       doc._id = labRequest.id.value;
@@ -163,37 +172,56 @@ export class MongooseLabRequestRepository implements ILabRequestRepository {
     });
 
     const tests = LabRequestTests.create({
-      cbcWithPlatelet: document.cbcWithPlatelet,
-      pregnancyTest: document.pregnancyTest,
-      urinalysis: document.urinalysis,
-      fecalysis: document.fecalysis,
-      occultBloodTest: document.occultBloodTest,
-      hepaBScreening: document.hepaBScreening,
-      hepaAScreening: document.hepaAScreening,
-      hepatitisProfile: document.hepatitisProfile,
-      vdrlRpr: document.vdrlRpr,
-      dengueNs1: document.dengueNs1,
-      ca125CeaPsa: document.ca125CeaPsa,
-      fbs: document.fbs,
-      bun: document.bun,
-      creatinine: document.creatinine,
-      bloodUricAcid: document.bloodUricAcid,
-      lipidProfile: document.lipidProfile,
-      sgot: document.sgot,
-      sgpt: document.sgpt,
-      alp: document.alp,
-      sodiumNa: document.sodiumNa,
-      potassiumK: document.potassiumK,
-      hbalc: document.hbalc,
-      ecg: document.ecg,
-      t3: document.t3,
-      t4: document.t4,
-      ft3: document.ft3,
-      ft4: document.ft4,
-      tsh: document.tsh
+      routine: {
+        cbcWithPlatelet: !!document.cbcWithPlatelet,
+        pregnancyTest: !!document.pregnancyTest,
+        urinalysis: !!document.urinalysis,
+        fecalysis: !!document.fecalysis,
+        occultBloodTest: !!document.occultBloodTest,
+      },
+      serology: {
+        hepatitisBScreening: !!document.hepaBScreening,
+        hepatitisAScreening: !!document.hepaAScreening,
+        hepatitisCScreening: false, // Not stored in document
+        hepatitisProfile: !!document.hepatitisProfile,
+        vdrlRpr: !!document.vdrlRpr,
+        crp: false, // Not stored in document
+        dengueNs1: !!document.dengueNs1,
+        aso: false, // Not stored in document
+        crf: false, // Not stored in document
+        raRf: false, // Not stored in document
+        tumorMarkers: false, // Not stored in document
+        ca125: !!document.ca125CeaPsa, // Combined field
+        cea: !!document.ca125CeaPsa, // Combined field
+        psa: !!document.ca125CeaPsa, // Combined field
+        betaHcg: false, // Not stored in document
+      },
+      bloodChemistry: {
+        fbs: !!document.fbs,
+        bun: !!document.bun,
+        creatinine: !!document.creatinine,
+        bloodUricAcid: !!document.bloodUricAcid,
+        lipidProfile: !!document.lipidProfile,
+        sgot: !!document.sgot,
+        sgpt: !!document.sgpt,
+        alkalinePhosphatase: !!document.alp,
+        sodium: !!document.sodiumNa,
+        potassium: !!document.potassiumK,
+        hba1c: !!document.hbalc,
+      },
+      miscellaneous: {
+        ecg: !!document.ecg,
+      },
+      thyroid: {
+        t3: !!document.t3,
+        t4: !!document.t4,
+        ft3: !!document.ft3,
+        ft4: !!document.ft4,
+        tsh: !!document.tsh,
+      },
     });
 
-    const status = LabRequestStatus.create(document.status as 'pending' | 'complete' | 'cancelled');
+    const status = LabRequestStatus.create(document.status);
 
     return new LabRequest(
       patientInfo,
