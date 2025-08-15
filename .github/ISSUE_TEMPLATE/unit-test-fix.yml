@@ -1,0 +1,355 @@
+name: 🔧 Unit Test Fix
+description: Fix failing unit tests for a specific application or library
+title: "[component] Fix failing unit tests"
+labels: ["testing", "test", "unit-tests", "high-priority", "copilot"]
+assignees: ["copilot"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Application/Library
+      description: Select the application or library with failing tests
+      options:
+        - api
+        - web
+        - domain
+        - application-api
+        - application-shared
+        - application-web
+        - utils-core
+    validations:
+      required: true
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency Level
+      description: How critical are these failing tests?
+      options:
+        - Critical - Blocking deployments/CI pipeline
+        - High - Breaking existing functionality
+        - Medium - Intermittent failures
+        - Low - Minor test issues
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: setup-prerequisites
+    attributes:
+      label: "📋 Setup Prerequisites"
+      description: "**IMPORTANT**: Before working on this issue, ensure you have the correct package manager setup!"
+      value: |
+        ## 🚀 Required Setup Steps
+        
+        **⚠️ CRITICAL**: This project uses **pnpm** as the package manager. Using npm or yarn will cause issues!
+        
+        ### 1. Install pnpm globally (if not already installed)
+        ```bash
+        npm install -g pnpm
+        ```
+        
+        ### 2. Install project dependencies
+        ```bash
+        pnpm install
+        ```
+        
+        ### 3. Verify setup by running tests
+        ```bash
+        # For API components
+        pnpm nx test api
+        
+        # For PWA components  
+        pnpm nx test web
+        
+        # For library components
+        pnpm nx test domain
+        pnpm nx test application-api
+        pnpm nx test application-shared
+        pnpm nx test application-web
+        pnpm nx test utils-core
+        ```
+        
+        **✅ You're ready to work on this issue once these commands run successfully!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-failure-output
+    attributes:
+      label: Test Failure Output
+      description: |
+        Paste the complete test failure output here (optional - coding agent can analyze failing tests).
+        Run the appropriate test command and copy the error messages if available.
+      placeholder: |
+        Example:
+        ```
+        pnpm domain
+        
+        FAIL src/services/user.service.spec.ts
+          ● UserService › should create user
+        
+            TypeError: Cannot read property 'save' of undefined
+              at UserService.createUser (src/services/user.service.ts:15:25)
+              at Object.<anonymous> (src/services/user.service.spec.ts:25:18)
+        
+        Test Suites: 1 failed, 3 passed, 4 total
+        Tests:       2 failed, 8 passed, 10 total
+        ```
+        
+        Or use "_No response_" if no output available.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: failing-tests-list
+    attributes:
+      label: Specific Failing Tests
+      description: |
+        List specific test files and cases that are failing (optional - coding agent can identify these)
+      placeholder: |
+        Example:
+        - src/services/user.service.spec.ts
+          - "should create user" test
+          - "should validate email" test
+        - src/controllers/auth.controller.spec.ts
+          - "should handle login" test
+        
+        Or use "_No response_" if not available.
+    validations:
+      required: false
+
+  - type: textarea
+    id: recent-changes
+    attributes:
+      label: Recent Changes
+      description: |
+        What recent changes might have caused these test failures?
+        (code changes, dependency updates, configuration changes, etc.)
+      placeholder: |
+        - Updated user.service.ts to use new validation logic
+        - Upgraded Vitest from v1.0 to v1.5
+        - Changed database configuration
+        - Modified authentication middleware
+        
+        Or use "_No response_" if no recent changes known.
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-analysis
+    attributes:
+      label: Initial Error Analysis
+      description: |
+        Any initial analysis of what might be causing the failures?
+        (optional - can be filled during investigation)
+      placeholder: |
+        - Error suggests mock repository is undefined
+        - Seems like async operation isn't being awaited properly
+        - Type mismatch between expected and actual values
+        
+        Or use "_No response_" if no initial analysis available.
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-commands
+    attributes:
+      label: Test Commands Reference
+      description: Relevant commands for debugging (auto-populated based on selection)
+      value: |
+        **Run Tests (Short Commands):**
+        - `pnpm domain` - Run domain tests
+        - `pnpm application` - Run application-shared tests  
+        - `pnpm utils` - Run utils-core tests
+        
+        **Coverage for Analysis (Short):**
+        - `pnpm covapi` - API coverage
+        - `pnpm covweb` - PWA coverage
+        - `pnpm covdomain` - Domain coverage
+        - `pnpm covapplication` - Application coverage
+        - `pnpm covutils` - Utils coverage
+        
+        **Debug Commands by Component:**
+        - **api**: `pnpm test:api` 
+        - **web**: `pnpm test:web`
+        - **domain**: `pnpm domain`
+        - **application-shared**: `pnpm application`
+        - **utils-core**: `pnpm utils`
+        
+        **Additional Options:**
+        - `pnpm test:watch` - Run all tests in watch mode for debugging
+        - Add `--no-coverage` - Skip coverage collection for faster execution
+        - Add `--run` - Run tests once (disable watch mode)
+        - Add `--reporter=verbose` - Show detailed test output
+        - Add `--threads=false` - Run tests in single thread for debugging
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be accomplished to close this issue?
+      value: |
+        ## Acceptance Criteria
+        
+        ### Test Execution
+        - [ ] All previously failing tests now pass
+        - [ ] No new test failures introduced
+        - [ ] Tests run successfully in CI environment
+        - [ ] Tests pass consistently (not flaky)
+        
+        ### Root Cause Resolution
+        - [ ] Root cause of failures identified and documented
+        - [ ] Underlying issue fixed (not just test workarounds)
+        - [ ] Similar issues prevented in other parts of codebase
+        
+        ### Code Quality
+        - [ ] Test fixes follow existing patterns and best practices
+        - [ ] No degradation in test coverage
+        - [ ] Tests properly mock external dependencies
+        - [ ] Tests are maintainable and well-documented
+        
+        ### Documentation
+        - [ ] Document any test patterns or practices learned
+        - [ ] Update test documentation if patterns changed
+        - [ ] Add comments for complex test scenarios if needed
+        
+        ### Verification
+        - [ ] Run full test suite to ensure no regressions
+        - [ ] Verify tests pass in clean environment
+        - [ ] Confirm CI pipeline runs successfully
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: debugging-approach
+    attributes:
+      label: Debugging Strategy for Coding Agent
+      description: Systematic approach the coding agent should follow to fix the tests
+      value: |
+        ## Debugging Checklist for Coding Agent
+        
+        **Essential Steps:**
+        - [ ] Run tests in isolation to identify specific failures
+        - [ ] Check test environment setup and configuration
+        - [ ] Verify all mocks and stubs are properly configured
+        - [ ] Review recent code changes that might affect tests
+        - [ ] Ensure all dependencies are properly imported/injected
+        
+        **Additional Investigation:**
+        - [ ] Check for timing issues with async operations
+        - [ ] Validate test data and fixtures are correct
+        - [ ] Review Vitest configuration and setup files
+        
+        **Common Failure Types to Consider:**
+        - Mock/Stub issues (dependencies not properly mocked)
+        - Async/Promise handling problems
+        - Type errors or TypeScript compilation issues
+        - Module import/export problems
+        - Test environment setup issues
+        - Database/external service connection issues
+        - Test data or fixture problems
+        - Timing/race condition issues
+        - Configuration or environment variable issues
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Any additional information that would be helpful for debugging these test failures?
+      placeholder: |
+        - Tests were working before specific commit/PR
+        - Failures only occur in CI, not locally
+        - Intermittent failures vs consistent failures
+        - Related to specific feature or functionality
+        - Performance or timeout issues observed
+        
+        Or use "_No response_" if no additional context available.
+    validations:
+      required: false
+
+  - type: textarea
+    id: commit-message-guidelines
+    attributes:
+      label: "⚠️ CRITICAL: Commit Message Guidelines"
+      description: "**IMPORTANT**: Following these rules is mandatory - commits will FAIL if not followed!"
+      value: |
+        ## ⚠️ MANDATORY Commit Message Format
+        
+        **🚨 FAILURE TO FOLLOW THESE RULES WILL CAUSE COMMIT FAILURES! 🚨**
+        
+        **Format:** `type(scope): subject`
+        
+        **Example:** `fix(api): resolve failing unit tests in todo service`
+        
+        **Available Types:**
+        - `fix` - A bug fix (for fixing failing tests)
+        - `test` - Adding missing tests or correcting existing tests
+        - `refactor` - Code changes that neither fix bugs nor add features
+        - `feat` - A new feature  
+        - `docs` - Documentation only changes
+        - `perf` - Performance improvements
+        - `style` - Formatting changes
+        - `build` - Build system or dependency changes
+        - `ci` - CI configuration changes
+        - `chore` - Other changes
+        
+        **Scope Rules (REQUIRED):**
+        - Use kebab-case (lowercase with hyphens)
+        - Examples: `api`, `web`, `domain`, application-shared`, `utils-core`
+        
+        **Subject Rules (REQUIRED):**
+        - Start with lowercase letter or number
+        - No period at the end
+        - Header length limits vary by scope:
+          - `api-e2e`, `web-e2e`, application-shared`: max 100 characters
+          - `domain`: max 95 characters  
+          - `api`, `web`: max 93 characters
+          - `utils-core`: max 90 characters
+          - All other scopes: max 82 characters
+        - Be descriptive and specific
+        
+        **Reference:** See `commitlint.config.ts` and `.husky/commit-msg` for complete rules
+        
+        **⚠️ Your commits will be automatically rejected if they don't follow these rules!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: clean-architecture-validation
+    attributes:
+      label: Clean Architecture Validation for Coding Agent
+      description: Ensure fixes maintain architectural integrity
+      value: |
+        ## Clean Architecture Guidelines for Coding Agent
+        
+        **Architectural Requirements:**
+        - [ ] Test fixes don't violate dependency inversion principle
+        - [ ] Tests still properly isolate units under test
+        - [ ] Mocking strategy aligns with clean architecture boundaries
+        - [ ] Tests validate business rules independently of infrastructure
+        
+        **Architecture Layers:**
+        - **Domain Core**: Should have no external dependencies
+        - **Application Core**: Can depend on domain but not infrastructure
+        - **Infrastructure**: Can depend on both domain and application layers
+        
+        **Testing Principles:**
+        - Mock external dependencies at architecture boundaries
+        - Test business logic in isolation from infrastructure concerns
+        - Ensure dependency injection works properly in tests
+        - Validate that tests don't bypass architectural constraints
+      render: markdown
+    validations:
+      required: false
