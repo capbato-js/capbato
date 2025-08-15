@@ -25,6 +25,7 @@ import {
   TypeOrmHematologyResultRepository,
   TypeOrmFecalysisResultRepository,
   TypeOrmSerologyResultRepository,
+  TypeOrmLabTestResultRepository,
   MongooseLabRequestRepository,
   MongooseBloodChemistryRepository,
   SqliteLabRequestRepository,
@@ -101,6 +102,7 @@ import {
   CreateSerologyResultUseCase,
   UpdateSerologyResultUseCase,
   DeleteSerologyResultUseCase,
+  CreateLabTestResultUseCase,
   // Laboratory Query Handlers
   GetAllLabRequestsQueryHandler,
   GetCompletedLabRequestsQueryHandler,
@@ -135,6 +137,7 @@ import {
   UpdateFecalysisResultValidationService,
   CreateSerologyResultValidationService,
   UpdateSerologyResultValidationService,
+  CreateLabTestResultValidationService,
   // Prescription Use Cases
   CreatePrescriptionUseCase,
   UpdatePrescriptionUseCase,
@@ -247,7 +250,7 @@ import {
 } from '@nx-starter/application-shared';
 import type { ITodoRepository, IUserRepository, IDoctorRepository, IAddressRepository, IScheduleRepository, IAppointmentRepository, IPrescriptionRepository, IReceiptRepository, IDoctorScheduleOverrideRepository } from '@nx-starter/domain';
 import type { IPatientRepository } from '@nx-starter/application-shared';
-import type { ILabRequestRepository, IBloodChemistryRepository, IUrinalysisResultRepository, IHematologyResultRepository, IFecalysisResultRepository, ISerologyResultRepository } from '@nx-starter/domain';
+import type { ILabRequestRepository, IBloodChemistryRepository, IUrinalysisResultRepository, IHematologyResultRepository, IFecalysisResultRepository, ISerologyResultRepository, ILabTestResultRepository } from '@nx-starter/domain';
 import { AppointmentDomainService } from '@nx-starter/domain';
 import { getTypeOrmDataSource } from '../database/connections/TypeOrmConnection';
 import { connectMongoDB } from '../database/connections/MongooseConnection';
@@ -333,6 +336,12 @@ export const configureDI = async () => {
   container.registerInstance<ISerologyResultRepository>(
     TOKENS.SerologyResultRepository,
     serologyResultRepositoryImplementation
+  );
+
+  const labTestResultRepositoryImplementation = await getLabTestResultRepositoryImplementation();
+  container.registerInstance<ILabTestResultRepository>(
+    TOKENS.LabTestResultRepository,
+    labTestResultRepositoryImplementation
   );
 
   const prescriptionRepositoryImplementation = await getPrescriptionRepositoryImplementation();
@@ -436,6 +445,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreateSerologyResultUseCase, CreateSerologyResultUseCase);
   container.registerSingleton(TOKENS.UpdateSerologyResultUseCase, UpdateSerologyResultUseCase);
   container.registerSingleton(TOKENS.DeleteSerologyResultUseCase, DeleteSerologyResultUseCase);
+  container.registerSingleton(TOKENS.CreateLabTestResultUseCase, CreateLabTestResultUseCase);
 
   // Prescription Use Cases (Commands)
   container.registerSingleton(TOKENS.CreatePrescriptionUseCase, CreatePrescriptionUseCase);
@@ -691,6 +701,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.UpdateFecalysisResultValidationService, UpdateFecalysisResultValidationService);
   container.registerSingleton(TOKENS.CreateSerologyResultValidationService, CreateSerologyResultValidationService);
   container.registerSingleton(TOKENS.UpdateSerologyResultValidationService, UpdateSerologyResultValidationService);
+  container.registerSingleton(TOKENS.CreateLabTestResultValidationService, CreateLabTestResultValidationService);
 
   // Prescription Validation Services
   container.registerSingleton(TOKENS.PrescriptionValidationService, PrescriptionValidationService);
@@ -1172,6 +1183,16 @@ async function getSerologyResultRepositoryImplementation(): Promise<ISerologyRes
   const dataSource = await getTypeOrmDataSource();
   console.log('📦 Using TypeORM serology result repository');
   return new TypeOrmSerologyResultRepository(dataSource);
+}
+
+async function getLabTestResultRepositoryImplementation(): Promise<ILabTestResultRepository> {
+  const dbType = process.env.DATABASE_TYPE || 'typeorm';
+  const ormType = process.env.ORM_TYPE || 'typeorm';
+
+  // For now, since we only have TypeORM implementation
+  const dataSource = await getTypeOrmDataSource();
+  console.log('📦 Using TypeORM lab test result repository');
+  return new TypeOrmLabTestResultRepository(dataSource);
 }
 
 // Export container and tokens for use in controllers

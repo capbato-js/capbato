@@ -22,6 +22,7 @@ export type {
   CreateSerologyResultCommand,
   UpdateSerologyResultCommand,
   DeleteSerologyResultCommand,
+  CreateLabTestResultCommand,
 } from '../validation/LaboratoryValidationSchemas';
 
 // Re-export validation schemas for backward compatibility
@@ -45,6 +46,7 @@ export {
   CreateSerologyResultCommandSchema,
   UpdateSerologyResultCommandSchema,
   DeleteSerologyResultCommandSchema,
+  CreateLabTestResultCommandSchema,
   LaboratoryValidationSchemas,
 } from '../validation/LaboratoryValidationSchemas';
 
@@ -341,5 +343,105 @@ export interface LabTestDto {
 export interface LabTestListResponse {
   success: boolean;
   data: LabTestDto[];
+  message?: string;
+}
+
+// Lab Test Result DTOs
+export interface LabTestResultDto {
+  id: string;
+  labRequestId: string;
+  patientId: string;
+  dateTested: string;
+  status: string;
+  bloodChemistry?: {
+    fbs?: number;
+    bun?: number;
+    creatinine?: number;
+    uricAcid?: number;
+    cholesterol?: number;
+    triglycerides?: number;
+    hdl?: number;
+    ldl?: number;
+    vldl?: number;
+    sodium?: number;
+    potassium?: number;
+    sgot?: number;
+    sgpt?: number;
+    alkPhosphatase?: number;
+    hba1c?: number;
+  };
+  urinalysis?: {
+    color?: string;
+    transparency?: string;
+    specificGravity?: string;
+    ph?: string;
+    protein?: string;
+    glucose?: string;
+    epithelialCells?: string;
+    redCells?: string;
+    pusCells?: string;
+    mucusThread?: string;
+    amorphousUrates?: string;
+    amorphousPhosphate?: string;
+    crystals?: string;
+    bacteria?: string;
+    others?: string;
+    pregnancyTest?: string;
+  };
+  remarks?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateLabTestResultRequestDto {
+  labRequestId: string;
+  dateTested: string;
+  bloodChemistry?: {
+    fbs?: number;
+    bun?: number;
+    creatinine?: number;
+    uricAcid?: number;
+    cholesterol?: number;
+    triglycerides?: number;
+    hdl?: number;
+    ldl?: number;
+    vldl?: number;
+    sodium?: number;
+    potassium?: number;
+    sgot?: number;
+    sgpt?: number;
+    alkPhosphatase?: number;
+    hba1c?: number;
+  };
+  urinalysis?: {
+    color?: string;
+    transparency?: string;
+    specificGravity?: string;
+    ph?: string;
+    protein?: string;
+    glucose?: string;
+    epithelialCells?: string;
+    redCells?: string;
+    pusCells?: string;
+    mucusThread?: string;
+    amorphousUrates?: string;
+    amorphousPhosphate?: string;
+    crystals?: string;
+    bacteria?: string;
+    others?: string;
+    pregnancyTest?: string;
+  };
+  remarks?: string;
+}
+
+export interface LabTestResultResponse {
+  success: boolean;
+  data: LabTestResultDto;
+  message?: string;
+}
+
+export interface LabTestResultListResponse {
+  success: boolean;
+  data: LabTestResultDto[];
   message?: string;
 }

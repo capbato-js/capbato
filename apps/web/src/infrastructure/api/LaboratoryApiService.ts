@@ -2,11 +2,13 @@ import { injectable, inject } from 'tsyringe';
 import { 
   CreateLabRequestCommand, 
   CreateBloodChemistryCommand,
+  CreateLabTestResultRequestDto,
   LabRequestResponse,
   LabRequestListResponse,
   LabTestListResponse,
   BloodChemistryResponse,
   LaboratoryOperationResponse,
+  LabTestResultResponse,
   TOKENS 
 } from '@nx-starter/application-shared';
 import { IHttpClient } from '../http/IHttpClient';
@@ -192,6 +194,26 @@ export class LaboratoryApiService implements ILaboratoryApiService {
         success: false,
         message: error instanceof Error ? error.message : 'Failed to create blood chemistry results'
       } as BloodChemistryResponse;
+    }
+  }
+
+  /**
+   * Create lab test result
+   */
+  async createLabTestResult(request: CreateLabTestResultRequestDto): Promise<LabTestResultResponse> {
+    try {
+      console.log('🧪 Creating lab test result:', request);
+      
+      const response = await this.httpClient.post<LabTestResultResponse>('/api/laboratory/test-results', request);
+      
+      console.log('✅ Lab test result created successfully');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error creating lab test result:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to create lab test result'
+      } as LabTestResultResponse;
     }
   }
 

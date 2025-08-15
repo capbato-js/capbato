@@ -384,6 +384,64 @@ export const SerologyResultIdSchema = z.string()
   .min(1, 'Serology result ID cannot be empty')
   .regex(/^[0-9a-fA-F]{32}$/, 'Serology result ID must be a valid dashless UUID format (32 hexadecimal characters)');
 
+// Lab Test Result validation schemas
+export const BloodChemistryResultsSchema = z.object({
+  fbs: z.number().min(0).max(1000).optional(),
+  bun: z.number().min(0).max(300).optional(),
+  creatinine: z.number().min(0).max(50).optional(),
+  uricAcid: z.number().min(0).max(50).optional(),
+  cholesterol: z.number().min(0).max(1000).optional(),
+  triglycerides: z.number().min(0).max(2000).optional(),
+  hdl: z.number().min(0).max(300).optional(),
+  ldl: z.number().min(0).max(500).optional(),
+  vldl: z.number().min(0).max(200).optional(),
+  sodium: z.number().min(0).max(200).optional(),
+  potassium: z.number().min(0).max(20).optional(),
+  sgot: z.number().min(0).max(1000).optional(),
+  sgpt: z.number().min(0).max(1000).optional(),
+  alkPhosphatase: z.number().min(0).max(1000).optional(),
+  hba1c: z.number().min(0).max(20).optional(),
+}).optional();
+
+export const UrinalysisResultsSchema = z.object({
+  color: z.string().max(100).optional(),
+  transparency: z.string().max(100).optional(),
+  specificGravity: z.string().max(50).optional(),
+  ph: z.string().max(50).optional(),
+  protein: z.string().max(50).optional(),
+  glucose: z.string().max(50).optional(),
+  epithelialCells: z.string().max(100).optional(),
+  redCells: z.string().max(50).optional(),
+  pusCells: z.string().max(50).optional(),
+  mucusThread: z.string().max(100).optional(),
+  amorphousUrates: z.string().max(100).optional(),
+  amorphousPhosphate: z.string().max(100).optional(),
+  crystals: z.string().max(100).optional(),
+  bacteria: z.string().max(100).optional(),
+  others: z.string().max(255).optional(),
+  pregnancyTest: z.string().max(50).optional(),
+}).optional();
+
+export const CreateLabTestResultCommandSchema = z.object({
+  labRequestId: z.string()
+    .min(1, 'Lab request ID cannot be empty')
+    .regex(/^[0-9a-fA-F]{32}$/, 'Lab request ID must be a valid dashless UUID format (32 hexadecimal characters)'),
+  dateTested: z.string().datetime().describe('Date and time when tests were performed'),
+  bloodChemistry: BloodChemistryResultsSchema,
+  urinalysis: UrinalysisResultsSchema,
+  remarks: z.string().max(500).optional(),
+}).refine(
+  (data) => data.bloodChemistry || data.urinalysis,
+  {
+    message: 'At least one test result type (bloodChemistry or urinalysis) must be provided',
+    path: ['testResults'],
+  }
+);
+
+export const LabTestResultIdSchema = z.string()
+  .min(1, 'Lab test result ID cannot be empty')
+  .regex(/^[0-9a-fA-F]{32}$/, 'Lab test result ID must be a valid dashless UUID format (32 hexadecimal characters)');
+
 // Export inferred types
 export type CreateLabRequestCommand = z.infer<typeof CreateLabRequestCommandSchema>;
 export type UpdateLabRequestCommand = z.infer<typeof UpdateLabRequestCommandSchema>;
@@ -404,6 +462,7 @@ export type DeleteFecalysisResultCommand = z.infer<typeof DeleteFecalysisResultC
 export type CreateSerologyResultCommand = z.infer<typeof CreateSerologyResultCommandSchema>;
 export type UpdateSerologyResultCommand = z.infer<typeof UpdateSerologyResultCommandSchema>;
 export type DeleteSerologyResultCommand = z.infer<typeof DeleteSerologyResultCommandSchema>;
+export type CreateLabTestResultCommand = z.infer<typeof CreateLabTestResultCommandSchema>;
 
 // Validation schema collection
 export const LaboratoryValidationSchemas = {
@@ -432,4 +491,6 @@ export const LaboratoryValidationSchemas = {
   HematologyResultIdSchema,
   FecalysisResultIdSchema,
   SerologyResultIdSchema,
+  CreateLabTestResultCommandSchema,
+  LabTestResultIdSchema,
 } as const;

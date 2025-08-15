@@ -1274,6 +1274,108 @@
               ]
             }
           ]
+        },
+        {
+          "name": "🧪 Lab Test Results",
+          "item": [
+            {
+              "name": "Create Lab Test Result",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n  \"dateTested\": \"2025-08-15T10:30:00.000Z\",\n  \"bloodChemistry\": {\n    \"fbs\": 95.5,\n    \"cholesterol\": 180.2,\n    \"triglycerides\": 110.8,\n    \"hdl\": 52.0,\n    \"ldl\": 108.5\n  },\n  \"urinalysis\": {\n    \"color\": \"Yellow\",\n    \"transparency\": \"Clear\",\n    \"specificGravity\": \"1.020\",\n    \"protein\": \"Negative\",\n    \"glucose\": \"Negative\",\n    \"ketones\": \"Negative\",\n    \"blood\": \"Negative\",\n    \"leukocyteEsterase\": \"Negative\",\n    \"nitrites\": \"Negative\"\n  },\n  \"remarks\": \"All test results within normal ranges\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results"
+                  ]
+                },
+                "description": "Create comprehensive lab test results for a lab request\n\n**Key Change: NO patientId Required**\n- The `patientId` is now automatically retrieved from the lab request\n- Only the `labRequestId` is needed to link results to the correct patient\n- This ensures data consistency and prevents mismatched patient information\n\n**Required Fields:**\n- `labRequestId`: Existing lab request identifier (patientId is derived from this)\n- `dateTested`: Date and time when tests were performed\n- At least one test result type (`bloodChemistry` or `urinalysis`)\n\n**Optional Test Results:**\n\n**Blood Chemistry (`bloodChemistry`):**\n- `fbs`: Fasting Blood Sugar (mg/dL)\n- `bun`: Blood Urea Nitrogen (mg/dL)\n- `creatinine`: Creatinine (mg/dL)\n- `uricAcid`: Uric Acid (mg/dL)\n- `cholesterol`: Total Cholesterol (mg/dL)\n- `triglycerides`: Triglycerides (mg/dL)\n- `hdl`: HDL Cholesterol (mg/dL)\n- `ldl`: LDL Cholesterol (mg/dL)\n- `vldl`: VLDL Cholesterol (mg/dL)\n- `sodium`: Sodium (mEq/L)\n- `potassium`: Potassium (mEq/L)\n- `chloride`: Chloride (mEq/L)\n- `calcium`: Calcium (mg/dL)\n- `sgot`: SGOT/AST (U/L)\n- `sgpt`: SGPT/ALT (U/L)\n- `hbalc`: HBA1C (%)\n\n**Urinalysis (`urinalysis`):**\n- `color`: Urine color (e.g., 'Yellow', 'Amber')\n- `transparency`: Clarity (e.g., 'Clear', 'Cloudy')\n- `specificGravity`: Specific gravity (e.g., '1.020')\n- `protein`: Protein level (e.g., 'Negative', 'Trace', '+1')\n- `glucose`: Glucose level (e.g., 'Negative', 'Positive')\n- `ketones`: Ketone level (e.g., 'Negative', 'Trace')\n- `blood`: Blood presence (e.g., 'Negative', 'Trace')\n- `leukocyteEsterase`: Leukocyte esterase (e.g., 'Negative', 'Positive')\n- `nitrites`: Nitrites (e.g., 'Negative', 'Positive')\n- `bacteria`: Bacteria description (optional)\n- `others`: Other findings (optional)\n- `pregnancyTest`: Pregnancy test result (optional)\n\n**Optional Fields:**\n- `remarks`: Additional comments or observations\n\n**Business Logic:**\n1. System validates that the lab request exists\n2. System retrieves patientId from the lab request automatically\n3. System validates that the lab request is in 'pending' status\n4. System validates that results match the originally requested tests\n5. System creates the lab test result and updates lab request status\n\n**Response:**\n- Status: 201 Created\n- Returns created lab test result with auto-populated patientId\n- Includes success message\n\n**Example Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Lab test result created successfully\",\n  \"data\": {\n    \"id\": \"abc123def456ghi789jkl012mno345pqr\",\n    \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n    \"patientId\": \"f5768246f4a64410a2a845a4a618f07e\",\n    \"dateTested\": \"2025-08-15T10:30:00.000Z\",\n    \"bloodChemistry\": { ... },\n    \"urinalysis\": { ... },\n    \"status\": \"completed\",\n    \"createdAt\": \"2025-08-15T10:35:00.000Z\"\n  }\n}\n```"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n  \"dateTested\": \"2025-08-15T10:30:00.000Z\",\n  \"bloodChemistry\": {\n    \"fbs\": 95.5,\n    \"cholesterol\": 180.2,\n    \"triglycerides\": 110.8\n  },\n  \"urinalysis\": {\n    \"color\": \"Yellow\",\n    \"protein\": \"Negative\"\n  },\n  \"remarks\": \"Normal results\"\n}"
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "body": "{\n  \"success\": true,\n  \"message\": \"Lab test result created successfully\",\n  \"data\": {\n    \"id\": \"abc123def456ghi789jkl012mno345pqr\",\n    \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n    \"patientId\": \"f5768246f4a64410a2a845a4a618f07e\",\n    \"dateTested\": \"2025-08-15T10:30:00.000Z\",\n    \"bloodChemistry\": {\n      \"fbs\": 95.5,\n      \"cholesterol\": 180.2,\n      \"triglycerides\": 110.8\n    },\n    \"urinalysis\": {\n      \"color\": \"Yellow\",\n      \"protein\": \"Negative\"\n    },\n    \"status\": \"completed\",\n    \"createdAt\": \"2025-08-15T10:35:00.000Z\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('Response is successful', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test('Response contains lab test result data', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('data');",
+                      "    pm.expect(jsonData.data).to.have.property('id');",
+                      "    pm.expect(jsonData.data).to.have.property('labRequestId');",
+                      "    pm.expect(jsonData.data).to.have.property('patientId');",
+                      "});",
+                      "",
+                      "pm.test('PatientId is automatically populated from lab request', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.data.patientId).to.be.a('string');",
+                      "    pm.expect(jsonData.data.patientId).to.not.be.empty;",
+                      "});",
+                      "",
+                      "pm.test('Response has success message', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.message).to.equal('Lab test result created successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     }

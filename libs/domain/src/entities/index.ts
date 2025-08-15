@@ -21,6 +21,7 @@ export * from './UrinalysisResult';
 export * from './HematologyResult';
 export * from './FecalysisResult';
 export * from './SerologyResult';
+export * from './LabTestResult';
 export * from './Prescription';
 export * from './Medication';
 export * from './Receipt';

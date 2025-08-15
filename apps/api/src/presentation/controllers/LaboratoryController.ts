@@ -25,6 +25,7 @@ import {
   CreateSerologyResultUseCase,
   UpdateSerologyResultUseCase,
   DeleteSerologyResultUseCase,
+  CreateLabTestResultUseCase,
   GetAllLabRequestsQueryHandler,
   GetCompletedLabRequestsQueryHandler,
   GetLabRequestByPatientIdQueryHandler,
@@ -53,9 +54,11 @@ import {
   BloodChemistryListResponse,
   LaboratoryOperationResponse,
   LabTestListResponse,
+  LabTestResultResponse,
   CreateLabRequestRequestDto,
   UpdateLabRequestResultsRequestDto,
   CreateBloodChemistryRequestDto,
+  CreateLabTestResultRequestDto,
   CreateUrinalysisResultCommand,
   UpdateUrinalysisResultCommand,
   CreateHematologyResultCommand,
@@ -81,6 +84,8 @@ export class LaboratoryController {
     private updateLabRequestResultsUseCase: UpdateLabRequestResultsUseCase,
     @inject(TOKENS.CreateBloodChemistryUseCase)
     private createBloodChemistryUseCase: CreateBloodChemistryUseCase,
+    @inject(TOKENS.CreateLabTestResultUseCase)
+    private createLabTestResultUseCase: CreateLabTestResultUseCase,
     @inject(TOKENS.GetAllLabRequestsQueryHandler)
     private getAllLabRequestsQueryHandler: GetAllLabRequestsQueryHandler,
     @inject(TOKENS.GetCompletedLabRequestsQueryHandler)
@@ -255,6 +260,19 @@ export class LaboratoryController {
     const bloodChemistryDto = LaboratoryMapper.toBloodChemistryDto(bloodChemistry);
 
     return ApiResponseBuilder.success(bloodChemistryDto);
+  }
+
+  /**
+   * POST /api/laboratory/test-results - Create lab test results
+   */
+  @Post('/test-results')
+  @HttpCode(201)
+  async createLabTestResult(@Body() body: CreateLabTestResultRequestDto): Promise<LabTestResultResponse> {
+    const validatedData = this.validationService.validateCreateLabTestResultCommand(body);
+    const labTestResult = await this.createLabTestResultUseCase.execute(validatedData);
+    const labTestResultDto = LaboratoryMapper.toLabTestResultDto(labTestResult);
+
+    return ApiResponseBuilder.success(labTestResultDto);
   }
 
   // ==================== URINALYSIS RESULTS ENDPOINTS ====================

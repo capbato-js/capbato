@@ -4,6 +4,7 @@ import { UrinalysisResult } from '@nx-starter/domain';
 import { HematologyResult } from '@nx-starter/domain';
 import { FecalysisResult } from '@nx-starter/domain';
 import { SerologyResult } from '@nx-starter/domain';
+import { LabTestResult } from '@nx-starter/domain';
 import { LabRequestPatientInfo } from '@nx-starter/domain';
 import { LabRequestTests } from '@nx-starter/domain';
 import { LabRequestStatus } from '@nx-starter/domain';
@@ -14,6 +15,7 @@ import {
   LabRequestDto,
   BloodChemistryDto,
   LabTestDto,
+  LabTestResultDto,
   CreateLabRequestCommand,
   CreateBloodChemistryCommand,
   CreateUrinalysisResultCommand,
@@ -966,5 +968,71 @@ export class LaboratoryMapper {
    */
   static toSerologyResultDtoArray(results: SerologyResult[]): any[] {
     return results.map(result => this.toSerologyResultDto(result));
+  }
+
+  /**
+   * Convert LabTestResult domain entity to DTO
+   */
+  static toLabTestResultDto(result: LabTestResult): LabTestResultDto {
+    return {
+      id: result.id!,
+      labRequestId: result.labRequestId,
+      patientId: result.patientId,
+      dateTested: result.dateTested instanceof Date 
+        ? result.dateTested.toISOString() 
+        : new Date(result.dateTested).toISOString(),
+      status: 'completed',
+      bloodChemistry: result.bloodChemistry ? {
+        fbs: result.bloodChemistry.fbs,
+        bun: result.bloodChemistry.bun,
+        creatinine: result.bloodChemistry.creatinine,
+        uricAcid: result.bloodChemistry.uricAcid,
+        cholesterol: result.bloodChemistry.cholesterol,
+        triglycerides: result.bloodChemistry.triglycerides,
+        hdl: result.bloodChemistry.hdl,
+        ldl: result.bloodChemistry.ldl,
+        vldl: result.bloodChemistry.vldl,
+        sodium: result.bloodChemistry.sodium,
+        potassium: result.bloodChemistry.potassium,
+        sgot: result.bloodChemistry.sgot,
+        sgpt: result.bloodChemistry.sgpt,
+        alkPhosphatase: result.bloodChemistry.alkPhosphatase,
+        hba1c: result.bloodChemistry.hba1c,
+      } : undefined,
+      urinalysis: result.urinalysis ? {
+        color: result.urinalysis.color,
+        transparency: result.urinalysis.transparency,
+        specificGravity: result.urinalysis.specificGravity,
+        ph: result.urinalysis.ph,
+        protein: result.urinalysis.protein,
+        glucose: result.urinalysis.glucose,
+        epithelialCells: result.urinalysis.epithelialCells,
+        redCells: result.urinalysis.redCells,
+        pusCells: result.urinalysis.pusCells,
+        mucusThread: result.urinalysis.mucusThread,
+        amorphousUrates: result.urinalysis.amorphousUrates,
+        amorphousPhosphate: result.urinalysis.amorphousPhosphate,
+        crystals: result.urinalysis.crystals,
+        bacteria: result.urinalysis.bacteria,
+        others: result.urinalysis.others,
+        pregnancyTest: result.urinalysis.pregnancyTest,
+      } : undefined,
+      remarks: result.remarks,
+      createdAt: result.createdAt instanceof Date 
+        ? result.createdAt.toISOString() 
+        : new Date(result.createdAt).toISOString(),
+      updatedAt: result.updatedAt 
+        ? (result.updatedAt instanceof Date 
+            ? result.updatedAt.toISOString() 
+            : new Date(result.updatedAt).toISOString()) 
+        : undefined,
+    };
+  }
+
+  /**
+   * Convert array of LabTestResult domain entities to DTOs
+   */
+  static toLabTestResultDtoArray(results: LabTestResult[]): LabTestResultDto[] {
+    return results.map(result => this.toLabTestResultDto(result));
   }
 }

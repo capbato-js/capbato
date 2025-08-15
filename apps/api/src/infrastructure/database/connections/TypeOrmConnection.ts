@@ -6,6 +6,7 @@ import { DoctorEntity } from '../../doctor/persistence/typeorm/DoctorEntity';
 import { ScheduleEntity } from '../../schedule/persistence/typeorm/ScheduleEntity';
 import { AppointmentEntity } from '../../appointment/persistence/typeorm/AppointmentEntity';
 import { LabRequestEntity } from '../../laboratory/persistence/typeorm/LabRequestEntity';
+import { LabTestResultEntity } from '../../laboratory/persistence/typeorm/LabTestResultEntity';
 import { BloodChemistryEntity } from '../../laboratory/persistence/typeorm/BloodChemistryEntity';
 import { UrinalysisResultEntity } from '../../laboratory/persistence/typeorm/UrinalysisResultEntity';
 import { HematologyResultEntity } from '../../laboratory/persistence/typeorm/HematologyResultEntity';
@@ -55,7 +56,8 @@ export const createTypeOrmDataSource = (): DataSource => {
       DoctorEntity, 
       ScheduleEntity, 
       AppointmentEntity, 
-      LabRequestEntity, 
+      LabRequestEntity,
+      LabTestResultEntity,
       BloodChemistryEntity, 
       UrinalysisResultEntity,
       HematologyResultEntity,

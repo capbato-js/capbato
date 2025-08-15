@@ -25,6 +25,7 @@ export const TOKENS = {
   HematologyResultRepository: 'IHematologyResultRepository',
   FecalysisResultRepository: 'IFecalysisResultRepository',
   SerologyResultRepository: 'ISerologyResultRepository',
+  LabTestResultRepository: 'ILabTestResultRepository',
   PrescriptionRepository: 'IPrescriptionRepository',
   ReceiptRepository: 'IReceiptRepository',
 
@@ -92,6 +93,7 @@ export const TOKENS = {
   CreateSerologyResultUseCase: 'CreateSerologyResultUseCase',
   UpdateSerologyResultUseCase: 'UpdateSerologyResultUseCase',
   DeleteSerologyResultUseCase: 'DeleteSerologyResultUseCase',
+  CreateLabTestResultUseCase: 'CreateLabTestResultUseCase',
 
   // Prescription Layer - Use Cases (Commands)
   CreatePrescriptionUseCase: 'CreatePrescriptionUseCase',
@@ -237,6 +239,7 @@ export const TOKENS = {
   UpdateFecalysisResultValidationService: 'UpdateFecalysisResultValidationService',
   CreateSerologyResultValidationService: 'CreateSerologyResultValidationService',
   UpdateSerologyResultValidationService: 'UpdateSerologyResultValidationService',
+  CreateLabTestResultValidationService: 'CreateLabTestResultValidationService',
   LaboratoryValidationService: 'LaboratoryValidationService',
 
   // Prescription Layer - Validation Services

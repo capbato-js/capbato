@@ -17,6 +17,7 @@ import {
   UpdateFecalysisResultCommand,
   CreateSerologyResultCommand,
   UpdateSerologyResultCommand,
+  CreateLabTestResultCommand,
   CreateLabRequestCommandSchema,
   UpdateLabRequestCommandSchema,
   DeleteLabRequestCommandSchema,
@@ -32,6 +33,7 @@ import {
   UpdateFecalysisResultCommandSchema,
   CreateSerologyResultCommandSchema,
   UpdateSerologyResultCommandSchema,
+  CreateLabTestResultCommandSchema,
   LabRequestIdSchema,
   BloodChemistryIdSchema,
 } from './LaboratoryValidationSchemas';
@@ -113,6 +115,11 @@ export class UpdateSerologyResultValidationService extends ValidationService<unk
   protected schema = UpdateSerologyResultCommandSchema;
 }
 
+@injectable()
+export class CreateLabTestResultValidationService extends ValidationService<unknown, CreateLabTestResultCommand> {
+  protected schema = CreateLabTestResultCommandSchema;
+}
+
 // Composite facade service combining all validations following TodoValidationService pattern
 @injectable()
 export class LaboratoryValidationService {
@@ -131,7 +138,8 @@ export class LaboratoryValidationService {
     @inject(TOKENS.CreateFecalysisResultValidationService) private readonly createFecalysisResultValidator: CreateFecalysisResultValidationService,
     @inject(TOKENS.UpdateFecalysisResultValidationService) private readonly updateFecalysisResultValidator: UpdateFecalysisResultValidationService,
     @inject(TOKENS.CreateSerologyResultValidationService) private readonly createSerologyResultValidator: CreateSerologyResultValidationService,
-    @inject(TOKENS.UpdateSerologyResultValidationService) private readonly updateSerologyResultValidator: UpdateSerologyResultValidationService
+    @inject(TOKENS.UpdateSerologyResultValidationService) private readonly updateSerologyResultValidator: UpdateSerologyResultValidationService,
+    @inject(TOKENS.CreateLabTestResultValidationService) private readonly createLabTestResultValidator: CreateLabTestResultValidationService
   ) {}
 
   // Lab Request validation methods
@@ -204,6 +212,10 @@ export class LaboratoryValidationService {
 
   validateUpdateSerologyResultCommand(data: unknown): UpdateSerologyResultCommand {
     return this.updateSerologyResultValidator.validate(data);
+  }
+
+  validateCreateLabTestResultCommand(data: unknown): CreateLabTestResultCommand {
+    return this.createLabTestResultValidator.validate(data);
   }
 
   // Safe validation methods (non-throwing)

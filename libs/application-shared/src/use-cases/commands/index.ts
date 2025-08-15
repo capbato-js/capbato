@@ -37,6 +37,7 @@ export * from './DeleteFecalysisResultUseCase';
 export * from './CreateSerologyResultUseCase';
 export * from './UpdateSerologyResultUseCase';
 export * from './DeleteSerologyResultUseCase';
+export * from './CreateLabTestResultUseCase';
 export * from './CreatePrescriptionUseCase';
 export * from './UpdatePrescriptionUseCase';
 export * from './DeletePrescriptionUseCase';
