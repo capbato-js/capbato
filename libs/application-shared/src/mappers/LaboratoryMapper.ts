@@ -251,38 +251,88 @@ export class LaboratoryMapper {
       urinalysis: 'URINALYSIS',
       fecalysis: 'FECALYSIS',
       cbcWithPlatelet: 'CBC with Platelet',
-      pregnancyTest: 'Pregnancy Test',
+      pregnancyTest: 'PREGNANCY TEST',
+      // Thyroid tests
       t3: 'T3',
       t4: 'T4',
       ft3: 'FT3',
       ft4: 'FT4',
       tsh: 'TSH',
+      // Serology tests
+      dengueNs1: 'DENGUE NS1',
+      hepatitisBScreening: 'HEPATITIS B SCREENING',
+      hepatitisAScreening: 'HEPATITIS A SCREENING',
+      hepatitisProfile: 'HEPATITIS PROFILE',
+      vdrlRpr: 'VDRL/RPR',
+      crp: 'CRP',
+      aso: 'ASO',
+      crf: 'CRF',
+      raRf: 'RA/RF',
+      tumorMarkers: 'TUMOR MARKERS',
+      ca125: 'CA 125',
+      cea: 'CEA',
+      psa: 'PSA',
+      betaHcg: 'BETA HCG',
     };
 
     return formatMap[test] || test.toUpperCase();
   }
 
   /**
-   * Determine test category from selected tests
+   * Determine test category from selected tests - aligned with LabTestResultEntity groupings
+   * Note: selectedTests contains display names like 'Dengue NS1', 'Pregnancy Test'
    */
-  private static determineTestCategory(selectedTests: string[]): 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'CBC' | 'THYROID_FUNCTION' {
-    const bloodChemistryTests = ['fbs', 'bun', 'creatinine', 'bloodUricAcid', 'lipidProfile', 'sgot', 'sgpt', 'hbalc'];
-    const thyroidTests = ['t3', 't4', 'ft3', 'ft4', 'tsh'];
+  private static determineTestCategory(selectedTests: string[]): 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'HEMATOLOGY' | 'SEROLOGY_IMMUNOLOGY' | 'ECG' | 'COAGULATION' {
+    // Debug logging
+    console.log('🔬 determineTestCategory - selectedTests:', selectedTests);
     
-    if (selectedTests.includes('urinalysis')) {
-      return 'URINALYSIS';
-    } else if (selectedTests.includes('fecalysis')) {
-      return 'FECALYSIS';
-    } else if (selectedTests.includes('cbcWithPlatelet')) {
-      return 'CBC';
-    } else if (selectedTests.some(test => thyroidTests.includes(test))) {
-      return 'THYROID_FUNCTION';
+    // Display names as returned by getSelectedTests() method - aligned with LabTestResultEntity form sections
+    const urinalysisTests = ['Urinalysis', 'Pregnancy Test']; // result_urine_* fields
+    const fecalysisTests = ['Fecalysis']; // result_fecal_* fields
+    const hematologyTests = ['CBC with Platelet']; // result_hematology_* fields
+    const serologyImmunologyTests = [
+      // Thyroid tests (stored as result_serology_*)
+      'T3', 'T4', 'FT3', 'FT4', 'TSH',
+      // Serology tests (stored as result_serology_*)
+      'Dengue NS1', 'Hepatitis B Screening', 'Hepatitis A Screening', 'Hepatitis Profile', 
+      'VDRL/RPR', 'CRP', 'ASO', 'CRF', 'RA/RF', 'Tumor Markers', 'CA 125', 'CEA', 'PSA', 'Beta HCG'
+    ];
+    const ecgTests = ['ECG']; // result_ecg_* fields
+    const coagulationTests: string[] = []; // result_coag_* fields - no tests defined in LabRequestTests yet
+    const bloodChemistryTests = ['FBS', 'BUN', 'Creatinine', 'Blood Uric Acid', 'Lipid Profile', 'SGOT', 'SGPT', 'HBA1C', 'Alkaline Phosphatase', 'Sodium', 'Potassium']; // result_blood_* fields
+    
+    let detectedCategory: string;
+    
+    if (selectedTests.some(test => urinalysisTests.includes(test))) {
+      detectedCategory = 'URINALYSIS';
+    } else if (selectedTests.some(test => fecalysisTests.includes(test))) {
+      detectedCategory = 'FECALYSIS';
+    } else if (selectedTests.some(test => hematologyTests.includes(test))) {
+      detectedCategory = 'HEMATOLOGY';
+    } else if (selectedTests.some(test => serologyImmunologyTests.includes(test))) {
+      detectedCategory = 'SEROLOGY_IMMUNOLOGY';
+    } else if (selectedTests.some(test => ecgTests.includes(test))) {
+      detectedCategory = 'ECG';
+    } else if (selectedTests.some(test => coagulationTests.includes(test))) {
+      detectedCategory = 'COAGULATION';
     } else if (selectedTests.some(test => bloodChemistryTests.includes(test))) {
-      return 'BLOOD_CHEMISTRY';
+      detectedCategory = 'BLOOD_CHEMISTRY';
+    } else {
+      console.error('❌ No matching category found for tests:', selectedTests);
+      console.error('❌ Available categories:', {
+        urinalysis: urinalysisTests,
+        fecalysis: fecalysisTests,
+        hematology: hematologyTests,
+        serology: serologyImmunologyTests,
+        ecg: ecgTests,
+        coagulation: coagulationTests,
+        bloodChemistry: bloodChemistryTests
+      });
+      throw new Error(`Unknown test category for tests: ${selectedTests.join(', ')}`);
     }
-
-    // Default fallback
-    return 'BLOOD_CHEMISTRY';
+    
+    console.log('🔬 detectedCategory:', detectedCategory);
+    return detectedCategory as 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'HEMATOLOGY' | 'SEROLOGY_IMMUNOLOGY' | 'ECG' | 'COAGULATION';
   }
 
   /**
@@ -295,18 +345,26 @@ export class LaboratoryMapper {
 
     // Handle single test categories
     if (testCategory === 'URINALYSIS' && testDisplayNames.length === 1) {
-      return 'URINALYSIS';
+      return testDisplayNames.includes('PREGNANCY TEST') ? 'URINALYSIS: PREGNANCY TEST' : 'URINALYSIS';
     } else if (testCategory === 'FECALYSIS' && testDisplayNames.length === 1) {
       return 'FECALYSIS';
+    } else if (testCategory === 'HEMATOLOGY' && testDisplayNames.length === 1) {
+      return 'HEMATOLOGY: CBC with Platelet';
+    } else if (testCategory === 'ECG') {
+      return 'ECG';
     }
 
     // Handle multiple tests or specific naming
     if (testCategory === 'URINALYSIS' && testDisplayNames.length > 1) {
-      return 'URINALYSIS: Complete Panel';
+      return `URINALYSIS: ${testDisplayNames.join(', ')}`;
     } else if (testCategory === 'FECALYSIS' && testDisplayNames.length > 1) {
       return 'FECALYSIS: Comprehensive';
-    } else if (testCategory === 'THYROID_FUNCTION') {
-      return `THYROID FUNCTION: ${testDisplayNames.join(', ')}`;
+    } else if (testCategory === 'SEROLOGY_IMMUNOLOGY') {
+      return `SEROLOGY & IMMUNOLOGY: ${testDisplayNames.join(', ')}`;
+    } else if (testCategory === 'HEMATOLOGY') {
+      return `HEMATOLOGY: ${testDisplayNames.join(', ')}`;
+    } else if (testCategory === 'COAGULATION') {
+      return `COAGULATION: ${testDisplayNames.join(', ')}`;
     } else {
       return `${testCategory.replace('_', ' ')}: ${testDisplayNames.join(', ')}`;
     }
