@@ -118,4 +118,86 @@ describe('LaboratoryController - createLabTestResult', () => {
 
     expect(useCaseCalled).toBe(true);
   });
+
+  // Test cases for the validation bug fix
+  it('should reject empty bloodChemistry object', async () => {
+    const requestData = {
+      labRequestId: 'd2e66463bb2349209ea2cddf47f7822f',
+      dateTested: '2025-08-13T10:30:00.000Z',
+      bloodChemistry: {}, // Empty object should be rejected
+      remarks: 'Within normal range'
+    };
+
+    mockValidationService.validateCreateLabTestResultCommand = (data: any) => {
+      throw new Error('Test result objects must contain actual result values, not empty objects');
+    };
+
+    await expect(controller.createLabTestResult(requestData))
+      .rejects.toThrow('Test result objects must contain actual result values, not empty objects');
+  });
+
+  it('should reject empty urinalysis object', async () => {
+    const requestData = {
+      labRequestId: 'd2e66463bb2349209ea2cddf47f7822f',
+      dateTested: '2025-08-13T10:30:00.000Z',
+      urinalysis: {}, // Empty object should be rejected
+      remarks: 'Within normal range'
+    };
+
+    mockValidationService.validateCreateLabTestResultCommand = (data: any) => {
+      throw new Error('Test result objects must contain actual result values, not empty objects');
+    };
+
+    await expect(controller.createLabTestResult(requestData))
+      .rejects.toThrow('Test result objects must contain actual result values, not empty objects');
+  });
+
+  it('should accept bloodChemistry with actual values', async () => {
+    const requestData = {
+      labRequestId: 'd2e66463bb2349209ea2cddf47f7822f',
+      dateTested: '2025-08-13T10:30:00.000Z',
+      bloodChemistry: {
+        fbs: 5.2,
+        bun: 15.0
+      },
+      remarks: 'Within normal range'
+    };
+
+    const response = await controller.createLabTestResult(requestData);
+
+    expect(response.success).toBe(true);
+    expect(response.data.bloodChemistry).toEqual(requestData.bloodChemistry);
+  });
+
+  it('should accept urinalysis with actual values', async () => {
+    const requestData = {
+      labRequestId: 'd2e66463bb2349209ea2cddf47f7822f',
+      dateTested: '2025-08-13T10:30:00.000Z',
+      urinalysis: {
+        color: 'Yellow',
+        protein: 'Negative'
+      },
+      remarks: 'Within normal range'
+    };
+
+    const response = await controller.createLabTestResult(requestData);
+
+    expect(response.success).toBe(true);
+    expect(response.data.urinalysis).toEqual(requestData.urinalysis);
+  });
+
+  it('should reject request with neither bloodChemistry nor urinalysis', async () => {
+    const requestData = {
+      labRequestId: 'd2e66463bb2349209ea2cddf47f7822f',
+      dateTested: '2025-08-13T10:30:00.000Z',
+      remarks: 'Within normal range'
+    };
+
+    mockValidationService.validateCreateLabTestResultCommand = (data: any) => {
+      throw new Error('At least one test result type (bloodChemistry or urinalysis) must be provided');
+    };
+
+    await expect(controller.createLabTestResult(requestData))
+      .rejects.toThrow('At least one test result type (bloodChemistry or urinalysis) must be provided');
+  });
 });

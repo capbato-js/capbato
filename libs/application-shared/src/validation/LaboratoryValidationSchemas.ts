@@ -436,6 +436,32 @@ export const CreateLabTestResultCommandSchema = z.object({
     message: 'At least one test result type (bloodChemistry or urinalysis) must be provided',
     path: ['testResults'],
   }
+).refine(
+  (data) => {
+    // If bloodChemistry is provided, ensure it has at least one actual test result value
+    if (data.bloodChemistry) {
+      const bloodChemistryValues = Object.values(data.bloodChemistry);
+      const hasBloodChemistryValues = bloodChemistryValues.some(value => value !== undefined && value !== null);
+      if (!hasBloodChemistryValues) {
+        return false;
+      }
+    }
+    
+    // If urinalysis is provided, ensure it has at least one actual test result value
+    if (data.urinalysis) {
+      const urinalysisValues = Object.values(data.urinalysis);
+      const hasUrinalysisValues = urinalysisValues.some(value => value !== undefined && value !== null && value !== '');
+      if (!hasUrinalysisValues) {
+        return false;
+      }
+    }
+    
+    return true;
+  },
+  {
+    message: 'Test result objects must contain actual result values, not empty objects',
+    path: ['testResults'],
+  }
 );
 
 export const LabTestResultIdSchema = z.string()

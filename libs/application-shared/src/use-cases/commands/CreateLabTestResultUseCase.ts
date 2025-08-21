@@ -109,11 +109,45 @@ export class CreateLabTestResultUseCase {
       hba1c: 'hba1c'
     };
 
+    // Track which tests were requested
+    const requestedBloodChemistryTests: string[] = [];
+    if (requestedTests.tests && requestedTests.tests.bloodChemistry) {
+      for (const [testKey, isRequested] of Object.entries(requestedTests.tests.bloodChemistry)) {
+        if (isRequested === true) {
+          requestedBloodChemistryTests.push(testKey);
+        }
+      }
+    }
+
+    // If bloodChemistry results are provided, validate each result field
     for (const [resultField, requestField] of Object.entries(bloodChemistryTests)) {
       if (results[resultField] !== undefined) {
         // Check if the corresponding test was requested in bloodChemistry category
         if (!requestedTests.tests || !requestedTests.tests.bloodChemistry || !requestedTests.tests.bloodChemistry[requestField]) {
           throw new Error(`Blood chemistry result '${resultField}' provided but test '${requestField}' was not requested`);
+        }
+      }
+    }
+
+    // Check if all requested blood chemistry tests have corresponding result values
+    for (const requestedTest of requestedBloodChemistryTests) {
+      const resultFieldMap = Object.fromEntries(
+        Object.entries(bloodChemistryTests).map(([resultField, requestField]) => [requestField, resultField])
+      );
+      
+      const resultField = resultFieldMap[requestedTest];
+      if (resultField && (results[resultField] === undefined || results[resultField] === null)) {
+        throw new Error(`Blood chemistry test '${requestedTest}' was requested but no result value provided for '${resultField}'`);
+      }
+      
+      // Special case for lipidProfile - any lipid result satisfies the lipidProfile request
+      if (requestedTest === 'lipidProfile') {
+        const lipidFields = ['cholesterol', 'triglycerides', 'hdl', 'ldl', 'vldl'];
+        const hasAnyLipidResult = lipidFields.some(field => 
+          results[field] !== undefined && results[field] !== null
+        );
+        if (!hasAnyLipidResult) {
+          throw new Error(`Blood chemistry test 'lipidProfile' was requested but no lipid profile results provided`);
         }
       }
     }
@@ -126,6 +160,13 @@ export class CreateLabTestResultUseCase {
     // Check if urinalysis was requested in routine category
     if (!requestedTests.tests || !requestedTests.tests.routine || !requestedTests.tests.routine.urinalysis) {
       throw new Error('Urinalysis results provided but urinalysis test was not requested');
+    }
+
+    // Validate that urinalysis results contain actual values
+    const urinalysisValues = Object.values(results);
+    const hasUrinalysisValues = urinalysisValues.some(value => value !== undefined && value !== null && value !== '');
+    if (!hasUrinalysisValues) {
+      throw new Error('Urinalysis test was requested but no result values provided');
     }
 
     // Validate pregnancy test specifically
