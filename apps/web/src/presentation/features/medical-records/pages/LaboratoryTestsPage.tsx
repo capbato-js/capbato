@@ -315,11 +315,11 @@ export const LaboratoryTestsPage: React.FC = () => {
         console.log('✅ Other lab test results submitted successfully!');
       }
       
-      // Update the specific lab test status to "Complete" 
+      // Update the specific lab test status to "Completed" 
       setLabTests(prevTests => 
         prevTests.map(test => 
           test.id === selectedLabTest.id 
-            ? { ...test, status: 'Complete', results: 'Available' }
+            ? { ...test, status: 'Completed', results: 'Available' }
             : test
         )
       );
@@ -381,7 +381,7 @@ export const LaboratoryTestsPage: React.FC = () => {
 
   const getStatusBadge = (status: LabTest['status']) => {
     const styles = {
-      'Complete': {
+      'Completed': {
         background: theme.colors.green[1],
         color: theme.colors.green[9],
         padding: '5px 10px',
@@ -437,7 +437,7 @@ export const LaboratoryTestsPage: React.FC = () => {
   };
 
   const getActionButtons = (test: LabTest): ActionButtonConfig[] => {
-    if (test.status === 'Confirmed' || test.status === 'Complete') {
+    if (test.status === 'Confirmed' || test.status === 'Completed') {
       return [
         {
           icon: 'fas fa-eye',
