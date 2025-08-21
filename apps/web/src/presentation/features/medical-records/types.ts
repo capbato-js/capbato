@@ -37,7 +37,7 @@ export interface LabTest {
   tests: string[]; // Array of test IDs like ['blood_chemistry_fbs', 'blood_chemistry_bun', 'blood_chemistry_creatinine']
   testDisplayNames?: string[]; // Optional formatted names like ['FBS', 'BUN', 'Creatinine']
   date: string;
-  status: 'Complete' | 'Confirmed' | 'Pending' | 'In Progress';
+  status: 'Completed' | 'Confirmed' | 'Pending' | 'In Progress';
   results?: string;
   patientId?: string;
   // Backward compatibility - computed display value

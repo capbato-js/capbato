@@ -190,7 +190,7 @@ export class LaboratoryMapper {
       date: bloodChemistry.dateTaken instanceof Date 
         ? bloodChemistry.dateTaken.toISOString().split('T')[0] 
         : new Date(bloodChemistry.dateTaken).toISOString().split('T')[0], // Format as YYYY-MM-DD
-      status: 'Complete', // Blood chemistry results are always complete once created
+      status: 'Completed', // Blood chemistry results are always completed once created
       results: 'Available',
       patientId: bloodChemistry.patientInfo.patientId || bloodChemistry.patientInfo.patientName, // Use patient ID if available, fallback to name
       testName,
@@ -373,9 +373,9 @@ export class LaboratoryMapper {
   /**
    * Map backend status to frontend status format
    */
-  private static mapStatusToFrontend(backendStatus: string): 'Complete' | 'Confirmed' | 'Pending' | 'In Progress' {
-    const statusMap: Record<string, 'Complete' | 'Confirmed' | 'Pending' | 'In Progress'> = {
-      'complete': 'Complete',
+  private static mapStatusToFrontend(backendStatus: string): 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' {
+    const statusMap: Record<string, 'Completed' | 'Confirmed' | 'Pending' | 'In Progress'> = {
+      'completed': 'Completed',
       'confirmed': 'Confirmed', 
       'pending': 'Pending',
       'in_progress': 'In Progress',
