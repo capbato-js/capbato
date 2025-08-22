@@ -1,12 +1,10 @@
 import { injectable, inject } from 'tsyringe';
 import { 
   CreateLabRequestCommand, 
-  CreateBloodChemistryCommand,
   CreateLabTestResultRequestDto,
   LabRequestResponse,
   LabRequestListResponse,
   LabTestListResponse,
-  BloodChemistryResponse,
   LaboratoryOperationResponse,
   LabTestResultResponse,
   TOKENS 
@@ -178,26 +176,6 @@ export class LaboratoryApiService implements ILaboratoryApiService {
   }
 
   /**
-   * Create blood chemistry results
-   */
-  async createBloodChemistry(command: CreateBloodChemistryCommand): Promise<BloodChemistryResponse> {
-    try {
-      console.log('🧪 Creating blood chemistry results:', command);
-      
-      const response = await this.httpClient.post<BloodChemistryResponse>('/api/laboratory/blood-chemistry', command);
-      
-      console.log('✅ Blood chemistry results created successfully');
-      return response.data;
-    } catch (error) {
-      console.error('❌ Error creating blood chemistry results:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to create blood chemistry results'
-      } as BloodChemistryResponse;
-    }
-  }
-
-  /**
    * Create lab test result
    */
   async createLabTestResult(request: CreateLabTestResultRequestDto): Promise<LabTestResultResponse> {
@@ -214,26 +192,6 @@ export class LaboratoryApiService implements ILaboratoryApiService {
         success: false,
         message: error instanceof Error ? error.message : 'Failed to create lab test result'
       } as LabTestResultResponse;
-    }
-  }
-
-  /**
-   * Get blood chemistry results by patient ID
-   */
-  async getBloodChemistryByPatientId(patientId: string): Promise<BloodChemistryResponse> {
-    try {
-      console.log('🧪 Fetching blood chemistry results for patient:', patientId);
-      
-      const response = await this.httpClient.get<BloodChemistryResponse>(`/api/laboratory/blood-chemistry/${patientId}`);
-      
-      console.log('✅ Blood chemistry results fetched successfully');
-      return response.data;
-    } catch (error) {
-      console.error('❌ Error fetching blood chemistry results:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch blood chemistry results'
-      } as BloodChemistryResponse;
     }
   }
 }

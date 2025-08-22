@@ -49,20 +49,140 @@ export const LaboratoryTestsPage: React.FC = () => {
     getPatientDetails
   } = usePatientStore();
 
+  /**
+   * Map lab request fields to form input IDs for proper field enabling
+   */
+  const mapLabRequestFieldsToFormIds = (tests: string[]): string[] => {
+    const fieldMapping: Record<string, string> = {
+      'fbs': 'fastingBloodSugar',
+      'fasting_blood_sugar': 'fastingBloodSugar',
+      'fastingBloodSugar': 'fastingBloodSugar',
+      'rbs': 'randomBloodSugar', 
+      'random_blood_sugar': 'randomBloodSugar',
+      'randomBloodSugar': 'randomBloodSugar',
+      'totalCholesterol': 'cholesterol',
+      'total_cholesterol': 'cholesterol',
+      'cholesterol': 'cholesterol',
+      'triglycerides': 'triglycerides',
+      'hdl': 'hdl',
+      'hdl_cholesterol': 'hdl',
+      'hdlCholesterol': 'hdl',
+      'ldl': 'ldl',
+      'ldl_cholesterol': 'ldl', 
+      'ldlCholesterol': 'ldl',
+      'vldl': 'vldl',
+      'vldl_cholesterol': 'vldl',
+      'vldlCholesterol': 'vldl',
+      'creatinine': 'creatinine',
+      'bun': 'bloodUreaNitrogen',
+      'blood_urea_nitrogen': 'bloodUreaNitrogen',
+      'bloodUreaNitrogen': 'bloodUreaNitrogen',
+      'sgpt': 'sgpt',
+      'alt': 'sgpt',
+      'sgot': 'sgot',
+      'ast': 'sgot', 
+      'blood_uric_acid': 'uricAcid',
+      'uricAcid': 'uricAcid'
+    };
+
+    return tests.map(test => {
+      const mapped = fieldMapping[test];
+      if (mapped) {
+        return mapped;
+      }
+      return test;
+    });
+  };
+
+  /**
+   * Expand lipid profile test into individual lipid components
+   */
+  const expandLipidProfile = (tests: string[]): string[] => {
+    let hasLipidProfile = false;
+    
+    // Common lipid profile identifiers to look for
+    const lipidProfileIdentifiers = [
+      'lipid profile',
+      'lipid_profile', 
+      'lipidProfile',
+      'cholesterol panel',
+      'lipid panel'
+    ];
+    
+    // Filter out lipid profile identifiers and mark if found
+    const filteredTests = tests.filter(test => {
+      const testLower = test.toLowerCase();
+      
+      const isExactMatch = lipidProfileIdentifiers.some(identifier => 
+        testLower === identifier.toLowerCase()
+      );
+      
+      const isPartialMatch = lipidProfileIdentifiers.some(identifier => 
+        testLower.includes(identifier.toLowerCase()) || 
+        identifier.toLowerCase().includes(testLower)
+      );
+      
+      if (isExactMatch || isPartialMatch) {
+        hasLipidProfile = true;
+        return false; // Remove this identifier
+      }
+      
+      return true; // Keep non-lipid-profile tests
+    });
+    
+    // Add all lipid profile components if we found a lipid profile
+    const expandedTests = [...filteredTests];
+    if (hasLipidProfile) {
+      const lipidProfileComponents = [
+        'cholesterol',    // Total Cholesterol (matches form config)
+        'triglycerides',  // Triglycerides  
+        'hdl',           // HDL Cholesterol (matches form config)
+        'ldl',           // LDL Cholesterol (matches form config)
+        'vldl'           // VLDL Cholesterol (matches form config)
+      ];
+      
+      // Add components that aren't already present (case-insensitive check)
+      for (const component of lipidProfileComponents) {
+        const componentLower = component.toLowerCase();
+        const alreadyExists = expandedTests.some(test => 
+          test.toLowerCase() === componentLower ||
+          test.toLowerCase().includes(componentLower) ||
+          componentLower.includes(test.toLowerCase())
+        );
+        
+        if (!alreadyExists) {
+          expandedTests.push(component);
+        }
+      }
+    }
+    
+    // Remove duplicates (case-insensitive)
+    const uniqueTests = [];
+    const seenLower = new Set();
+    
+    for (const test of expandedTests) {
+      const testLower = test.toLowerCase();
+      if (!seenLower.has(testLower)) {
+        uniqueTests.push(test);
+        seenLower.add(testLower);
+      }
+    }
+    
+    return uniqueTests;
+  };
+
   // Fetch lab tests from API
   useEffect(() => {
     const fetchLabTests = async () => {
       if (!patientId) return;
       
       try {
-        console.log('🧪 Fetching lab data for patient:', patientId);
         
         // First, try to fetch lab request to get patient information
         let patientData = null;
         try {
           const labRequest = await fetchLabRequestByPatientId(patientId);
           if (labRequest) {
-            console.log('📋 Retrieved lab request with patient info:', labRequest);
             patientData = labRequest.patient;
           }
         } catch (requestError) {
@@ -71,24 +191,22 @@ export const LaboratoryTestsPage: React.FC = () => {
         
         // Then fetch lab tests
         const fetchedLabTests = await fetchLabTestsByPatientId(patientId);
-        console.log('✅ Received lab tests from store:', fetchedLabTests);
         
-        // Convert LabTestDto[] to LabTest[] (they should be compatible)
-        const convertedLabTests: LabTest[] = fetchedLabTests.map((dto, index) => {
-          console.log(`🔍 Processing lab test ${index}:`, {
-            id: dto.id,
-            testCategory: dto.testCategory,
-            tests: dto.tests,
-            testDisplayNames: dto.testDisplayNames,
-            testName: dto.testName,
-            date: dto.date,
-            status: dto.status
-          });
+        // Convert LabTestDto[] to LabTest[] and apply field mapping
+        const convertedLabTests: LabTest[] = fetchedLabTests.map((dto) => {
+          // Apply field mapping and lipid profile expansion to the tests
+          const originalTests = dto.tests || [];
+          const mappedTests = mapLabRequestFieldsToFormIds(originalTests);
+          const expandedTests = expandLipidProfile(mappedTests);
           
           const converted = {
             id: dto.id || `test-${Date.now()}`,
-            testCategory: dto.testCategory || 'BLOOD_CHEMISTRY',
-            tests: dto.tests || [],
+            testCategory: (dto.testCategory === 'HEMATOLOGY' ? 'CBC' : 
+                          dto.testCategory === 'SEROLOGY_IMMUNOLOGY' ? 'BLOOD_CHEMISTRY' :
+                          dto.testCategory === 'ECG' ? 'BLOOD_CHEMISTRY' :
+                          dto.testCategory === 'COAGULATION' ? 'CBC' :
+                          dto.testCategory || 'BLOOD_CHEMISTRY') as 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'CBC' | 'THYROID_FUNCTION',
+            tests: expandedTests, // Use the processed tests
             testDisplayNames: dto.testDisplayNames || [],
             date: dto.date || new Date().toISOString(),
             status: dto.status || 'Pending',
@@ -97,11 +215,9 @@ export const LaboratoryTestsPage: React.FC = () => {
             testName: dto.testName
           };
           
-          console.log(`🔄 Converted lab test ${index}:`, converted);
           return converted;
         });
         
-        console.log('📋 Final converted lab tests:', convertedLabTests);
         setLabTests(convertedLabTests);
         
         // Set patient information from lab request data or fallback
@@ -132,13 +248,11 @@ export const LaboratoryTestsPage: React.FC = () => {
           });
         } else {
           // Fallback if no lab request data available - fetch patient details directly
-          console.log('🔄 Lab request failed, attempting to fetch patient details directly...');
           try {
             await loadPatientById(patientId);
             const patientDetails = getPatientDetails(patientId);
             
             if (patientDetails) {
-              console.log('✅ Retrieved patient details from Patient API:', patientDetails);
               setPatientInfo({
                 patientNumber: patientDetails.patientNumber,
                 patientName: `${patientDetails.firstName} ${patientDetails.lastName}`.trim(),
@@ -182,7 +296,6 @@ export const LaboratoryTestsPage: React.FC = () => {
   };
 
   const handleViewTest = async (test: LabTest) => {
-    console.log('View test:', test);
     setSelectedLabTest(test);
     
     // Fetch blood chemistry data if it's a blood chemistry test
@@ -191,7 +304,7 @@ export const LaboratoryTestsPage: React.FC = () => {
         const bloodChemistryResults = await fetchBloodChemistryByPatientId(patientId);
         
         // Find the blood chemistry result that matches this lab test ID
-        const matchingResult = bloodChemistryResults.find(result => 
+        const matchingResult = bloodChemistryResults.find((result: any) => 
           result.labRequestId === test.id
         );
         
@@ -216,15 +329,11 @@ export const LaboratoryTestsPage: React.FC = () => {
     setViewResultModalOpened(true);
   };
 
-  const handleEditTest = (test: LabTest) => {
-    console.log('Edit test:', test);
+  const handleEditTest = (_test: LabTest) => {
     // TODO: Implement edit test functionality
   };
 
   const handleAddResult = (test: LabTest) => {
-    console.log('🧪 Add Result clicked for test:', test);
-    console.log('🧪 Test category:', test.testCategory);
-    console.log('🧪 Specific tests to enable:', test.tests);
     setSelectedLabTest(test);
     setAddResultModalOpened(true);
     setError(null);
@@ -241,15 +350,14 @@ export const LaboratoryTestsPage: React.FC = () => {
     setError(null);
     
     try {
-      console.log('🔬 Submitting lab test results:', data);
       
       if (!patientId || !selectedLabTest || !patientInfo) {
         throw new Error('Missing required patient information or selected lab test');
       }
 
       // Check if this is a blood chemistry test by looking at the selected tests
-      const isBloodChemistryTest = selectedLabTest.testName.toLowerCase().includes('blood chemistry') ||
-                                   selectedLabTest.selectedTests.some(test => 
+      const isBloodChemistryTest = (selectedLabTest.testName?.toLowerCase().includes('blood chemistry')) ||
+                                   selectedLabTest.tests.some((test: string) => 
                                      ['blood_chemistry_fbs', 'blood_chemistry_bun', 'blood_chemistry_creatinine', 'blood_chemistry_blood_uric_acid', 'blood_chemistry_cholesterol', 'blood_chemistry_triglycerides', 'blood_chemistry_hdl', 'blood_chemistry_ldl', 'blood_chemistry_sgot', 'blood_chemistry_sgpt']
                                        .includes(test.toLowerCase())
                                    );
@@ -601,7 +709,7 @@ export const LaboratoryTestsPage: React.FC = () => {
         >
           <AddLabTestResultForm
               testType={selectedLabTest.testCategory}
-              enabledFields={selectedLabTest.tests} // Pass the specific tests that should be enabled
+              enabledFields={expandLipidProfile(mapLabRequestFieldsToFormIds(selectedLabTest.tests))} // Apply field mapping and lipid profile expansion
               patientData={{
                 patientNumber: patientInfo.patientNumber,
                 patientName: patientInfo.patientName,
@@ -631,7 +739,7 @@ export const LaboratoryTestsPage: React.FC = () => {
           <AddLabTestResultForm
               testType={selectedLabTest.testCategory}
               viewMode={true} // Enable view-only mode
-              enabledFields={selectedLabTest.tests} // Show the specific tests
+              enabledFields={expandLipidProfile(mapLabRequestFieldsToFormIds(selectedLabTest.tests))} // Apply field mapping and lipid profile expansion
               existingData={bloodChemistryData} // Use fetched blood chemistry data
               patientData={{
                 patientNumber: patientInfo.patientNumber,

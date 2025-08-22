@@ -3,9 +3,7 @@ import {
   LabRequestResponse,
   LabRequestListResponse,
   LabTestListResponse,
-  BloodChemistryResponse,
   LaboratoryOperationResponse,
-  CreateBloodChemistryCommand,
   CreateLabTestResultRequestDto,
   LabTestResultResponse
 } from '@nx-starter/application-shared';
@@ -47,16 +45,6 @@ export interface ILaboratoryApiService {
     requestDate: string, 
     results: Record<string, string>
   ): Promise<LaboratoryOperationResponse>;
-  
-  /**
-   * Create blood chemistry results
-   */
-  createBloodChemistry(command: CreateBloodChemistryCommand): Promise<BloodChemistryResponse>;
-
-  /**
-   * Get blood chemistry results by patient ID
-   */
-  getBloodChemistryByPatientId(patientId: string): Promise<BloodChemistryResponse>;
 
   /**
    * Create lab test result

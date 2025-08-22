@@ -202,6 +202,8 @@ export const LaboratoryPage: React.FC = () => {
         data={laboratoryResults}
         columns={columns}
         actions={actions}
+        onRowClick={handleViewResult}
+        cursor="pointer"
         searchable={true}
         searchPlaceholder="Search laboratory results by patient or status..."
         emptyStateMessage={loadingStates.fetching ? "Loading laboratory results..." : "No laboratory results found"}

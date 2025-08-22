@@ -61,11 +61,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   const leftFields = getFieldsByColumn(testType, 'left');
   const rightFields = getFieldsByColumn(testType, 'right');
 
-  // Debug logging for enabled fields
-  console.log('🧪 AddLabTestResultForm - Test Type:', testType);
-  console.log('🧪 AddLabTestResultForm - Enabled Fields:', enabledFields);
-  console.log('🧪 AddLabTestResultForm - Available Left Fields:', leftFields.map(f => ({ id: f.id, label: f.label })));
-  console.log('🧪 AddLabTestResultForm - Available Right Fields:', rightFields.map(f => ({ id: f.id, label: f.label })));
+
 
   const {
     register,
@@ -90,11 +86,15 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
         const normalizedFieldId = field.id.toLowerCase().trim();
         const normalizedFieldLabel = field.label.toLowerCase().trim();
         
-        // Match by ID, label, or if enabled field is part of label
-        return normalizedEnabledField === normalizedFieldId ||
+        // Match by ID, label, or bidirectional partial matching
+        const matches = normalizedEnabledField === normalizedFieldId ||
                normalizedEnabledField === normalizedFieldLabel ||
                normalizedFieldLabel.includes(normalizedEnabledField) ||
-               normalizedFieldId.includes(normalizedEnabledField);
+               normalizedFieldId.includes(normalizedEnabledField) ||
+               normalizedEnabledField.includes(normalizedFieldLabel) ||  // Check if enabled field contains label
+               normalizedEnabledField.includes(normalizedFieldId);       // Check if enabled field contains ID
+        
+        return matches;
       }));
     
     return (
