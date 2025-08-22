@@ -26,8 +26,11 @@ import {
   UpdateSerologyResultUseCase,
   DeleteSerologyResultUseCase,
   CreateLabTestResultUseCase,
+  UpdateLabTestResultUseCase,
+  DeleteLabTestResultUseCase,
   GetAllLabRequestsQueryHandler,
   GetCompletedLabRequestsQueryHandler,
+  GetLabRequestByIdQueryHandler,
   GetLabRequestByPatientIdQueryHandler,
   GetAllUrinalysisResultsQueryHandler,
   GetUrinalysisResultByIdQueryHandler,
@@ -41,6 +44,8 @@ import {
   GetAllSerologyResultsQueryHandler,
   GetSerologyResultByIdQueryHandler,
   GetSerologyResultsByPatientIdQueryHandler,
+  GetLabTestResultByIdQueryHandler,
+  GetAllLabTestResultsQueryHandler,
   GetBloodChemistryByPatientIdQueryHandler,
   LaboratoryMapper,
   TOKENS,
@@ -55,10 +60,12 @@ import {
   LaboratoryOperationResponse,
   LabTestListResponse,
   LabTestResultResponse,
+  LabTestResultListResponse,
   CreateLabRequestRequestDto,
   UpdateLabRequestResultsRequestDto,
   CreateBloodChemistryRequestDto,
   CreateLabTestResultRequestDto,
+  UpdateLabTestResultRequestDto,
   CreateUrinalysisResultCommand,
   UpdateUrinalysisResultCommand,
   CreateHematologyResultCommand,
@@ -67,6 +74,8 @@ import {
   UpdateFecalysisResultCommand,
   CreateSerologyResultCommand,
   UpdateSerologyResultCommand,
+  DeleteLabTestResultCommand,
+  UpdateLabTestResultCommand,
 } from '@nx-starter/application-shared';
 import { ApiResponseBuilder, ApiSuccessResponse } from '../dto/ApiResponse';
 
@@ -90,6 +99,8 @@ export class LaboratoryController {
     private getAllLabRequestsQueryHandler: GetAllLabRequestsQueryHandler,
     @inject(TOKENS.GetCompletedLabRequestsQueryHandler)
     private getCompletedLabRequestsQueryHandler: GetCompletedLabRequestsQueryHandler,
+    @inject(TOKENS.GetLabRequestByIdQueryHandler)
+    private getLabRequestByIdQueryHandler: GetLabRequestByIdQueryHandler,
     @inject(TOKENS.GetLabRequestByPatientIdQueryHandler)
     private getLabRequestByPatientIdQueryHandler: GetLabRequestByPatientIdQueryHandler,
     @inject(TOKENS.LaboratoryValidationService)
@@ -146,6 +157,14 @@ export class LaboratoryController {
     private getSerologyResultByIdQueryHandler: GetSerologyResultByIdQueryHandler,
     @inject(TOKENS.GetSerologyResultsByPatientIdQueryHandler)
     private getSerologyResultsByPatientIdQueryHandler: GetSerologyResultsByPatientIdQueryHandler,
+    @inject(TOKENS.GetLabTestResultByIdQueryHandler)
+    private getLabTestResultByIdQueryHandler: GetLabTestResultByIdQueryHandler,
+    @inject(TOKENS.GetAllLabTestResultsQueryHandler)
+    private getAllLabTestResultsQueryHandler: GetAllLabTestResultsQueryHandler,
+    @inject(TOKENS.UpdateLabTestResultUseCase)
+    private updateLabTestResultUseCase: UpdateLabTestResultUseCase,
+    @inject(TOKENS.DeleteLabTestResultUseCase)
+    private deleteLabTestResultUseCase: DeleteLabTestResultUseCase,
     // Blood Chemistry Query Handler
     @inject(TOKENS.GetBloodChemistryByPatientIdQueryHandler)
     private getBloodChemistryByPatientIdQueryHandler: GetBloodChemistryByPatientIdQueryHandler
@@ -171,6 +190,18 @@ export class LaboratoryController {
     const labRequestDtos = LaboratoryMapper.toLabRequestDtoArray(labRequests);
 
     return ApiResponseBuilder.success(labRequestDtos);
+  }
+
+  /**
+   * GET /api/laboratory/requests/:id - Get lab request by ID
+   */
+  @Get('/requests/:id')
+  async getLabRequestById(@Param('id') id: string): Promise<LabRequestResponse> {
+    const validatedId = LabRequestIdSchema.parse(id);
+    const labRequest = await this.getLabRequestByIdQueryHandler.execute(validatedId);
+    const labRequestDto = LaboratoryMapper.toLabRequestDto(labRequest);
+
+    return ApiResponseBuilder.success(labRequestDto);
   }
 
   /**
@@ -275,10 +306,64 @@ export class LaboratoryController {
     return ApiResponseBuilder.success(labTestResultDto);
   }
 
-  // ==================== URINALYSIS RESULTS ENDPOINTS ====================
+  /**
+   * GET /api/laboratory/test-results - Get all lab test results
+   */
+  @Get('/test-results')
+  async getAllLabTestResults(): Promise<LabTestResultListResponse> {
+    const labTestResults = await this.getAllLabTestResultsQueryHandler.execute();
+    const labTestResultDtos = labTestResults.map(labTestResult => 
+      LaboratoryMapper.toLabTestResultDto(labTestResult)
+    );
+
+    return ApiResponseBuilder.success(labTestResultDtos);
+  }
+
+  /**
+   * GET /api/laboratory/test-results/:id - Get lab test result by ID
+   */
+  @Get('/test-results/:id')
+  async getLabTestResultById(@Param('id') id: string): Promise<LabTestResultResponse> {
+    const validatedId = LabRequestIdSchema.parse(id);
+    const labTestResult = await this.getLabTestResultByIdQueryHandler.execute(validatedId);
+    const labTestResultDto = LaboratoryMapper.toLabTestResultDto(labTestResult);
+
+    return ApiResponseBuilder.success(labTestResultDto);
+  }
+
+  /**
+   * DELETE /api/laboratory/test-results/:id - Delete lab test result by ID
+   */
+  @Delete('/test-results/:id')
+  async deleteLabTestResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
+    const validatedCommand = this.validationService.validateDeleteLabTestResultCommand({ id });
+    await this.deleteLabTestResultUseCase.execute(validatedCommand);
+    return ApiResponseBuilder.successWithMessage('Lab test result deleted successfully');
+  }
+
+  /**
+   * PUT /api/laboratory/test-results/:id - Update lab test result by ID
+   */
+  @Put('/test-results/:id')
+  async updateLabTestResult(
+    @Param('id') id: string,
+    @Body() body: UpdateLabTestResultRequestDto
+  ): Promise<LabTestResultResponse> {
+    const updateData = { ...body, id };
+    const validatedCommand = this.validationService.validateUpdateLabTestResultCommand(updateData);
+    const labTestResult = await this.updateLabTestResultUseCase.execute(validatedCommand);
+    const labTestResultDto = LaboratoryMapper.toLabTestResultDto(labTestResult);
+
+    return ApiResponseBuilder.success(labTestResultDto);
+  }
+
+  // ==================== URINALYSIS RESULTS ENDPOINTS (LEGACY - DO NOT USE) ====================
+  // @deprecated These specialized test result endpoints are legacy.
+  // Use the general createLabTestResult endpoint (POST /api/laboratory/test-results) instead.
   
   /**
    * GET /api/laboratory/urinalysis-results - Get all urinalysis results
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/urinalysis-results')
   async getAllUrinalysisResults(): Promise<ApiSuccessResponse<any[]>> {
@@ -290,6 +375,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/urinalysis-results/:id - Get urinalysis result by ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/urinalysis-results/:id')
   async getUrinalysisResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
@@ -301,6 +387,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/urinalysis-results/patient/:patientId - Get urinalysis results by patient ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/urinalysis-results/patient/:patientId')
   async getUrinalysisResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
@@ -313,6 +400,7 @@ export class LaboratoryController {
 
   /**
    * POST /api/laboratory/urinalysis-results - Create a new urinalysis result
+   * @deprecated Use POST /api/laboratory/test-results instead
    */
   @Post('/urinalysis-results')
   @HttpCode(201)
@@ -326,6 +414,7 @@ export class LaboratoryController {
 
   /**
    * PUT /api/laboratory/urinalysis-results/:id - Update urinalysis result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Put('/urinalysis-results/:id')
   async updateUrinalysisResult(
@@ -342,6 +431,7 @@ export class LaboratoryController {
 
   /**
    * DELETE /api/laboratory/urinalysis-results/:id - Delete urinalysis result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Delete('/urinalysis-results/:id')
   async deleteUrinalysisResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
@@ -349,10 +439,13 @@ export class LaboratoryController {
     return ApiResponseBuilder.successWithMessage('Urinalysis result deleted successfully');
   }
 
-  // ==================== HEMATOLOGY RESULTS ENDPOINTS ====================
+  // ==================== HEMATOLOGY RESULTS ENDPOINTS (LEGACY - DO NOT USE) ====================
+  // @deprecated These specialized test result endpoints are legacy.
+  // Use the general createLabTestResult endpoint (POST /api/laboratory/test-results) instead.
   
   /**
    * GET /api/laboratory/hematology-results - Get all hematology results
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/hematology-results')
   async getAllHematologyResults(): Promise<ApiSuccessResponse<any[]>> {
@@ -364,6 +457,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/hematology-results/:id - Get hematology result by ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/hematology-results/:id')
   async getHematologyResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
@@ -375,6 +469,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/hematology-results/patient/:patientId - Get hematology results by patient ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/hematology-results/patient/:patientId')
   async getHematologyResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
@@ -387,6 +482,7 @@ export class LaboratoryController {
 
   /**
    * POST /api/laboratory/hematology-results - Create a new hematology result
+   * @deprecated Use POST /api/laboratory/test-results instead
    */
   @Post('/hematology-results')
   @HttpCode(201)
@@ -400,6 +496,7 @@ export class LaboratoryController {
 
   /**
    * PUT /api/laboratory/hematology-results/:id - Update hematology result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Put('/hematology-results/:id')
   async updateHematologyResult(
@@ -416,6 +513,7 @@ export class LaboratoryController {
 
   /**
    * DELETE /api/laboratory/hematology-results/:id - Delete hematology result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Delete('/hematology-results/:id')
   async deleteHematologyResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
@@ -423,10 +521,13 @@ export class LaboratoryController {
     return ApiResponseBuilder.successWithMessage('Hematology result deleted successfully');
   }
 
-  // ==================== FECALYSIS RESULTS ENDPOINTS ====================
+  // ==================== FECALYSIS RESULTS ENDPOINTS (LEGACY - DO NOT USE) ====================
+  // @deprecated These specialized test result endpoints are legacy.
+  // Use the general createLabTestResult endpoint (POST /api/laboratory/test-results) instead.
   
   /**
    * GET /api/laboratory/fecalysis-results - Get all fecalysis results
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/fecalysis-results')
   async getAllFecalysisResults(): Promise<ApiSuccessResponse<any[]>> {
@@ -438,6 +539,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/fecalysis-results/:id - Get fecalysis result by ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/fecalysis-results/:id')
   async getFecalysisResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
@@ -449,6 +551,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/fecalysis-results/patient/:patientId - Get fecalysis results by patient ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/fecalysis-results/patient/:patientId')
   async getFecalysisResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
@@ -461,6 +564,7 @@ export class LaboratoryController {
 
   /**
    * POST /api/laboratory/fecalysis-results - Create a new fecalysis result
+   * @deprecated Use POST /api/laboratory/test-results instead
    */
   @Post('/fecalysis-results')
   @HttpCode(201)
@@ -474,6 +578,7 @@ export class LaboratoryController {
 
   /**
    * PUT /api/laboratory/fecalysis-results/:id - Update fecalysis result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Put('/fecalysis-results/:id')
   async updateFecalysisResult(
@@ -490,6 +595,7 @@ export class LaboratoryController {
 
   /**
    * DELETE /api/laboratory/fecalysis-results/:id - Delete fecalysis result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Delete('/fecalysis-results/:id')
   async deleteFecalysisResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
@@ -497,10 +603,13 @@ export class LaboratoryController {
     return ApiResponseBuilder.successWithMessage('Fecalysis result deleted successfully');
   }
 
-  // ==================== SEROLOGY RESULTS ENDPOINTS ====================
+  // ==================== SEROLOGY RESULTS ENDPOINTS (LEGACY - DO NOT USE) ====================
+  // @deprecated These specialized test result endpoints are legacy.
+  // Use the general createLabTestResult endpoint (POST /api/laboratory/test-results) instead.
   
   /**
    * GET /api/laboratory/serology-results - Get all serology results
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/serology-results')
   async getAllSerologyResults(): Promise<ApiSuccessResponse<any[]>> {
@@ -512,6 +621,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/serology-results/:id - Get serology result by ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/serology-results/:id')
   async getSerologyResultById(@Param('id') id: string): Promise<ApiSuccessResponse<any>> {
@@ -523,6 +633,7 @@ export class LaboratoryController {
 
   /**
    * GET /api/laboratory/serology-results/patient/:patientId - Get serology results by patient ID
+   * @deprecated Use general lab test results endpoint instead
    */
   @Get('/serology-results/patient/:patientId')
   async getSerologyResultsByPatientId(@Param('patientId') patientId: string): Promise<ApiSuccessResponse<any[]>> {
@@ -535,6 +646,7 @@ export class LaboratoryController {
 
   /**
    * POST /api/laboratory/serology-results - Create a new serology result
+   * @deprecated Use POST /api/laboratory/test-results instead
    */
   @Post('/serology-results')
   @HttpCode(201)
@@ -548,6 +660,7 @@ export class LaboratoryController {
 
   /**
    * PUT /api/laboratory/serology-results/:id - Update serology result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Put('/serology-results/:id')
   async updateSerologyResult(
@@ -564,6 +677,7 @@ export class LaboratoryController {
 
   /**
    * DELETE /api/laboratory/serology-results/:id - Delete serology result
+   * @deprecated Use general lab test results endpoint instead
    */
   @Delete('/serology-results/:id')
   async deleteSerologyResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {

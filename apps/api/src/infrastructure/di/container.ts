@@ -103,9 +103,12 @@ import {
   UpdateSerologyResultUseCase,
   DeleteSerologyResultUseCase,
   CreateLabTestResultUseCase,
+  UpdateLabTestResultUseCase,
+  DeleteLabTestResultUseCase,
   // Laboratory Query Handlers
   GetAllLabRequestsQueryHandler,
   GetCompletedLabRequestsQueryHandler,
+  GetLabRequestByIdQueryHandler,
   GetLabRequestByPatientIdQueryHandler,
   GetAllUrinalysisResultsQueryHandler,
   GetUrinalysisResultByIdQueryHandler,
@@ -119,6 +122,8 @@ import {
   GetAllSerologyResultsQueryHandler,
   GetSerologyResultByIdQueryHandler,
   GetSerologyResultsByPatientIdQueryHandler,
+  GetLabTestResultByIdQueryHandler,
+  GetAllLabTestResultsQueryHandler,
   GetBloodChemistryByPatientIdQueryHandler,
   // Laboratory Validation Services
   LaboratoryValidationService,
@@ -138,6 +143,8 @@ import {
   CreateSerologyResultValidationService,
   UpdateSerologyResultValidationService,
   CreateLabTestResultValidationService,
+  UpdateLabTestResultValidationService,
+  DeleteLabTestResultValidationService,
   // Prescription Use Cases
   CreatePrescriptionUseCase,
   UpdatePrescriptionUseCase,
@@ -446,6 +453,8 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.UpdateSerologyResultUseCase, UpdateSerologyResultUseCase);
   container.registerSingleton(TOKENS.DeleteSerologyResultUseCase, DeleteSerologyResultUseCase);
   container.registerSingleton(TOKENS.CreateLabTestResultUseCase, CreateLabTestResultUseCase);
+  container.registerSingleton(TOKENS.UpdateLabTestResultUseCase, UpdateLabTestResultUseCase);
+  container.registerSingleton(TOKENS.DeleteLabTestResultUseCase, DeleteLabTestResultUseCase);
 
   // Prescription Use Cases (Commands)
   container.registerSingleton(TOKENS.CreatePrescriptionUseCase, CreatePrescriptionUseCase);
@@ -549,6 +558,7 @@ export const configureDI = async () => {
   // Laboratory Query Handlers
   container.registerSingleton(TOKENS.GetAllLabRequestsQueryHandler, GetAllLabRequestsQueryHandler);
   container.registerSingleton(TOKENS.GetCompletedLabRequestsQueryHandler, GetCompletedLabRequestsQueryHandler);
+  container.registerSingleton(TOKENS.GetLabRequestByIdQueryHandler, GetLabRequestByIdQueryHandler);
   container.registerSingleton(TOKENS.GetLabRequestByPatientIdQueryHandler, GetLabRequestByPatientIdQueryHandler);
   container.registerSingleton(TOKENS.GetAllUrinalysisResultsQueryHandler, GetAllUrinalysisResultsQueryHandler);
   container.registerSingleton(TOKENS.GetUrinalysisResultByIdQueryHandler, GetUrinalysisResultByIdQueryHandler);
@@ -562,6 +572,8 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetAllSerologyResultsQueryHandler, GetAllSerologyResultsQueryHandler);
   container.registerSingleton(TOKENS.GetSerologyResultByIdQueryHandler, GetSerologyResultByIdQueryHandler);
   container.registerSingleton(TOKENS.GetSerologyResultsByPatientIdQueryHandler, GetSerologyResultsByPatientIdQueryHandler);
+  container.registerSingleton(TOKENS.GetLabTestResultByIdQueryHandler, GetLabTestResultByIdQueryHandler);
+  container.registerSingleton(TOKENS.GetAllLabTestResultsQueryHandler, GetAllLabTestResultsQueryHandler);
   container.registerSingleton(TOKENS.GetBloodChemistryByPatientIdQueryHandler, GetBloodChemistryByPatientIdQueryHandler);
 
   // Prescription Query Handlers
@@ -702,6 +714,8 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.CreateSerologyResultValidationService, CreateSerologyResultValidationService);
   container.registerSingleton(TOKENS.UpdateSerologyResultValidationService, UpdateSerologyResultValidationService);
   container.registerSingleton(TOKENS.CreateLabTestResultValidationService, CreateLabTestResultValidationService);
+  container.registerSingleton(TOKENS.UpdateLabTestResultValidationService, UpdateLabTestResultValidationService);
+  container.registerSingleton(TOKENS.DeleteLabTestResultValidationService, DeleteLabTestResultValidationService);
 
   // Prescription Validation Services
   container.registerSingleton(TOKENS.PrescriptionValidationService, PrescriptionValidationService);

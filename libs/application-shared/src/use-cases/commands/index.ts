@@ -38,6 +38,8 @@ export * from './CreateSerologyResultUseCase';
 export * from './UpdateSerologyResultUseCase';
 export * from './DeleteSerologyResultUseCase';
 export * from './CreateLabTestResultUseCase';
+export * from './UpdateLabTestResultUseCase';
+export * from './DeleteLabTestResultUseCase';
 export * from './CreatePrescriptionUseCase';
 export * from './UpdatePrescriptionUseCase';
 export * from './DeletePrescriptionUseCase';

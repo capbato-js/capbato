@@ -70,6 +70,28 @@ export interface LabTestSerologyResults {
   dengueNs1?: string;
 }
 
+export interface LabTestEcgResults {
+  av?: string;
+  qrs?: string;
+  axis?: string;
+  pr?: string;
+  qt?: string;
+  stT?: string;
+  rhythm?: string;
+  others?: string;
+  interpretation?: string;
+  interpreter?: string;
+}
+
+export interface LabTestCoagulationResults {
+  patientPt?: string;
+  controlPt?: string;
+  inr?: string;
+  activityPercent?: string;
+  patientPtt?: string;
+  controlPtt?: string;
+}
+
 interface ILabTestResult {
   id?: string;
   labRequestId: string;
@@ -80,6 +102,8 @@ interface ILabTestResult {
   hematology?: LabTestHematologyResults;
   fecalysis?: LabTestFecalysisResults;
   serology?: LabTestSerologyResults;
+  ecg?: LabTestEcgResults;
+  coagulation?: LabTestCoagulationResults;
   remarks?: string;
   createdAt: Date;
   updatedAt?: Date;
@@ -95,6 +119,8 @@ export class LabTestResult implements ILabTestResult {
   private readonly _hematology?: LabTestHematologyResults;
   private readonly _fecalysis?: LabTestFecalysisResults;
   private readonly _serology?: LabTestSerologyResults;
+  private readonly _ecg?: LabTestEcgResults;
+  private readonly _coagulation?: LabTestCoagulationResults;
   private readonly _remarks?: string;
   private readonly _createdAt: Date;
   private readonly _updatedAt?: Date;
@@ -108,6 +134,8 @@ export class LabTestResult implements ILabTestResult {
     hematology?: LabTestHematologyResults,
     fecalysis?: LabTestFecalysisResults,
     serology?: LabTestSerologyResults,
+    ecg?: LabTestEcgResults,
+    coagulation?: LabTestCoagulationResults,
     remarks?: string,
     id?: string,
     createdAt = new Date(),
@@ -121,6 +149,8 @@ export class LabTestResult implements ILabTestResult {
     this._hematology = hematology;
     this._fecalysis = fecalysis;
     this._serology = serology;
+    this._ecg = ecg;
+    this._coagulation = coagulation;
     this._remarks = remarks;
     this._id = id;
     this._createdAt = createdAt;
@@ -163,6 +193,14 @@ export class LabTestResult implements ILabTestResult {
     return this._serology;
   }
 
+  get ecg(): LabTestEcgResults | undefined {
+    return this._ecg;
+  }
+
+  get coagulation(): LabTestCoagulationResults | undefined {
+    return this._coagulation;
+  }
+
   get remarks(): string | undefined {
     return this._remarks;
   }
@@ -182,7 +220,9 @@ export class LabTestResult implements ILabTestResult {
       this._urinalysis ||
       this._hematology ||
       this._fecalysis ||
-      this._serology
+      this._serology ||
+      this._ecg ||
+      this._coagulation
     );
   }
 
@@ -204,6 +244,14 @@ export class LabTestResult implements ILabTestResult {
 
   hasSerologyResults(): boolean {
     return !!this._serology && Object.keys(this._serology).length > 0;
+  }
+
+  hasEcgResults(): boolean {
+    return !!this._ecg && Object.keys(this._ecg).length > 0;
+  }
+
+  hasCoagulationResults(): boolean {
+    return !!this._coagulation && Object.keys(this._coagulation).length > 0;
   }
 
   validate(): void {
@@ -238,6 +286,8 @@ export class LabTestResult implements ILabTestResult {
       this._hematology,
       this._fecalysis,
       this._serology,
+      this._ecg,
+      this._coagulation,
       this._remarks,
       id,
       this._createdAt,
@@ -251,6 +301,8 @@ export class LabTestResult implements ILabTestResult {
     hematology?: LabTestHematologyResults,
     fecalysis?: LabTestFecalysisResults,
     serology?: LabTestSerologyResults,
+    ecg?: LabTestEcgResults,
+    coagulation?: LabTestCoagulationResults,
     remarks?: string
   ): LabTestResult {
     return new LabTestResult(
@@ -262,6 +314,8 @@ export class LabTestResult implements ILabTestResult {
       hematology ?? this._hematology,
       fecalysis ?? this._fecalysis,
       serology ?? this._serology,
+      ecg ?? this._ecg,
+      coagulation ?? this._coagulation,
       remarks ?? this._remarks,
       this._id,
       this._createdAt,

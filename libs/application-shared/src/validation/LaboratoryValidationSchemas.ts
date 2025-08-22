@@ -422,6 +422,61 @@ export const UrinalysisResultsSchema = z.object({
   pregnancyTest: z.string().max(50).optional(),
 }).optional();
 
+export const HematologyResultsSchema = z.object({
+  hematocrit: z.string().max(50).optional(),
+  hemoglobin: z.string().max(50).optional(),
+  rbc: z.string().max(50).optional(),
+  wbc: z.string().max(50).optional(),
+  segmenters: z.string().max(50).optional(),
+  lymphocyte: z.string().max(50).optional(),
+  monocyte: z.string().max(50).optional(),
+  basophils: z.string().max(50).optional(),
+  eosinophils: z.string().max(50).optional(),
+  platelet: z.string().max(50).optional(),
+  others: z.string().max(255).optional(),
+}).optional();
+
+export const FecalysisResultsSchema = z.object({
+  color: z.string().max(100).optional(),
+  consistency: z.string().max(100).optional(),
+  rbc: z.string().max(50).optional(),
+  wbc: z.string().max(50).optional(),
+  occultBlood: z.string().max(50).optional(),
+  urobilinogen: z.string().max(50).optional(),
+  others: z.string().max(255).optional(),
+}).optional();
+
+export const SerologyResultsSchema = z.object({
+  ft3: z.number().min(0).max(50).optional(),
+  ft4: z.number().min(0).max(50).optional(),
+  tsh: z.number().min(0).max(100).optional(),
+  dengueIgg: z.string().max(50).optional(),
+  dengueIgm: z.string().max(50).optional(),
+  dengueNs1: z.string().max(50).optional(),
+}).optional();
+
+export const EcgResultsSchema = z.object({
+  av: z.string().max(100).optional(),
+  qrs: z.string().max(100).optional(),
+  axis: z.string().max(100).optional(),
+  pr: z.string().max(100).optional(),
+  qt: z.string().max(100).optional(),
+  stT: z.string().max(100).optional(),
+  rhythm: z.string().max(100).optional(),
+  others: z.string().max(255).optional(),
+  interpretation: z.string().max(500).optional(),
+  interpreter: z.string().max(255).optional(),
+}).optional();
+
+export const CoagulationResultsSchema = z.object({
+  patientPt: z.string().max(50).optional(),
+  controlPt: z.string().max(50).optional(),
+  inr: z.string().max(50).optional(),
+  activityPercent: z.string().max(50).optional(),
+  patientPtt: z.string().max(50).optional(),
+  controlPtt: z.string().max(50).optional(),
+}).optional();
+
 export const CreateLabTestResultCommandSchema = z.object({
   labRequestId: z.string()
     .min(1, 'Lab request ID cannot be empty')
@@ -429,34 +484,42 @@ export const CreateLabTestResultCommandSchema = z.object({
   dateTested: z.string().datetime().describe('Date and time when tests were performed'),
   bloodChemistry: BloodChemistryResultsSchema,
   urinalysis: UrinalysisResultsSchema,
+  hematology: HematologyResultsSchema,
+  fecalysis: FecalysisResultsSchema,
+  serology: SerologyResultsSchema,
+  ecg: EcgResultsSchema,
+  coagulation: CoagulationResultsSchema,
   remarks: z.string().max(500).optional(),
 }).refine(
-  (data) => data.bloodChemistry || data.urinalysis,
+  (data) => data.bloodChemistry || data.urinalysis || data.hematology || data.fecalysis || data.serology || data.ecg || data.coagulation,
   {
-    message: 'At least one test result type (bloodChemistry or urinalysis) must be provided',
+    message: 'At least one test result type must be provided',
     path: ['testResults'],
   }
 ).refine(
   (data) => {
-    // If bloodChemistry is provided, ensure it has at least one actual test result value
-    if (data.bloodChemistry) {
-      const bloodChemistryValues = Object.values(data.bloodChemistry);
-      const hasBloodChemistryValues = bloodChemistryValues.some(value => value !== undefined && value !== null);
-      if (!hasBloodChemistryValues) {
-        return false;
+    // Check if any provided test result has actual values
+    const categories = [
+      data.bloodChemistry,
+      data.urinalysis,
+      data.hematology,
+      data.fecalysis,
+      data.serology,
+      data.ecg,
+      data.coagulation
+    ];
+    
+    for (const category of categories) {
+      if (category) {
+        const values = Object.values(category);
+        const hasValues = values.some(value => value !== undefined && value !== null && value !== '');
+        if (hasValues) {
+          return true;
+        }
       }
     }
     
-    // If urinalysis is provided, ensure it has at least one actual test result value
-    if (data.urinalysis) {
-      const urinalysisValues = Object.values(data.urinalysis);
-      const hasUrinalysisValues = urinalysisValues.some(value => value !== undefined && value !== null && value !== '');
-      if (!hasUrinalysisValues) {
-        return false;
-      }
-    }
-    
-    return true;
+    return false;
   },
   {
     message: 'Test result objects must contain actual result values, not empty objects',
@@ -467,6 +530,63 @@ export const CreateLabTestResultCommandSchema = z.object({
 export const LabTestResultIdSchema = z.string()
   .min(1, 'Lab test result ID cannot be empty')
   .regex(/^[0-9a-fA-F]{32}$/, 'Lab test result ID must be a valid dashless UUID format (32 hexadecimal characters)');
+
+export const DeleteLabTestResultCommandSchema = z.object({
+  id: z.string().min(1, 'ID cannot be empty'),
+});
+
+export const UpdateLabTestResultCommandSchema = z.object({
+  id: z.string().min(1, 'ID cannot be empty'),
+  labRequestId: z.string()
+    .min(1, 'Lab request ID cannot be empty')
+    .regex(/^[0-9a-fA-F]{32}$/, 'Lab request ID must be a valid dashless UUID format (32 hexadecimal characters)')
+    .optional(),
+  dateTested: z.string().datetime().describe('Date and time when tests were performed').optional(),
+  bloodChemistry: BloodChemistryResultsSchema.optional(),
+  urinalysis: UrinalysisResultsSchema.optional(),
+  hematology: HematologyResultsSchema.optional(),
+  fecalysis: FecalysisResultsSchema.optional(),
+  serology: SerologyResultsSchema.optional(),
+  ecg: EcgResultsSchema.optional(),
+  coagulation: CoagulationResultsSchema.optional(),
+  remarks: z.string().max(500).optional(),
+}).refine(
+  (data) => {
+    // For updates, allow partial updates - if any test result field is provided, it should have values
+    const categories = [
+      data.bloodChemistry,
+      data.urinalysis,
+      data.hematology,
+      data.fecalysis,
+      data.serology,
+      data.ecg,
+      data.coagulation
+    ];
+    
+    // If no test categories are provided, that's fine for partial updates
+    const providedCategories = categories.filter(cat => cat !== undefined);
+    if (providedCategories.length === 0) {
+      return true; // Allow updates with no test result changes
+    }
+    
+    // Check if provided categories have actual values
+    for (const category of providedCategories) {
+      if (category) {
+        const values = Object.values(category);
+        const hasValues = values.some(value => value !== undefined && value !== null && value !== '');
+        if (hasValues) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  },
+  {
+    message: 'Provided test result objects must contain actual result values, not empty objects',
+    path: ['testResults'],
+  }
+);
 
 // Export inferred types
 export type CreateLabRequestCommand = z.infer<typeof CreateLabRequestCommandSchema>;
@@ -489,6 +609,13 @@ export type CreateSerologyResultCommand = z.infer<typeof CreateSerologyResultCom
 export type UpdateSerologyResultCommand = z.infer<typeof UpdateSerologyResultCommandSchema>;
 export type DeleteSerologyResultCommand = z.infer<typeof DeleteSerologyResultCommandSchema>;
 export type CreateLabTestResultCommand = z.infer<typeof CreateLabTestResultCommandSchema>;
+export type UpdateLabTestResultCommand = z.infer<typeof UpdateLabTestResultCommandSchema>;
+export type DeleteLabTestResultCommand = z.infer<typeof DeleteLabTestResultCommandSchema>;
+export type HematologyResults = z.infer<typeof HematologyResultsSchema>;
+export type FecalysisResults = z.infer<typeof FecalysisResultsSchema>;
+export type SerologyResults = z.infer<typeof SerologyResultsSchema>;
+export type EcgResults = z.infer<typeof EcgResultsSchema>;
+export type CoagulationResults = z.infer<typeof CoagulationResultsSchema>;
 
 // Validation schema collection
 export const LaboratoryValidationSchemas = {
@@ -518,5 +645,7 @@ export const LaboratoryValidationSchemas = {
   FecalysisResultIdSchema,
   SerologyResultIdSchema,
   CreateLabTestResultCommandSchema,
+  UpdateLabTestResultCommandSchema,
+  DeleteLabTestResultCommandSchema,
   LabTestResultIdSchema,
 } as const;

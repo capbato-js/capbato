@@ -104,6 +104,66 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
       entity.resultUrinePregnancyTest = domain.urinalysis.pregnancyTest;
     }
 
+    // Map hematology results
+    if (domain.hematology) {
+      entity.resultHematologyHematocrit = domain.hematology.hematocrit;
+      entity.resultHematologyHemoglobin = domain.hematology.hemoglobin;
+      entity.resultHematologyRbc = domain.hematology.rbc;
+      entity.resultHematologyWbc = domain.hematology.wbc;
+      entity.resultHematologySegmenters = domain.hematology.segmenters;
+      entity.resultHematologyLymphocyte = domain.hematology.lymphocyte;
+      entity.resultHematologyMonocyte = domain.hematology.monocyte;
+      entity.resultHematologyBasophils = domain.hematology.basophils;
+      entity.resultHematologyEosinophils = domain.hematology.eosinophils;
+      entity.resultHematologyPlatelet = domain.hematology.platelet;
+      entity.resultHematologyOthers = domain.hematology.others;
+    }
+
+    // Map fecalysis results
+    if (domain.fecalysis) {
+      entity.resultFecalColor = domain.fecalysis.color;
+      entity.resultFecalConsistency = domain.fecalysis.consistency;
+      entity.resultFecalRbc = domain.fecalysis.rbc;
+      entity.resultFecalWbc = domain.fecalysis.wbc;
+      entity.resultFecalOccultBlood = domain.fecalysis.occultBlood;
+      entity.resultFecalUrobilinogen = domain.fecalysis.urobilinogen;
+      entity.resultFecalOthers = domain.fecalysis.others;
+    }
+
+    // Map serology results
+    if (domain.serology) {
+      entity.resultSerologyFt3 = domain.serology.ft3;
+      entity.resultSerologyFt4 = domain.serology.ft4;
+      entity.resultSerologyTsh = domain.serology.tsh;
+      entity.resultSerologyDengueIgg = domain.serology.dengueIgg;
+      entity.resultSerologyDengueIgm = domain.serology.dengueIgm;
+      entity.resultSerologyDengueNs1 = domain.serology.dengueNs1;
+    }
+
+    // Map ECG results
+    if (domain.ecg) {
+      entity.resultEcgAv = domain.ecg.av;
+      entity.resultEcgQrs = domain.ecg.qrs;
+      entity.resultEcgAxis = domain.ecg.axis;
+      entity.resultEcgPr = domain.ecg.pr;
+      entity.resultEcgQt = domain.ecg.qt;
+      entity.resultEcgStT = domain.ecg.stT;
+      entity.resultEcgRhythm = domain.ecg.rhythm;
+      entity.resultEcgOthers = domain.ecg.others;
+      entity.resultEcgInterpretation = domain.ecg.interpretation;
+      entity.resultEcgInterpreter = domain.ecg.interpreter;
+    }
+
+    // Map coagulation results
+    if (domain.coagulation) {
+      entity.resultCoagPatientPt = domain.coagulation.patientPt;
+      entity.resultCoagControlPt = domain.coagulation.controlPt;
+      entity.resultCoagInr = domain.coagulation.inr;
+      entity.resultCoagActivityPercent = domain.coagulation.activityPercent;
+      entity.resultCoagPatientPtt = domain.coagulation.patientPtt;
+      entity.resultCoagControlPtt = domain.coagulation.controlPtt;
+    }
+
     return entity;
   }
 
@@ -147,15 +207,77 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
       pregnancyTest: entity.resultUrinePregnancyTest,
     } : undefined;
 
+    // Map hematology results
+    const hematology = this.hasHematologyResults(entity) ? {
+      hematocrit: entity.resultHematologyHematocrit,
+      hemoglobin: entity.resultHematologyHemoglobin,
+      rbc: entity.resultHematologyRbc,
+      wbc: entity.resultHematologyWbc,
+      segmenters: entity.resultHematologySegmenters,
+      lymphocyte: entity.resultHematologyLymphocyte,
+      monocyte: entity.resultHematologyMonocyte,
+      basophils: entity.resultHematologyBasophils,
+      eosinophils: entity.resultHematologyEosinophils,
+      platelet: entity.resultHematologyPlatelet,
+      others: entity.resultHematologyOthers,
+    } : undefined;
+
+    // Map fecalysis results
+    const fecalysis = this.hasFecalysisResults(entity) ? {
+      color: entity.resultFecalColor,
+      consistency: entity.resultFecalConsistency,
+      rbc: entity.resultFecalRbc,
+      wbc: entity.resultFecalWbc,
+      occultBlood: entity.resultFecalOccultBlood,
+      urobilinogen: entity.resultFecalUrobilinogen,
+      others: entity.resultFecalOthers,
+    } : undefined;
+
+    // Map serology results
+    const serology = this.hasSerologyResults(entity) ? {
+      ft3: entity.resultSerologyFt3,
+      ft4: entity.resultSerologyFt4,
+      tsh: entity.resultSerologyTsh,
+      dengueIgg: entity.resultSerologyDengueIgg,
+      dengueIgm: entity.resultSerologyDengueIgm,
+      dengueNs1: entity.resultSerologyDengueNs1,
+    } : undefined;
+
+    // Map ECG results
+    const ecg = this.hasEcgResults(entity) ? {
+      av: entity.resultEcgAv,
+      qrs: entity.resultEcgQrs,
+      axis: entity.resultEcgAxis,
+      pr: entity.resultEcgPr,
+      qt: entity.resultEcgQt,
+      stT: entity.resultEcgStT,
+      rhythm: entity.resultEcgRhythm,
+      others: entity.resultEcgOthers,
+      interpretation: entity.resultEcgInterpretation,
+      interpreter: entity.resultEcgInterpreter,
+    } : undefined;
+
+    // Map coagulation results
+    const coagulation = this.hasCoagulationResults(entity) ? {
+      patientPt: entity.resultCoagPatientPt,
+      controlPt: entity.resultCoagControlPt,
+      inr: entity.resultCoagInr,
+      activityPercent: entity.resultCoagActivityPercent,
+      patientPtt: entity.resultCoagPatientPtt,
+      controlPtt: entity.resultCoagControlPtt,
+    } : undefined;
+
     return new LabTestResult(
       entity.labRequestId,
       entity.patientId,
       entity.dateTested!,
       bloodChemistry,
       urinalysis,
-      undefined, // hematology
-      undefined, // fecalysis  
-      undefined, // serology
+      hematology,
+      fecalysis,
+      serology,
+      ecg,
+      coagulation,
       entity.remarks,
       entity.id,
       entity.createdAt,
@@ -201,6 +323,71 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
       entity.resultUrineBacteria ||
       entity.resultUrineOthers ||
       entity.resultUrinePregnancyTest
+    );
+  }
+
+  private hasHematologyResults(entity: LabTestResultEntity): boolean {
+    return !!(
+      entity.resultHematologyHematocrit ||
+      entity.resultHematologyHemoglobin ||
+      entity.resultHematologyRbc ||
+      entity.resultHematologyWbc ||
+      entity.resultHematologySegmenters ||
+      entity.resultHematologyLymphocyte ||
+      entity.resultHematologyMonocyte ||
+      entity.resultHematologyBasophils ||
+      entity.resultHematologyEosinophils ||
+      entity.resultHematologyPlatelet ||
+      entity.resultHematologyOthers
+    );
+  }
+
+  private hasFecalysisResults(entity: LabTestResultEntity): boolean {
+    return !!(
+      entity.resultFecalColor ||
+      entity.resultFecalConsistency ||
+      entity.resultFecalRbc ||
+      entity.resultFecalWbc ||
+      entity.resultFecalOccultBlood ||
+      entity.resultFecalUrobilinogen ||
+      entity.resultFecalOthers
+    );
+  }
+
+  private hasSerologyResults(entity: LabTestResultEntity): boolean {
+    return !!(
+      entity.resultSerologyFt3 ||
+      entity.resultSerologyFt4 ||
+      entity.resultSerologyTsh ||
+      entity.resultSerologyDengueIgg ||
+      entity.resultSerologyDengueIgm ||
+      entity.resultSerologyDengueNs1
+    );
+  }
+
+  private hasEcgResults(entity: LabTestResultEntity): boolean {
+    return !!(
+      entity.resultEcgAv ||
+      entity.resultEcgQrs ||
+      entity.resultEcgAxis ||
+      entity.resultEcgPr ||
+      entity.resultEcgQt ||
+      entity.resultEcgStT ||
+      entity.resultEcgRhythm ||
+      entity.resultEcgOthers ||
+      entity.resultEcgInterpretation ||
+      entity.resultEcgInterpreter
+    );
+  }
+
+  private hasCoagulationResults(entity: LabTestResultEntity): boolean {
+    return !!(
+      entity.resultCoagPatientPt ||
+      entity.resultCoagControlPt ||
+      entity.resultCoagInr ||
+      entity.resultCoagActivityPercent ||
+      entity.resultCoagPatientPtt ||
+      entity.resultCoagControlPtt
     );
   }
 }

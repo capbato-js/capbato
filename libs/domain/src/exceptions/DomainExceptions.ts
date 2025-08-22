@@ -289,6 +289,12 @@ export class BloodChemistryNotFoundException extends DomainException {
   }
 }
 
+export class LabTestResultNotFoundException extends DomainException {
+  constructor(identifier: string) {
+    super(`Lab test result with identifier ${identifier} not found`, 'LAB_TEST_RESULT_NOT_FOUND', 404);
+  }
+}
+
 export class InvalidLabRequestStatusException extends DomainException {
   constructor(status: string) {
     super(`Invalid lab request status: ${status}`, 'INVALID_LAB_REQUEST_STATUS');

@@ -23,6 +23,8 @@ export type {
   UpdateSerologyResultCommand,
   DeleteSerologyResultCommand,
   CreateLabTestResultCommand,
+  UpdateLabTestResultCommand,
+  DeleteLabTestResultCommand,
 } from '../validation/LaboratoryValidationSchemas';
 
 // Re-export validation schemas for backward compatibility
@@ -47,6 +49,8 @@ export {
   UpdateSerologyResultCommandSchema,
   DeleteSerologyResultCommandSchema,
   CreateLabTestResultCommandSchema,
+  UpdateLabTestResultCommandSchema,
+  DeleteLabTestResultCommandSchema,
   LaboratoryValidationSchemas,
 } from '../validation/LaboratoryValidationSchemas';
 
@@ -388,6 +392,56 @@ export interface LabTestResultDto {
     others?: string;
     pregnancyTest?: string;
   };
+  hematology?: {
+    hematocrit?: string;
+    hemoglobin?: string;
+    rbc?: string;
+    wbc?: string;
+    segmenters?: string;
+    lymphocyte?: string;
+    monocyte?: string;
+    basophils?: string;
+    eosinophils?: string;
+    platelet?: string;
+    others?: string;
+  };
+  fecalysis?: {
+    color?: string;
+    consistency?: string;
+    rbc?: string;
+    wbc?: string;
+    occultBlood?: string;
+    urobilinogen?: string;
+    others?: string;
+  };
+  serology?: {
+    ft3?: number;
+    ft4?: number;
+    tsh?: number;
+    dengueIgg?: string;
+    dengueIgm?: string;
+    dengueNs1?: string;
+  };
+  ecg?: {
+    av?: string;
+    qrs?: string;
+    axis?: string;
+    pr?: string;
+    qt?: string;
+    stT?: string;
+    rhythm?: string;
+    others?: string;
+    interpretation?: string;
+    interpreter?: string;
+  };
+  coagulation?: {
+    patientPt?: string;
+    controlPt?: string;
+    inr?: string;
+    activityPercent?: string;
+    patientPtt?: string;
+    controlPtt?: string;
+  };
   remarks?: string;
   createdAt: string;
   updatedAt?: string;
@@ -430,6 +484,142 @@ export interface CreateLabTestResultRequestDto {
     bacteria?: string;
     others?: string;
     pregnancyTest?: string;
+  };
+  hematology?: {
+    hematocrit?: string;
+    hemoglobin?: string;
+    rbc?: string;
+    wbc?: string;
+    segmenters?: string;
+    lymphocyte?: string;
+    monocyte?: string;
+    basophils?: string;
+    eosinophils?: string;
+    platelet?: string;
+    others?: string;
+  };
+  fecalysis?: {
+    color?: string;
+    consistency?: string;
+    rbc?: string;
+    wbc?: string;
+    occultBlood?: string;
+    urobilinogen?: string;
+    others?: string;
+  };
+  serology?: {
+    ft3?: number;
+    ft4?: number;
+    tsh?: number;
+    dengueIgg?: string;
+    dengueIgm?: string;
+    dengueNs1?: string;
+  };
+  ecg?: {
+    av?: string;
+    qrs?: string;
+    axis?: string;
+    pr?: string;
+    qt?: string;
+    stT?: string;
+    rhythm?: string;
+    others?: string;
+    interpretation?: string;
+    interpreter?: string;
+  };
+  coagulation?: {
+    patientPt?: string;
+    controlPt?: string;
+    inr?: string;
+    activityPercent?: string;
+    patientPtt?: string;
+    controlPtt?: string;
+  };
+  remarks?: string;
+}
+
+export interface UpdateLabTestResultRequestDto {
+  labRequestId?: string;
+  dateTested?: string;
+  bloodChemistry?: {
+    fbs?: number;
+    bun?: number;
+    creatinine?: number;
+    uricAcid?: number;
+    cholesterol?: number;
+    triglycerides?: number;
+    hdl?: number;
+    ldl?: number;
+    vldl?: number;
+    sodium?: number;
+    potassium?: number;
+    sgot?: number;
+    sgpt?: number;
+    alkPhosphatase?: number;
+    hba1c?: number;
+  };
+  urinalysis?: {
+    color?: string;
+    transparency?: string;
+    specificGravity?: string;
+    ph?: string;
+    protein?: string;
+    glucose?: string;
+    epithelialCells?: string;
+    redCells?: string;
+    pusCells?: string;
+    mucusThread?: string;
+    bacteria?: string;
+    amorphousUrates?: string;
+    casts?: string;
+    crystals?: string;
+  };
+  hematology?: {
+    hemoglobin?: string;
+    hematocrit?: string;
+    wbcCount?: string;
+    rbcCount?: string;
+    plateletCount?: string;
+    mchc?: string;
+    mch?: string;
+    mcv?: string;
+    neutrophils?: string;
+    lymphocytes?: string;
+    monocytes?: string;
+    eosinophils?: string;
+    basophils?: string;
+  };
+  fecalysis?: {
+    color?: string;
+    consistency?: string;
+    microscopicExam?: string;
+    occultBlood?: string;
+  };
+  serology?: {
+    vdrl?: string;
+    hepatitisB?: string;
+    hepatitisA?: string;
+    hepatitisC?: string;
+    dengueTest?: string;
+    typhoidTest?: string;
+    pregnancyTest?: string;
+  };
+  ecg?: {
+    rhythm?: string;
+    rate?: string;
+    findings?: string;
+    interpretation?: string;
+  };
+  coagulation?: {
+    bleedingTime?: string;
+    clottingTime?: string;
+    plateletAggregation?: string;
+    prothrombinTime?: string;
+    aptt?: string;
+    inr?: string;
+    activityPercent?: string;
+    patientPtt?: string;
+    controlPtt?: string;
   };
   remarks?: string;
 }

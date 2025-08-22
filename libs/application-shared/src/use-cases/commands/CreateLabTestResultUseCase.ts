@@ -43,9 +43,11 @@ export class CreateLabTestResultUseCase {
       new Date(command.dateTested),
       command.bloodChemistry,
       command.urinalysis,
-      undefined, // hematology - not in the sample request
-      undefined, // fecalysis - not in the sample request
-      undefined, // serology - not in the sample request
+      command.hematology,
+      command.fecalysis,
+      command.serology,
+      command.ecg,
+      command.coagulation,
       command.remarks,
       generateDashlessUuid()
     );
@@ -84,6 +86,31 @@ export class CreateLabTestResultUseCase {
     // Validate urinalysis results
     if (providedResults.urinalysis) {
       this.validateUrinalysisResults(providedResults.urinalysis, requestedTests);
+    }
+
+    // Validate hematology results
+    if (providedResults.hematology) {
+      this.validateHematologyResults(providedResults.hematology, requestedTests);
+    }
+
+    // Validate fecalysis results
+    if (providedResults.fecalysis) {
+      this.validateFecalysisResults(providedResults.fecalysis, requestedTests);
+    }
+
+    // Validate serology results
+    if (providedResults.serology) {
+      this.validateSerologyResults(providedResults.serology, requestedTests);
+    }
+
+    // Validate ECG results
+    if (providedResults.ecg) {
+      this.validateEcgResults(providedResults.ecg, requestedTests);
+    }
+
+    // Validate coagulation results
+    if (providedResults.coagulation) {
+      this.validateCoagulationResults(providedResults.coagulation, requestedTests);
     }
   }
 
@@ -174,6 +201,103 @@ export class CreateLabTestResultUseCase {
       if (!requestedTests.tests || !requestedTests.tests.routine || !requestedTests.tests.routine.pregnancyTest) {
         throw new Error('Pregnancy test result provided but pregnancy test was not requested');
       }
+    }
+  }
+
+  /**
+   * Validates hematology results against requested tests
+   */
+  private validateHematologyResults(results: any, requestedTests: any): void {
+    // Check if CBC with platelet was requested in routine category
+    if (!requestedTests.tests || !requestedTests.tests.routine || !requestedTests.tests.routine.cbcWithPlatelet) {
+      throw new Error('Hematology results provided but CBC with platelet test was not requested');
+    }
+
+    // Validate that hematology results contain actual values
+    const hematologyValues = Object.values(results);
+    const hasHematologyValues = hematologyValues.some(value => value !== undefined && value !== null && value !== '');
+    if (!hasHematologyValues) {
+      throw new Error('Hematology test was requested but no result values provided');
+    }
+  }
+
+  /**
+   * Validates fecalysis results against requested tests
+   */
+  private validateFecalysisResults(results: any, requestedTests: any): void {
+    // Check if fecalysis was requested in routine category
+    if (!requestedTests.tests || !requestedTests.tests.routine || !requestedTests.tests.routine.fecalysis) {
+      throw new Error('Fecalysis results provided but fecalysis test was not requested');
+    }
+
+    // Validate that fecalysis results contain actual values
+    const fecalysisValues = Object.values(results);
+    const hasFecalysisValues = fecalysisValues.some(value => value !== undefined && value !== null && value !== '');
+    if (!hasFecalysisValues) {
+      throw new Error('Fecalysis test was requested but no result values provided');
+    }
+  }
+
+  /**
+   * Validates serology results against requested tests
+   */
+  private validateSerologyResults(results: any, requestedTests: any): void {
+    const serologyTests = {
+      ft3: 'ft3',
+      ft4: 'ft4',
+      tsh: 'tsh',
+      dengueIgg: 'dengueNs1', // Map dengue IgG to dengue NS1 request
+      dengueIgm: 'dengueNs1', // Map dengue IgM to dengue NS1 request
+      dengueNs1: 'dengueNs1'
+    };
+
+    // Check if any serology or thyroid tests were requested
+    const hasSerologyRequest = requestedTests.tests && (
+      (requestedTests.tests.serology && Object.values(requestedTests.tests.serology).some((v: any) => v === true)) ||
+      (requestedTests.tests.thyroid && Object.values(requestedTests.tests.thyroid).some((v: any) => v === true))
+    );
+
+    if (!hasSerologyRequest) {
+      throw new Error('Serology results provided but no serology or thyroid tests were requested');
+    }
+
+    // Validate that serology results contain actual values
+    const serologyValues = Object.values(results);
+    const hasSerologyValues = serologyValues.some(value => value !== undefined && value !== null && value !== '');
+    if (!hasSerologyValues) {
+      throw new Error('Serology tests were requested but no result values provided');
+    }
+  }
+
+  /**
+   * Validates ECG results against requested tests
+   */
+  private validateEcgResults(results: any, requestedTests: any): void {
+    // Check if ECG was requested in miscellaneous category
+    if (!requestedTests.tests || !requestedTests.tests.miscellaneous || !requestedTests.tests.miscellaneous.ecg) {
+      throw new Error('ECG results provided but ECG test was not requested');
+    }
+
+    // Validate that ECG results contain actual values
+    const ecgValues = Object.values(results);
+    const hasEcgValues = ecgValues.some(value => value !== undefined && value !== null && value !== '');
+    if (!hasEcgValues) {
+      throw new Error('ECG test was requested but no result values provided');
+    }
+  }
+
+  /**
+   * Validates coagulation results against requested tests
+   */
+  private validateCoagulationResults(results: any, requestedTests: any): void {
+    // Note: Coagulation tests are not yet defined in the LabRequestTests schema
+    // For now, we'll allow coagulation results without strict validation
+    
+    // Validate that coagulation results contain actual values
+    const coagulationValues = Object.values(results);
+    const hasCoagulationValues = coagulationValues.some(value => value !== undefined && value !== null && value !== '');
+    if (!hasCoagulationValues) {
+      throw new Error('Coagulation results provided but no result values found');
     }
   }
 }

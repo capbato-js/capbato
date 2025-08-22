@@ -94,6 +94,8 @@ export const TOKENS = {
   UpdateSerologyResultUseCase: 'UpdateSerologyResultUseCase',
   DeleteSerologyResultUseCase: 'DeleteSerologyResultUseCase',
   CreateLabTestResultUseCase: 'CreateLabTestResultUseCase',
+  UpdateLabTestResultUseCase: 'UpdateLabTestResultUseCase',
+  DeleteLabTestResultUseCase: 'DeleteLabTestResultUseCase',
 
   // Prescription Layer - Use Cases (Commands)
   CreatePrescriptionUseCase: 'CreatePrescriptionUseCase',
@@ -136,6 +138,8 @@ export const TOKENS = {
   GetAllSerologyResultsQueryHandler: 'GetAllSerologyResultsQueryHandler',
   GetSerologyResultByIdQueryHandler: 'GetSerologyResultByIdQueryHandler',
   GetSerologyResultsByPatientIdQueryHandler: 'GetSerologyResultsByPatientIdQueryHandler',
+  GetLabTestResultByIdQueryHandler: 'GetLabTestResultByIdQueryHandler',
+  GetAllLabTestResultsQueryHandler: 'GetAllLabTestResultsQueryHandler',
   GetPendingLabRequestsQueryHandler: 'GetPendingLabRequestsQueryHandler',
   GetAllBloodChemistryQueryHandler: 'GetAllBloodChemistryQueryHandler',
   GetBloodChemistryByIdQueryHandler: 'GetBloodChemistryByIdQueryHandler',
@@ -240,6 +244,8 @@ export const TOKENS = {
   CreateSerologyResultValidationService: 'CreateSerologyResultValidationService',
   UpdateSerologyResultValidationService: 'UpdateSerologyResultValidationService',
   CreateLabTestResultValidationService: 'CreateLabTestResultValidationService',
+  UpdateLabTestResultValidationService: 'UpdateLabTestResultValidationService',
+  DeleteLabTestResultValidationService: 'DeleteLabTestResultValidationService',
   LaboratoryValidationService: 'LaboratoryValidationService',
 
   // Prescription Layer - Validation Services

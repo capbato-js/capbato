@@ -18,6 +18,8 @@ import {
   CreateSerologyResultCommand,
   UpdateSerologyResultCommand,
   CreateLabTestResultCommand,
+  UpdateLabTestResultCommand,
+  DeleteLabTestResultCommand,
   CreateLabRequestCommandSchema,
   UpdateLabRequestCommandSchema,
   DeleteLabRequestCommandSchema,
@@ -34,6 +36,8 @@ import {
   CreateSerologyResultCommandSchema,
   UpdateSerologyResultCommandSchema,
   CreateLabTestResultCommandSchema,
+  UpdateLabTestResultCommandSchema,
+  DeleteLabTestResultCommandSchema,
   LabRequestIdSchema,
   BloodChemistryIdSchema,
 } from './LaboratoryValidationSchemas';
@@ -120,6 +124,16 @@ export class CreateLabTestResultValidationService extends ValidationService<unkn
   protected schema = CreateLabTestResultCommandSchema;
 }
 
+@injectable()
+export class UpdateLabTestResultValidationService extends ValidationService<unknown, UpdateLabTestResultCommand> {
+  protected schema = UpdateLabTestResultCommandSchema;
+}
+
+@injectable()
+export class DeleteLabTestResultValidationService extends ValidationService<unknown, DeleteLabTestResultCommand> {
+  protected schema = DeleteLabTestResultCommandSchema;
+}
+
 // Composite facade service combining all validations following TodoValidationService pattern
 @injectable()
 export class LaboratoryValidationService {
@@ -139,7 +153,9 @@ export class LaboratoryValidationService {
     @inject(TOKENS.UpdateFecalysisResultValidationService) private readonly updateFecalysisResultValidator: UpdateFecalysisResultValidationService,
     @inject(TOKENS.CreateSerologyResultValidationService) private readonly createSerologyResultValidator: CreateSerologyResultValidationService,
     @inject(TOKENS.UpdateSerologyResultValidationService) private readonly updateSerologyResultValidator: UpdateSerologyResultValidationService,
-    @inject(TOKENS.CreateLabTestResultValidationService) private readonly createLabTestResultValidator: CreateLabTestResultValidationService
+    @inject(TOKENS.CreateLabTestResultValidationService) private readonly createLabTestResultValidator: CreateLabTestResultValidationService,
+    @inject(TOKENS.UpdateLabTestResultValidationService) private readonly updateLabTestResultValidator: UpdateLabTestResultValidationService,
+    @inject(TOKENS.DeleteLabTestResultValidationService) private readonly deleteLabTestResultValidator: DeleteLabTestResultValidationService
   ) {}
 
   // Lab Request validation methods
@@ -216,6 +232,14 @@ export class LaboratoryValidationService {
 
   validateCreateLabTestResultCommand(data: unknown): CreateLabTestResultCommand {
     return this.createLabTestResultValidator.validate(data);
+  }
+
+  validateUpdateLabTestResultCommand(data: unknown): UpdateLabTestResultCommand {
+    return this.updateLabTestResultValidator.validate(data);
+  }
+
+  validateDeleteLabTestResultCommand(data: unknown): DeleteLabTestResultCommand {
+    return this.deleteLabTestResultValidator.validate(data);
   }
 
   // Safe validation methods (non-throwing)

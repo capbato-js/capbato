@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "cms-laboratory-api-collection",
     "name": "CMS - Laboratory Management API",
-    "description": "Laboratory Management API collection for the Clinic Management System with Clean Architecture.\n\n## 🧪 Laboratory Management API (/api/laboratory)\n\nThis collection focuses specifically on laboratory management endpoints:\n\n- **Laboratory Request Management**: Create, read, update, and delete lab requests\n- **Blood Chemistry Results**: Track and manage blood chemistry test results\n- **Critical Value Alerting**: Handle critical laboratory values and notifications\n- **Test Selection**: Manage available laboratory tests and selections\n- **Patient-Lab Association**: Link laboratory requests with patients\n- **Results Entry**: Enter and validate laboratory test results\n- **Reference Ranges**: Manage normal and critical value ranges\n- **Report Generation**: Generate laboratory reports and summaries\n\n## Testing Coverage\n\n- ✅ Laboratory request creation\n- ✅ Laboratory request retrieval (single and list)\n- ✅ Laboratory request updates and modifications\n- ✅ Laboratory test result entry\n- ✅ Critical value detection and alerting\n- ✅ Test selection and validation\n- ✅ Patient-lab request association\n- ✅ Reference range validation\n- ✅ Error handling (validation, not found, duplicates)\n- ✅ Laboratory reporting and statistics\n\n## Environment Variables\n\nThis collection uses the following environment variables:\n- `cms_local`: http://localhost:4000 (for local development)\n- `cms_prod`: https://capstone-api.up.railway.app (for production)\n- `baseUrl`: Base URL for API endpoints\n- `authToken`: JWT token for authenticated requests\n- Various test data variables for dynamic testing",
+    "description": "Laboratory Management API collection for the Clinic Management System with Clean Architecture.\n\n## 🧪 Laboratory Management API (/api/laboratory)\n\n**⭐ MAJOR UPDATE: Comprehensive Lab Test Results System**\n\nThis collection has been enhanced to support the complete laboratory test result ecosystem with all 7 test categories:\n\n### **🎯 Unified Lab Test Results Endpoint**\n**POST /api/laboratory/test-results** - The powerful unified endpoint that handles:\n\n1. ✅ **Blood Chemistry** - FBS, Lipid Profile, Liver/Kidney function\n2. ✅ **Urinalysis** - Complete urinalysis with microscopic examination\n3. ⭐ **Hematology** - CBC with differential and platelet count\n4. ⭐ **Fecalysis** - Stool analysis and parasite examination\n5. ⭐ **Serology** - Dengue tests (IgG/IgM/NS1) & Thyroid function (T3/T4/TSH)\n6. ⭐ **ECG** - Electrocardiogram with professional interpretation\n7. ⭐ **Coagulation** - PT/PTT/INR for bleeding assessment\n\n### **🦟 Dengue Testing Now Supported!**\nThe exact dengue test payload from implementation is now fully functional:\n```json\n{\n  \"labRequestId\": \"32967a6c16a14457a8f7183b364cff12\",\n  \"dateTested\": \"2025-08-20T13:23:36.000Z\",\n  \"serology\": {\n    \"dengueIgg\": \"Positive\",\n    \"dengueIgm\": \"Negative\",\n    \"dengueNs1\": \"Negative\"\n  },\n  \"remarks\": \"Within normal range\"\n}\n```\n\n### **Core Laboratory Features:**\n- **Laboratory Request Management**: Create, read, update, and delete lab requests\n- **Comprehensive Results Entry**: Support for all 7 major test categories\n- **Automatic Patient Linking**: PatientId resolved from lab request automatically\n- **Enhanced Validation**: Comprehensive validation for all test types\n- **Multi-Category Support**: Single API call can handle multiple test types\n- **Critical Value Alerting**: Handle critical laboratory values and notifications\n- **Test Selection Validation**: Ensures results match requested tests\n- **Status Management**: Automatic lab request status updates\n\n## Testing Coverage\n\n- ✅ Laboratory request creation and management\n- ✅ All 7 test result categories (Blood Chemistry, Urinalysis, Hematology, Fecalysis, Serology, ECG, Coagulation)\n- ✅ Dengue test scenarios (IgG, IgM, NS1)\n- ✅ Multi-category test result creation\n- ✅ Comprehensive validation testing\n- ✅ Error handling (missing fields, empty objects, invalid data)\n- ✅ Critical value detection and alerting\n- ✅ Patient-lab request association\n- ✅ Reference range validation\n- ✅ Laboratory reporting and statistics\n\n## Environment Variables\n\nThis collection uses the following environment variables:\n- `cms_local`: http://localhost:4000 (for local development)\n- `cms_prod`: https://capstone-api.up.railway.app (for production)\n- `baseUrl`: Base URL for API endpoints\n- `authToken`: JWT token for authenticated requests\n- Various test data variables for dynamic testing",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "version": {
       "major": 2,
@@ -324,6 +324,138 @@
                       "    const jsonData = pm.response.json();",
                       "    pm.expect(jsonData).to.have.property('data');",
                       "    pm.expect(jsonData.data).to.be.an('array');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Lab Request by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/requests/{{lab_request_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "requests",
+                    "{{lab_request_id}}"
+                  ]
+                },
+                "description": "Get a specific laboratory request by its ID\n\n**Path Parameters:**\n- `lab_request_id`: Laboratory request identifier (string)\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"2a26b746cec9466aba33df5ab722b109\",\n    \"patient\": {\n      \"id\": \"f5768246f4a64410a2a845a4a618f07e\",\n      \"patientNumber\": \"2025-D3\",\n      \"firstName\": \"Andra\",\n      \"lastName\": \"Depanes\",\n      \"name\": \"Andra Depanes\",\n      \"ageGender\": \"Age/Gender\"\n    },\n    \"requestDate\": \"2025-08-23T00:00:00.000Z\",\n    \"status\": \"completed\",\n    \"dateTaken\": \"2025-08-22T00:00:00.000Z\",\n    \"others\": \"ECG examination\",\n    \"selectedTests\": [\"ECG\"],\n    \"createdAt\": \"2025-08-22T17:12:47.000Z\",\n    \"updatedAt\": \"2025-08-22T17:12:53.000Z\"\n  }\n}\n```\n\n**Use Cases:**\n- View specific lab request details\n- Check lab request status\n- Patient inquiry\n- Results retrieval\n- Quality control tracking"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/requests/2a26b746cec9466aba33df5ab722b109",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "requests",
+                        "2a26b746cec9466aba33df5ab722b109"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"2a26b746cec9466aba33df5ab722b109\",\n    \"patient\": {\n      \"id\": \"f5768246f4a64410a2a845a4a618f07e\",\n      \"patientNumber\": \"2025-D3\",\n      \"firstName\": \"Andra\",\n      \"lastName\": \"Depanes\",\n      \"name\": \"Andra Depanes\",\n      \"ageGender\": \"Age/Gender\"\n    },\n    \"requestDate\": \"2025-08-23T00:00:00.000Z\",\n    \"status\": \"completed\",\n    \"dateTaken\": \"2025-08-22T00:00:00.000Z\",\n    \"others\": \"ECG examination\",\n    \"selectedTests\": [\"ECG\"],\n    \"createdAt\": \"2025-08-22T17:12:47.000Z\",\n    \"updatedAt\": \"2025-08-22T17:12:53.000Z\"\n  }\n}"
+                },
+                {
+                  "name": "Not Found Response",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/requests/nonexistent-id",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "requests",
+                        "nonexistent-id"
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "body": "{\n  \"success\": false,\n  \"message\": \"Laboratory request not found\"\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is successful', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test('Response contains lab request data', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('data');",
+                      "    pm.expect(jsonData.data).to.have.property('id');",
+                      "    pm.expect(jsonData.data).to.have.property('patient');",
+                      "});",
+                      "",
+                      "pm.test('Patient object has required properties', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    const patient = jsonData.data.patient;",
+                      "    pm.expect(patient).to.have.property('id');",
+                      "    pm.expect(patient).to.have.property('patientNumber');",
+                      "    pm.expect(patient).to.have.property('firstName');",
+                      "    pm.expect(patient).to.have.property('lastName');",
+                      "    pm.expect(patient).to.have.property('name');",
+                      "    pm.expect(patient).to.have.property('ageGender');",
+                      "});",
+                      "",
+                      "pm.test('Lab request has required properties', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    const labRequest = jsonData.data;",
+                      "    pm.expect(labRequest).to.have.property('requestDate');",
+                      "    pm.expect(labRequest).to.have.property('status');",
+                      "    pm.expect(labRequest).to.have.property('selectedTests');",
+                      "    pm.expect(labRequest).to.have.property('createdAt');",
+                      "    pm.expect(labRequest).to.have.property('updatedAt');",
+                      "});",
+                      "",
+                      "pm.test('selectedTests is an array', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.data.selectedTests).to.be.an('array');",
                       "});"
                     ]
                   }
@@ -1279,7 +1411,7 @@
           "name": "🧪 Lab Test Results",
           "item": [
             {
-              "name": "Create Lab Test Result",
+              "name": "Create Lab Test Result - Blood Chemistry & Urinalysis",
               "request": {
                 "method": "POST",
                 "header": [
@@ -1290,7 +1422,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n  \"dateTested\": \"2025-08-15T10:30:00.000Z\",\n  \"bloodChemistry\": {\n    \"fbs\": 95.5,\n    \"cholesterol\": 180.2,\n    \"triglycerides\": 110.8,\n    \"hdl\": 52.0,\n    \"ldl\": 108.5\n  },\n  \"urinalysis\": {\n    \"color\": \"Yellow\",\n    \"transparency\": \"Clear\",\n    \"specificGravity\": \"1.020\",\n    \"protein\": \"Negative\",\n    \"glucose\": \"Negative\",\n    \"ketones\": \"Negative\",\n    \"blood\": \"Negative\",\n    \"leukocyteEsterase\": \"Negative\",\n    \"nitrites\": \"Negative\"\n  },\n  \"remarks\": \"All test results within normal ranges\"\n}"
+                  "raw": "{\n  \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n  \"dateTested\": \"2025-08-15T10:30:00.000Z\",\n  \"bloodChemistry\": {\n    \"fbs\": 95.5,\n    \"cholesterol\": 180.2,\n    \"triglycerides\": 110.8,\n    \"hdl\": 52.0,\n    \"ldl\": 108.5,\n    \"bun\": 18.5,\n    \"creatinine\": 1.1,\n    \"uricAcid\": 6.2,\n    \"sgot\": 28.0,\n    \"sgpt\": 35.0\n  },\n  \"urinalysis\": {\n    \"color\": \"Yellow\",\n    \"transparency\": \"Clear\",\n    \"specificGravity\": \"1.020\",\n    \"protein\": \"Negative\",\n    \"glucose\": \"Negative\",\n    \"ketones\": \"Negative\",\n    \"blood\": \"Negative\",\n    \"leukocyteEsterase\": \"Negative\",\n    \"nitrites\": \"Negative\"\n  },\n  \"remarks\": \"All test results within normal ranges\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/laboratory/test-results",
@@ -1303,7 +1435,7 @@
                     "test-results"
                   ]
                 },
-                "description": "Create comprehensive lab test results for a lab request\n\n**Key Change: NO patientId Required**\n- The `patientId` is now automatically retrieved from the lab request\n- Only the `labRequestId` is needed to link results to the correct patient\n- This ensures data consistency and prevents mismatched patient information\n\n**Required Fields:**\n- `labRequestId`: Existing lab request identifier (patientId is derived from this)\n- `dateTested`: Date and time when tests were performed\n- At least one test result type (`bloodChemistry` or `urinalysis`)\n\n**Optional Test Results:**\n\n**Blood Chemistry (`bloodChemistry`):**\n- `fbs`: Fasting Blood Sugar (mg/dL)\n- `bun`: Blood Urea Nitrogen (mg/dL)\n- `creatinine`: Creatinine (mg/dL)\n- `uricAcid`: Uric Acid (mg/dL)\n- `cholesterol`: Total Cholesterol (mg/dL)\n- `triglycerides`: Triglycerides (mg/dL)\n- `hdl`: HDL Cholesterol (mg/dL)\n- `ldl`: LDL Cholesterol (mg/dL)\n- `vldl`: VLDL Cholesterol (mg/dL)\n- `sodium`: Sodium (mEq/L)\n- `potassium`: Potassium (mEq/L)\n- `chloride`: Chloride (mEq/L)\n- `calcium`: Calcium (mg/dL)\n- `sgot`: SGOT/AST (U/L)\n- `sgpt`: SGPT/ALT (U/L)\n- `hbalc`: HBA1C (%)\n\n**Urinalysis (`urinalysis`):**\n- `color`: Urine color (e.g., 'Yellow', 'Amber')\n- `transparency`: Clarity (e.g., 'Clear', 'Cloudy')\n- `specificGravity`: Specific gravity (e.g., '1.020')\n- `protein`: Protein level (e.g., 'Negative', 'Trace', '+1')\n- `glucose`: Glucose level (e.g., 'Negative', 'Positive')\n- `ketones`: Ketone level (e.g., 'Negative', 'Trace')\n- `blood`: Blood presence (e.g., 'Negative', 'Trace')\n- `leukocyteEsterase`: Leukocyte esterase (e.g., 'Negative', 'Positive')\n- `nitrites`: Nitrites (e.g., 'Negative', 'Positive')\n- `bacteria`: Bacteria description (optional)\n- `others`: Other findings (optional)\n- `pregnancyTest`: Pregnancy test result (optional)\n\n**Optional Fields:**\n- `remarks`: Additional comments or observations\n\n**Business Logic:**\n1. System validates that the lab request exists\n2. System retrieves patientId from the lab request automatically\n3. System validates that the lab request is in 'pending' status\n4. System validates that results match the originally requested tests\n5. System creates the lab test result and updates lab request status\n\n**Response:**\n- Status: 201 Created\n- Returns created lab test result with auto-populated patientId\n- Includes success message\n\n**Example Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Lab test result created successfully\",\n  \"data\": {\n    \"id\": \"abc123def456ghi789jkl012mno345pqr\",\n    \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n    \"patientId\": \"f5768246f4a64410a2a845a4a618f07e\",\n    \"dateTested\": \"2025-08-15T10:30:00.000Z\",\n    \"bloodChemistry\": { ... },\n    \"urinalysis\": { ... },\n    \"status\": \"completed\",\n    \"createdAt\": \"2025-08-15T10:35:00.000Z\"\n  }\n}\n```"
+                "description": "🎯 **UNIFIED ENDPOINT - Supports ALL 7 Test Categories**\n\nCreate comprehensive lab test results using the powerful unified endpoint that now supports all laboratory test categories.\n\n**⭐ MAJOR ENHANCEMENT:**\n**All 7 Test Categories Now Supported:**\n1. ✅ Blood Chemistry (existing)\n2. ✅ Urinalysis (existing)\n3. ⭐ Hematology (NEW - CBC with platelet)\n4. ⭐ Fecalysis (NEW - stool analysis)\n5. ⭐ Serology (NEW - includes Dengue & Thyroid tests)\n6. ⭐ ECG (NEW - electrocardiogram)\n7. ⭐ Coagulation (NEW - PT/PTT/INR)\n\n**Key Features:**\n- Single endpoint handles all test result types\n- Automatic patient ID retrieval from lab request\n- Comprehensive validation for all categories\n- Supports partial results (any combination of test types)\n- Enhanced business logic validation\n\n**Required Fields:**\n- `labRequestId`: Existing lab request identifier\n- `dateTested`: Date and time when tests were performed\n- At least one test result category with actual values\n\n**Business Logic:**\n1. Validates lab request exists and is pending\n2. Auto-retrieves patientId from lab request\n3. Validates results match requested tests\n4. Updates lab request status to completed\n\n**Perfect for Testing:**\n- Basic metabolic panels\n- Comprehensive health screenings\n- Routine lab work\n- Specialized testing scenarios"
               },
               "response": [
                 {
@@ -1370,6 +1502,679 @@
                       "    const jsonData = pm.response.json();",
                       "    pm.expect(jsonData.message).to.equal('Lab test result created successfully');",
                       "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Lab Test Result - Serology (Dengue Tests)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"labRequestId\": \"32967a6c16a14457a8f7183b364cff12\",\n  \"dateTested\": \"2025-08-20T13:23:36.000Z\",\n  \"serology\": {\n    \"dengueIgg\": \"Positive\",\n    \"dengueIgm\": \"Negative\",\n    \"dengueNs1\": \"Negative\"\n  },\n  \"remarks\": \"Within normal range\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results"
+                  ]
+                },
+                "description": "🦟 **DENGUE TEST PAYLOAD - NOW SUPPORTED!**\n\nCreate Serology test results including Dengue tests. This is the exact payload from your summary that now works perfectly!\n\n**⭐ NEW: Serology Support**\n\n**Serology Fields (`serology`):**\n- `dengueIgg`: IgG antibodies (indicates past infection)\n- `dengueIgm`: IgM antibodies (indicates recent infection)\n- `dengueNs1`: NS1 antigen (indicates active infection)\n- `ft3`: Free T3 (numeric - thyroid function)\n- `ft4`: Free T4 (numeric - thyroid function)\n- `tsh`: Thyroid Stimulating Hormone (numeric)\n\n**Clinical Interpretation:**\n- **IgG Positive, IgM Negative**: Past dengue infection (immunity)\n- **IgG Negative, IgM Positive**: Recent/current infection\n- **NS1 Positive**: Active dengue infection\n\n**Supported Test Categories (All 7):**\n1. ✅ Blood Chemistry\n2. ✅ Urinalysis\n3. ⭐ Hematology (NEW)\n4. ⭐ Fecalysis (NEW)\n5. ⭐ Serology (NEW) - includes Dengue & Thyroid\n6. ⭐ ECG (NEW)\n7. ⭐ Coagulation (NEW)\n\n**Use Cases:**\n- Dengue fever diagnosis\n- Thyroid function assessment\n- Infectious disease screening"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"labRequestId\": \"32967a6c16a14457a8f7183b364cff12\",\n  \"dateTested\": \"2025-08-20T13:23:36.000Z\",\n  \"serology\": {\n    \"dengueIgg\": \"Positive\",\n    \"dengueIgm\": \"Negative\",\n    \"dengueNs1\": \"Negative\"\n  },\n  \"remarks\": \"Within normal range\"\n}"
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "body": "{\n  \"success\": true,\n  \"message\": \"Lab test result created successfully\",\n  \"data\": {\n    \"id\": \"serology456789123\",\n    \"labRequestId\": \"32967a6c16a14457a8f7183b364cff12\",\n    \"patientId\": \"dengue567890123456789012345678901\",\n    \"dateTested\": \"2025-08-20T13:23:36.000Z\",\n    \"serology\": {\n      \"dengueIgg\": \"Positive\",\n      \"dengueIgm\": \"Negative\",\n      \"dengueNs1\": \"Negative\"\n    },\n    \"remarks\": \"Within normal range\",\n    \"createdAt\": \"2025-08-20T13:30:00.000Z\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('Serology (Dengue) results are included', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.data).to.have.property('serology');",
+                      "    pm.expect(jsonData.data.serology).to.have.property('dengueIgg');",
+                      "    pm.expect(jsonData.data.serology).to.have.property('dengueIgm');",
+                      "    pm.expect(jsonData.data.serology).to.have.property('dengueNs1');",
+                      "});",
+                      "",
+                      "pm.test('Dengue test results are valid', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    const serology = jsonData.data.serology;",
+                      "    pm.expect(serology.dengueIgg).to.be.oneOf(['Positive', 'Negative']);",
+                      "    pm.expect(serology.dengueIgm).to.be.oneOf(['Positive', 'Negative']);",
+                      "    pm.expect(serology.dengueNs1).to.be.oneOf(['Positive', 'Negative']);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Lab Test Result - Hematology (CBC)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"labRequestId\": \"a1b2c3d4e5f6789012345678901234ef\",\n  \"dateTested\": \"2025-08-20T09:15:00.000Z\",\n  \"hematology\": {\n    \"hematocrit\": \"42.5\",\n    \"hemoglobin\": \"14.2\",\n    \"rbc\": \"4.8\",\n    \"wbc\": \"7.2\",\n    \"segmenters\": \"65\",\n    \"lymphocyte\": \"28\",\n    \"platelet\": \"250\"\n  },\n  \"remarks\": \"Complete Blood Count within normal limits\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results"
+                  ]
+                },
+                "description": "⭐ **NEW: Hematology Support**\n\nCreate Hematology (Complete Blood Count) test results\n\n**Hematology Fields (`hematology`):**\n- `hematocrit`: Packed cell volume (%)\n- `hemoglobin`: Hemoglobin concentration (g/dL)\n- `rbc`: Red blood cell count (×10¹²/L)\n- `wbc`: White blood cell count (×10⁹/L)\n- `segmenters`: Neutrophils (%)\n- `lymphocyte`: Lymphocytes (%)\n- `monocyte`: Monocytes (%) \n- `basophils`: Basophils (%)\n- `eosinophils`: Eosinophils (%)\n- `platelet`: Platelet count (×10⁹/L)\n- `others`: Additional findings\n\n**Use Cases:**\n- Complete Blood Count (CBC)\n- Infection screening\n- Anemia evaluation\n- Pre-operative screening"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"labRequestId\": \"a1b2c3d4e5f6789012345678901234ef\",\n  \"dateTested\": \"2025-08-20T09:15:00.000Z\",\n  \"hematology\": {\n    \"hemoglobin\": \"14.2\",\n    \"wbc\": \"7.2\",\n    \"platelet\": \"250\"\n  }\n}"
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "body": "{\n  \"success\": true,\n  \"message\": \"Lab test result created successfully\",\n  \"data\": {\n    \"id\": \"hematology123456789\",\n    \"labRequestId\": \"a1b2c3d4e5f6789012345678901234ef\",\n    \"patientId\": \"pat789012345678901234567890123456\",\n    \"dateTested\": \"2025-08-20T09:15:00.000Z\",\n    \"hematology\": {\n      \"hemoglobin\": \"14.2\",\n      \"wbc\": \"7.2\",\n      \"platelet\": \"250\"\n    },\n    \"createdAt\": \"2025-08-20T09:20:00.000Z\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('Hematology results are included', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.data).to.have.property('hematology');",
+                      "    pm.expect(jsonData.data.hematology).to.have.property('hemoglobin');",
+                      "    pm.expect(jsonData.data.hematology).to.have.property('wbc');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Lab Test Result - Multiple Categories",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"labRequestId\": \"multi789012345678901234567890cdef\",\n  \"dateTested\": \"2025-08-20T08:00:00.000Z\",\n  \"bloodChemistry\": {\n    \"fbs\": 110.0,\n    \"bun\": 20.5,\n    \"creatinine\": 1.0\n  },\n  \"urinalysis\": {\n    \"color\": \"Yellow\",\n    \"protein\": \"Negative\",\n    \"glucose\": \"Negative\"\n  },\n  \"hematology\": {\n    \"hemoglobin\": \"13.5\",\n    \"wbc\": \"6.8\",\n    \"platelet\": \"280\"\n  },\n  \"serology\": {\n    \"ft3\": 3.2,\n    \"ft4\": 1.4,\n    \"tsh\": 2.1\n  },\n  \"remarks\": \"Comprehensive panel - all results within normal limits\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results"
+                  ]
+                },
+                "description": "🎯 **MULTI-CATEGORY TESTING**\n\nDemonstrates the comprehensive capabilities of the unified endpoint to handle multiple test types in a single request.\n\n**Included Categories:**\n- ✅ Blood Chemistry (Basic metabolic panel)\n- ✅ Urinalysis (Basic screening)\n- ✅ Hematology (CBC essentials)\n- ✅ Serology (Thyroid function)\n\n**NEW CAPABILITIES:**\n- Single API call for multiple test types\n- Automatic patient ID resolution\n- Comprehensive validation for all 7 categories\n- Supports any combination of test types\n\n**Perfect for:**\n- Annual physical exams\n- Pre-operative workups\n- Comprehensive health screenings\n- Executive health packages"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"labRequestId\": \"multi789012345678901234567890cdef\",\n  \"dateTested\": \"2025-08-20T08:00:00.000Z\",\n  \"bloodChemistry\": {\n    \"fbs\": 110.0\n  },\n  \"hematology\": {\n    \"hemoglobin\": \"13.5\"\n  }\n}"
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "body": "{\n  \"success\": true,\n  \"message\": \"Lab test result created successfully\",\n  \"data\": {\n    \"id\": \"multi234567890123456\",\n    \"labRequestId\": \"multi789012345678901234567890cdef\",\n    \"patientId\": \"comprehensive901234567890123456789012\",\n    \"dateTested\": \"2025-08-20T08:00:00.000Z\",\n    \"bloodChemistry\": {\n      \"fbs\": 110.0\n    },\n    \"hematology\": {\n      \"hemoglobin\": \"13.5\"\n    },\n    \"createdAt\": \"2025-08-20T08:10:00.000Z\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('Multiple test categories are included', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    const data = jsonData.data;",
+                      "    pm.expect(data).to.have.property('bloodChemistry');",
+                      "    pm.expect(data).to.have.property('hematology');",
+                      "});",
+                      "",
+                      "pm.test('All test categories have valid data', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    const data = jsonData.data;",
+                      "    ",
+                      "    if (data.bloodChemistry) {",
+                      "        pm.expect(Object.keys(data.bloodChemistry).length).to.be.greaterThan(0);",
+                      "    }",
+                      "    ",
+                      "    if (data.hematology) {",
+                      "        pm.expect(Object.keys(data.hematology).length).to.be.greaterThan(0);",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get All Lab Test Results",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results"
+                  ]
+                },
+                "description": "📋 **GET ALL LAB TEST RESULTS**\n\nRetrieve all lab test results from the system.\n\n**Features:**\n- Retrieves all lab test results across all patients\n- Includes all 7 test categories when present\n- Formatted with patient information\n- Sorted by creation date (newest first)\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"result123\",\n      \"labRequestId\": \"request456\",\n      \"patientId\": \"patient789\",\n      \"dateTested\": \"2025-08-23T10:30:00.000Z\",\n      \"bloodChemistry\": { ... },\n      \"urinalysis\": { ... },\n      \"createdAt\": \"2025-08-23T10:35:00.000Z\"\n    }\n  ]\n}\n```\n\n**Use Cases:**\n- Lab dashboard overview\n- Quality control reviews\n- Batch result processing\n- Administrative reports"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory", 
+                        "test-results"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"abc123def456ghi789jkl012mno345pqr\",\n      \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n      \"patientId\": \"f5768246f4a64410a2a845a4a618f07e\",\n      \"dateTested\": \"2025-08-23T10:30:00.000Z\",\n      \"bloodChemistry\": {\n        \"fbs\": 95.5,\n        \"cholesterol\": 180.2\n      },\n      \"urinalysis\": {\n        \"color\": \"Yellow\",\n        \"protein\": \"Negative\"\n      },\n      \"createdAt\": \"2025-08-23T10:35:00.000Z\"\n    }\n  ]\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is successful', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.success).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test('Response contains array of lab test results', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.data).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('Each result has required fields', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    if (jsonData.data.length > 0) {",
+                      "        const result = jsonData.data[0];",
+                      "        pm.expect(result).to.have.property('id');",
+                      "        pm.expect(result).to.have.property('labRequestId');",
+                      "        pm.expect(result).to.have.property('patientId');",
+                      "        pm.expect(result).to.have.property('dateTested');",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Lab Test Result by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results/{{lab_test_result_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results",
+                    "{{lab_test_result_id}}"
+                  ]
+                },
+                "description": "🔍 **GET LAB TEST RESULT BY ID**\n\nRetrieve a specific lab test result by its unique identifier.\n\n**Path Parameters:**\n- `id`: Lab test result ID (32-character hex string)\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"abc123def456ghi789jkl012mno345pqr\",\n    \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n    \"patientId\": \"f5768246f4a64410a2a845a4a618f07e\",\n    \"dateTested\": \"2025-08-23T10:30:00.000Z\",\n    \"bloodChemistry\": {\n      \"fbs\": 95.5,\n      \"cholesterol\": 180.2\n    },\n    \"urinalysis\": {\n      \"color\": \"Yellow\",\n      \"protein\": \"Negative\"\n    },\n    \"remarks\": \"All results within normal ranges\",\n    \"createdAt\": \"2025-08-23T10:35:00.000Z\",\n    \"updatedAt\": \"2025-08-23T10:35:00.000Z\"\n  }\n}\n```\n\n**Use Cases:**\n- View detailed test results\n- Patient result inquiry\n- Quality control review\n- Results verification\n- Print/export specific result"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results/abc123def456ghi789jkl012mno345pqr",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results",
+                        "abc123def456ghi789jkl012mno345pqr"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"abc123def456ghi789jkl012mno345pqr\",\n    \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n    \"patientId\": \"f5768246f4a64410a2a845a4a618f07e\",\n    \"dateTested\": \"2025-08-23T10:30:00.000Z\",\n    \"bloodChemistry\": {\n      \"fbs\": 95.5,\n      \"cholesterol\": 180.2,\n      \"triglycerides\": 110.8\n    },\n    \"urinalysis\": {\n      \"color\": \"Yellow\",\n      \"protein\": \"Negative\",\n      \"glucose\": \"Negative\"\n    },\n    \"remarks\": \"All results within normal ranges\",\n    \"createdAt\": \"2025-08-23T10:35:00.000Z\",\n    \"updatedAt\": \"2025-08-23T10:35:00.000Z\"\n  }\n}"
+                },
+                {
+                  "name": "Not Found Response",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results/nonexistent123",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results",
+                        "nonexistent123"
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "body": "{\n  \"success\": false,\n  \"message\": \"Lab test result with ID nonexistent123 not found\"\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 or 404', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200) {",
+                      "    pm.test('Response is successful', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.success).to.be.true;",
+                      "    });",
+                      "    ",
+                      "    pm.test('Response contains lab test result data', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData).to.have.property('data');",
+                      "        pm.expect(jsonData.data).to.have.property('id');",
+                      "        pm.expect(jsonData.data).to.have.property('labRequestId');",
+                      "        pm.expect(jsonData.data).to.have.property('patientId');",
+                      "    });",
+                      "} else if (pm.response.code === 404) {",
+                      "    pm.test('Error response structure is correct', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.success).to.be.false;",
+                      "        pm.expect(jsonData).to.have.property('message');",
+                      "    });",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Lab Test Result",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dateTested\": \"2025-08-23T14:30:00.000Z\",\n  \"bloodChemistry\": {\n    \"fbs\": 98.0,\n    \"cholesterol\": 175.5,\n    \"triglycerides\": 105.2\n  },\n  \"urinalysis\": {\n    \"color\": \"Light Yellow\",\n    \"transparency\": \"Clear\",\n    \"protein\": \"Trace\"\n  },\n  \"remarks\": \"Updated results - minor corrections made\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results/{{lab_test_result_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results",
+                    "{{lab_test_result_id}}"
+                  ]
+                },
+                "description": "✏️ **UPDATE LAB TEST RESULT**\n\nUpdate an existing lab test result with new values. Supports partial updates.\n\n**Path Parameters:**\n- `id`: Lab test result ID to update\n\n**Update Features:**\n- ✅ **Partial Updates**: Only provide fields you want to change\n- ✅ **All 7 Categories**: Can update any test category\n- ✅ **Validation**: Ensures data integrity\n- ✅ **Timestamps**: Automatically updates `updatedAt`\n- ✅ **Error Handling**: Proper 404 for non-existent results\n\n**Updatable Fields:**\n- `labRequestId`: Change associated lab request (optional)\n- `dateTested`: Update test date/time\n- `bloodChemistry`: Blood chemistry values\n- `urinalysis`: Urinalysis results\n- `hematology`: CBC results\n- `fecalysis`: Stool analysis\n- `serology`: Serology/immunology tests\n- `ecg`: ECG findings\n- `coagulation`: Coagulation studies\n- `remarks`: Additional notes\n\n**Business Rules:**\n- Original creation timestamp preserved\n- Updated timestamp automatically set\n- Patient ID cannot be changed (derived from lab request)\n- At least one field must be updated\n\n**Perfect for:**\n- Result corrections\n- Adding missing test values\n- Updating remarks/interpretations\n- Correcting transcription errors"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"bloodChemistry\": {\n    \"fbs\": 98.0,\n    \"cholesterol\": 175.5\n  },\n  \"remarks\": \"Updated results\"\n}"
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results/abc123def456ghi789jkl012mno345pqr",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results",
+                        "abc123def456ghi789jkl012mno345pqr"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"abc123def456ghi789jkl012mno345pqr\",\n    \"labRequestId\": \"d2e66463bb2349209ea2cddf47f7822f\",\n    \"patientId\": \"f5768246f4a64410a2a845a4a618f07e\",\n    \"dateTested\": \"2025-08-23T14:30:00.000Z\",\n    \"bloodChemistry\": {\n      \"fbs\": 98.0,\n      \"cholesterol\": 175.5,\n      \"triglycerides\": 105.2\n    },\n    \"urinalysis\": {\n      \"color\": \"Light Yellow\",\n      \"transparency\": \"Clear\",\n      \"protein\": \"Trace\"\n    },\n    \"remarks\": \"Updated results - minor corrections made\",\n    \"createdAt\": \"2025-08-23T10:35:00.000Z\",\n    \"updatedAt\": \"2025-08-23T14:45:00.000Z\"\n  }\n}"
+                },
+                {
+                  "name": "Not Found Response",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"remarks\": \"Updated\"\n}"
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results/nonexistent123",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results",
+                        "nonexistent123"
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "body": "{\n  \"success\": false,\n  \"message\": \"Lab test result with ID nonexistent123 not found\"\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 or 404', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200) {",
+                      "    pm.test('Response is successful', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.success).to.be.true;",
+                      "    });",
+                      "    ",
+                      "    pm.test('Response contains updated lab test result', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData).to.have.property('data');",
+                      "        pm.expect(jsonData.data).to.have.property('id');",
+                      "        pm.expect(jsonData.data).to.have.property('updatedAt');",
+                      "    });",
+                      "    ",
+                      "    pm.test('Updated timestamp is more recent than created timestamp', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        const createdAt = new Date(jsonData.data.createdAt);",
+                      "        const updatedAt = new Date(jsonData.data.updatedAt);",
+                      "        pm.expect(updatedAt.getTime()).to.be.greaterThanOrEqual(createdAt.getTime());",
+                      "    });",
+                      "} else if (pm.response.code === 404) {",
+                      "    pm.test('Error response structure is correct', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.success).to.be.false;",
+                      "        pm.expect(jsonData).to.have.property('message');",
+                      "    });",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Lab Test Result",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/laboratory/test-results/{{lab_test_result_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "laboratory",
+                    "test-results",
+                    "{{lab_test_result_id}}"
+                  ]
+                },
+                "description": "🗑️ **DELETE LAB TEST RESULT**\n\nPermanently delete a lab test result from the system.\n\n**Path Parameters:**\n- `id`: Lab test result ID to delete\n\n**⚠️ Important Notes:**\n- **Permanent Action**: Cannot be undone\n- **Data Integrity**: Validates result exists before deletion\n- **Audit Trail**: Consider logging for compliance\n- **Access Control**: Should be restricted to authorized users\n\n**Business Rules:**\n- Only existing results can be deleted\n- Returns 404 if result doesn't exist\n- Returns success message upon completion\n\n**Use Cases:**\n- Remove duplicate entries\n- Delete erroneous results\n- System cleanup/maintenance\n- Data correction workflows\n\n**Response Format:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Lab test result deleted successfully\"\n}\n```\n\n**Security Considerations:**\n- Implement proper authorization\n- Log deletion activities\n- Consider soft-delete for audit purposes\n- Validate user permissions"
+              },
+              "response": [
+                {
+                  "name": "Success Response",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results/abc123def456ghi789jkl012mno345pqr",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results",
+                        "abc123def456ghi789jkl012mno345pqr"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "body": "{\n  \"success\": true,\n  \"message\": \"Lab test result deleted successfully\"\n}"
+                },
+                {
+                  "name": "Not Found Response",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/laboratory/test-results/nonexistent123",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "laboratory",
+                        "test-results",
+                        "nonexistent123"
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "body": "{\n  \"success\": false,\n  \"message\": \"Lab test result with ID nonexistent123 not found\"\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 or 404', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200) {",
+                      "    pm.test('Response is successful', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.success).to.be.true;",
+                      "    });",
+                      "    ",
+                      "    pm.test('Response contains success message', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.message).to.equal('Lab test result deleted successfully');",
+                      "    });",
+                      "} else if (pm.response.code === 404) {",
+                      "    pm.test('Error response structure is correct', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.success).to.be.false;",
+                      "        pm.expect(jsonData).to.have.property('message');",
+                      "    });",
+                      "    ",
+                      "    pm.test('Error message indicates result not found', function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData.message.toLowerCase()).to.include('not found');",
+                      "    });",
+                      "}"
                     ]
                   }
                 }
