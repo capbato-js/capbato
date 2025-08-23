@@ -390,13 +390,14 @@ export class LaboratoryMapper {
   /**
    * Map backend status to frontend status format
    */
-  private static mapStatusToFrontend(backendStatus: string): 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' {
-    const statusMap: Record<string, 'Completed' | 'Confirmed' | 'Pending' | 'In Progress'> = {
+  private static mapStatusToFrontend(backendStatus: string): 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' | 'Cancelled' {
+    const statusMap: Record<string, 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' | 'Cancelled'> = {
       'completed': 'Completed',
       'confirmed': 'Confirmed', 
       'pending': 'Pending',
       'in_progress': 'In Progress',
       'in-progress': 'In Progress',
+      'cancelled': 'Cancelled',
     };
 
     return statusMap[backendStatus.toLowerCase()] || 'Pending';

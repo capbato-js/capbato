@@ -66,4 +66,7 @@ export interface ILaboratoryApiService {
    * Update lab test result by ID
    */
   updateLabTestResult(id: string, request: UpdateLabTestResultRequestDto): Promise<LabTestResultResponse>;
+  
+  // Lab Request Operations
+  cancelLabRequest(id: string): Promise<LaboratoryOperationResponse>;
 }

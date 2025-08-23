@@ -26,6 +26,8 @@ export interface LaboratoryTestsViewModelReturn {
   addResultModalOpened: boolean;
   viewResultModalOpened: boolean;
   isUpdateMode: boolean;
+  cancelConfirmationModalOpened: boolean;
+  testToCancel: LabTest | null;
   
   // Actions
   handleBackToLaboratory: () => void;
@@ -36,6 +38,8 @@ export interface LaboratoryTestsViewModelReturn {
   handleCloseModal: () => void;
   handleSubmitResult: (formData: AddLabTestResultFormData) => Promise<void>;
   setViewResultModalOpened: (opened: boolean) => void;
+  handleConfirmCancel: () => void;
+  handleCloseCancelConfirmation: () => void;
   
   // Store states
   loadingStates: {
@@ -58,6 +62,8 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   const [addResultModalOpened, setAddResultModalOpened] = useState(false);
   const [viewResultModalOpened, setViewResultModalOpened] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [cancelConfirmationModalOpened, setCancelConfirmationModalOpened] = useState(false);
+  const [testToCancel, setTestToCancel] = useState<LabTest | null>(null);
   const [selectedLabTest, setSelectedLabTest] = useState<LabTest | null>(null);
   const [bloodChemistryData, setBloodChemistryData] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +80,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     fetchLabTestResultByLabRequestId,
     createLabTestResult,
     updateLabTestResult,
+    cancelLabRequest,
     loadingStates, 
     errorStates 
   } = useLaboratoryStore();
@@ -396,8 +403,39 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   };
 
   const handleCancelTest = (test: LabTest) => {
-    console.log('Cancel test:', test);
-    // TODO: Implement cancel test functionality
+    setTestToCancel(test);
+    setCancelConfirmationModalOpened(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!testToCancel) return;
+
+    try {
+      console.log('🚫 Cancelling test:', testToCancel);
+      const success = await cancelLabRequest(testToCancel.id);
+      
+      if (success) {
+        console.log('✅ Test cancelled successfully');
+        
+        // Close the confirmation modal
+        setCancelConfirmationModalOpened(false);
+        setTestToCancel(null);
+        
+        // Refresh the lab tests to reflect the updated status
+        if (patientId) {
+          await fetchLabTestsByPatientId(patientId);
+        }
+      } else {
+        console.error('❌ Failed to cancel test');
+      }
+    } catch (error) {
+      console.error('❌ Error cancelling test:', error);
+    }
+  };
+
+  const handleCloseCancelConfirmation = () => {
+    setCancelConfirmationModalOpened(false);
+    setTestToCancel(null);
   };
 
   return {
@@ -413,6 +451,8 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     addResultModalOpened,
     viewResultModalOpened,
     isUpdateMode,
+    cancelConfirmationModalOpened,
+    testToCancel,
     
     // Actions
     handleBackToLaboratory,
@@ -423,6 +463,8 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     handleCloseModal,
     handleSubmitResult,
     setViewResultModalOpened,
+    handleConfirmCancel,
+    handleCloseCancelConfirmation,
     
     // Store states
     loadingStates,

@@ -337,7 +337,7 @@ export interface LabTestDto {
   tests: string[]; // Array of test IDs like ['fbs', 'bun', 'creatinine']
   testDisplayNames?: string[]; // Optional formatted names like ['FBS', 'BUN', 'Creatinine']
   date: string;
-  status: 'Completed' | 'Confirmed' | 'Pending' | 'In Progress';
+  status: 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' | 'Cancelled';
   results?: string;
   patientId?: string;
   enabledFields: string[]; // Backend-driven field enabling based on original lab request

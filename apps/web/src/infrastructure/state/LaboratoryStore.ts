@@ -47,6 +47,7 @@ interface LaboratoryStore {
   fetchLabTestResultById: (id: string) => Promise<LabTestResultDto | null>;
   fetchLabTestResultByLabRequestId: (labRequestId: string) => Promise<LabTestResultDto | null>;
   updateLabTestResult: (id: string, request: UpdateLabTestResultRequestDto) => Promise<boolean>;
+  cancelLabRequest: (id: string) => Promise<boolean>;
   clearErrors: () => void;
   reset: () => void;
 }
@@ -442,6 +443,41 @@ export const useLaboratoryStore = create<LaboratoryStore>((set, get) => {
         }
         
         throw new Error(response.message || 'Failed to update lab test result');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, updating: false },
+          errorStates: { ...state.errorStates, updateError: errorMessage }
+        }));
+        return false;
+      }
+    },
+
+    cancelLabRequest: async (id: string): Promise<boolean> => {
+      set(state => ({
+        ...state,
+        loadingStates: { ...state.loadingStates, updating: true },
+        errorStates: { ...state.errorStates, updateError: null }
+      }));
+
+      try {
+        const laboratoryApiService = getLaboratoryApiService();
+        const response = await laboratoryApiService.cancelLabRequest(id);
+        
+        if (response.success) {
+          // Update the lab test status to cancelled in local state
+          set(state => ({
+            ...state,
+            labTests: state.labTests.map(test =>
+              test.id === id ? { ...test, status: 'Cancelled' } : test
+            ),
+            loadingStates: { ...state.loadingStates, updating: false }
+          }));
+          return true;
+        }
+        
+        throw new Error(response.message || 'Failed to cancel lab request');
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         set(state => ({

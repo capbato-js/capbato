@@ -1,5 +1,6 @@
 import React from 'react';
 import { MedicalClinicLayout } from '../../../components/layout';
+import { ConfirmationModal } from '../../../components/common';
 import { 
   LaboratoryTestsPageHeader, 
   LaboratoryTestsTable, 
@@ -21,6 +22,8 @@ export const LaboratoryTestsPage: React.FC = () => {
     addResultModalOpened,
     viewResultModalOpened,
     isUpdateMode,
+    cancelConfirmationModalOpened,
+    testToCancel,
     
     // Actions
     handleBackToLaboratory,
@@ -31,6 +34,8 @@ export const LaboratoryTestsPage: React.FC = () => {
     handleCloseModal,
     handleSubmitResult,
     setViewResultModalOpened,
+    handleConfirmCancel,
+    handleCloseCancelConfirmation,
     
     // Store states
     errorStates,
@@ -65,6 +70,18 @@ export const LaboratoryTestsPage: React.FC = () => {
         isLoading={isLoading}
         error={error}
         isUpdateMode={isUpdateMode}
+      />
+
+      <ConfirmationModal
+        isOpen={cancelConfirmationModalOpened}
+        onClose={handleCloseCancelConfirmation}
+        onConfirm={handleConfirmCancel}
+        title="Cancel Lab Test"
+        message={`Are you sure you want to cancel the ${testToCancel?.testName || testToCancel?.testCategory || ''} test?`}
+        confirmText="Cancel"
+        cancelText="No"
+        confirmColor="red"
+        isLoading={isLoading}
       />
     </MedicalClinicLayout>
   );

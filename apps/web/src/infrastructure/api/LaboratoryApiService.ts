@@ -255,4 +255,24 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       } as LabTestResultResponse;
     }
   }
+
+  /**
+   * Cancel a lab request
+   */
+  async cancelLabRequest(id: string): Promise<LaboratoryOperationResponse> {
+    try {
+      console.log('🚫 Cancelling lab request:', id);
+
+      const response = await this.httpClient.put(`/api/laboratory/requests/${id}/cancel`);
+      
+      console.log('✅ Lab request cancelled successfully');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error cancelling lab request:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to cancel lab request'
+      } as LaboratoryOperationResponse;
+    }
+  }
 }

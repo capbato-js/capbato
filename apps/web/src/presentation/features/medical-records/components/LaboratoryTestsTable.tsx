@@ -100,6 +100,15 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
         fontWeight: 600,
         fontSize: '16px',
         display: 'inline-block'
+      },
+      'Cancelled': {
+        background: theme.colors.red[1],
+        color: theme.colors.red[9],
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontWeight: 600,
+        fontSize: '16px',
+        display: 'inline-block'
       }
     };
 
