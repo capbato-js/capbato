@@ -1,6 +1,7 @@
 import { injectable } from 'tsyringe';
 import { Repository, DataSource } from 'typeorm';
 import { ILabTestResultRepository, LabTestResult } from '@nx-starter/domain';
+import { v4 as uuidv4 } from 'uuid';
 import { LabTestResultEntity } from './LabTestResultEntity';
 
 @injectable()
@@ -59,7 +60,8 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
   private toEntity(domain: LabTestResult): LabTestResultEntity {
     const entity = new LabTestResultEntity();
     
-    entity.id = domain.id!;
+    // Generate ID if not present
+    entity.id = domain.id || uuidv4().replace(/-/g, '');
     entity.labRequestId = domain.labRequestId;
     entity.patientId = domain.patientId;
     entity.dateTested = domain.dateTested;
@@ -278,7 +280,7 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
     return new LabTestResult(
       entity.labRequestId,
       entity.patientId,
-      entity.dateTested!,
+      entity.dateTested || new Date(), // Handle nullable dateTested
       bloodChemistry,
       urinalysis,
       hematology,

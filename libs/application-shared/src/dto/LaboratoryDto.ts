@@ -333,7 +333,7 @@ export interface LaboratoryOperationResponse {
 // New LabTest DTOs for frontend integration
 export interface LabTestDto {
   id: string;
-  testCategory: 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'HEMATOLOGY' | 'SEROLOGY_IMMUNOLOGY' | 'ECG' | 'COAGULATION';
+  testCategory: 'bloodChemistry' | 'urinalysis' | 'fecalysis' | 'hematology' | 'serology' | 'dengue' | 'ecg' | 'coagulation';
   tests: string[]; // Array of test IDs like ['fbs', 'bun', 'creatinine']
   testDisplayNames?: string[]; // Optional formatted names like ['FBS', 'BUN', 'Creatinine']
   date: string;

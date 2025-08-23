@@ -112,11 +112,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
           
           const converted = {
             id: dto.id || `test-${Date.now()}`,
-            testCategory: (dto.testCategory === 'HEMATOLOGY' ? 'CBC' : 
-                          dto.testCategory === 'SEROLOGY_IMMUNOLOGY' ? 'BLOOD_CHEMISTRY' :
-                          dto.testCategory === 'ECG' ? 'BLOOD_CHEMISTRY' :
-                          dto.testCategory === 'COAGULATION' ? 'CBC' :
-                          dto.testCategory || 'BLOOD_CHEMISTRY') as 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'CBC' | 'THYROID_FUNCTION',
+            testCategory: dto.testCategory || 'bloodChemistry', // Use backend category directly
             tests: expandedTests, // Use the processed tests
             testDisplayNames: dto.testDisplayNames || [],
             date: dto.date || new Date().toISOString(),
@@ -209,7 +205,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     setSelectedLabTest(test);
     
     // Fetch blood chemistry data if it's a blood chemistry test
-    if (test.testCategory === 'BLOOD_CHEMISTRY' && patientId) {
+    if (test.testCategory === 'bloodChemistry' && patientId) {
       try {
         // TODO: Implement fetchBloodChemistryByPatientId when available
         console.warn('Blood chemistry fetching not implemented yet');

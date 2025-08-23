@@ -46,6 +46,7 @@ export class CreateLabTestResultUseCase {
       command.hematology,
       command.fecalysis,
       command.serology,
+      command.dengue,
       command.ecg,
       command.coagulation,
       command.remarks,
@@ -146,8 +147,36 @@ export class CreateLabTestResultUseCase {
       }
     }
 
-    // If bloodChemistry results are provided, validate each result field
+    // Special handling for lipid profile first
+    const lipidFields = ['cholesterol', 'triglycerides', 'hdl', 'ldl', 'vldl'];
+    const hasLipidProfileRequest = requestedBloodChemistryTests.includes('lipidProfile');
+    const providedLipidFields = lipidFields.filter(field => 
+      results[field] !== undefined && results[field] !== null
+    );
+
+    // If lipidProfile was requested, validate that ALL 5 lipid results are provided
+    if (hasLipidProfileRequest) {
+      const missingLipidFields = lipidFields.filter(field => 
+        results[field] === undefined || results[field] === null
+      );
+      
+      if (missingLipidFields.length > 0) {
+        throw new Error(`Blood chemistry test 'lipidProfile' was requested but missing values for: ${missingLipidFields.join(', ')}`);
+      }
+    }
+
+    // If lipid results are provided, ensure lipidProfile was requested
+    if (providedLipidFields.length > 0 && !hasLipidProfileRequest) {
+      throw new Error(`Lipid profile results provided but test 'lipidProfile' was not requested`);
+    }
+
+    // Validate non-lipid blood chemistry tests
     for (const [resultField, requestField] of Object.entries(bloodChemistryTests)) {
+      // Skip lipid fields - they are handled above
+      if (lipidFields.includes(resultField)) {
+        continue;
+      }
+
       if (results[resultField] !== undefined) {
         // Check if the corresponding test was requested in bloodChemistry category
         if (!requestedTests.tests || !requestedTests.tests.bloodChemistry || !requestedTests.tests.bloodChemistry[requestField]) {
@@ -156,8 +185,13 @@ export class CreateLabTestResultUseCase {
       }
     }
 
-    // Check if all requested blood chemistry tests have corresponding result values
+    // Check if all requested non-lipid blood chemistry tests have corresponding result values
     for (const requestedTest of requestedBloodChemistryTests) {
+      // Skip lipidProfile - it's handled above
+      if (requestedTest === 'lipidProfile') {
+        continue;
+      }
+
       const resultFieldMap = Object.fromEntries(
         Object.entries(bloodChemistryTests).map(([resultField, requestField]) => [requestField, resultField])
       );
@@ -166,17 +200,6 @@ export class CreateLabTestResultUseCase {
       if (resultField && (results[resultField] === undefined || results[resultField] === null)) {
         throw new Error(`Blood chemistry test '${requestedTest}' was requested but no result value provided for '${resultField}'`);
       }
-      
-      // Special case for lipidProfile - any lipid result satisfies the lipidProfile request
-      if (requestedTest === 'lipidProfile') {
-        const lipidFields = ['cholesterol', 'triglycerides', 'hdl', 'ldl', 'vldl'];
-        const hasAnyLipidResult = lipidFields.some(field => 
-          results[field] !== undefined && results[field] !== null
-        );
-        if (!hasAnyLipidResult) {
-          throw new Error(`Blood chemistry test 'lipidProfile' was requested but no lipid profile results provided`);
-        }
-      }
     }
   }
 
@@ -184,22 +207,52 @@ export class CreateLabTestResultUseCase {
    * Validates urinalysis results against requested tests
    */
   private validateUrinalysisResults(results: any, requestedTests: any): void {
-    // Check if urinalysis was requested in routine category
-    if (!requestedTests.tests || !requestedTests.tests.routine || !requestedTests.tests.routine.urinalysis) {
-      throw new Error('Urinalysis results provided but urinalysis test was not requested');
-    }
+    // Define urinalysis fields (excluding pregnancy test and others which is optional)
+    const regularUrinalysisFields = [
+      'color', 'transparency', 'specificGravity', 'ph', 'protein', 'glucose',
+      'epithelialCells', 'redCells', 'pusCells', 'mucusThread', 'amorphousUrates',
+      'amorphousPhosphate', 'crystals', 'bacteria'
+    ];
+    
+    const hasUrinalysisRequest = requestedTests.tests?.routine?.urinalysis;
+    const hasPregnancyTestRequest = requestedTests.tests?.routine?.pregnancyTest;
+    
+    // Check what results are provided
+    const providedRegularFields = regularUrinalysisFields.filter(field => 
+      results[field] !== undefined && results[field] !== null
+    );
+    const hasPregnancyTestResult = results.pregnancyTest !== undefined && results.pregnancyTest !== null;
 
-    // Validate that urinalysis results contain actual values
-    const urinalysisValues = Object.values(results);
-    const hasUrinalysisValues = urinalysisValues.some(value => value !== undefined && value !== null && value !== '');
-    if (!hasUrinalysisValues) {
-      throw new Error('Urinalysis test was requested but no result values provided');
+    // Validation logic
+    if (hasPregnancyTestRequest && hasUrinalysisRequest) {
+      throw new Error('Cannot request both pregnancy test and regular urinalysis in the same request');
     }
-
-    // Validate pregnancy test specifically
-    if (results.pregnancyTest !== undefined) {
-      if (!requestedTests.tests || !requestedTests.tests.routine || !requestedTests.tests.routine.pregnancyTest) {
-        throw new Error('Pregnancy test result provided but pregnancy test was not requested');
+    
+    if (hasPregnancyTestRequest) {
+      // Pregnancy test scenario: ONLY pregnancy test should be provided
+      if (providedRegularFields.length > 0) {
+        throw new Error(`Pregnancy test was requested but regular urinalysis results provided: ${providedRegularFields.join(', ')}`);
+      }
+      if (!hasPregnancyTestResult) {
+        throw new Error('Pregnancy test was requested but no pregnancy test result provided');
+      }
+    } else if (hasUrinalysisRequest) {
+      // Regular urinalysis scenario: ALL regular fields must be provided
+      const missingFields = regularUrinalysisFields.filter(field => 
+        results[field] === undefined || results[field] === null
+      );
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Urinalysis test was requested but missing values for: ${missingFields.join(', ')}`);
+      }
+      
+      if (hasPregnancyTestResult) {
+        throw new Error('Regular urinalysis was requested but pregnancy test result provided. Use separate pregnancy test request.');
+      }
+    } else {
+      // No urinalysis or pregnancy test requested
+      if (providedRegularFields.length > 0 || hasPregnancyTestResult) {
+        throw new Error('Urinalysis results provided but no urinalysis or pregnancy test was requested');
       }
     }
   }
@@ -213,11 +266,19 @@ export class CreateLabTestResultUseCase {
       throw new Error('Hematology results provided but CBC with platelet test was not requested');
     }
 
-    // Validate that hematology results contain actual values
-    const hematologyValues = Object.values(results);
-    const hasHematologyValues = hematologyValues.some(value => value !== undefined && value !== null && value !== '');
-    if (!hasHematologyValues) {
-      throw new Error('Hematology test was requested but no result values provided');
+    // Define required hematology/CBC fields ('others' is optional)
+    const requiredHematologyFields = [
+      'hematocrit', 'hemoglobin', 'rbc', 'wbc', 'segmenters', 
+      'lymphocyte', 'monocyte', 'basophils', 'eosinophils', 'platelet'
+    ];
+
+    // Check for missing required fields
+    const missingFields = requiredHematologyFields.filter(field => 
+      results[field] === undefined || results[field] === null
+    );
+
+    if (missingFields.length > 0) {
+      throw new Error(`CBC with platelet test was requested but missing values for: ${missingFields.join(', ')}`);
     }
   }
 
@@ -225,16 +286,52 @@ export class CreateLabTestResultUseCase {
    * Validates fecalysis results against requested tests
    */
   private validateFecalysisResults(results: any, requestedTests: any): void {
-    // Check if fecalysis was requested in routine category
-    if (!requestedTests.tests || !requestedTests.tests.routine || !requestedTests.tests.routine.fecalysis) {
-      throw new Error('Fecalysis results provided but fecalysis test was not requested');
-    }
+    // Define fecalysis fields (excluding occult blood - it's a separate test)
+    // 'others' is optional and not required for validation
+    const regularFecalysisFields = [
+      'color', 'consistency', 'rbc', 'wbc', 'urobilinogen'
+    ];
+    
+    const hasFecalysisRequest = requestedTests.tests?.routine?.fecalysis;
+    const hasOccultBloodRequest = requestedTests.tests?.routine?.occultBloodTest;
+    
+    // Check what results are provided
+    const providedRegularFields = regularFecalysisFields.filter(field => 
+      results[field] !== undefined && results[field] !== null
+    );
+    const hasOccultBloodResult = results.occultBlood !== undefined && results.occultBlood !== null;
 
-    // Validate that fecalysis results contain actual values
-    const fecalysisValues = Object.values(results);
-    const hasFecalysisValues = fecalysisValues.some(value => value !== undefined && value !== null && value !== '');
-    if (!hasFecalysisValues) {
-      throw new Error('Fecalysis test was requested but no result values provided');
+    // Validation logic
+    if (hasOccultBloodRequest && hasFecalysisRequest) {
+      throw new Error('Cannot request both occult blood test and regular fecalysis in the same request');
+    }
+    
+    if (hasOccultBloodRequest) {
+      // Occult blood test scenario: ONLY occult blood should be provided
+      if (providedRegularFields.length > 0) {
+        throw new Error(`Occult blood test was requested but regular fecalysis results provided: ${providedRegularFields.join(', ')}`);
+      }
+      if (!hasOccultBloodResult) {
+        throw new Error('Occult blood test was requested but no occult blood result provided');
+      }
+    } else if (hasFecalysisRequest) {
+      // Regular fecalysis scenario: ALL fecalysis fields must be provided (excluding occult blood)
+      const missingFields = regularFecalysisFields.filter(field => 
+        results[field] === undefined || results[field] === null
+      );
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Fecalysis test was requested but missing values for: ${missingFields.join(', ')}`);
+      }
+      
+      if (hasOccultBloodResult) {
+        throw new Error('Regular fecalysis was requested but occult blood result provided. Use separate occult blood test request.');
+      }
+    } else {
+      // No fecalysis or occult blood test requested
+      if (providedRegularFields.length > 0 || hasOccultBloodResult) {
+        throw new Error('Fecalysis results provided but no fecalysis or occult blood test was requested');
+      }
     }
   }
 
@@ -278,11 +375,18 @@ export class CreateLabTestResultUseCase {
       throw new Error('ECG results provided but ECG test was not requested');
     }
 
-    // Validate that ECG results contain actual values
-    const ecgValues = Object.values(results);
-    const hasEcgValues = ecgValues.some(value => value !== undefined && value !== null && value !== '');
-    if (!hasEcgValues) {
-      throw new Error('ECG test was requested but no result values provided');
+    // Define required ECG fields ('others', 'interpretation', 'interpreter' are optional)
+    const requiredEcgFields = [
+      'av', 'qrs', 'axis', 'pr', 'qt', 'stT', 'rhythm'
+    ];
+
+    // Check for missing required fields
+    const missingFields = requiredEcgFields.filter(field => 
+      results[field] === undefined || results[field] === null
+    );
+
+    if (missingFields.length > 0) {
+      throw new Error(`ECG test was requested but missing values for: ${missingFields.join(', ')}`);
     }
   }
 
