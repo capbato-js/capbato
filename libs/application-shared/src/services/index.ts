@@ -13,3 +13,4 @@ export * from './PatientQueryService';
 export * from './PrescriptionCommandService';
 export * from './PrescriptionQueryService';
 export * from './ScheduleWithDoctorService';
+export * from './LabTestResultTransformer';

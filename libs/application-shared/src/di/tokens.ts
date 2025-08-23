@@ -139,6 +139,7 @@ export const TOKENS = {
   GetSerologyResultByIdQueryHandler: 'GetSerologyResultByIdQueryHandler',
   GetSerologyResultsByPatientIdQueryHandler: 'GetSerologyResultsByPatientIdQueryHandler',
   GetLabTestResultByIdQueryHandler: 'GetLabTestResultByIdQueryHandler',
+  GetLabTestResultByLabRequestIdQueryHandler: 'GetLabTestResultByLabRequestIdQueryHandler',
   GetAllLabTestResultsQueryHandler: 'GetAllLabTestResultsQueryHandler',
   GetPendingLabRequestsQueryHandler: 'GetPendingLabRequestsQueryHandler',
   GetAllBloodChemistryQueryHandler: 'GetAllBloodChemistryQueryHandler',

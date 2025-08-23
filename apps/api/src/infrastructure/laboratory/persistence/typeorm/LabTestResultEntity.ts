@@ -226,7 +226,7 @@ export class LabTestResultEntity {
   @Column({ name: 'result_fecal_others', type: 'varchar', length: 255, nullable: true })
   resultFecalOthers?: string;
 
-  // Serology & Immunology Results
+  // Serology & Immunology Results (Thyroid Function Tests)
   @Column({ name: 'result_serology_ft3', type: 'decimal', precision: 6, scale: 2, nullable: true })
   resultSerologyFt3?: number;
 
@@ -237,14 +237,14 @@ export class LabTestResultEntity {
   resultSerologyTsh?: number;
 
   // Dengue Duo Results
-  @Column({ name: 'result_serology_dengue_igg', type: 'varchar', length: 50, nullable: true })
-  resultSerologyDengueIgg?: string;
+  @Column({ name: 'result_dengue_igg', type: 'varchar', length: 50, nullable: true })
+  resultDengueIgg?: string;
 
-  @Column({ name: 'result_serology_dengue_igm', type: 'varchar', length: 50, nullable: true })
-  resultSerologyDengueIgm?: string;
+  @Column({ name: 'result_dengue_igm', type: 'varchar', length: 50, nullable: true })
+  resultDengueIgm?: string;
 
-  @Column({ name: 'result_serology_dengue_ns1', type: 'varchar', length: 50, nullable: true })
-  resultSerologyDengueNs1?: string;
+  @Column({ name: 'result_dengue_ns1', type: 'varchar', length: 50, nullable: true })
+  resultDengueNs1?: string;
 
   // Electrocardiogram Results
   @Column({ name: 'result_ecg_av', type: 'varchar', length: 100, nullable: true })

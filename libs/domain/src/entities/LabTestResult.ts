@@ -65,9 +65,12 @@ export interface LabTestSerologyResults {
   ft3?: number;
   ft4?: number;
   tsh?: number;
-  dengueIgg?: string;
-  dengueIgm?: string;
-  dengueNs1?: string;
+}
+
+export interface LabTestDengueResults {
+  igg?: string;
+  igm?: string;
+  ns1?: string;
 }
 
 export interface LabTestEcgResults {
@@ -102,6 +105,7 @@ interface ILabTestResult {
   hematology?: LabTestHematologyResults;
   fecalysis?: LabTestFecalysisResults;
   serology?: LabTestSerologyResults;
+  dengue?: LabTestDengueResults;
   ecg?: LabTestEcgResults;
   coagulation?: LabTestCoagulationResults;
   remarks?: string;
@@ -119,6 +123,7 @@ export class LabTestResult implements ILabTestResult {
   private readonly _hematology?: LabTestHematologyResults;
   private readonly _fecalysis?: LabTestFecalysisResults;
   private readonly _serology?: LabTestSerologyResults;
+  private readonly _dengue?: LabTestDengueResults;
   private readonly _ecg?: LabTestEcgResults;
   private readonly _coagulation?: LabTestCoagulationResults;
   private readonly _remarks?: string;
@@ -134,6 +139,7 @@ export class LabTestResult implements ILabTestResult {
     hematology?: LabTestHematologyResults,
     fecalysis?: LabTestFecalysisResults,
     serology?: LabTestSerologyResults,
+    dengue?: LabTestDengueResults,
     ecg?: LabTestEcgResults,
     coagulation?: LabTestCoagulationResults,
     remarks?: string,
@@ -149,6 +155,7 @@ export class LabTestResult implements ILabTestResult {
     this._hematology = hematology;
     this._fecalysis = fecalysis;
     this._serology = serology;
+    this._dengue = dengue;
     this._ecg = ecg;
     this._coagulation = coagulation;
     this._remarks = remarks;
@@ -193,6 +200,10 @@ export class LabTestResult implements ILabTestResult {
     return this._serology;
   }
 
+  get dengue(): LabTestDengueResults | undefined {
+    return this._dengue;
+  }
+
   get ecg(): LabTestEcgResults | undefined {
     return this._ecg;
   }
@@ -221,6 +232,7 @@ export class LabTestResult implements ILabTestResult {
       this._hematology ||
       this._fecalysis ||
       this._serology ||
+      this._dengue ||
       this._ecg ||
       this._coagulation
     );
@@ -244,6 +256,10 @@ export class LabTestResult implements ILabTestResult {
 
   hasSerologyResults(): boolean {
     return !!this._serology && Object.keys(this._serology).length > 0;
+  }
+
+  hasDengueResults(): boolean {
+    return !!this._dengue && Object.keys(this._dengue).length > 0;
   }
 
   hasEcgResults(): boolean {
@@ -286,6 +302,7 @@ export class LabTestResult implements ILabTestResult {
       this._hematology,
       this._fecalysis,
       this._serology,
+      this._dengue,
       this._ecg,
       this._coagulation,
       this._remarks,
@@ -301,6 +318,7 @@ export class LabTestResult implements ILabTestResult {
     hematology?: LabTestHematologyResults,
     fecalysis?: LabTestFecalysisResults,
     serology?: LabTestSerologyResults,
+    dengue?: LabTestDengueResults,
     ecg?: LabTestEcgResults,
     coagulation?: LabTestCoagulationResults,
     remarks?: string
@@ -314,6 +332,7 @@ export class LabTestResult implements ILabTestResult {
       hematology ?? this._hematology,
       fecalysis ?? this._fecalysis,
       serology ?? this._serology,
+      dengue ?? this._dengue,
       ecg ?? this._ecg,
       coagulation ?? this._coagulation,
       remarks ?? this._remarks,

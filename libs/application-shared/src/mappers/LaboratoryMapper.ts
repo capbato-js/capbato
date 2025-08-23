@@ -11,6 +11,7 @@ import { LabRequestStatus } from '@nx-starter/domain';
 import { LabRequestId } from '@nx-starter/domain';
 import { BloodChemistryPatientInfo } from '@nx-starter/domain';
 import { BloodChemistryResults } from '@nx-starter/domain';
+import { LabTestFieldMappingService } from '../services/LabTestFieldMappingService';
 import {
   LabRequestDto,
   BloodChemistryDto,
@@ -103,6 +104,10 @@ export class LaboratoryMapper {
     // Create backward compatibility testName for transition period
     const testName = this.generateLegacyTestName(testCategory, testDisplayNames);
 
+    // Get enabled fields based on original lab request using the mapping service
+    const allEnabledFields = LabTestFieldMappingService.getEnabledFields(labRequest.tests.tests);
+    const categoryEnabledFields = allEnabledFields[testCategory] || [];
+
     return {
       id: labRequest.id?.value || '',
       testCategory,
@@ -114,6 +119,7 @@ export class LaboratoryMapper {
       status,
       results: labRequest.status.value === 'completed' ? 'Available' : undefined,
       patientId: labRequest.patientInfo.patientId,
+      enabledFields: categoryEnabledFields, // Backend-driven field enabling
       // Backward compatibility
       testName,
     };
@@ -184,7 +190,7 @@ export class LaboratoryMapper {
 
     return {
       id: bloodChemistry.id?.value || '',
-      testCategory: 'BLOOD_CHEMISTRY',
+      testCategory: 'bloodChemistry',
       tests: availableTests,
       testDisplayNames: displayNames,
       date: bloodChemistry.dateTaken instanceof Date 
@@ -193,6 +199,7 @@ export class LaboratoryMapper {
       status: 'Completed', // Blood chemistry results are always completed once created
       results: 'Available',
       patientId: bloodChemistry.patientInfo.patientId || bloodChemistry.patientInfo.patientName, // Use patient ID if available, fallback to name
+      enabledFields: availableTests.concat(['others']), // Enable fields based on available results
       testName,
     };
   }
@@ -282,21 +289,22 @@ export class LaboratoryMapper {
    * Determine test category from selected tests - aligned with LabTestResultEntity groupings
    * Note: selectedTests contains display names like 'Dengue NS1', 'Pregnancy Test'
    */
-  private static determineTestCategory(selectedTests: string[]): 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'HEMATOLOGY' | 'SEROLOGY_IMMUNOLOGY' | 'ECG' | 'COAGULATION' {
+  private static determineTestCategory(selectedTests: string[]): 'bloodChemistry' | 'urinalysis' | 'fecalysis' | 'hematology' | 'serology' | 'dengue' | 'ecg' | 'coagulation' {
     // Debug logging
     console.log('🔬 determineTestCategory - selectedTests:', selectedTests);
     
     // Display names as returned by getSelectedTests() method - aligned with LabTestResultEntity form sections
     const urinalysisTests = ['Urinalysis', 'Pregnancy Test']; // result_urine_* fields
-    const fecalysisTests = ['Fecalysis']; // result_fecal_* fields
+    const fecalysisTests = ['Fecalysis', 'Occult Blood Test']; // result_fecal_* fields
     const hematologyTests = ['CBC with Platelet']; // result_hematology_* fields
-    const serologyImmunologyTests = [
+    const serologyTests = [
       // Thyroid tests (stored as result_serology_*)
       'T3', 'T4', 'FT3', 'FT4', 'TSH',
-      // Serology tests (stored as result_serology_*)
-      'Dengue NS1', 'Hepatitis B Screening', 'Hepatitis A Screening', 'Hepatitis Profile', 
+      // Other serology tests (stored as result_serology_*)
+      'Hepatitis B Screening', 'Hepatitis A Screening', 'Hepatitis Profile', 
       'VDRL/RPR', 'CRP', 'ASO', 'CRF', 'RA/RF', 'Tumor Markers', 'CA 125', 'CEA', 'PSA', 'Beta HCG'
     ];
+    const dengueTests = ['Dengue NS1']; // result_dengue_* fields - separate from serology
     const ecgTests = ['ECG']; // result_ecg_* fields
     const coagulationTests: string[] = []; // result_coag_* fields - no tests defined in LabRequestTests yet
     const bloodChemistryTests = ['FBS', 'BUN', 'Creatinine', 'Blood Uric Acid', 'Lipid Profile', 'SGOT', 'SGPT', 'HBA1C', 'Alkaline Phosphatase', 'Sodium', 'Potassium']; // result_blood_* fields
@@ -304,26 +312,29 @@ export class LaboratoryMapper {
     let detectedCategory: string;
     
     if (selectedTests.some(test => urinalysisTests.includes(test))) {
-      detectedCategory = 'URINALYSIS';
+      detectedCategory = 'urinalysis';
     } else if (selectedTests.some(test => fecalysisTests.includes(test))) {
-      detectedCategory = 'FECALYSIS';
+      detectedCategory = 'fecalysis';
     } else if (selectedTests.some(test => hematologyTests.includes(test))) {
-      detectedCategory = 'HEMATOLOGY';
-    } else if (selectedTests.some(test => serologyImmunologyTests.includes(test))) {
-      detectedCategory = 'SEROLOGY_IMMUNOLOGY';
+      detectedCategory = 'hematology';
+    } else if (selectedTests.some(test => dengueTests.includes(test))) {
+      detectedCategory = 'dengue';
+    } else if (selectedTests.some(test => serologyTests.includes(test))) {
+      detectedCategory = 'serology';
     } else if (selectedTests.some(test => ecgTests.includes(test))) {
-      detectedCategory = 'ECG';
+      detectedCategory = 'ecg';
     } else if (selectedTests.some(test => coagulationTests.includes(test))) {
-      detectedCategory = 'COAGULATION';
+      detectedCategory = 'coagulation';
     } else if (selectedTests.some(test => bloodChemistryTests.includes(test))) {
-      detectedCategory = 'BLOOD_CHEMISTRY';
+      detectedCategory = 'bloodChemistry';
     } else {
       console.error('❌ No matching category found for tests:', selectedTests);
       console.error('❌ Available categories:', {
         urinalysis: urinalysisTests,
         fecalysis: fecalysisTests,
         hematology: hematologyTests,
-        serology: serologyImmunologyTests,
+        dengue: dengueTests,
+        serology: serologyTests,
         ecg: ecgTests,
         coagulation: coagulationTests,
         bloodChemistry: bloodChemistryTests
@@ -332,7 +343,7 @@ export class LaboratoryMapper {
     }
     
     console.log('🔬 detectedCategory:', detectedCategory);
-    return detectedCategory as 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'HEMATOLOGY' | 'SEROLOGY_IMMUNOLOGY' | 'ECG' | 'COAGULATION';
+    return detectedCategory as 'bloodChemistry' | 'urinalysis' | 'fecalysis' | 'hematology' | 'serology' | 'dengue' | 'ecg' | 'coagulation';
   }
 
   /**
@@ -343,43 +354,50 @@ export class LaboratoryMapper {
       return 'Lab Test';
     }
 
-    // Handle single test categories
-    if (testCategory === 'URINALYSIS' && testDisplayNames.length === 1) {
+    // Handle single test categories with new naming convention
+    if (testCategory === 'urinalysis' && testDisplayNames.length === 1) {
       return testDisplayNames.includes('PREGNANCY TEST') ? 'URINALYSIS: PREGNANCY TEST' : 'URINALYSIS';
-    } else if (testCategory === 'FECALYSIS' && testDisplayNames.length === 1) {
-      return 'FECALYSIS';
-    } else if (testCategory === 'HEMATOLOGY' && testDisplayNames.length === 1) {
+    } else if (testCategory === 'fecalysis' && testDisplayNames.length === 1) {
+      return testDisplayNames.includes('OCCULT BLOOD TEST') ? 'FECALYSIS: OCCULT BLOOD TEST' : 'FECALYSIS';
+    } else if (testCategory === 'hematology' && testDisplayNames.length === 1) {
       return 'HEMATOLOGY: CBC with Platelet';
-    } else if (testCategory === 'ECG') {
+    } else if (testCategory === 'ecg') {
       return 'ECG';
+    } else if (testCategory === 'dengue') {
+      return 'DENGUE TEST';
     }
 
     // Handle multiple tests or specific naming
-    if (testCategory === 'URINALYSIS' && testDisplayNames.length > 1) {
+    if (testCategory === 'urinalysis' && testDisplayNames.length > 1) {
       return `URINALYSIS: ${testDisplayNames.join(', ')}`;
-    } else if (testCategory === 'FECALYSIS' && testDisplayNames.length > 1) {
+    } else if (testCategory === 'fecalysis' && testDisplayNames.length > 1) {
       return 'FECALYSIS: Comprehensive';
-    } else if (testCategory === 'SEROLOGY_IMMUNOLOGY') {
+    } else if (testCategory === 'serology') {
       return `SEROLOGY & IMMUNOLOGY: ${testDisplayNames.join(', ')}`;
-    } else if (testCategory === 'HEMATOLOGY') {
+    } else if (testCategory === 'dengue') {
+      return `DENGUE: ${testDisplayNames.join(', ')}`;
+    } else if (testCategory === 'hematology') {
       return `HEMATOLOGY: ${testDisplayNames.join(', ')}`;
-    } else if (testCategory === 'COAGULATION') {
+    } else if (testCategory === 'coagulation') {
       return `COAGULATION: ${testDisplayNames.join(', ')}`;
+    } else if (testCategory === 'bloodChemistry') {
+      return `BLOOD CHEMISTRY: ${testDisplayNames.join(', ')}`;
     } else {
-      return `${testCategory.replace('_', ' ')}: ${testDisplayNames.join(', ')}`;
+      return `${testCategory.toUpperCase()}: ${testDisplayNames.join(', ')}`;
     }
   }
 
   /**
    * Map backend status to frontend status format
    */
-  private static mapStatusToFrontend(backendStatus: string): 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' {
-    const statusMap: Record<string, 'Completed' | 'Confirmed' | 'Pending' | 'In Progress'> = {
+  private static mapStatusToFrontend(backendStatus: string): 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' | 'Cancelled' {
+    const statusMap: Record<string, 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' | 'Cancelled'> = {
       'completed': 'Completed',
       'confirmed': 'Confirmed', 
       'pending': 'Pending',
       'in_progress': 'In Progress',
       'in-progress': 'In Progress',
+      'cancelled': 'Cancelled',
     };
 
     return statusMap[backendStatus.toLowerCase()] || 'Pending';
@@ -1101,9 +1119,11 @@ export class LaboratoryMapper {
         ft3: result.serology.ft3,
         ft4: result.serology.ft4,
         tsh: result.serology.tsh,
-        dengueIgg: result.serology.dengueIgg,
-        dengueIgm: result.serology.dengueIgm,
-        dengueNs1: result.serology.dengueNs1,
+      } : undefined,
+      dengue: result.dengue ? {
+        igg: result.dengue.igg,
+        igm: result.dengue.igm,
+        ns1: result.dengue.ns1,
       } : undefined,
       ecg: result.ecg ? {
         av: result.ecg.av,

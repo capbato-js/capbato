@@ -3,10 +3,9 @@ import {
   LabRequestResponse,
   LabRequestListResponse,
   LabTestListResponse,
-  BloodChemistryResponse,
   LaboratoryOperationResponse,
-  CreateBloodChemistryCommand,
   CreateLabTestResultRequestDto,
+  UpdateLabTestResultRequestDto,
   LabTestResultResponse
 } from '@nx-starter/application-shared';
 
@@ -47,19 +46,27 @@ export interface ILaboratoryApiService {
     requestDate: string, 
     results: Record<string, string>
   ): Promise<LaboratoryOperationResponse>;
-  
-  /**
-   * Create blood chemistry results
-   */
-  createBloodChemistry(command: CreateBloodChemistryCommand): Promise<BloodChemistryResponse>;
-
-  /**
-   * Get blood chemistry results by patient ID
-   */
-  getBloodChemistryByPatientId(patientId: string): Promise<BloodChemistryResponse>;
 
   /**
    * Create lab test result
    */
   createLabTestResult(request: CreateLabTestResultRequestDto): Promise<LabTestResultResponse>;
+
+  /**
+   * Get lab test result by ID
+   */
+  getLabTestResultById(id: string): Promise<LabTestResultResponse>;
+
+  /**
+   * Get lab test result by lab request ID
+   */
+  getLabTestResultByLabRequestId(labRequestId: string): Promise<LabTestResultResponse>;
+
+  /**
+   * Update lab test result by ID
+   */
+  updateLabTestResult(id: string, request: UpdateLabTestResultRequestDto): Promise<LabTestResultResponse>;
+  
+  // Lab Request Operations
+  cancelLabRequest(id: string): Promise<LaboratoryOperationResponse>;
 }

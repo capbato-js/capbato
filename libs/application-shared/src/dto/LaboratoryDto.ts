@@ -333,13 +333,14 @@ export interface LaboratoryOperationResponse {
 // New LabTest DTOs for frontend integration
 export interface LabTestDto {
   id: string;
-  testCategory: 'BLOOD_CHEMISTRY' | 'URINALYSIS' | 'FECALYSIS' | 'HEMATOLOGY' | 'SEROLOGY_IMMUNOLOGY' | 'ECG' | 'COAGULATION';
+  testCategory: 'bloodChemistry' | 'urinalysis' | 'fecalysis' | 'hematology' | 'serology' | 'dengue' | 'ecg' | 'coagulation';
   tests: string[]; // Array of test IDs like ['fbs', 'bun', 'creatinine']
   testDisplayNames?: string[]; // Optional formatted names like ['FBS', 'BUN', 'Creatinine']
   date: string;
-  status: 'Completed' | 'Confirmed' | 'Pending' | 'In Progress';
+  status: 'Completed' | 'Confirmed' | 'Pending' | 'In Progress' | 'Cancelled';
   results?: string;
   patientId?: string;
+  enabledFields: string[]; // Backend-driven field enabling based on original lab request
   // Backward compatibility - computed display value
   testName?: string; // Deprecated: Use testCategory and tests instead
 }
@@ -418,9 +419,11 @@ export interface LabTestResultDto {
     ft3?: number;
     ft4?: number;
     tsh?: number;
-    dengueIgg?: string;
-    dengueIgm?: string;
-    dengueNs1?: string;
+  };
+  dengue?: {
+    igg?: string;
+    igm?: string;
+    ns1?: string;
   };
   ecg?: {
     av?: string;
@@ -511,9 +514,11 @@ export interface CreateLabTestResultRequestDto {
     ft3?: number;
     ft4?: number;
     tsh?: number;
-    dengueIgg?: string;
-    dengueIgm?: string;
-    dengueNs1?: string;
+  };
+  dengue?: {
+    igg?: string;
+    igm?: string;
+    ns1?: string;
   };
   ecg?: {
     av?: string;

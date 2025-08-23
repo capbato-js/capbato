@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
@@ -26,6 +26,7 @@ interface AddLabTestResultFormProps {
   testType?: LabTestType;
   enabledFields?: string[]; // Array of field IDs that should be enabled (e.g., ['blood_chemistry_fbs', 'blood_chemistry_bun'])
   viewMode?: boolean; // If true, all fields are read-only and form shows existing data
+  isUpdate?: boolean; // If true, this is an update operation rather than create
   existingData?: AddLabTestResultFormData; // Pre-populate form with existing results
   patientData?: {
     patientNumber?: string;
@@ -48,6 +49,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   testType = 'BLOOD_CHEMISTRY',
   enabledFields, // Array of field IDs that should be enabled
   viewMode = false, // Read-only mode for viewing existing results
+  isUpdate = false, // Update mode flag
   existingData, // Pre-populated data for view mode
   patientData,
   onSubmit,
@@ -61,22 +63,32 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   const leftFields = getFieldsByColumn(testType, 'left');
   const rightFields = getFieldsByColumn(testType, 'right');
 
-  // Debug logging for enabled fields
-  console.log('🧪 AddLabTestResultForm - Test Type:', testType);
-  console.log('🧪 AddLabTestResultForm - Enabled Fields:', enabledFields);
-  console.log('🧪 AddLabTestResultForm - Available Left Fields:', leftFields.map(f => ({ id: f.id, label: f.label })));
-  console.log('🧪 AddLabTestResultForm - Available Right Fields:', rightFields.map(f => ({ id: f.id, label: f.label })));
+
 
   const {
     register,
     handleSubmit,
+    reset,
   } = useForm<AddLabTestResultFormData>({
     resolver: zodResolver(schema),
-    defaultValues: existingData || {}, // Pre-populate with existing data in view mode
+    defaultValues: existingData || {}, // Pre-populate with existing data
   });
 
+  // Reset form when existingData changes (for edit mode)
+  useEffect(() => {
+    if (existingData) {
+      console.log('🔄 Resetting form with existing data:', existingData);
+      reset(existingData);
+    }
+  }, [existingData, reset]);
+
   const handleFormSubmit = (data: AddLabTestResultFormData) => {
-    onSubmit(data);
+    // Remove empty/undefined values to clean the form data
+    const cleanedData = Object.entries(data)
+      .filter(([, value]) => value !== undefined && value !== '' && value !== null)
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+    onSubmit(cleanedData);
   };
 
   // Reusable field component
@@ -90,11 +102,15 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
         const normalizedFieldId = field.id.toLowerCase().trim();
         const normalizedFieldLabel = field.label.toLowerCase().trim();
         
-        // Match by ID, label, or if enabled field is part of label
-        return normalizedEnabledField === normalizedFieldId ||
+        // Match by ID, label, or bidirectional partial matching
+        const matches = normalizedEnabledField === normalizedFieldId ||
                normalizedEnabledField === normalizedFieldLabel ||
                normalizedFieldLabel.includes(normalizedEnabledField) ||
-               normalizedFieldId.includes(normalizedEnabledField);
+               normalizedFieldId.includes(normalizedEnabledField) ||
+               normalizedEnabledField.includes(normalizedFieldLabel) ||  // Check if enabled field contains label
+               normalizedEnabledField.includes(normalizedFieldId);       // Check if enabled field contains ID
+        
+        return matches;
       }));
     
     return (
@@ -330,7 +346,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                 disabled={isLoading}
                 leftSection={<Icon icon="fas fa-save" size={14} />}
               >
-                Submit
+                {isUpdate ? 'Update Result' : 'Submit Result'}
               </Button>
             )}
           </Box>

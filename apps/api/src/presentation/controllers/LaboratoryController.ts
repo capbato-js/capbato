@@ -12,6 +12,7 @@ import {
 import {
   CreateLabRequestUseCase,
   UpdateLabRequestResultsUseCase,
+  UpdateLabRequestStatusByIdUseCase,
   CreateBloodChemistryUseCase,
   CreateUrinalysisResultUseCase,
   UpdateUrinalysisResultUseCase,
@@ -45,6 +46,7 @@ import {
   GetSerologyResultByIdQueryHandler,
   GetSerologyResultsByPatientIdQueryHandler,
   GetLabTestResultByIdQueryHandler,
+  GetLabTestResultByLabRequestIdQueryHandler,
   GetAllLabTestResultsQueryHandler,
   GetBloodChemistryByPatientIdQueryHandler,
   LaboratoryMapper,
@@ -74,8 +76,6 @@ import {
   UpdateFecalysisResultCommand,
   CreateSerologyResultCommand,
   UpdateSerologyResultCommand,
-  DeleteLabTestResultCommand,
-  UpdateLabTestResultCommand,
 } from '@nx-starter/application-shared';
 import { ApiResponseBuilder, ApiSuccessResponse } from '../dto/ApiResponse';
 
@@ -91,6 +91,8 @@ export class LaboratoryController {
     private createLabRequestUseCase: CreateLabRequestUseCase,
     @inject(TOKENS.UpdateLabRequestResultsUseCase)
     private updateLabRequestResultsUseCase: UpdateLabRequestResultsUseCase,
+    @inject(TOKENS.UpdateLabRequestStatusByIdUseCase)
+    private updateLabRequestStatusByIdUseCase: UpdateLabRequestStatusByIdUseCase,
     @inject(TOKENS.CreateBloodChemistryUseCase)
     private createBloodChemistryUseCase: CreateBloodChemistryUseCase,
     @inject(TOKENS.CreateLabTestResultUseCase)
@@ -159,6 +161,8 @@ export class LaboratoryController {
     private getSerologyResultsByPatientIdQueryHandler: GetSerologyResultsByPatientIdQueryHandler,
     @inject(TOKENS.GetLabTestResultByIdQueryHandler)
     private getLabTestResultByIdQueryHandler: GetLabTestResultByIdQueryHandler,
+    @inject(TOKENS.GetLabTestResultByLabRequestIdQueryHandler)
+    private getLabTestResultByLabRequestIdQueryHandler: GetLabTestResultByLabRequestIdQueryHandler,
     @inject(TOKENS.GetAllLabTestResultsQueryHandler)
     private getAllLabTestResultsQueryHandler: GetAllLabTestResultsQueryHandler,
     @inject(TOKENS.UpdateLabTestResultUseCase)
@@ -205,9 +209,9 @@ export class LaboratoryController {
   }
 
   /**
-   * GET /api/laboratory/requests/:patientId - Get lab request by patient ID (most recent)
+   * GET /api/laboratory/requests/patient/:patientId - Get lab request by patient ID (most recent)
    */
-  @Get('/requests/:patientId')
+  @Get('/requests/patient/:patientId')
   async getLabRequestByPatientId(@Param('patientId') patientId: string): Promise<LabRequestResponse> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     const labRequest = await this.getLabRequestByPatientIdQueryHandler.execute(validatedPatientId);
@@ -256,6 +260,21 @@ export class LaboratoryController {
     const labRequestDto = LaboratoryMapper.toLabRequestDto(labRequest);
 
     return ApiResponseBuilder.success(labRequestDto);
+  }
+
+  /**
+   * PUT /api/laboratory/requests/:id/cancel - Cancel a lab request
+   */
+  @Put('/requests/:id/cancel')
+  async cancelLabRequest(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
+    const validatedId = LabRequestIdSchema.parse(id);
+    
+    await this.updateLabRequestStatusByIdUseCase.execute({
+      labRequestId: validatedId,
+      status: 'cancelled'
+    });
+
+    return ApiResponseBuilder.successWithMessage('Lab request cancelled successfully');
   }
 
   /**
@@ -326,6 +345,18 @@ export class LaboratoryController {
   async getLabTestResultById(@Param('id') id: string): Promise<LabTestResultResponse> {
     const validatedId = LabRequestIdSchema.parse(id);
     const labTestResult = await this.getLabTestResultByIdQueryHandler.execute(validatedId);
+    const labTestResultDto = LaboratoryMapper.toLabTestResultDto(labTestResult);
+
+    return ApiResponseBuilder.success(labTestResultDto);
+  }
+
+  /**
+   * GET /api/laboratory/test-results/by-request/:labRequestId - Get lab test result by lab request ID
+   */
+  @Get('/test-results/by-request/:labRequestId')
+  async getLabTestResultByLabRequestId(@Param('labRequestId') labRequestId: string): Promise<LabTestResultResponse> {
+    const validatedId = LabRequestIdSchema.parse(labRequestId);
+    const labTestResult = await this.getLabTestResultByLabRequestIdQueryHandler.execute(validatedId);
     const labTestResultDto = LaboratoryMapper.toLabTestResultDto(labTestResult);
 
     return ApiResponseBuilder.success(labTestResultDto);

@@ -1,12 +1,11 @@
 import { injectable, inject } from 'tsyringe';
 import { 
   CreateLabRequestCommand, 
-  CreateBloodChemistryCommand,
   CreateLabTestResultRequestDto,
+  UpdateLabTestResultRequestDto,
   LabRequestResponse,
   LabRequestListResponse,
   LabTestListResponse,
-  BloodChemistryResponse,
   LaboratoryOperationResponse,
   LabTestResultResponse,
   TOKENS 
@@ -178,26 +177,6 @@ export class LaboratoryApiService implements ILaboratoryApiService {
   }
 
   /**
-   * Create blood chemistry results
-   */
-  async createBloodChemistry(command: CreateBloodChemistryCommand): Promise<BloodChemistryResponse> {
-    try {
-      console.log('🧪 Creating blood chemistry results:', command);
-      
-      const response = await this.httpClient.post<BloodChemistryResponse>('/api/laboratory/blood-chemistry', command);
-      
-      console.log('✅ Blood chemistry results created successfully');
-      return response.data;
-    } catch (error) {
-      console.error('❌ Error creating blood chemistry results:', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to create blood chemistry results'
-      } as BloodChemistryResponse;
-    }
-  }
-
-  /**
    * Create lab test result
    */
   async createLabTestResult(request: CreateLabTestResultRequestDto): Promise<LabTestResultResponse> {
@@ -218,22 +197,82 @@ export class LaboratoryApiService implements ILaboratoryApiService {
   }
 
   /**
-   * Get blood chemistry results by patient ID
+   * Get lab test result by ID
    */
-  async getBloodChemistryByPatientId(patientId: string): Promise<BloodChemistryResponse> {
+  async getLabTestResultById(id: string): Promise<LabTestResultResponse> {
     try {
-      console.log('🧪 Fetching blood chemistry results for patient:', patientId);
+      console.log('🔍 Fetching lab test result for ID:', id);
       
-      const response = await this.httpClient.get<BloodChemistryResponse>(`/api/laboratory/blood-chemistry/${patientId}`);
+      const response = await this.httpClient.get<LabTestResultResponse>(`/api/laboratory/test-results/${id}`);
       
-      console.log('✅ Blood chemistry results fetched successfully');
+      console.log('✅ Lab test result fetched successfully for ID:', id);
       return response.data;
     } catch (error) {
-      console.error('❌ Error fetching blood chemistry results:', error);
+      console.error('❌ Error fetching lab test result for ID:', id, error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch blood chemistry results'
-      } as BloodChemistryResponse;
+        message: error instanceof Error ? error.message : 'Failed to fetch lab test result'
+      } as LabTestResultResponse;
+    }
+  }
+
+  /**
+   * Get lab test result by lab request ID
+   */
+  async getLabTestResultByLabRequestId(labRequestId: string): Promise<LabTestResultResponse> {
+    try {
+      console.log('🔍 Fetching lab test result for lab request ID:', labRequestId);
+      
+      const response = await this.httpClient.get<LabTestResultResponse>(`/api/laboratory/test-results/by-request/${labRequestId}`);
+      
+      console.log('✅ Lab test result fetched successfully for lab request ID:', labRequestId);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error fetching lab test result for lab request ID:', labRequestId, error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fetch lab test result'
+      } as LabTestResultResponse;
+    }
+  }
+
+  /**
+   * Update lab test result by ID
+   */
+  async updateLabTestResult(id: string, request: UpdateLabTestResultRequestDto): Promise<LabTestResultResponse> {
+    try {
+      console.log('🔄 Updating lab test result ID:', id, 'with data:', request);
+      
+      const response = await this.httpClient.put<LabTestResultResponse>(`/api/laboratory/test-results/${id}`, request);
+      
+      console.log('✅ Lab test result updated successfully');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error updating lab test result:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to update lab test result'
+      } as LabTestResultResponse;
+    }
+  }
+
+  /**
+   * Cancel a lab request
+   */
+  async cancelLabRequest(id: string): Promise<LaboratoryOperationResponse> {
+    try {
+      console.log('🚫 Cancelling lab request:', id);
+
+      const response = await this.httpClient.put(`/api/laboratory/requests/${id}/cancel`);
+      
+      console.log('✅ Lab request cancelled successfully');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error cancelling lab request:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to cancel lab request'
+      } as LaboratoryOperationResponse;
     }
   }
 }
