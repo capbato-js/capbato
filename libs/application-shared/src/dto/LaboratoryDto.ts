@@ -418,9 +418,11 @@ export interface LabTestResultDto {
     ft3?: number;
     ft4?: number;
     tsh?: number;
-    dengueIgg?: string;
-    dengueIgm?: string;
-    dengueNs1?: string;
+  };
+  dengue?: {
+    igg?: string;
+    igm?: string;
+    ns1?: string;
   };
   ecg?: {
     av?: string;
@@ -511,9 +513,11 @@ export interface CreateLabTestResultRequestDto {
     ft3?: number;
     ft4?: number;
     tsh?: number;
-    dengueIgg?: string;
-    dengueIgm?: string;
-    dengueNs1?: string;
+  };
+  dengue?: {
+    igg?: string;
+    igm?: string;
+    ns1?: string;
   };
   ecg?: {
     av?: string;

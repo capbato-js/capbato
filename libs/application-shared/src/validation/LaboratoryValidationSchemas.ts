@@ -450,9 +450,12 @@ export const SerologyResultsSchema = z.object({
   ft3: z.number().min(0).max(50).optional(),
   ft4: z.number().min(0).max(50).optional(),
   tsh: z.number().min(0).max(100).optional(),
-  dengueIgg: z.string().max(50).optional(),
-  dengueIgm: z.string().max(50).optional(),
-  dengueNs1: z.string().max(50).optional(),
+}).optional();
+
+export const DengueResultsSchema = z.object({
+  igg: z.string().max(50).optional(),
+  igm: z.string().max(50).optional(),
+  ns1: z.string().max(50).optional(),
 }).optional();
 
 export const EcgResultsSchema = z.object({
@@ -487,11 +490,12 @@ export const CreateLabTestResultCommandSchema = z.object({
   hematology: HematologyResultsSchema,
   fecalysis: FecalysisResultsSchema,
   serology: SerologyResultsSchema,
+  dengue: DengueResultsSchema,
   ecg: EcgResultsSchema,
   coagulation: CoagulationResultsSchema,
   remarks: z.string().max(500).optional(),
 }).refine(
-  (data) => data.bloodChemistry || data.urinalysis || data.hematology || data.fecalysis || data.serology || data.ecg || data.coagulation,
+  (data) => data.bloodChemistry || data.urinalysis || data.hematology || data.fecalysis || data.serology || data.dengue || data.ecg || data.coagulation,
   {
     message: 'At least one test result type must be provided',
     path: ['testResults'],
@@ -547,6 +551,7 @@ export const UpdateLabTestResultCommandSchema = z.object({
   hematology: HematologyResultsSchema.optional(),
   fecalysis: FecalysisResultsSchema.optional(),
   serology: SerologyResultsSchema.optional(),
+  dengue: DengueResultsSchema.optional(),
   ecg: EcgResultsSchema.optional(),
   coagulation: CoagulationResultsSchema.optional(),
   remarks: z.string().max(500).optional(),
@@ -559,6 +564,7 @@ export const UpdateLabTestResultCommandSchema = z.object({
       data.hematology,
       data.fecalysis,
       data.serology,
+      data.dengue,
       data.ecg,
       data.coagulation
     ];
@@ -614,6 +620,7 @@ export type DeleteLabTestResultCommand = z.infer<typeof DeleteLabTestResultComma
 export type HematologyResults = z.infer<typeof HematologyResultsSchema>;
 export type FecalysisResults = z.infer<typeof FecalysisResultsSchema>;
 export type SerologyResults = z.infer<typeof SerologyResultsSchema>;
+export type DengueResults = z.infer<typeof DengueResultsSchema>;
 export type EcgResults = z.infer<typeof EcgResultsSchema>;
 export type CoagulationResults = z.infer<typeof CoagulationResultsSchema>;
 

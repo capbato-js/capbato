@@ -1101,9 +1101,11 @@ export class LaboratoryMapper {
         ft3: result.serology.ft3,
         ft4: result.serology.ft4,
         tsh: result.serology.tsh,
-        dengueIgg: result.serology.dengueIgg,
-        dengueIgm: result.serology.dengueIgm,
-        dengueNs1: result.serology.dengueNs1,
+      } : undefined,
+      dengue: result.dengue ? {
+        igg: result.dengue.igg,
+        igm: result.dengue.igm,
+        ns1: result.dengue.ns1,
       } : undefined,
       ecg: result.ecg ? {
         av: result.ecg.av,

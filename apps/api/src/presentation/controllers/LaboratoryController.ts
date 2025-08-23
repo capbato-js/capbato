@@ -12,6 +12,7 @@ import {
 import {
   CreateLabRequestUseCase,
   UpdateLabRequestResultsUseCase,
+  UpdateLabRequestStatusByIdUseCase,
   CreateBloodChemistryUseCase,
   CreateUrinalysisResultUseCase,
   UpdateUrinalysisResultUseCase,
@@ -74,8 +75,6 @@ import {
   UpdateFecalysisResultCommand,
   CreateSerologyResultCommand,
   UpdateSerologyResultCommand,
-  DeleteLabTestResultCommand,
-  UpdateLabTestResultCommand,
 } from '@nx-starter/application-shared';
 import { ApiResponseBuilder, ApiSuccessResponse } from '../dto/ApiResponse';
 
@@ -91,6 +90,8 @@ export class LaboratoryController {
     private createLabRequestUseCase: CreateLabRequestUseCase,
     @inject(TOKENS.UpdateLabRequestResultsUseCase)
     private updateLabRequestResultsUseCase: UpdateLabRequestResultsUseCase,
+    @inject(TOKENS.UpdateLabRequestStatusByIdUseCase)
+    private updateLabRequestStatusByIdUseCase: UpdateLabRequestStatusByIdUseCase,
     @inject(TOKENS.CreateBloodChemistryUseCase)
     private createBloodChemistryUseCase: CreateBloodChemistryUseCase,
     @inject(TOKENS.CreateLabTestResultUseCase)
@@ -205,9 +206,9 @@ export class LaboratoryController {
   }
 
   /**
-   * GET /api/laboratory/requests/:patientId - Get lab request by patient ID (most recent)
+   * GET /api/laboratory/requests/patient/:patientId - Get lab request by patient ID (most recent)
    */
-  @Get('/requests/:patientId')
+  @Get('/requests/patient/:patientId')
   async getLabRequestByPatientId(@Param('patientId') patientId: string): Promise<LabRequestResponse> {
     const validatedPatientId = LabRequestIdSchema.parse(patientId);
     const labRequest = await this.getLabRequestByPatientIdQueryHandler.execute(validatedPatientId);
@@ -278,6 +279,21 @@ export class LaboratoryController {
     await this.updateLabRequestResultsUseCase.execute(validatedData);
 
     return ApiResponseBuilder.successWithMessage('Lab results updated successfully');
+  }
+
+  /**
+   * PUT /api/laboratory/requests/:id/cancel - Cancel a lab request
+   */
+  @Put('/requests/:id/cancel')
+  async cancelLabRequest(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
+    const validatedId = LabRequestIdSchema.parse(id);
+    
+    await this.updateLabRequestStatusByIdUseCase.execute({
+      labRequestId: validatedId,
+      status: 'cancelled'
+    });
+
+    return ApiResponseBuilder.successWithMessage('Lab request cancelled successfully');
   }
 
   /**

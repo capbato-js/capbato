@@ -135,9 +135,13 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
       entity.resultSerologyFt3 = domain.serology.ft3;
       entity.resultSerologyFt4 = domain.serology.ft4;
       entity.resultSerologyTsh = domain.serology.tsh;
-      entity.resultSerologyDengueIgg = domain.serology.dengueIgg;
-      entity.resultSerologyDengueIgm = domain.serology.dengueIgm;
-      entity.resultSerologyDengueNs1 = domain.serology.dengueNs1;
+    }
+
+    // Map dengue results
+    if (domain.dengue) {
+      entity.resultDengueIgg = domain.dengue.igg;
+      entity.resultDengueIgm = domain.dengue.igm;
+      entity.resultDengueNs1 = domain.dengue.ns1;
     }
 
     // Map ECG results
@@ -238,9 +242,13 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
       ft3: entity.resultSerologyFt3,
       ft4: entity.resultSerologyFt4,
       tsh: entity.resultSerologyTsh,
-      dengueIgg: entity.resultSerologyDengueIgg,
-      dengueIgm: entity.resultSerologyDengueIgm,
-      dengueNs1: entity.resultSerologyDengueNs1,
+    } : undefined;
+
+    // Map dengue results
+    const dengue = this.hasDengueResults(entity) ? {
+      igg: entity.resultDengueIgg,
+      igm: entity.resultDengueIgm,
+      ns1: entity.resultDengueNs1,
     } : undefined;
 
     // Map ECG results
@@ -276,6 +284,7 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
       hematology,
       fecalysis,
       serology,
+      dengue,
       ecg,
       coagulation,
       entity.remarks,
@@ -358,10 +367,15 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
     return !!(
       entity.resultSerologyFt3 ||
       entity.resultSerologyFt4 ||
-      entity.resultSerologyTsh ||
-      entity.resultSerologyDengueIgg ||
-      entity.resultSerologyDengueIgm ||
-      entity.resultSerologyDengueNs1
+      entity.resultSerologyTsh
+    );
+  }
+
+  private hasDengueResults(entity: LabTestResultEntity): boolean {
+    return !!(
+      entity.resultDengueIgg ||
+      entity.resultDengueIgm ||
+      entity.resultDengueNs1
     );
   }
 
