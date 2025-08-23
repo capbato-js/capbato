@@ -9,7 +9,7 @@ interface LaboratoryTestsTableProps {
   isLoading: boolean;
   errorMessage: string | null;
   onViewTest: (test: LabTest) => void;
-  onEditTest: () => void;
+  onEditTest: (test: LabTest) => void;
   onAddResult: (test: LabTest) => void;
   onCancelTest: (test: LabTest) => void;
 }
@@ -131,7 +131,7 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
         {
           icon: 'fas fa-edit',
           tooltip: 'Update Result',
-          onClick: () => onEditTest()
+          onClick: () => onEditTest(test)
         }
       ];
     } else if (test.status === 'Pending') {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
@@ -26,6 +26,7 @@ interface AddLabTestResultFormProps {
   testType?: LabTestType;
   enabledFields?: string[]; // Array of field IDs that should be enabled (e.g., ['blood_chemistry_fbs', 'blood_chemistry_bun'])
   viewMode?: boolean; // If true, all fields are read-only and form shows existing data
+  isUpdate?: boolean; // If true, this is an update operation rather than create
   existingData?: AddLabTestResultFormData; // Pre-populate form with existing results
   patientData?: {
     patientNumber?: string;
@@ -48,6 +49,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   testType = 'BLOOD_CHEMISTRY',
   enabledFields, // Array of field IDs that should be enabled
   viewMode = false, // Read-only mode for viewing existing results
+  isUpdate = false, // Update mode flag
   existingData, // Pre-populated data for view mode
   patientData,
   onSubmit,
@@ -66,10 +68,19 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   const {
     register,
     handleSubmit,
+    reset,
   } = useForm<AddLabTestResultFormData>({
     resolver: zodResolver(schema),
-    defaultValues: existingData || {}, // Pre-populate with existing data in view mode
+    defaultValues: existingData || {}, // Pre-populate with existing data
   });
+
+  // Reset form when existingData changes (for edit mode)
+  useEffect(() => {
+    if (existingData) {
+      console.log('🔄 Resetting form with existing data:', existingData);
+      reset(existingData);
+    }
+  }, [existingData, reset]);
 
   const handleFormSubmit = (data: AddLabTestResultFormData) => {
     // Remove empty/undefined values to clean the form data
@@ -335,7 +346,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                 disabled={isLoading}
                 leftSection={<Icon icon="fas fa-save" size={14} />}
               >
-                Submit
+                {isUpdate ? 'Update Result' : 'Submit Result'}
               </Button>
             )}
           </Box>

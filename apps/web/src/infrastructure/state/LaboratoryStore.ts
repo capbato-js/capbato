@@ -4,6 +4,7 @@ import {
   LabRequestDto,
   LabTestDto,
   CreateLabTestResultRequestDto,
+  UpdateLabTestResultRequestDto,
   LabTestResultDto,
   TOKENS
 } from '@nx-starter/application-shared';
@@ -45,6 +46,7 @@ interface LaboratoryStore {
   createLabTestResult: (request: CreateLabTestResultRequestDto) => Promise<boolean>;
   fetchLabTestResultById: (id: string) => Promise<LabTestResultDto | null>;
   fetchLabTestResultByLabRequestId: (labRequestId: string) => Promise<LabTestResultDto | null>;
+  updateLabTestResult: (id: string, request: UpdateLabTestResultRequestDto) => Promise<boolean>;
   clearErrors: () => void;
   reset: () => void;
 }
@@ -417,6 +419,37 @@ export const useLaboratoryStore = create<LaboratoryStore>((set, get) => {
           errorStates: { ...state.errorStates, fetchError: errorMessage }
         }));
         return null;
+      }
+    },
+
+    updateLabTestResult: async (id: string, request: UpdateLabTestResultRequestDto): Promise<boolean> => {
+      set(state => ({
+        ...state,
+        loadingStates: { ...state.loadingStates, updating: true },
+        errorStates: { ...state.errorStates, updateError: null }
+      }));
+
+      try {
+        const laboratoryApiService = getLaboratoryApiService();
+        const response = await laboratoryApiService.updateLabTestResult(id, request);
+        
+        if (response.success) {
+          set(state => ({
+            ...state,
+            loadingStates: { ...state.loadingStates, updating: false }
+          }));
+          return true;
+        }
+        
+        throw new Error(response.message || 'Failed to update lab test result');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, updating: false },
+          errorStates: { ...state.errorStates, updateError: errorMessage }
+        }));
+        return false;
       }
     },
 

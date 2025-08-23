@@ -20,6 +20,7 @@ export const LaboratoryTestsPage: React.FC = () => {
     // Modal state
     addResultModalOpened,
     viewResultModalOpened,
+    isUpdateMode,
     
     // Actions
     handleBackToLaboratory,
@@ -47,7 +48,7 @@ export const LaboratoryTestsPage: React.FC = () => {
         isLoading={isLoading}
         errorMessage={errorStates.fetchError}
         onViewTest={handleViewTest}
-        onEditTest={handleEditTest}
+  onEditTest={handleEditTest}
         onAddResult={handleAddResult}
         onCancelTest={handleCancelTest}
       />
@@ -63,6 +64,7 @@ export const LaboratoryTestsPage: React.FC = () => {
         bloodChemistryData={bloodChemistryData}
         isLoading={isLoading}
         error={error}
+        isUpdateMode={isUpdateMode}
       />
     </MedicalClinicLayout>
   );

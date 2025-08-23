@@ -25,11 +25,12 @@ export interface LaboratoryTestsViewModelReturn {
   // Modal state
   addResultModalOpened: boolean;
   viewResultModalOpened: boolean;
+  isUpdateMode: boolean;
   
   // Actions
   handleBackToLaboratory: () => void;
   handleViewTest: (test: LabTest) => Promise<void>;
-  handleEditTest: () => void;
+  handleEditTest: (test: LabTest) => void;
   handleAddResult: (test: LabTest) => void;
   handleCancelTest: (test: LabTest) => void;
   handleCloseModal: () => void;
@@ -56,6 +57,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   // Modal state
   const [addResultModalOpened, setAddResultModalOpened] = useState(false);
   const [viewResultModalOpened, setViewResultModalOpened] = useState(false);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [selectedLabTest, setSelectedLabTest] = useState<LabTest | null>(null);
   const [bloodChemistryData, setBloodChemistryData] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -71,6 +73,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     fetchLabRequestByPatientId,
     fetchLabTestResultByLabRequestId,
     createLabTestResult,
+    updateLabTestResult,
     loadingStates, 
     errorStates 
   } = useLaboratoryStore();
@@ -239,12 +242,48 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     }
   };
 
-  const handleEditTest = () => {
-    // TODO: Implement edit test functionality
+  const handleEditTest = async (test: LabTest) => {
+    setSelectedLabTest(test);
+    setIsUpdateMode(true);
+    
+    // Fetch and set existing result data for editing before opening modal
+    try {
+      const existingResult = await fetchLabTestResultByLabRequestId(test.id);
+      if (existingResult) {
+        console.log('🔍 Existing result found, transforming for form:', existingResult);
+        // Transform API result to form data for editing
+        const formData = LabTestResultTransformer.transformApiResultToFormData(
+          existingResult,
+          test.testCategory
+        );
+        console.log('📝 Transformed form data:', formData);
+        setBloodChemistryData(formData);
+      } else {
+        console.log('⚠️ No existing result found');
+        setBloodChemistryData({});
+      }
+    } catch (error) {
+      console.error('❌ Error fetching existing result:', error);
+      setBloodChemistryData({});
+    }
+    
+    // Open modal after data is loaded
+    setAddResultModalOpened(true);
   };
 
-  const handleAddResult = (test: LabTest) => {
+  const handleAddResult = async (test: LabTest) => {
     setSelectedLabTest(test);
+    
+    // Check if a lab test result already exists to determine if we're updating
+    try {
+      const existingResult = await fetchLabTestResultByLabRequestId(test.id);
+      setIsUpdateMode(!!existingResult);
+      console.log(`🔍 ${existingResult ? 'Update' : 'Add'} mode for test:`, test.id);
+    } catch {
+      console.log('⚠️ Could not check existing result, defaulting to add mode');
+      setIsUpdateMode(false);
+    }
+    
     setAddResultModalOpened(true);
     setError(null);
   };
@@ -296,16 +335,44 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
         throw new Error(`Validation errors: ${validationErrors.join(', ')}`);
       }
 
-      console.log('✅ Validation passed, submitting to API...');
+      console.log('✅ Validation passed, checking if lab test result exists...');
 
-      // Call the API with our transformed payload
-      const success = await createLabTestResult(apiPayload);
+      // Check if a lab test result already exists for this lab request
+      const existingResult = await fetchLabTestResultByLabRequestId(selectedLabTest.id);
+      let success = false;
 
-      if (!success) {
-        throw new Error('Failed to submit lab test results');
+      if (existingResult) {
+        console.log('🔄 Lab test result exists, updating...', existingResult.id);
+        
+        // Create update payload using the update transformer
+        const updatePayload = LabTestResultTransformer.transformFormDataToUpdateApiPayload(
+          cleanedFormData,
+          selectedLabTest.testCategory,
+          selectedLabTest.id,
+          new Date(), // Current timestamp for dateTested
+          'Lab test results updated' // Default remarks for update
+        );
+        
+        // Update existing lab test result
+        success = await updateLabTestResult(existingResult.id, updatePayload);
+        
+        if (!success) {
+          throw new Error('Failed to update lab test results');
+        }
+        
+        console.log('🎉 Lab test results updated successfully!');
+      } else {
+        console.log('➕ No existing lab test result found, creating new...');
+        
+        // Create new lab test result
+        success = await createLabTestResult(apiPayload);
+        
+        if (!success) {
+          throw new Error('Failed to create lab test results');
+        }
+        
+        console.log('🎉 Lab test results created successfully!');
       }
-
-      console.log('🎉 Lab test results submitted successfully!');
       
       // Update the specific lab test status to "Completed" 
       setLabTests(prevTests => 
@@ -345,6 +412,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     // Modal state
     addResultModalOpened,
     viewResultModalOpened,
+    isUpdateMode,
     
     // Actions
     handleBackToLaboratory,

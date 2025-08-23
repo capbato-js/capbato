@@ -20,6 +20,7 @@ interface LaboratoryTestsModalsProps {
   bloodChemistryData: Record<string, string>;
   isLoading: boolean;
   error: string | null;
+  isUpdateMode: boolean; // Whether we're adding or updating a result
 }
 
 export const LaboratoryTestsModals: React.FC<LaboratoryTestsModalsProps> = ({
@@ -33,6 +34,7 @@ export const LaboratoryTestsModals: React.FC<LaboratoryTestsModalsProps> = ({
   bloodChemistryData,
   isLoading,
   error,
+  isUpdateMode,
 }) => {
   const getEnabledFields = (test: LabTest): string[] => {
     // Use backend-provided enabled fields directly - single source of truth
@@ -57,6 +59,8 @@ export const LaboratoryTestsModals: React.FC<LaboratoryTestsModalsProps> = ({
           <AddLabTestResultForm
             testType={selectedLabTest.testCategory}
             enabledFields={getEnabledFields(selectedLabTest)}
+            isUpdate={isUpdateMode}
+            existingData={isUpdateMode ? bloodChemistryData : undefined}
             patientData={{
               patientNumber: patientInfo.patientNumber,
               patientName: patientInfo.patientName,

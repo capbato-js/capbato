@@ -1,4 +1,4 @@
-import { CreateLabTestResultRequestDto } from '../dto/LaboratoryDto';
+import { CreateLabTestResultRequestDto, UpdateLabTestResultRequestDto } from '../dto/LaboratoryDto';
 
 // Type definitions for category-specific result data
 interface BloodChemistryData {
@@ -166,6 +166,57 @@ export class LabTestResultTransformer {
         break;
       case 'coagulation':
         payload.coagulation = this.transformCoagulationData(cleanedFormData);
+        break;
+      default:
+        console.warn(`Unknown test category: ${testCategory}`);
+        break;
+    }
+
+    return payload;
+  }
+
+  /**
+   * Transform flat form data to structured API payload for updating lab test results
+   * Similar to create but uses UpdateLabTestResultRequestDto structure
+   */
+  static transformFormDataToUpdateApiPayload(
+    formData: Record<string, string>,
+    testCategory: string,
+    labRequestId: string,
+    dateTested: Date,
+    remarks?: string
+  ): UpdateLabTestResultRequestDto {
+    const payload: UpdateLabTestResultRequestDto = {
+      labRequestId,
+      dateTested: dateTested.toISOString(),
+      remarks: remarks || 'Lab test results updated'
+    };
+
+    // Remove empty/undefined values from form data
+    const cleanedFormData = this.cleanFormData(formData);
+
+    // Group fields by category and transform data types
+    switch (testCategory) {
+      case 'bloodChemistry':
+        payload.bloodChemistry = this.transformBloodChemistryData(cleanedFormData);
+        break;
+      case 'urinalysis':
+        payload.urinalysis = this.transformUrinalysisDataForUpdate(cleanedFormData);
+        break;
+      case 'fecalysis':
+        payload.fecalysis = this.transformFecalysisDataForUpdate(cleanedFormData);
+        break;
+      case 'hematology':
+        payload.hematology = this.transformHematologyDataForUpdate(cleanedFormData);
+        break;
+      case 'serology':
+        payload.serology = this.transformSerologyDataForUpdate(cleanedFormData);
+        break;
+      case 'ecg':
+        payload.ecg = this.transformEcgDataForUpdate(cleanedFormData);
+        break;
+      case 'coagulation':
+        payload.coagulation = this.transformCoagulationDataForUpdate(cleanedFormData);
         break;
       default:
         console.warn(`Unknown test category: ${testCategory}`);
@@ -503,5 +554,129 @@ export class LabTestResultTransformer {
       default:
         return [];
     }
+  }
+
+  // ======= Update-specific transformation methods =======
+
+  /**
+   * Transform urinalysis fields for update DTO (simpler structure)
+   */
+  private static transformUrinalysisDataForUpdate(formData: Record<string, string>) {
+    const urinalysis: Record<string, string> = {};
+
+    // Fields for update DTO
+    const stringFields = [
+      'color', 'transparency', 'specificGravity', 'ph', 'protein', 'glucose',
+      'epithelialCells', 'redCells', 'pusCells', 'mucusThread', 'bacteria',
+      'amorphousUrates', 'casts', 'crystals'
+    ];
+
+    stringFields.forEach(field => {
+      if (formData[field]) {
+        urinalysis[field] = formData[field];
+      }
+    });
+
+    return Object.keys(urinalysis).length > 0 ? urinalysis : undefined;
+  }
+
+  /**
+   * Transform fecalysis fields for update DTO (different structure)
+   */
+  private static transformFecalysisDataForUpdate(formData: Record<string, string>) {
+    const fecalysis: Record<string, string> = {};
+
+    // Fields for update DTO
+    const stringFields = ['color', 'consistency', 'microscopicExam', 'occultBlood'];
+
+    stringFields.forEach(field => {
+      if (formData[field]) {
+        fecalysis[field] = formData[field];
+      }
+    });
+
+    return Object.keys(fecalysis).length > 0 ? fecalysis : undefined;
+  }
+
+  /**
+   * Transform hematology fields for update DTO (different field names)
+   */
+  private static transformHematologyDataForUpdate(formData: Record<string, string>) {
+    const hematology: Record<string, string> = {};
+
+    // Fields for update DTO (different from create)
+    const stringFields = [
+      'hemoglobin', 'hematocrit', 'wbcCount', 'rbcCount', 'plateletCount',
+      'mchc', 'mch', 'mcv', 'neutrophils', 'lymphocytes', 'monocytes',
+      'eosinophils', 'basophils'
+    ];
+    
+    stringFields.forEach(field => {
+      if (formData[field]) {
+        hematology[field] = formData[field];
+      }
+    });
+
+    return Object.keys(hematology).length > 0 ? hematology : undefined;
+  }
+
+  /**
+   * Transform serology fields for update DTO (infection tests instead of thyroid)
+   */
+  private static transformSerologyDataForUpdate(formData: Record<string, string>) {
+    const serology: Record<string, string> = {};
+
+    // Fields for update DTO (infection tests)
+    const stringFields = [
+      'vdrl', 'hepatitisB', 'hepatitisA', 'hepatitisC', 
+      'dengueTest', 'typhoidTest', 'pregnancyTest'
+    ];
+
+    stringFields.forEach(field => {
+      if (formData[field]) {
+        serology[field] = formData[field];
+      }
+    });
+
+    return Object.keys(serology).length > 0 ? serology : undefined;
+  }
+
+  /**
+   * Transform ECG fields for update DTO (simpler structure)
+   */
+  private static transformEcgDataForUpdate(formData: Record<string, string>) {
+    const ecg: Record<string, string> = {};
+
+    // Fields for update DTO
+    const stringFields = ['rhythm', 'rate', 'findings', 'interpretation'];
+
+    stringFields.forEach(field => {
+      if (formData[field]) {
+        ecg[field] = formData[field];
+      }
+    });
+
+    return Object.keys(ecg).length > 0 ? ecg : undefined;
+  }
+
+  /**
+   * Transform coagulation fields for update DTO (extended structure)
+   */
+  private static transformCoagulationDataForUpdate(formData: Record<string, string>) {
+    const coagulation: Record<string, string> = {};
+
+    // Fields for update DTO
+    const stringFields = [
+      'bleedingTime', 'clottingTime', 'plateletAggregation', 'prothrombinTime',
+      'aptt', 'inr', 'activityPercent', 'patientPtt', 'controlPtt'
+    ];
+    
+    stringFields.forEach(field => {
+      if (formData[field]) {
+        coagulation[field] = formData[field];
+      }
+    });
+
+    return Object.keys(coagulation).length > 0 ? coagulation : undefined;
   }
 }

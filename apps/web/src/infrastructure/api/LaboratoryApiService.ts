@@ -2,6 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { 
   CreateLabRequestCommand, 
   CreateLabTestResultRequestDto,
+  UpdateLabTestResultRequestDto,
   LabRequestResponse,
   LabRequestListResponse,
   LabTestListResponse,
@@ -231,6 +232,26 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       return {
         success: false,
         message: error instanceof Error ? error.message : 'Failed to fetch lab test result'
+      } as LabTestResultResponse;
+    }
+  }
+
+  /**
+   * Update lab test result by ID
+   */
+  async updateLabTestResult(id: string, request: UpdateLabTestResultRequestDto): Promise<LabTestResultResponse> {
+    try {
+      console.log('🔄 Updating lab test result ID:', id, 'with data:', request);
+      
+      const response = await this.httpClient.put<LabTestResultResponse>(`/api/laboratory/test-results/${id}`, request);
+      
+      console.log('✅ Lab test result updated successfully');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error updating lab test result:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to update lab test result'
       } as LabTestResultResponse;
     }
   }

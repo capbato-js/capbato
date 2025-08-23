@@ -5,6 +5,7 @@ import {
   LabTestListResponse,
   LaboratoryOperationResponse,
   CreateLabTestResultRequestDto,
+  UpdateLabTestResultRequestDto,
   LabTestResultResponse
 } from '@nx-starter/application-shared';
 
@@ -60,4 +61,9 @@ export interface ILaboratoryApiService {
    * Get lab test result by lab request ID
    */
   getLabTestResultByLabRequestId(labRequestId: string): Promise<LabTestResultResponse>;
+
+  /**
+   * Update lab test result by ID
+   */
+  updateLabTestResult(id: string, request: UpdateLabTestResultRequestDto): Promise<LabTestResultResponse>;
 }
