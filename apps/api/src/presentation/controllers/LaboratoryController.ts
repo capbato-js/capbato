@@ -263,6 +263,21 @@ export class LaboratoryController {
   }
 
   /**
+   * PUT /api/laboratory/requests/:id/cancel - Cancel a lab request
+   */
+  @Put('/requests/:id/cancel')
+  async cancelLabRequest(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
+    const validatedId = LabRequestIdSchema.parse(id);
+    
+    await this.updateLabRequestStatusByIdUseCase.execute({
+      labRequestId: validatedId,
+      status: 'cancelled'
+    });
+
+    return ApiResponseBuilder.successWithMessage('Lab request cancelled successfully');
+  }
+
+  /**
    * PUT /api/laboratory/requests/:patientId/:requestDate - Update lab request results
    */
   @Put('/requests/:patientId/:requestDate')
@@ -282,21 +297,6 @@ export class LaboratoryController {
     await this.updateLabRequestResultsUseCase.execute(validatedData);
 
     return ApiResponseBuilder.successWithMessage('Lab results updated successfully');
-  }
-
-  /**
-   * PUT /api/laboratory/requests/:id/cancel - Cancel a lab request
-   */
-  @Put('/requests/:id/cancel')
-  async cancelLabRequest(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
-    const validatedId = LabRequestIdSchema.parse(id);
-    
-    await this.updateLabRequestStatusByIdUseCase.execute({
-      labRequestId: validatedId,
-      status: 'cancelled'
-    });
-
-    return ApiResponseBuilder.successWithMessage('Lab request cancelled successfully');
   }
 
   /**
