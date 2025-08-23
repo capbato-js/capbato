@@ -417,4 +417,146 @@ describe('LabTestResultTransformer', () => {
       expect(result.ecg).toBeUndefined();
     });
   });
+
+  describe('transformApiResultToFormData', () => {
+    it('should transform API blood chemistry result to form data', () => {
+      const apiResult = {
+        bloodChemistry: {
+          fbs: 5.2,
+          cholesterol: 200,
+          triglycerides: 150,
+          hdl: 50,
+          ldl: 120,
+          others: 'Normal findings'
+        }
+      };
+
+      const result = LabTestResultTransformer.transformApiResultToFormData(
+        apiResult,
+        'bloodChemistry'
+      );
+
+      expect(result).toEqual({
+        fbs: '5.2',
+        cholesterol: '200',
+        triglycerides: '150',
+        hdl: '50',
+        ldl: '120',
+        others: 'Normal findings'
+      });
+    });
+
+    it('should transform API ECG result to form data', () => {
+      const apiResult = {
+        ecg: {
+          av: '1',
+          qrs: '2',
+          axis: '3',
+          pr: '4',
+          qt: '5',
+          rhythm: 'Regular',
+          interpretation: 'Normal ECG',
+          interpreter: 'Dr. Smith'
+        }
+      };
+
+      const result = LabTestResultTransformer.transformApiResultToFormData(
+        apiResult,
+        'ecg'
+      );
+
+      expect(result).toEqual({
+        av: '1',
+        qrs: '2',
+        axis: '3',
+        pr: '4',
+        qt: '5',
+        rhythm: 'Regular',
+        interpretation: 'Normal ECG',
+        interpreter: 'Dr. Smith'
+      });
+    });
+
+    it('should return empty object when no category data exists', () => {
+      const apiResult = {
+        bloodChemistry: {
+          fbs: 5.2,
+          cholesterol: 200
+        }
+      };
+
+      const result = LabTestResultTransformer.transformApiResultToFormData(
+        apiResult,
+        'ecg' // Different category
+      );
+
+      expect(result).toEqual({});
+    });
+
+    it('should return empty object when apiResult is null or undefined', () => {
+      const result1 = LabTestResultTransformer.transformApiResultToFormData(
+        {} as never,
+        'bloodChemistry'
+      );
+
+      const result2 = LabTestResultTransformer.transformApiResultToFormData(
+        {} as never,
+        'bloodChemistry'
+      );
+
+      expect(result1).toEqual({});
+      expect(result2).toEqual({});
+    });
+
+    it('should handle null and undefined values in category data', () => {
+      const apiResult = {
+        bloodChemistry: {
+          fbs: 5.2,
+          cholesterol: undefined, // Changed from null to undefined to match interface
+          triglycerides: undefined,
+          hdl: 50,
+          others: ''
+        }
+      };
+
+      const result = LabTestResultTransformer.transformApiResultToFormData(
+        apiResult,
+        'bloodChemistry'
+      );
+
+      expect(result).toEqual({
+        fbs: '5.2',
+        hdl: '50',
+        others: ''
+      });
+    });
+  });
+
+  describe('getCategoryFields', () => {
+    it('should return correct fields for blood chemistry', () => {
+      const fields = LabTestResultTransformer.getCategoryFields('bloodChemistry');
+      
+      expect(fields).toContain('fbs');
+      expect(fields).toContain('cholesterol');
+      expect(fields).toContain('triglycerides');
+      expect(fields).toContain('others');
+      expect(fields.length).toBeGreaterThan(10);
+    });
+
+    it('should return correct fields for ECG', () => {
+      const fields = LabTestResultTransformer.getCategoryFields('ecg');
+      
+      expect(fields).toContain('av');
+      expect(fields).toContain('qrs');
+      expect(fields).toContain('rhythm');
+      expect(fields).toContain('interpretation');
+      expect(fields).toContain('interpreter');
+    });
+
+    it('should return empty array for unknown category', () => {
+      const fields = LabTestResultTransformer.getCategoryFields('unknownCategory');
+      
+      expect(fields).toEqual([]);
+    });
+  });
 });

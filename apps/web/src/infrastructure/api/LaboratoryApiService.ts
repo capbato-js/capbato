@@ -194,4 +194,44 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       } as LabTestResultResponse;
     }
   }
+
+  /**
+   * Get lab test result by ID
+   */
+  async getLabTestResultById(id: string): Promise<LabTestResultResponse> {
+    try {
+      console.log('🔍 Fetching lab test result for ID:', id);
+      
+      const response = await this.httpClient.get<LabTestResultResponse>(`/api/laboratory/test-results/${id}`);
+      
+      console.log('✅ Lab test result fetched successfully for ID:', id);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error fetching lab test result for ID:', id, error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fetch lab test result'
+      } as LabTestResultResponse;
+    }
+  }
+
+  /**
+   * Get lab test result by lab request ID
+   */
+  async getLabTestResultByLabRequestId(labRequestId: string): Promise<LabTestResultResponse> {
+    try {
+      console.log('🔍 Fetching lab test result for lab request ID:', labRequestId);
+      
+      const response = await this.httpClient.get<LabTestResultResponse>(`/api/laboratory/test-results/by-request/${labRequestId}`);
+      
+      console.log('✅ Lab test result fetched successfully for lab request ID:', labRequestId);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error fetching lab test result for lab request ID:', labRequestId, error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fetch lab test result'
+      } as LabTestResultResponse;
+    }
+  }
 }

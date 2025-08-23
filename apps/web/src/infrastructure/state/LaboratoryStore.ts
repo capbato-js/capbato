@@ -43,6 +43,8 @@ interface LaboratoryStore {
     results: Record<string, string>
   ) => Promise<boolean>;
   createLabTestResult: (request: CreateLabTestResultRequestDto) => Promise<boolean>;
+  fetchLabTestResultById: (id: string) => Promise<LabTestResultDto | null>;
+  fetchLabTestResultByLabRequestId: (labRequestId: string) => Promise<LabTestResultDto | null>;
   clearErrors: () => void;
   reset: () => void;
 }
@@ -353,6 +355,68 @@ export const useLaboratoryStore = create<LaboratoryStore>((set, get) => {
           errorStates: { ...state.errorStates, createError: errorMessage }
         }));
         return false;
+      }
+    },
+
+    fetchLabTestResultById: async (id: string): Promise<LabTestResultDto | null> => {
+      set(state => ({
+        ...state,
+        loadingStates: { ...state.loadingStates, fetching: true },
+        errorStates: { ...state.errorStates, fetchError: null }
+      }));
+
+      try {
+        const laboratoryApiService = getLaboratoryApiService();
+        const response = await laboratoryApiService.getLabTestResultById(id);
+        
+        if (response.success && response.data) {
+          set(state => ({
+            ...state,
+            loadingStates: { ...state.loadingStates, fetching: false }
+          }));
+          return response.data;
+        }
+        
+        throw new Error(response.message || 'Failed to fetch lab test result');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, fetching: false },
+          errorStates: { ...state.errorStates, fetchError: errorMessage }
+        }));
+        return null;
+      }
+    },
+
+    fetchLabTestResultByLabRequestId: async (labRequestId: string): Promise<LabTestResultDto | null> => {
+      set(state => ({
+        ...state,
+        loadingStates: { ...state.loadingStates, fetching: true },
+        errorStates: { ...state.errorStates, fetchError: null }
+      }));
+
+      try {
+        const laboratoryApiService = getLaboratoryApiService();
+        const response = await laboratoryApiService.getLabTestResultByLabRequestId(labRequestId);
+        
+        if (response.success && response.data) {
+          set(state => ({
+            ...state,
+            loadingStates: { ...state.loadingStates, fetching: false }
+          }));
+          return response.data;
+        }
+        
+        throw new Error(response.message || 'Failed to fetch lab test result');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, fetching: false },
+          errorStates: { ...state.errorStates, fetchError: errorMessage }
+        }));
+        return null;
       }
     },
 

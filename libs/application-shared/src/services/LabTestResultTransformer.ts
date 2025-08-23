@@ -105,6 +105,18 @@ interface CoagulationData {
   controlPtt?: string;
 }
 
+// Interface for API result data structure
+interface ApiResultData {
+  bloodChemistry?: BloodChemistryData;
+  urinalysis?: UrinalysisData;
+  fecalysis?: FecalysisData;
+  hematology?: HematologyData;
+  serology?: SerologyData;
+  dengue?: DengueData;
+  ecg?: EcgData;
+  coagulation?: CoagulationData;
+}
+
 /**
  * Transforms flat form data into structured API payload for lab test results
  * Ensures proper data types and category grouping for backend API
@@ -421,5 +433,75 @@ export class LabTestResultTransformer {
         errors.push(`${field.replace(/([A-Z])/g, ' $1').toUpperCase()} cannot be empty`);
       }
     });
+  }
+
+  /**
+   * Transform structured API result data back to flat form data for display
+   * Used when viewing existing lab test results
+   */
+  static transformApiResultToFormData(
+    apiResult: ApiResultData,
+    testCategory: string
+  ): Record<string, string> {
+    if (!apiResult || !testCategory) {
+      return {};
+    }
+
+    // Get the category-specific data from the API result
+    const categoryData = (apiResult as Record<string, unknown>)[testCategory];
+    if (!categoryData || typeof categoryData !== 'object' || categoryData === null) {
+      return {};
+    }
+
+    // Convert all values to strings for form display
+    const formData: Record<string, string> = {};
+    
+    Object.entries(categoryData as Record<string, unknown>).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        // Convert all values to strings for form inputs
+        formData[key] = String(value);
+      }
+    });
+
+    return formData;
+  }
+
+  /**
+   * Get all category-specific fields for a test type
+   * Used for validation and form rendering
+   */
+  static getCategoryFields(testCategory: string): string[] {
+    switch (testCategory) {
+      case 'bloodChemistry':
+        return [
+          'fbs', 'bun', 'creatinine', 'uricAcid', 'cholesterol', 'triglycerides',
+          'hdl', 'ldl', 'vldl', 'sodium', 'potassium', 'sgot', 'sgpt', 'hba1c',
+          'alkPhosphatase', 'totalBilirubin', 'directBilirubin', 'indirectBilirubin',
+          'totalProtein', 'albumin', 'globulin', 'agRatio', 'inorgPhosphorus', 'others'
+        ];
+      case 'urinalysis':
+        return [
+          'color', 'transparency', 'specificGravity', 'ph', 'protein', 'glucose',
+          'epithelialCells', 'redCells', 'pusCells', 'mucusThread', 'amorphousUrates',
+          'amorphousPhosphate', 'crystals', 'bacteria', 'others', 'pregnancyTest'
+        ];
+      case 'fecalysis':
+        return ['color', 'consistency', 'rbc', 'wbc', 'occultBlood', 'urobilinogen', 'others'];
+      case 'hematology':
+        return [
+          'hematocrit', 'hemoglobin', 'rbc', 'wbc', 'segmenters', 'lymphocyte',
+          'monocyte', 'basophils', 'eosinophils', 'platelet', 'others'
+        ];
+      case 'serology':
+        return ['ft3', 'ft4', 'tsh'];
+      case 'dengue':
+        return ['igg', 'igm', 'ns1'];
+      case 'ecg':
+        return ['av', 'qrs', 'axis', 'pr', 'qt', 'stT', 'rhythm', 'others', 'interpretation', 'interpreter'];
+      case 'coagulation':
+        return ['patientPt', 'controlPt', 'inr', 'activityPercent', 'patientPtt', 'controlPtt'];
+      default:
+        return [];
+    }
   }
 }

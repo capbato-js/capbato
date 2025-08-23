@@ -50,4 +50,14 @@ export interface ILaboratoryApiService {
    * Create lab test result
    */
   createLabTestResult(request: CreateLabTestResultRequestDto): Promise<LabTestResultResponse>;
+
+  /**
+   * Get lab test result by ID
+   */
+  getLabTestResultById(id: string): Promise<LabTestResultResponse>;
+
+  /**
+   * Get lab test result by lab request ID
+   */
+  getLabTestResultByLabRequestId(labRequestId: string): Promise<LabTestResultResponse>;
 }

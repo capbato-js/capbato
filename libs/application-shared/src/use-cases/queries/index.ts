@@ -37,6 +37,7 @@ export * from './GetAllSerologyResultsQueryHandler';
 export * from './GetSerologyResultByIdQueryHandler';
 export * from './GetSerologyResultsByPatientIdQueryHandler';
 export * from './GetLabTestResultByIdQueryHandler';
+export * from './GetLabTestResultByLabRequestIdQueryHandler';
 export * from './GetAllLabTestResultsQueryHandler';
 export * from './GetBloodChemistryByPatientIdQueryHandler';
 export * from './PrescriptionQueryHandlers';

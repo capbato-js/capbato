@@ -46,6 +46,7 @@ import {
   GetSerologyResultByIdQueryHandler,
   GetSerologyResultsByPatientIdQueryHandler,
   GetLabTestResultByIdQueryHandler,
+  GetLabTestResultByLabRequestIdQueryHandler,
   GetAllLabTestResultsQueryHandler,
   GetBloodChemistryByPatientIdQueryHandler,
   LaboratoryMapper,
@@ -160,6 +161,8 @@ export class LaboratoryController {
     private getSerologyResultsByPatientIdQueryHandler: GetSerologyResultsByPatientIdQueryHandler,
     @inject(TOKENS.GetLabTestResultByIdQueryHandler)
     private getLabTestResultByIdQueryHandler: GetLabTestResultByIdQueryHandler,
+    @inject(TOKENS.GetLabTestResultByLabRequestIdQueryHandler)
+    private getLabTestResultByLabRequestIdQueryHandler: GetLabTestResultByLabRequestIdQueryHandler,
     @inject(TOKENS.GetAllLabTestResultsQueryHandler)
     private getAllLabTestResultsQueryHandler: GetAllLabTestResultsQueryHandler,
     @inject(TOKENS.UpdateLabTestResultUseCase)
@@ -342,6 +345,18 @@ export class LaboratoryController {
   async getLabTestResultById(@Param('id') id: string): Promise<LabTestResultResponse> {
     const validatedId = LabRequestIdSchema.parse(id);
     const labTestResult = await this.getLabTestResultByIdQueryHandler.execute(validatedId);
+    const labTestResultDto = LaboratoryMapper.toLabTestResultDto(labTestResult);
+
+    return ApiResponseBuilder.success(labTestResultDto);
+  }
+
+  /**
+   * GET /api/laboratory/test-results/by-request/:labRequestId - Get lab test result by lab request ID
+   */
+  @Get('/test-results/by-request/:labRequestId')
+  async getLabTestResultByLabRequestId(@Param('labRequestId') labRequestId: string): Promise<LabTestResultResponse> {
+    const validatedId = LabRequestIdSchema.parse(labRequestId);
+    const labTestResult = await this.getLabTestResultByLabRequestIdQueryHandler.execute(validatedId);
     const labTestResultDto = LaboratoryMapper.toLabTestResultDto(labTestResult);
 
     return ApiResponseBuilder.success(labTestResultDto);

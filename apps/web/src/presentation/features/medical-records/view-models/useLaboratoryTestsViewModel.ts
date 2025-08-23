@@ -69,6 +69,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   const { 
     fetchLabTestsByPatientId,
     fetchLabRequestByPatientId,
+    fetchLabTestResultByLabRequestId,
     createLabTestResult,
     loadingStates, 
     errorStates 
@@ -195,21 +196,47 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   };
 
   const handleViewTest = async (test: LabTest) => {
-    setSelectedLabTest(test);
-    
-    // Fetch blood chemistry data if it's a blood chemistry test
-    if (test.testCategory === 'bloodChemistry' && patientId) {
-      try {
-        // TODO: Implement fetchBloodChemistryByPatientId when available
-        console.warn('Blood chemistry fetching not implemented yet');
+    try {
+      setSelectedLabTest(test);
+      setError(null);
+      
+      console.log('🔍 Viewing test result for lab request ID:', test.id, 'category:', test.testCategory);
+      
+      // Fetch the actual lab test result data using the lab request ID
+      // test.id is actually the lab request ID, we need to get the lab test result by lab request ID
+      const resultData = await fetchLabTestResultByLabRequestId(test.id);
+      
+      if (resultData) {
+        console.log('✅ Lab test result data fetched:', resultData);
+        
+        // Transform structured data to flat form data for display
+        const formData = LabTestResultTransformer.transformApiResultToFormData(
+          resultData, 
+          test.testCategory
+        );
+        
+        console.log('🔄 Transformed form data for display:', formData);
+        
+        // Set the form data based on the test category
+        setBloodChemistryData(formData);
+        
+        setViewResultModalOpened(true);
+      } else {
+        console.warn('⚠️ No result data found for test ID:', test.id);
+        setError('No test results found for this test');
+        
+        // Still open modal but with empty data
         setBloodChemistryData({});
-      } catch (error) {
-        console.error('Error fetching blood chemistry data:', error);
-        setBloodChemistryData({});
+        setViewResultModalOpened(true);
       }
+    } catch (error) {
+      console.error('❌ Error viewing test result:', error);
+      setError('Failed to load test results');
+      
+      // Open modal with empty data in case of error
+      setBloodChemistryData({});
+      setViewResultModalOpened(true);
     }
-    
-    setViewResultModalOpened(true);
   };
 
   const handleEditTest = () => {
