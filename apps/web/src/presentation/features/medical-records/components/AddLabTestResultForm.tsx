@@ -72,7 +72,12 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   });
 
   const handleFormSubmit = (data: AddLabTestResultFormData) => {
-    onSubmit(data);
+    // Remove empty/undefined values to clean the form data
+    const cleanedData = Object.entries(data)
+      .filter(([, value]) => value !== undefined && value !== '' && value !== null)
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+    onSubmit(cleanedData);
   };
 
   // Reusable field component

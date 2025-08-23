@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../../../components/common';
-import { AddLabTestResultForm } from './AddLabTestResultForm';
+import { AddLabTestResultForm, AddLabTestResultFormData } from './AddLabTestResultForm';
 import { LabTest } from '../types';
 import { PatientInfo } from '../view-models/useLaboratoryTestsViewModel';
 
@@ -8,7 +8,7 @@ interface LaboratoryTestsModalsProps {
   // Add Result Modal
   addResultModalOpened: boolean;
   onCloseAddResultModal: () => void;
-  onSubmitResult: () => Promise<void>;
+  onSubmitResult: (formData: AddLabTestResultFormData) => Promise<void>;
   
   // View Result Modal
   viewResultModalOpened: boolean;

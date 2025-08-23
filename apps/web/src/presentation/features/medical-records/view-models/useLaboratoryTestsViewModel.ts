@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LabTest } from '../types';
+import { AddLabTestResultFormData } from '../components/AddLabTestResultForm';
+import { LabTestResultTransformer } from '@nx-starter/application-shared';
 import { useLaboratoryStore } from '../../../../infrastructure/state/LaboratoryStore';
 import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 
@@ -31,7 +33,7 @@ export interface LaboratoryTestsViewModelReturn {
   handleAddResult: (test: LabTest) => void;
   handleCancelTest: (test: LabTest) => void;
   handleCloseModal: () => void;
-  handleSubmitResult: () => Promise<void>;
+  handleSubmitResult: (formData: AddLabTestResultFormData) => Promise<void>;
   setViewResultModalOpened: (opened: boolean) => void;
   
   // Store states
@@ -67,6 +69,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   const { 
     fetchLabTestsByPatientId,
     fetchLabRequestByPatientId,
+    createLabTestResult,
     loadingStates, 
     errorStates 
   } = useLaboratoryStore();
@@ -225,7 +228,7 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     setError(null);
   };
 
-  const handleSubmitResult = async () => {
+  const handleSubmitResult = async (formData: AddLabTestResultFormData) => {
     setIsLoading(true);
     setError(null);
     
@@ -234,9 +237,48 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
         throw new Error('Missing required patient information or selected lab test');
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('✅ Lab test results submitted successfully!');
+      console.log('🔄 Starting lab test result submission...');
+      console.log('📋 Form data received:', formData);
+      console.log('🧪 Test category:', selectedLabTest.testCategory);
+      console.log('📊 Enabled fields:', selectedLabTest.enabledFields);
+
+      // Convert formData to Record<string, string> by filtering out undefined values
+      const cleanedFormData: Record<string, string> = Object.entries(formData)
+        .filter(([, value]) => value !== undefined && value !== '' && value !== null)
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value as string }), {});
+
+      // Transform flat form data to structured API payload using our transformer
+      const apiPayload = LabTestResultTransformer.transformFormDataToApiPayload(
+        cleanedFormData,
+        selectedLabTest.testCategory,
+        selectedLabTest.id, // This is the labRequestId
+        new Date(), // Current timestamp for dateTested
+        'Lab test results submitted' // Default remarks
+      );
+
+      console.log('✨ Transformed API payload:', apiPayload);
+
+      // Validate the transformed data before submission
+      const validationErrors = LabTestResultTransformer.validateFormData(
+        cleanedFormData,
+        selectedLabTest.enabledFields || [],
+        selectedLabTest.testCategory
+      );
+
+      if (validationErrors.length > 0) {
+        throw new Error(`Validation errors: ${validationErrors.join(', ')}`);
+      }
+
+      console.log('✅ Validation passed, submitting to API...');
+
+      // Call the API with our transformed payload
+      const success = await createLabTestResult(apiPayload);
+
+      if (!success) {
+        throw new Error('Failed to submit lab test results');
+      }
+
+      console.log('🎉 Lab test results submitted successfully!');
       
       // Update the specific lab test status to "Completed" 
       setLabTests(prevTests => 
