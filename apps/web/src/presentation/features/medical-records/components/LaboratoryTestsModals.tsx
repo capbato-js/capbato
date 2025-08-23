@@ -20,10 +20,6 @@ interface LaboratoryTestsModalsProps {
   bloodChemistryData: Record<string, string>;
   isLoading: boolean;
   error: string | null;
-  
-  // Utility functions
-  mapLabRequestFieldsToFormIds: (tests: string[]) => string[];
-  expandLipidProfile: (tests: string[]) => string[];
 }
 
 export const LaboratoryTestsModals: React.FC<LaboratoryTestsModalsProps> = ({
@@ -37,12 +33,10 @@ export const LaboratoryTestsModals: React.FC<LaboratoryTestsModalsProps> = ({
   bloodChemistryData,
   isLoading,
   error,
-  mapLabRequestFieldsToFormIds,
-  expandLipidProfile
 }) => {
   const getEnabledFields = (test: LabTest): string[] => {
-    const mappedTests = mapLabRequestFieldsToFormIds(test.tests);
-    return expandLipidProfile(mappedTests);
+    // Use backend-provided enabled fields directly - single source of truth
+    return test.enabledFields || [];
   };
 
   return (

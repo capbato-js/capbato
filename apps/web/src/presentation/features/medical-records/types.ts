@@ -40,6 +40,7 @@ export interface LabTest {
   status: 'Completed' | 'Confirmed' | 'Pending' | 'In Progress';
   results?: string;
   patientId?: string;
+  enabledFields: string[]; // Backend-driven field enabling based on original lab request
   // Backward compatibility - computed display value
   testName?: string; // Deprecated: Use testCategory and tests instead
 }

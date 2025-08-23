@@ -11,6 +11,7 @@ import { LabRequestStatus } from '@nx-starter/domain';
 import { LabRequestId } from '@nx-starter/domain';
 import { BloodChemistryPatientInfo } from '@nx-starter/domain';
 import { BloodChemistryResults } from '@nx-starter/domain';
+import { LabTestFieldMappingService } from '../services/LabTestFieldMappingService';
 import {
   LabRequestDto,
   BloodChemistryDto,
@@ -103,6 +104,10 @@ export class LaboratoryMapper {
     // Create backward compatibility testName for transition period
     const testName = this.generateLegacyTestName(testCategory, testDisplayNames);
 
+    // Get enabled fields based on original lab request using the mapping service
+    const allEnabledFields = LabTestFieldMappingService.getEnabledFields(labRequest.tests.tests);
+    const categoryEnabledFields = allEnabledFields[testCategory] || [];
+
     return {
       id: labRequest.id?.value || '',
       testCategory,
@@ -114,6 +119,7 @@ export class LaboratoryMapper {
       status,
       results: labRequest.status.value === 'completed' ? 'Available' : undefined,
       patientId: labRequest.patientInfo.patientId,
+      enabledFields: categoryEnabledFields, // Backend-driven field enabling
       // Backward compatibility
       testName,
     };
@@ -184,7 +190,7 @@ export class LaboratoryMapper {
 
     return {
       id: bloodChemistry.id?.value || '',
-      testCategory: 'BLOOD_CHEMISTRY',
+      testCategory: 'bloodChemistry',
       tests: availableTests,
       testDisplayNames: displayNames,
       date: bloodChemistry.dateTaken instanceof Date 
@@ -193,6 +199,7 @@ export class LaboratoryMapper {
       status: 'Completed', // Blood chemistry results are always completed once created
       results: 'Available',
       patientId: bloodChemistry.patientInfo.patientId || bloodChemistry.patientInfo.patientName, // Use patient ID if available, fallback to name
+      enabledFields: availableTests.concat(['others']), // Enable fields based on available results
       testName,
     };
   }

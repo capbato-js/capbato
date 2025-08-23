@@ -33,10 +33,6 @@ export const LaboratoryTestsPage: React.FC = () => {
     
     // Store states
     errorStates,
-    
-    // Utility functions for components
-    mapLabRequestFieldsToFormIds,
-    expandLipidProfile
   } = useLaboratoryTestsViewModel();
 
   return (
@@ -67,8 +63,6 @@ export const LaboratoryTestsPage: React.FC = () => {
         bloodChemistryData={bloodChemistryData}
         isLoading={isLoading}
         error={error}
-        mapLabRequestFieldsToFormIds={mapLabRequestFieldsToFormIds}
-        expandLipidProfile={expandLipidProfile}
       />
     </MedicalClinicLayout>
   );

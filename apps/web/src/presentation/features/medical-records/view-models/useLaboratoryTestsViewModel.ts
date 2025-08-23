@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { LabTest } from '../types';
 import { useLaboratoryStore } from '../../../../infrastructure/state/LaboratoryStore';
 import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
-import { useLabTestFieldMapping } from '../hooks/useLabTestFieldMapping';
 
 export interface PatientInfo {
   patientNumber: string;
@@ -46,16 +45,11 @@ export interface LaboratoryTestsViewModelReturn {
     fetchError: string | null;
     updateError: string | null;
   };
-  
-  // Utility functions for components
-  mapLabRequestFieldsToFormIds: (tests: string[]) => string[];
-  expandLipidProfile: (tests: string[]) => string[];
 }
 
 export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
-  const { mapLabRequestFieldsToFormIds, expandLipidProfile } = useLabTestFieldMapping();
   
   // Modal state
   const [addResultModalOpened, setAddResultModalOpened] = useState(false);
@@ -103,22 +97,18 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
         // Then fetch lab tests
         const fetchedLabTests = await fetchLabTestsByPatientId(patientId);
         
-        // Convert LabTestDto[] to LabTest[] and apply field mapping
+        // Convert LabTestDto[] to LabTest[] - backend now provides enabledFields
         const convertedLabTests: LabTest[] = fetchedLabTests.map((dto) => {
-          // Apply field mapping and lipid profile expansion to the tests
-          const originalTests = dto.tests || [];
-          const mappedTests = mapLabRequestFieldsToFormIds(originalTests);
-          const expandedTests = expandLipidProfile(mappedTests);
-          
-          const converted = {
+          const converted: LabTest = {
             id: dto.id || `test-${Date.now()}`,
             testCategory: dto.testCategory || 'bloodChemistry', // Use backend category directly
-            tests: expandedTests, // Use the processed tests
+            tests: dto.tests || [], // Use backend-provided tests directly
             testDisplayNames: dto.testDisplayNames || [],
             date: dto.date || new Date().toISOString(),
             status: dto.status || 'Pending',
             results: dto.results,
             patientId: dto.patientId,
+            enabledFields: dto.enabledFields || [], // Backend-provided field enabling
             testName: dto.testName
           };
           
@@ -300,9 +290,5 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     // Store states
     loadingStates,
     errorStates,
-    
-    // Utility functions for components
-    mapLabRequestFieldsToFormIds,
-    expandLipidProfile
   };
 };
