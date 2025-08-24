@@ -39,6 +39,7 @@ export const useEditLabTestResultViewModel = (): EditLabTestResultViewModelRetur
   const [selectedLabTest, setSelectedLabTest] = useState<LabTest | null>(navigationLabTest || null);
   const [patientInfo, setPatientInfo] = useState<PatientInfo | null>(null);
   const [bloodChemistryData, setBloodChemistryData] = useState<Record<string, string>>({});
+  const [labTestResultId, setLabTestResultId] = useState<string | null>(null); // Store actual lab test result ID
   const [isLoading, setIsLoading] = useState(false); // For initial data loading
   const [isSubmitting, setIsSubmitting] = useState(false); // For form submission
   const [error, setError] = useState<string | null>(null);
@@ -143,6 +144,9 @@ export const useEditLabTestResultViewModel = (): EditLabTestResultViewModelRetur
           try {
             const existingResult = await fetchLabTestResultByLabRequestId(testId);
             if (existingResult) {
+              // Store the actual lab test result ID for updates
+              setLabTestResultId(existingResult.id);
+              
               const formData = LabTestResultTransformer.transformApiResultToFormData(
                 existingResult,
                 navigationLabTest.testCategory
@@ -232,6 +236,9 @@ export const useEditLabTestResultViewModel = (): EditLabTestResultViewModelRetur
           try {
             const existingResult = await fetchLabTestResultByLabRequestId(testId);
             if (existingResult) {
+              // Store the actual lab test result ID for updates
+              setLabTestResultId(existingResult.id);
+              
               const formData = LabTestResultTransformer.transformApiResultToFormData(
                 existingResult,
                 labTest.testCategory
@@ -258,18 +265,25 @@ export const useEditLabTestResultViewModel = (): EditLabTestResultViewModelRetur
   }, [patientId, testId, navigationLabTest, fetchLabTestsByPatientId, fetchLabRequestByPatientId, fetchLabTestResultByLabRequestId]);
 
   const handleFormSubmit = useCallback(async (formData: AddLabTestResultFormData) => {
-    if (!selectedLabTest || !patientId || !testId) return;
+    if (!selectedLabTest || !patientId || !labTestResultId) {
+      setError('Missing required data - lab test result ID not found');
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const transformedData = LabTestResultTransformer.transformFormDataToApiResult(
+      const transformedData = LabTestResultTransformer.transformFormDataToUpdateApiPayload(
         formData,
-        selectedLabTest.testCategory
+        selectedLabTest.testCategory,
+        selectedLabTest.id, // labRequestId
+        new Date(), // dateTested
+        'Lab test results updated'
       );
 
-      await updateLabTestResult(testId, transformedData);
+      // Use the actual lab test result ID (not the lab request ID)
+      await updateLabTestResult(labTestResultId, transformedData);
       
       // Navigate back to the tests list
       navigate(`/laboratory/tests/${patientId}`);
@@ -279,7 +293,7 @@ export const useEditLabTestResultViewModel = (): EditLabTestResultViewModelRetur
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedLabTest, patientId, testId, updateLabTestResult, navigate]);
+  }, [selectedLabTest, patientId, labTestResultId, updateLabTestResult, navigate]);
 
   const handleCancel = useCallback(() => {
     navigate(`/laboratory/tests/${patientId}`);

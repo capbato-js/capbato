@@ -212,6 +212,9 @@ export class LabTestResultTransformer {
       case 'serology':
         payload.serology = this.transformSerologyDataForUpdate(cleanedFormData);
         break;
+      case 'dengue':
+        payload.dengue = this.transformDengueData(cleanedFormData);
+        break;
       case 'ecg':
         payload.ecg = this.transformEcgDataForUpdate(cleanedFormData);
         break;

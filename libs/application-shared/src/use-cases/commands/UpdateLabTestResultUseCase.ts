@@ -32,7 +32,7 @@ export class UpdateLabTestResultUseCase {
       command.hematology !== undefined ? command.hematology : existingLabTestResult.hematology,
       command.fecalysis !== undefined ? command.fecalysis : existingLabTestResult.fecalysis,
       command.serology !== undefined ? command.serology : existingLabTestResult.serology,
-      existingLabTestResult.dengue, // Keep existing dengue results (not updated by command)
+      command.dengue !== undefined ? command.dengue : existingLabTestResult.dengue,
       command.ecg !== undefined ? command.ecg : existingLabTestResult.ecg,
       command.coagulation !== undefined ? command.coagulation : existingLabTestResult.coagulation,
       command.remarks !== undefined ? command.remarks : existingLabTestResult.remarks,
