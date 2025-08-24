@@ -509,6 +509,7 @@ export const CreateLabTestResultCommandSchema = z.object({
       data.hematology,
       data.fecalysis,
       data.serology,
+      data.dengue,
       data.ecg,
       data.coagulation
     ];

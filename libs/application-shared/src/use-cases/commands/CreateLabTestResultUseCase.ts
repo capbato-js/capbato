@@ -104,6 +104,11 @@ export class CreateLabTestResultUseCase {
       this.validateSerologyResults(providedResults.serology, requestedTests);
     }
 
+    // Validate dengue results
+    if (providedResults.dengue) {
+      this.validateDengueResults(providedResults.dengue, requestedTests);
+    }
+
     // Validate ECG results
     if (providedResults.ecg) {
       this.validateEcgResults(providedResults.ecg, requestedTests);
@@ -363,6 +368,23 @@ export class CreateLabTestResultUseCase {
     const hasSerologyValues = serologyValues.some(value => value !== undefined && value !== null && value !== '');
     if (!hasSerologyValues) {
       throw new Error('Serology tests were requested but no result values provided');
+    }
+  }
+
+  /**
+   * Validates dengue results against requested tests
+   */
+  private validateDengueResults(results: any, requestedTests: any): void {
+    // Check if dengue test was requested in serology category
+    if (!requestedTests.tests || !requestedTests.tests.serology || !requestedTests.tests.serology.dengueNs1) {
+      throw new Error('Dengue results provided but dengue test was not requested');
+    }
+
+    // Validate that dengue results contain actual values
+    const dengueValues = Object.values(results);
+    const hasDengueValues = dengueValues.some(value => value !== undefined && value !== null && value !== '');
+    if (!hasDengueValues) {
+      throw new Error('Dengue test was requested but no result values provided');
     }
   }
 
