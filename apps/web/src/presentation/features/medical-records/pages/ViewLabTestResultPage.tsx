@@ -54,7 +54,7 @@ export const ViewLabTestResultPage: React.FC = () => {
         viewMode={true}
         enabledFields={viewModel.selectedLabTest?.enabledFields || []}
         existingData={viewModel.bloodChemistryData}
-        isLoadingData={!viewModel.selectedLabTest || !viewModel.patientInfo}
+        isLoadingData={viewModel.isLoading}
         patientData={{
           patientNumber: viewModel.patientInfo?.patientNumber || '',
           patientName: viewModel.patientInfo?.patientName || '',

@@ -53,7 +53,7 @@ export const AddLabTestResultPage: React.FC = () => {
         testType={viewModel.selectedLabTest?.testCategory}
         enabledFields={viewModel.selectedLabTest?.enabledFields || []}
         existingData={undefined}
-        isLoadingData={!viewModel.selectedLabTest || !viewModel.patientInfo}
+        isLoadingData={viewModel.isLoading}
         submitButtonText="Submit Result"
         patientData={{
           patientNumber: viewModel.patientInfo?.patientNumber || '',

@@ -173,12 +173,16 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
 
   const handleEditTest = (labTest: LabTest) => {
     console.log('✏️ Editing lab test:', labTest);
-    navigate(`/laboratory/tests/${patientId}/edit-result/${labTest.id}`);
+    navigate(`/laboratory/tests/${patientId}/edit-result/${labTest.id}`, {
+      state: { labTest }
+    });
   };
 
   const handleAddResult = (labTest: LabTest) => {
     console.log('➕ Adding result for lab test:', labTest);
-    navigate(`/laboratory/tests/${patientId}/add-result/${labTest.id}`);
+    navigate(`/laboratory/tests/${patientId}/add-result/${labTest.id}`, {
+      state: { labTest }
+    });
   };
 
   // Cancel confirmation handlers
