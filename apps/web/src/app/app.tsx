@@ -7,7 +7,7 @@ import { DashboardPage } from '../presentation/features/dashboard';
 import { AppointmentsPage } from '../presentation/features/appointments';
 import { PatientsPage, AddPatientPage, EditPatientPage } from '../presentation/features/patients';
 import { PatientDetailsPage } from '../presentation/features/patients/pages/PatientDetailsPage';
-import { LaboratoryPage, LaboratoryTestsPage, PrescriptionsPage, AddLabTestPage } from '../presentation/features/medical-records';
+import { LaboratoryPage, LaboratoryTestsPage, PrescriptionsPage, AddLabTestPage, AddLabTestResultPage, EditLabTestResultPage, ViewLabTestResultPage } from '../presentation/features/medical-records';
 import { TransactionsPage } from '../presentation/features/transactions';
 import { DoctorsPage, AccountsPage } from '../presentation/features/staff';
 import { AuthGuard, RoleGuard } from '../presentation/features/auth';
@@ -74,6 +74,21 @@ function App() {
         <Route path="/laboratory/tests/:patientId" element={
           <AuthGuard requireAuth={true}>
             <LaboratoryTestsPage />
+          </AuthGuard>
+        } />
+        <Route path="/laboratory/tests/:patientId/add-result/:testId" element={
+          <AuthGuard requireAuth={true}>
+            <AddLabTestResultPage />
+          </AuthGuard>
+        } />
+        <Route path="/laboratory/tests/:patientId/edit-result/:testId" element={
+          <AuthGuard requireAuth={true}>
+            <EditLabTestResultPage />
+          </AuthGuard>
+        } />
+        <Route path="/laboratory/tests/:patientId/view-result/:testId" element={
+          <AuthGuard requireAuth={true}>
+            <ViewLabTestResultPage />
           </AuthGuard>
         } />
         <Route path="/prescriptions" element={

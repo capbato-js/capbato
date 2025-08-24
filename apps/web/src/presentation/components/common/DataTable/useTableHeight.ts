@@ -1,4 +1,4 @@
-import { useState, useEffect, RefObject } from 'react';
+import { useState, useEffect, RefObject, useMemo } from 'react';
 
 interface UseTableHeightOptions {
   enabled: boolean;
@@ -11,16 +11,19 @@ export function useTableHeight(
   containerRef: RefObject<HTMLElement | null>,
   options: UseTableHeightOptions
 ): string | number {
-  const {
-    enabled,
-    bottomPadding = 20,
-    minHeight = 200,
-    fallbackHeight = '400px'
-  } = options;
+  const [calculatedHeight, setCalculatedHeight] = useState<string | number>(options.fallbackHeight || '400px');
 
-  const [calculatedHeight, setCalculatedHeight] = useState<string | number>(fallbackHeight);
+  // Memoize options to prevent unnecessary effect reruns
+  const memoizedOptions = useMemo(() => ({
+    enabled: options.enabled,
+    bottomPadding: options.bottomPadding ?? 20,
+    minHeight: options.minHeight ?? 200,
+    fallbackHeight: options.fallbackHeight ?? '400px'
+  }), [options.enabled, options.bottomPadding, options.minHeight, options.fallbackHeight]);
 
   useEffect(() => {
+    const { enabled, bottomPadding, minHeight, fallbackHeight } = memoizedOptions;
+    
     console.log('[useTableHeight] Hook called with:', { enabled, fallbackHeight });
     
     if (!enabled) {
@@ -86,7 +89,7 @@ export function useTableHeight(
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [enabled, bottomPadding, minHeight, fallbackHeight]);
+  }, [containerRef, memoizedOptions]); // Use memoized options instead of individual props
 
-  return enabled ? calculatedHeight : fallbackHeight;
+  return memoizedOptions.enabled ? calculatedHeight : memoizedOptions.fallbackHeight;
 }

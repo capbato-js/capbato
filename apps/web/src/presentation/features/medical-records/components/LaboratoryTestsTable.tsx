@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useMantineTheme } from '@mantine/core';
 import { DataTable, TableColumn } from '../../../components/common/DataTable';
 import { TableActionButtons, ActionButtonConfig } from '../../../components/common/TableActionButtons';
@@ -25,8 +25,7 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
 }) => {
   const theme = useMantineTheme();
 
-  // Helper function to format test display name from new structure
-  const formatTestDisplayName = (test: LabTest): string => {
+  const formatTestDisplayName = useCallback((test: LabTest): string => {
     console.log('🧪 formatTestDisplayName called with test:', {
       id: test.id,
       testName: test.testName,
@@ -34,7 +33,7 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
       tests: test.tests,
       testDisplayNames: test.testDisplayNames
     });
-    
+
     // Priority 1: Use testName if available (already formatted from API)
     if (test.testName && test.testName.trim() !== '') {
       console.log('✅ Using testName:', test.testName);
@@ -61,9 +60,7 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
     const result = test.testCategory?.replace('_', ' ') || 'Test: N/A';
     console.log('⚠️ Using final fallback:', result);
     return result;
-  };
-
-  const getStatusBadge = (status: LabTest['status']) => {
+  }, []);  const getStatusBadge = useCallback((status: LabTest['status']) => {
     const styles = {
       'Completed': {
         background: theme.colors.green[1],
@@ -127,9 +124,9 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
         {status}
       </span>
     );
-  };
+  }, [theme]);
 
-  const getActionButtons = (test: LabTest): ActionButtonConfig[] => {
+  const getActionButtons = useCallback((test: LabTest): ActionButtonConfig[] => {
     if (test.status === 'Confirmed' || test.status === 'Completed') {
       return [
         {
@@ -158,18 +155,18 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
       ];
     }
     return [];
-  };
+  }, [onViewTest, onEditTest, onAddResult, onCancelTest]);
 
-  const getResultsContent = (test: LabTest) => {
+  const getResultsContent = useCallback((test: LabTest) => {
     const actions = getActionButtons(test);
     if (actions.length > 0) {
       return <TableActionButtons actions={actions} />;
     }
     return null;
-  };
+  }, [getActionButtons]);
 
-  // Define columns for the DataTable
-  const columns: TableColumn<LabTest>[] = [
+  // Define columns for the DataTable - memoized to prevent infinite re-renders
+  const columns: TableColumn<LabTest>[] = useMemo(() => [
     {
       key: 'testName',
       header: 'Lab Test',
@@ -205,23 +202,18 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
       align: 'center',
       render: (_value: string | undefined, record: LabTest) => getResultsContent(record)
     }
-  ];
+  ], [formatTestDisplayName, getStatusBadge, getResultsContent]);
 
   return (
-    <>
-      {/* Debug: Log current labTests state before rendering table */}
-      {console.log('📊 Rendering DataTable with labTests:', labTests)}
-      
-      <DataTable
-        data={labTests}
-        columns={columns}
-        searchable={true}
-        searchPlaceholder="Search lab tests by name, date, or status..."
-        emptyStateMessage={errorMessage ? `Error: ${errorMessage}` : "No lab tests found"}
-        useViewportHeight={true}
-        bottomPadding={90}
-        isLoading={isLoading}
-      />
-    </>
+    <DataTable
+      data={labTests}
+      columns={columns}
+      searchable={true}
+      searchPlaceholder="Search lab tests by name, date, or status..."
+      emptyStateMessage={errorMessage ? `Error: ${errorMessage}` : "No lab tests found"}
+      useViewportHeight={true}
+      bottomPadding={90}
+      isLoading={isLoading}
+    />
   );
 };

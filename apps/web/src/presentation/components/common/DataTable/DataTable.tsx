@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Box, TextInput, Table, Skeleton, useMantineTheme, ActionIcon, Tooltip, ScrollArea } from '@mantine/core';
 import { DataTableProps, SearchableItem } from './types';
 import { useTableHeight } from './useTableHeight';
@@ -27,21 +27,28 @@ export function DataTable<T extends SearchableItem>({
   const headerRef = useRef<HTMLTableSectionElement>(null);
   const [actualHeaderHeight, setActualHeaderHeight] = useState<number>(60);
 
-  // Measure actual header height dynamically
-  useEffect(() => {
-    const measureHeaderHeight = () => {
-      if (headerRef.current) {
-        const measuredHeight = headerRef.current.offsetHeight;
-        const safeHeight = Math.max(measuredHeight, 50); // Minimum 50px
-        console.log('[DataTable] Header height measured:', {
-          measuredHeight,
-          safeHeight,
-          previousHeight: actualHeaderHeight
-        });
-        setActualHeaderHeight(safeHeight);
-      }
-    };
+  // Measure actual header height dynamically - memoized to prevent infinite loops
+  const measureHeaderHeight = useCallback(() => {
+    if (headerRef.current) {
+      const measuredHeight = headerRef.current.offsetHeight;
+      const safeHeight = Math.max(measuredHeight, 50); // Minimum 50px
+      
+      // Only update if height actually changed to prevent unnecessary re-renders
+      setActualHeaderHeight(prevHeight => {
+        if (prevHeight !== safeHeight) {
+          console.log('[DataTable] Header height measured:', {
+            measuredHeight,
+            safeHeight,
+            previousHeight: prevHeight
+          });
+          return safeHeight;
+        }
+        return prevHeight;
+      });
+    }
+  }, []); // No dependencies - the function is stable
 
+  useEffect(() => {
     // Initial measurement
     measureHeaderHeight();
 
@@ -50,12 +57,19 @@ export function DataTable<T extends SearchableItem>({
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           const newHeight = Math.max(entry.contentRect.height, 50);
-          console.log('[DataTable] Header resized:', {
-            oldHeight: actualHeaderHeight,
-            newHeight,
-            contentRect: entry.contentRect
+          
+          // Only update if height actually changed
+          setActualHeaderHeight(prevHeight => {
+            if (prevHeight !== newHeight) {
+              console.log('[DataTable] Header resized:', {
+                oldHeight: prevHeight,
+                newHeight,
+                contentRect: entry.contentRect
+              });
+              return newHeight;
+            }
+            return prevHeight;
           });
-          setActualHeaderHeight(newHeight);
         }
       });
 
@@ -67,10 +81,9 @@ export function DataTable<T extends SearchableItem>({
     }
 
     // Fallback: Re-measure on window resize
-    const handleResize = () => measureHeaderHeight();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [columns]); // Re-run when columns change
+    window.addEventListener('resize', measureHeaderHeight);
+    return () => window.removeEventListener('resize', measureHeaderHeight);
+  }, [measureHeaderHeight]); // Only depend on the memoized function
 
   const dynamicHeight = useTableHeight(tableContainerRef, {
     enabled: useViewportHeight,

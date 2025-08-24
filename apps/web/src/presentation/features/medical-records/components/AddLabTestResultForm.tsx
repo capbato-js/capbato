@@ -8,6 +8,7 @@ import {
   Title,
   Text,
   Divider,
+  Skeleton,
 } from '@mantine/core';
 import { Icon } from '../../../components/common/Icon';
 import { 
@@ -26,8 +27,9 @@ interface AddLabTestResultFormProps {
   testType?: LabTestType;
   enabledFields?: string[]; // Array of field IDs that should be enabled (e.g., ['blood_chemistry_fbs', 'blood_chemistry_bun'])
   viewMode?: boolean; // If true, all fields are read-only and form shows existing data
-  isUpdate?: boolean; // If true, this is an update operation rather than create
   existingData?: AddLabTestResultFormData; // Pre-populate form with existing results
+  isLoadingData?: boolean; // If true, show skeletons for dynamic content
+  submitButtonText?: string; // Static text for submit button (e.g., "Submit Result" or "Update Result")
   patientData?: {
     patientNumber?: string;
     patientName?: string;
@@ -41,7 +43,7 @@ interface AddLabTestResultFormProps {
   };
   onSubmit: (data: AddLabTestResultFormData) => void;
   onCancel?: () => void;
-  isLoading?: boolean;
+  isSubmitting?: boolean; // If true, show loading on submit button
   error?: string | null;
 }
 
@@ -49,12 +51,13 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
   testType = 'BLOOD_CHEMISTRY',
   enabledFields, // Array of field IDs that should be enabled
   viewMode = false, // Read-only mode for viewing existing results
-  isUpdate = false, // Update mode flag
   existingData, // Pre-populated data for view mode
+  isLoadingData = false, // Show skeletons while loading
+  submitButtonText = 'Submit Result', // Default button text
   patientData,
   onSubmit,
   onCancel,
-  isLoading = false,
+  isSubmitting = false, // Show loading only on button during submission
   error = null,
 }) => {
   // Generate dynamic schema and config based on test type
@@ -169,14 +172,25 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
             <Text size="sm" fw={700} style={{ margin: '0' }}>
               LICENSE NUMBER. 1-3-CL-592-06-P
             </Text>
-            <Title order={3} style={{ 
-              margin: '10px 0', 
-              color: '#cc0000', 
-              letterSpacing: '3px',
-              fontSize: '18px'
-            }}>
-              {testConfig.title}
-            </Title>
+            {isLoadingData ? (
+              <Skeleton 
+                height={24} 
+                width={300} 
+                style={{ 
+                  margin: '10px auto', 
+                  borderRadius: '4px'
+                }}
+              />
+            ) : (
+              <Title order={3} style={{ 
+                margin: '10px 0', 
+                color: '#cc0000', 
+                letterSpacing: '3px',
+                fontSize: '18px'
+              }}>
+                {testConfig.title}
+              </Title>
+            )}
           </Box>
 
           {/* Patient Information */}
@@ -211,7 +225,11 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
-                  <Text size="sm">{patientData?.patientName || patientData?.name || ''}</Text>
+                  {isLoadingData ? (
+                    <Skeleton height={16} width={150} />
+                  ) : (
+                    <Text size="sm">{patientData?.patientName || patientData?.name || ''}</Text>
+                  )}
                 </Box>
               </Box>
 
@@ -229,7 +247,11 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                   outline: 'none',
                   width: '250px'
                 }}>
-                  <Text size="sm">{patientData?.dateRequested || new Date().toLocaleDateString()}</Text>
+                  {isLoadingData ? (
+                    <Skeleton height={16} width={100} />
+                  ) : (
+                    <Text size="sm">{patientData?.dateRequested || new Date().toLocaleDateString()}</Text>
+                  )}
                 </Box>
               </Box>
             </Box>
@@ -254,7 +276,11 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                   outline: 'none',
                   width: '250px'
                 }}>
-                  <Text size="sm">{patientData?.age || ''}</Text>
+                  {isLoadingData ? (
+                    <Skeleton height={16} width={50} />
+                  ) : (
+                    <Text size="sm">{patientData?.age || ''}</Text>
+                  )}
                 </Box>
               </Box>
 
@@ -272,7 +298,11 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                   outline: 'none',
                   width: '250px'
                 }}>
-                  <Text size="sm">{patientData?.sex || patientData?.gender || ''}</Text>
+                  {isLoadingData ? (
+                    <Skeleton height={16} width={30} />
+                  ) : (
+                    <Text size="sm">{patientData?.sex || patientData?.gender || ''}</Text>
+                  )}
                 </Box>
               </Box>
             </Box>
@@ -280,15 +310,61 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
 
           {/* Lab Test Results Section */}
           <Box style={{ display: 'flex', gap: '40px', marginTop: '0px' }} className="results">
-            {/* Left Column */}
-            <Box style={{ flex: 1 }} className="column">
-              {leftFields.map(field => renderField(field))}
-            </Box>
+            {isLoadingData ? (
+              <>
+                {/* Left Column Skeleton */}
+                <Box style={{ flex: 1 }} className="column">
+                  {Array.from({ length: 6 }, (_, index) => (
+                    <Box 
+                      key={`left-skeleton-${index}`}
+                      style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: '1fr auto 1fr', 
+                        alignItems: 'center', 
+                        marginBottom: '5px', 
+                        gap: '10px'
+                      }}
+                    >
+                      <Skeleton height={16} width={120} />
+                      <Skeleton height={32} width={150} />
+                      <Skeleton height={16} width={80} />
+                    </Box>
+                  ))}
+                </Box>
 
-            {/* Right Column */}
-            <Box style={{ flex: 1 }}>
-              {rightFields.map(field => renderField(field))}
-            </Box>
+                {/* Right Column Skeleton */}
+                <Box style={{ flex: 1 }}>
+                  {Array.from({ length: 6 }, (_, index) => (
+                    <Box 
+                      key={`right-skeleton-${index}`}
+                      style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: '1fr auto 1fr', 
+                        alignItems: 'center', 
+                        marginBottom: '5px', 
+                        gap: '10px'
+                      }}
+                    >
+                      <Skeleton height={16} width={120} />
+                      <Skeleton height={32} width={150} />
+                      <Skeleton height={16} width={80} />
+                    </Box>
+                  ))}
+                </Box>
+              </>
+            ) : (
+              <>
+                {/* Left Column */}
+                <Box style={{ flex: 1 }} className="column">
+                  {leftFields.map(field => renderField(field))}
+                </Box>
+
+                {/* Right Column */}
+                <Box style={{ flex: 1 }}>
+                  {rightFields.map(field => renderField(field))}
+                </Box>
+              </>
+            )}
           </Box>
 
           <Divider />
@@ -332,7 +408,7 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
                 variant="outline"
                 onClick={onCancel}
                 style={{ minWidth: '100px' }}
-                disabled={isLoading}
+                disabled={isSubmitting}
                 leftSection={<Icon icon="fas fa-times" size={14} />}
               >
                 {viewMode ? 'Close' : 'Cancel'}
@@ -342,11 +418,11 @@ export const AddLabTestResultForm: React.FC<AddLabTestResultFormProps> = ({
               <Button
                 type="submit"
                 style={{ minWidth: '100px' }}
-                loading={isLoading}
-                disabled={isLoading}
+                loading={isSubmitting}
+                disabled={isSubmitting}
                 leftSection={<Icon icon="fas fa-save" size={14} />}
               >
-                {isUpdate ? 'Update Result' : 'Submit Result'}
+                {submitButtonText}
               </Button>
             )}
           </Box>

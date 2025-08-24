@@ -1,6 +1,5 @@
 import React from 'react';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { ConfirmationModal } from '../../../components/common';
 import { 
   LaboratoryTestsPageHeader, 
   LaboratoryTestsTable, 
@@ -13,15 +12,10 @@ export const LaboratoryTestsPage: React.FC = () => {
     // State
     labTests,
     patientInfo,
-    selectedLabTest,
-    bloodChemistryData,
     isLoading,
     error,
     
-    // Modal state
-    addResultModalOpened,
-    viewResultModalOpened,
-    isUpdateMode,
+    // Cancel confirmation modal state
     cancelConfirmationModalOpened,
     testToCancel,
     
@@ -31,9 +25,6 @@ export const LaboratoryTestsPage: React.FC = () => {
     handleEditTest,
     handleAddResult,
     handleCancelTest,
-    handleCloseModal,
-    handleSubmitResult,
-    setViewResultModalOpened,
     handleConfirmCancel,
     handleCloseCancelConfirmation,
     
@@ -59,29 +50,13 @@ export const LaboratoryTestsPage: React.FC = () => {
       />
 
       <LaboratoryTestsModals
-        addResultModalOpened={addResultModalOpened}
-        onCloseAddResultModal={handleCloseModal}
-        onSubmitResult={handleSubmitResult}
-        viewResultModalOpened={viewResultModalOpened}
-        onCloseViewResultModal={() => setViewResultModalOpened(false)}
-        selectedLabTest={selectedLabTest}
+        cancelConfirmationModalOpened={cancelConfirmationModalOpened}
+        onCloseCancelConfirmation={handleCloseCancelConfirmation}
+        onConfirmCancel={handleConfirmCancel}
+        testToCancel={testToCancel}
         patientInfo={patientInfo}
-        bloodChemistryData={bloodChemistryData}
         isLoading={isLoading}
         error={error}
-        isUpdateMode={isUpdateMode}
-      />
-
-      <ConfirmationModal
-        isOpen={cancelConfirmationModalOpened}
-        onClose={handleCloseCancelConfirmation}
-        onConfirm={handleConfirmCancel}
-        title="Cancel Lab Test"
-        message={`Are you sure you want to cancel the ${testToCancel?.testName || testToCancel?.testCategory || ''} test?`}
-        confirmText="Cancel"
-        cancelText="No"
-        confirmColor="red"
-        isLoading={isLoading}
       />
     </MedicalClinicLayout>
   );
