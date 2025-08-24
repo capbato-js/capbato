@@ -204,6 +204,16 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
     }
   ], [formatTestDisplayName, getStatusBadge, getResultsContent]);
 
+  const handleRowClick = useCallback((test: LabTest) => {
+    // Check if the test has results to view, otherwise show add result
+    if (test.status === 'Confirmed' || test.status === 'Completed') {
+      onViewTest(test);
+    } else if (test.status === 'Pending') {
+      onAddResult(test);
+    }
+    // Don't do anything for cancelled tests
+  }, [onViewTest, onAddResult]);
+
   return (
     <DataTable
       data={labTests}
@@ -214,6 +224,8 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
       useViewportHeight={true}
       bottomPadding={90}
       isLoading={isLoading}
+      onRowClick={handleRowClick}
+      cursor="pointer"
     />
   );
 };
