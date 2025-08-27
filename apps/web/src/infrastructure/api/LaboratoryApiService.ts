@@ -28,11 +28,8 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async createLabRequest(command: CreateLabRequestCommand): Promise<LabRequestResponse> {
     try {
-      console.log('📋 Creating lab request:', command);
-      
       const response = await this.httpClient.post<LabRequestResponse>('/api/laboratory/requests', command);
       
-      console.log('✅ Lab request created successfully:', response.data);
       
       // The backend already returns { success: true, data: LabRequestDto }
       // So we can return it directly
@@ -51,24 +48,14 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async getAllLabRequests(): Promise<LabRequestListResponse> {
     try {
-      console.log('📋 Fetching all lab requests from:', '/api/laboratory/requests');
       
       const response = await this.httpClient.get<LabRequestListResponse>('/api/laboratory/requests');
       
-      console.log('🔍 Raw API response:', response);
-      console.log('📊 Response data:', response.data);
-      console.log('✅ Lab requests fetched successfully:', response.data?.data?.length || 0, 'items');
       
       return response.data;
     } catch (error) {
       console.error('❌ Error fetching lab requests:', error);
       
-      // Check if it's a 404 or other HTTP error
-      if (error && typeof error === 'object' && 'response' in error) {
-        const httpError = error as { response?: { status?: number; data?: unknown } };
-        console.error('HTTP Error Status:', httpError.response?.status);
-        console.error('HTTP Error Data:', httpError.response?.data);
-      }
       
       return {
         success: false,
@@ -83,11 +70,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async getLabRequestByPatientId(patientId: string): Promise<LabRequestResponse> {
     try {
-      console.log('📋 Fetching lab request for patient:', patientId);
       
       const response = await this.httpClient.get<LabRequestResponse>(`/api/laboratory/requests/${patientId}`);
       
-      console.log('✅ Lab request fetched successfully for patient:', patientId);
       return response.data;
     } catch (error) {
       console.error('❌ Error fetching lab request for patient:', patientId, error);
@@ -103,17 +88,8 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async getLabTestsByPatientId(patientId: string): Promise<LabTestListResponse> {
     try {
-      console.log('🧪 Fetching lab tests for patient:', patientId);
-      
       const response = await this.httpClient.get<LabTestListResponse>(`/api/laboratory/lab-tests/${patientId}`);
-      
-      console.log('🔍 Raw API response:', response.data);
-      console.log('🔍 Lab tests data array:', response.data?.data);
-      if (response.data?.data && response.data.data.length > 0) {
-        console.log('🔍 First lab test item:', response.data.data[0]);
-      }
-      
-      console.log('✅ Lab tests fetched successfully for patient:', patientId, '- Found', response.data?.data?.length || 0, 'tests');
+    
       return response.data;
     } catch (error) {
       console.error('❌ Error fetching lab tests for patient:', patientId, error);
@@ -134,14 +110,12 @@ export class LaboratoryApiService implements ILaboratoryApiService {
     results: Record<string, string>
   ): Promise<LaboratoryOperationResponse> {
     try {
-      console.log('📋 Updating lab results for patient:', patientId, 'date:', requestDate);
       
       const response = await this.httpClient.put<{ message: string }>(
         `/api/laboratory/requests/${patientId}/results`,
         { requestDate, results }
       );
       
-      console.log('✅ Lab results updated successfully');
       return {
         success: true,
         message: response.data.message || 'Lab results updated successfully'
@@ -160,11 +134,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async getCompletedLabRequests(): Promise<LabRequestListResponse> {
     try {
-      console.log('📋 Fetching completed lab requests');
       
       const response = await this.httpClient.get<LabRequestListResponse>('/api/laboratory/requests/completed');
       
-      console.log('✅ Completed lab requests fetched successfully:', response.data?.data?.length || 0, 'items');
       return response.data;
     } catch (error) {
       console.error('❌ Error fetching completed lab requests:', error);
@@ -181,11 +153,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async createLabTestResult(request: CreateLabTestResultRequestDto): Promise<LabTestResultResponse> {
     try {
-      console.log('🧪 Creating lab test result:', request);
       
       const response = await this.httpClient.post<LabTestResultResponse>('/api/laboratory/test-results', request);
       
-      console.log('✅ Lab test result created successfully');
       return response.data;
     } catch (error) {
       console.error('❌ Error creating lab test result:', error);
@@ -201,11 +171,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async getLabTestResultById(id: string): Promise<LabTestResultResponse> {
     try {
-      console.log('🔍 Fetching lab test result for ID:', id);
       
       const response = await this.httpClient.get<LabTestResultResponse>(`/api/laboratory/test-results/${id}`);
       
-      console.log('✅ Lab test result fetched successfully for ID:', id);
       return response.data;
     } catch (error) {
       console.error('❌ Error fetching lab test result for ID:', id, error);
@@ -221,11 +189,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async getLabTestResultByLabRequestId(labRequestId: string): Promise<LabTestResultResponse> {
     try {
-      console.log('🔍 Fetching lab test result for lab request ID:', labRequestId);
       
       const response = await this.httpClient.get<LabTestResultResponse>(`/api/laboratory/test-results/by-request/${labRequestId}`);
       
-      console.log('✅ Lab test result fetched successfully for lab request ID:', labRequestId);
       return response.data;
     } catch (error) {
       console.error('❌ Error fetching lab test result for lab request ID:', labRequestId, error);
@@ -241,11 +207,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async updateLabTestResult(id: string, request: UpdateLabTestResultRequestDto): Promise<LabTestResultResponse> {
     try {
-      console.log('🔄 Updating lab test result ID:', id, 'with data:', request);
       
       const response = await this.httpClient.put<LabTestResultResponse>(`/api/laboratory/test-results/${id}`, request);
       
-      console.log('✅ Lab test result updated successfully');
       return response.data;
     } catch (error) {
       console.error('❌ Error updating lab test result:', error);
@@ -261,11 +225,9 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   async cancelLabRequest(id: string): Promise<LaboratoryOperationResponse> {
     try {
-      console.log('🚫 Cancelling lab request:', id);
 
       const response = await this.httpClient.put(`/api/laboratory/requests/${id}/cancel`);
       
-      console.log('✅ Lab request cancelled successfully');
       return response.data;
     } catch (error) {
       console.error('❌ Error cancelling lab request:', error);

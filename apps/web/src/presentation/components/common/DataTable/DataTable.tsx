@@ -36,11 +36,6 @@ export function DataTable<T extends SearchableItem>({
       // Only update if height actually changed to prevent unnecessary re-renders
       setActualHeaderHeight(prevHeight => {
         if (prevHeight !== safeHeight) {
-          console.log('[DataTable] Header height measured:', {
-            measuredHeight,
-            safeHeight,
-            previousHeight: prevHeight
-          });
           return safeHeight;
         }
         return prevHeight;
@@ -61,11 +56,6 @@ export function DataTable<T extends SearchableItem>({
           // Only update if height actually changed
           setActualHeaderHeight(prevHeight => {
             if (prevHeight !== newHeight) {
-              console.log('[DataTable] Header resized:', {
-                oldHeight: prevHeight,
-                newHeight,
-                contentRect: entry.contentRect
-              });
               return newHeight;
             }
             return prevHeight;
@@ -122,26 +112,6 @@ export function DataTable<T extends SearchableItem>({
   const estimatedContentHeight = filteredData.length * estimatedRowHeight + actualHeaderHeight;
   const availableHeight = typeof dynamicHeight === 'number' ? dynamicHeight : parseInt(String(dynamicHeight)) || 400;
   const needsScrolling = useViewportHeight && estimatedContentHeight > availableHeight;
-
-  console.log('[DataTable] Content analysis:', {
-    rowCount: filteredData.length,
-    estimatedRowHeight,
-    actualHeaderHeight,
-    estimatedContentHeight,
-    availableHeight,
-    dynamicHeight,
-    needsScrolling,
-    useViewportHeight,
-    maxHeight,
-    bottomPadding,
-    renderingMode: needsScrolling ? 'ScrollArea with fixed height' : 'Natural height (no ScrollArea)'
-  });
-  
-  console.log('[DataTable] Scroll decision:', {
-    needsScrolling,
-    willUseScrollArea: needsScrolling,
-    contentFitsInViewport: estimatedContentHeight <= availableHeight
-  });
 
   // Create skeleton rows for loading state
   const skeletonRows = Array.from({ length: skeletonRowCount }, (_, index) => (
@@ -263,7 +233,6 @@ export function DataTable<T extends SearchableItem>({
 
         {/* Conditional Scrollable Body */}
         {(() => {
-          console.log('[DataTable] Rendering decision: needsScrolling =', needsScrolling);
           return needsScrolling;
         })() ? (
           <ScrollArea
@@ -393,7 +362,6 @@ export function DataTable<T extends SearchableItem>({
             </Table>
           </ScrollArea>
         ) : (() => {
-          console.log('[DataTable] Rendering natural height (no ScrollArea)');
           return (
           <Table
             style={{

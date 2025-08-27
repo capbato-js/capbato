@@ -46,9 +46,6 @@ export class AuthApiService implements IAuthApiService {
       throw new Error('Login failed - invalid response format');
     }
     
-    console.log('🔐 AuthApiService received response:', apiResponse);
-    console.log('🔐 AuthApiService extracting token:', apiResponse.data.token);
-    
     return apiResponse.data;
   }
 
@@ -71,8 +68,6 @@ export class AuthApiService implements IAuthApiService {
     if (!apiResponse.success || !apiResponse.data) {
       throw new Error('Registration failed - invalid response format');
     }
-    
-    console.log('🔐 AuthApiService register response:', apiResponse);
     
     return apiResponse.data;
   }

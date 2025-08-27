@@ -60,8 +60,6 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
     const fetchData = async () => {
       if (!patientId) return;
       
-      console.log('🔍 Loading lab tests for patient:', patientId);
-      
       try {
         // Fetch lab tests
         await laboratoryStore.fetchLabTestsByPatientId(patientId);
@@ -102,7 +100,6 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
             });
           }
         } catch (requestError) {
-          console.warn('⚠️ Could not fetch lab request for patient info:', requestError);
           
           // Fallback to direct patient fetch
           try {
@@ -165,21 +162,18 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   };
 
   const handleViewTest = (labTest: LabTest) => {
-    console.log('👁️ Viewing lab test:', labTest);
     navigate(`/laboratory/tests/${patientId}/view-result/${labTest.id}`, {
       state: { labTest }
     });
   };
 
   const handleEditTest = (labTest: LabTest) => {
-    console.log('✏️ Editing lab test:', labTest);
     navigate(`/laboratory/tests/${patientId}/edit-result/${labTest.id}`, {
       state: { labTest }
     });
   };
 
   const handleAddResult = (labTest: LabTest) => {
-    console.log('➕ Adding result for lab test:', labTest);
     navigate(`/laboratory/tests/${patientId}/add-result/${labTest.id}`, {
       state: { labTest }
     });
@@ -187,17 +181,14 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
 
   // Cancel confirmation handlers
   const handleCancelTest = (labTest: LabTest) => {
-    console.log('❌ Initiating cancel for lab test:', labTest);
     setTestToCancel(labTest);
     setCancelConfirmationModalOpened(true);
   };
 
   const handleConfirmCancel = async () => {
     if (testToCancel && patientId) {
-      console.log('✅ Confirming cancel for lab test:', testToCancel.id);
       try {
         await laboratoryStore.cancelLabRequest(testToCancel.id);
-        console.log('🎉 Lab test cancelled successfully');
         
         // Reload lab tests to reflect the cancellation
         await laboratoryStore.fetchLabTestsByPatientId(patientId);

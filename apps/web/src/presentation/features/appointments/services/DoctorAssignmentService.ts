@@ -77,7 +77,6 @@ export class DoctorAssignmentService {
     }
 
     try {
-      console.log('🔄 [DoctorAssignmentService] Loading fresh data...');
       
       // Fetch doctors and schedule overrides in parallel
       const [doctors, scheduleOverrides] = await Promise.all([
@@ -89,10 +88,6 @@ export class DoctorAssignmentService {
       this.scheduleOverridesCache = scheduleOverrides;
       this.cacheTimestamp = Date.now();
       
-      console.log('✅ [DoctorAssignmentService] Data loaded successfully:', {
-        doctorCount: doctors.length,
-        overrideCount: scheduleOverrides.length
-      });
     } catch (error) {
       console.error('❌ [DoctorAssignmentService] Error loading data:', error);
       throw new Error('Failed to load doctor assignment data');
@@ -119,7 +114,6 @@ export class DoctorAssignmentService {
     const dateString = this.formatDateToISOString(date);
     const dayOfWeek = this.getDayOfWeek(date);
 
-    console.log(`🎯 [DoctorAssignmentService] Getting assigned doctor for ${dateString} (${dayOfWeek})`);
 
     // Check if there's a schedule override for this date
     const scheduleOverride = this.scheduleOverridesCache.find(override => override.date === dateString);
@@ -128,10 +122,8 @@ export class DoctorAssignmentService {
       // Use schedule override
       const assignedDoctor = this.doctorsCache.find(d => d.id === scheduleOverride.assignedDoctorId);
       if (assignedDoctor) {
-        console.log(`🔄 [DoctorAssignmentService] Using schedule override: ${assignedDoctor.fullName}`);
         return assignedDoctor;
       } else {
-        console.warn(`⚠️ [DoctorAssignmentService] Override doctor not found: ${scheduleOverride.assignedDoctorId}`);
         // Fall through to default schedule logic if override doctor not found
       }
     }
@@ -143,7 +135,6 @@ export class DoctorAssignmentService {
 
     if (scheduledDoctors.length > 0) {
       const assignedDoctor = scheduledDoctors[0]; // Take the first scheduled doctor
-      console.log(`📅 [DoctorAssignmentService] Using default schedule: ${assignedDoctor.fullName} (${assignedDoctor.schedulePattern})`);
       return assignedDoctor;
     }
 

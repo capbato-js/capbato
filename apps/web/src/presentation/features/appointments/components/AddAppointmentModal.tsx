@@ -22,9 +22,6 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   appointment,
   onAppointmentUpdated,
 }) => {
-  console.log('DEBUG: AddAppointmentModal - editMode:', editMode);
-  console.log('DEBUG: AddAppointmentModal - appointment:', appointment);
-  console.log('DEBUG: AddAppointmentModal - appointment?.id:', appointment?.id);
   
   // Store the appointmentId when modal first opens in edit mode
   const appointmentIdRef = useRef<string | undefined>(undefined);
@@ -33,7 +30,6 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   useEffect(() => {
     if (isOpen && editMode && appointment?.id) {
       appointmentIdRef.current = appointment.id;
-      console.log('DEBUG: Stored appointmentId in ref:', appointment.id);
     } else if (!isOpen) {
       // Clear when modal closes
       appointmentIdRef.current = undefined;
@@ -43,7 +39,6 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   // Use the stable ID from ref, fallback to current prop
   const stableAppointmentId = appointmentIdRef.current || (editMode && appointment?.id ? appointment.id : undefined);
   
-  console.log('DEBUG: AddAppointmentModal - stable appointmentId:', stableAppointmentId);
   
   const viewModel = useAppointmentFormViewModel(stableAppointmentId);
 

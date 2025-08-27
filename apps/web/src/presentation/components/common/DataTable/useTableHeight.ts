@@ -24,16 +24,12 @@ export function useTableHeight(
   useEffect(() => {
     const { enabled, bottomPadding, minHeight, fallbackHeight } = memoizedOptions;
     
-    console.log('[useTableHeight] Hook called with:', { enabled, fallbackHeight });
-    
     if (!enabled) {
-      console.log('[useTableHeight] Disabled - using fallback:', fallbackHeight);
       setCalculatedHeight(fallbackHeight);
       return;
     }
     
     if (!containerRef.current) {
-      console.log('[useTableHeight] No container ref - using fallback:', fallbackHeight);
       setCalculatedHeight(fallbackHeight);
       return;
     }
@@ -41,7 +37,6 @@ export function useTableHeight(
     const calculateHeight = () => {
       const element = containerRef.current;
       if (!element) {
-        console.log('[useTableHeight] No element reference');
         return;
       }
 
@@ -54,17 +49,6 @@ export function useTableHeight(
       
       // Ensure minimum height
       const finalHeight = Math.max(availableHeight, minHeight);
-      
-      console.log('[useTableHeight] Calculation:', {
-        viewportHeight,
-        offsetTop: rect.top,
-        scrollY: window.scrollY,
-        totalOffsetTop: offsetTop,
-        bottomPadding,
-        availableHeight,
-        minHeight,
-        finalHeight
-      });
       
       setCalculatedHeight(finalHeight);
     };

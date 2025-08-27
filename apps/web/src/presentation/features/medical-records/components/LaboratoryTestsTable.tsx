@@ -26,17 +26,9 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
   const theme = useMantineTheme();
 
   const formatTestDisplayName = useCallback((test: LabTest): string => {
-    console.log('🧪 formatTestDisplayName called with test:', {
-      id: test.id,
-      testName: test.testName,
-      testCategory: test.testCategory,
-      tests: test.tests,
-      testDisplayNames: test.testDisplayNames
-    });
 
     // Priority 1: Use testName if available (already formatted from API)
     if (test.testName && test.testName.trim() !== '') {
-      console.log('✅ Using testName:', test.testName);
       return test.testName;
     }
     
@@ -44,7 +36,6 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
     if (test.testDisplayNames && test.testDisplayNames.length > 0) {
       const categoryDisplayName = test.testCategory?.replace('_', ' ') || 'Test';
       const result = `${categoryDisplayName}: ${test.testDisplayNames.join(', ')}`;
-      console.log('✅ Using testDisplayNames:', result);
       return result;
     }
     
@@ -52,13 +43,11 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
     if (test.tests && test.tests.length > 0) {
       const categoryDisplayName = test.testCategory?.replace('_', ' ') || 'Test';
       const result = `${categoryDisplayName}: ${test.tests.join(', ')}`;
-      console.log('✅ Using tests array:', result);
       return result;
     }
     
     // Final fallback
     const result = test.testCategory?.replace('_', ' ') || 'Test: N/A';
-    console.log('⚠️ Using final fallback:', result);
     return result;
   }, []);  const getStatusBadge = useCallback((status: LabTest['status']) => {
     const styles = {
@@ -174,9 +163,7 @@ export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = ({
       align: 'left',
       searchable: true,
       render: (_value: string | undefined, record: LabTest) => {
-        console.log('📊 Table render called for record:', record);
         const result = formatTestDisplayName(record);
-        console.log('📊 Table render result:', result);
         return result;
       }
     },

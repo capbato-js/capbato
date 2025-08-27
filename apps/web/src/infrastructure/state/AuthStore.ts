@@ -45,8 +45,6 @@ export const useAuthStore = create<AuthStore>()(
 
               const response = await getCommandService().login(command);
               
-              console.log('🔐 AuthStore received login response:', response);
-              console.log('🔐 AuthStore checking token:', response.token);
 
               set((state) => {
                 state.isAuthenticated = true;
@@ -60,17 +58,11 @@ export const useAuthStore = create<AuthStore>()(
               if (typeof window !== 'undefined') {
                 // Only store if we have valid data
                 if (response.token) {
-                  console.log('🔐 AuthStore storing token in localStorage:', response.token);
                   localStorage.setItem('auth_token', response.token);
-                } else {
-                  console.warn('🔐 AuthStore: No token received to store!');
                 }
                 
                 if (response.user) {
-                  console.log('🔐 AuthStore storing user in localStorage:', response.user);
                   localStorage.setItem('auth_user', JSON.stringify(response.user));
-                } else {
-                  console.warn('🔐 AuthStore: No user received to store!');
                 }
                 
                 // Store remember me state and identifier if rememberMe is checked
@@ -114,7 +106,6 @@ export const useAuthStore = create<AuthStore>()(
                 // localStorage.removeItem('remembered_identifier');
               } catch (error) {
                 // Handle cases where localStorage is not available or throws errors
-                console.warn('Failed to clear localStorage during logout:', error);
               }
             }
           },
