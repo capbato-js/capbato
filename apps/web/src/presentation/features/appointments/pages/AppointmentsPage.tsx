@@ -5,6 +5,13 @@ import { AppointmentsTable, AppointmentsFilterControls, AppointmentCountDisplay,
 import { useAppointmentPageViewModel } from '../view-models/useAppointmentPageViewModel';
 import { Appointment } from '../types';
 import { AppointmentDto } from '@nx-starter/application-shared';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+// Configure dayjs plugins for timezone handling
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Helper function to convert AppointmentDto to the component's Appointment type
 const mapAppointmentDtoToAppointment = (dto: AppointmentDto): Appointment => ({
@@ -206,11 +213,20 @@ export const AppointmentsPage: React.FC = () => {
 
   // Convert DTOs to component format and filter appointments based on date and showAll flag
   const appointments = viewModel.appointments.map(mapAppointmentDtoToAppointment);
+  
+  // Use timezone-aware date filtering to avoid UTC conversion issues
+  const getSelectedDateString = (date: Date): string => {
+    // Use dayjs with Asia/Manila timezone to get the correct date string
+    return dayjs(date).tz('Asia/Manila').format('YYYY-MM-DD');
+  };
+  
   const filteredAppointments = showAll 
     ? appointments 
-    : appointments.filter(appointment => 
-        appointment.date === selectedDate.toISOString().split('T')[0]
-      );
+    : appointments.filter(appointment => {
+        // Compare appointment date with timezone-aware selected date
+        const selectedDateString = getSelectedDateString(selectedDate);
+        return appointment.date === selectedDateString;
+      });
   
   // Apply sorting based on showAll state
   const sortedAppointments = sortAppointments(filteredAppointments, showAll);

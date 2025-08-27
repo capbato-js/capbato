@@ -65,6 +65,21 @@ export class AppointmentApiService {
   }
 
   /**
+   * Gets today's confirmed appointments for dashboard
+   */
+  async getTodayConfirmedAppointments(): Promise<AppointmentDto[]> {
+    const response = await this.httpClient.get<{ success: boolean; data: AppointmentDto[] }>(
+      this.apiConfig.endpoints.appointments.todayConfirmed
+    );
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error('Failed to fetch today\'s confirmed appointments');
+    }
+
+    return response.data.data;
+  }
+
+  /**
    * Gets appointment by ID
    */
   async getAppointmentById(id: string): Promise<AppointmentDto> {

@@ -42,6 +42,7 @@ export interface ApiConfiguration {
       cancel: (id: string) => string;
       complete: (id: string) => string;
       reconfirm: (id: string) => string;
+      todayConfirmed: string;
     };
     doctors: {
       base: string;

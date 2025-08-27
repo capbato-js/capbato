@@ -37,6 +37,7 @@ interface AppointmentState {
   
   // Query Operations
   fetchAllAppointments: () => Promise<void>;
+  fetchTodayConfirmedAppointments: () => Promise<void>;
   fetchAppointmentsByPatientId: (patientId: string) => Promise<void>;
   getAppointmentsByDate: (date: string) => AppointmentDto[];
   getAppointmentById: (id: string) => Promise<AppointmentDto>;
@@ -233,6 +234,25 @@ export const useAppointmentStore = create<AppointmentState>()(
             });
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to fetch appointments';
+            set({ 
+              error: errorMessage, 
+              isLoading: false,
+              appointments: [] 
+            });
+          }
+        },
+
+        fetchTodayConfirmedAppointments: async () => {
+          set({ isLoading: true, error: null });
+          
+          try {
+            const appointments = await getApiService().getTodayConfirmedAppointments();
+            set({ 
+              appointments, 
+              isLoading: false 
+            });
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch today\'s confirmed appointments';
             set({ 
               error: errorMessage, 
               isLoading: false,

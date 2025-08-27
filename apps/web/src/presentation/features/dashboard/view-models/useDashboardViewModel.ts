@@ -3,6 +3,15 @@ import { useAppointmentStore } from '../../../../infrastructure/state/Appointmen
 import { AppointmentDto } from '@nx-starter/application-shared';
 import { BaseAppointment } from '../../../components/common';
 import { doctorAssignmentService } from '../../appointments/services/DoctorAssignmentService';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+// Configure dayjs plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isSameOrBefore);
 
 export interface DashboardStats {
   doctorName: string;
@@ -21,28 +30,14 @@ export interface DashboardViewModel {
 }
 
 export const useDashboardViewModel = (): DashboardViewModel => {
-  const { appointments, fetchAllAppointments, isLoading, error } = useAppointmentStore();
+  const { appointments, fetchTodayConfirmedAppointments, isLoading, error } = useAppointmentStore();
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     doctorName: 'No Doctor Assigned',
     currentPatient: 'N/A',
     totalAppointments: 0,
-    totalAppointmentsDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    totalAppointmentsDate: dayjs().tz('Asia/Manila').format('MMM D, YYYY')
   });
-
-  // Helper function to check if a date is today
-  const isToday = (dateString: string): boolean => {
-    const date = new Date(dateString);
-    const today = new Date();
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
-
-  // Filter today's appointments from raw data
-  const todaysRawAppointments = appointments.filter(appointment => isToday(appointment.appointmentDate));
 
   // Convert AppointmentDto to BaseAppointment
   const mapToBaseAppointment = (dto: AppointmentDto): BaseAppointment => ({
@@ -71,8 +66,8 @@ export const useDashboardViewModel = (): DashboardViewModel => {
     });
   };
 
-  // Get today's appointments - simplified approach
-  const todayAppointments = sortAppointmentsByTime(todaysRawAppointments.map(mapToBaseAppointment));
+  // Get today's confirmed appointments - data comes pre-filtered from the backend
+  const todayAppointments = sortAppointmentsByTime(appointments.map(mapToBaseAppointment));
 
   // Get assigned doctor for today using the DoctorAssignmentService
   const getAssignedDoctorForToday = async (): Promise<string> => {
@@ -99,32 +94,32 @@ export const useDashboardViewModel = (): DashboardViewModel => {
 
   // Simple patient detection - get current patient based on business rule
   const getCurrentPatientFromAppointments = (): string => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // Use dayjs with Asia/Manila timezone for accurate current time comparison
+    const now = dayjs().tz('Asia/Manila');
+    const today = now.startOf('day');
     
-    // Get all appointments sorted by date and time (earliest first)
+    // Get all confirmed appointments sorted by date and time (earliest first)
+    // Note: appointments are already filtered to today's confirmed appointments only
     const allAppointmentsSorted = appointments
       .map(mapToBaseAppointment)
       .sort((a, b) => {
-        // Create date objects for comparison
-        const dateTimeA = new Date(`${a.date} ${a.time}`);
-        const dateTimeB = new Date(`${b.date} ${b.time}`);
-        return dateTimeA.getTime() - dateTimeB.getTime();
+        // Create dayjs objects for comparison with timezone awareness
+        const dateTimeA = dayjs.tz(`${a.date} ${a.time}`, 'Asia/Manila');
+        const dateTimeB = dayjs.tz(`${b.date} ${b.time}`, 'Asia/Manila');
+        return dateTimeA.valueOf() - dateTimeB.valueOf();
       });
 
     // Find first active appointment that is either:
     // 1. From the past or current time (has started or should have started)
     // 2. Scheduled for today (regardless of time)
-    // Exclude completed and cancelled appointments
+    // Since we only fetch confirmed appointments, no need to exclude other statuses
     const currentAppointment = allAppointmentsSorted.find(apt => {
-      if (apt.status === 'completed' || apt.status === 'cancelled') return false;
-      
-      const appointmentDate = new Date(apt.date);
-      const appointmentDateTime = new Date(`${apt.date} ${apt.time}`);
+      const appointmentDate = dayjs.tz(apt.date, 'Asia/Manila').startOf('day');
+      const appointmentDateTime = dayjs.tz(`${apt.date} ${apt.time}`, 'Asia/Manila');
       
       // Check if appointment is today or in the past
-      const isToday = appointmentDate.getTime() === today.getTime();
-      const isInPastOrNow = appointmentDateTime.getTime() <= now.getTime();
+      const isToday = appointmentDate.isSame(today);
+      const isInPastOrNow = appointmentDateTime.isSameOrBefore(now);
       
       return isToday || isInPastOrNow;
     });
@@ -137,7 +132,7 @@ export const useDashboardViewModel = (): DashboardViewModel => {
       // Clear the doctor assignment cache to ensure we get fresh data
       doctorAssignmentService.getInstance().clearCache();
       
-      await fetchAllAppointments();
+      await fetchTodayConfirmedAppointments();
       // useEffect will handle stats update when appointments change
     } catch (err) {
       console.error('Failed to load dashboard data:', err);

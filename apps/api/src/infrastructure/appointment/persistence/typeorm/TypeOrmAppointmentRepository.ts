@@ -9,6 +9,13 @@ import { generateId, generateUUID } from '@nx-starter/utils-core';
 import { PatientEntity } from '../../../patient/persistence/typeorm/PatientEntity';
 import { DoctorEntity } from '../../../doctor/persistence/typeorm/DoctorEntity';
 import { UserEntity } from '../../../user/persistence/typeorm/UserEntity';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+// Configure dayjs plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 /**
  * Extended appointment data with populated patient and doctor information
@@ -236,14 +243,13 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
   }
 
   async getTodayAppointments(): Promise<Appointment[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    // Use dayjs with Asia/Manila timezone to get the correct "today"
+    const today = dayjs().tz('Asia/Manila').startOf('day');
+    const tomorrow = today.add(1, 'day');
 
     const entities = await this.repository.find({
       where: {
-        appointmentDate: Between(today, tomorrow),
+        appointmentDate: Between(today.toDate(), tomorrow.toDate()),
       },
       order: { appointmentTime: 'ASC' },
     });
@@ -251,19 +257,79 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
   }
 
   async getTodayConfirmedAppointments(): Promise<Appointment[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    // Use dayjs with Asia/Manila timezone to get the correct "today"
+    const today = dayjs().tz('Asia/Manila').startOf('day');
+    const tomorrow = today.add(1, 'day');
 
-    const entities = await this.repository.find({
-      where: {
-        appointmentDate: Between(today, tomorrow),
-        status: 'confirmed',
-      },
-      order: { appointmentTime: 'ASC' },
-    });
-    return entities.map(this.toDomain);
+    const queryBuilder = this.repository.createQueryBuilder('appointment')
+      .leftJoinAndSelect('patients', 'patient', 'patient.id = appointment.patient_id')
+      .leftJoinAndSelect('doctors', 'doctor', 'doctor.id = appointment.doctor_id')
+      .leftJoinAndSelect('users', 'doctorUser', 'doctorUser.id = doctor.user_id')
+      .where('appointment.appointment_date >= :startDate', { startDate: today.toDate() })
+      .andWhere('appointment.appointment_date < :endDate', { endDate: tomorrow.toDate() })
+      .andWhere('appointment.status = :status', { status: 'confirmed' })
+      .orderBy('appointment.appointment_time', 'ASC');
+
+    const results = await queryBuilder.getRawMany();
+    
+    return results.map(row => this.toDomainWithRelations({
+      appointment: {
+        id: row.appointment_id,
+        patientId: row.appointment_patient_id,
+        reasonForVisit: row.appointment_reason_for_visit,
+        appointmentDate: row.appointment_appointment_date,
+        appointmentTime: row.appointment_appointment_time,
+        status: row.appointment_status,
+        doctorId: row.appointment_doctor_id,
+        createdAt: row.appointment_created_at,
+        updatedAt: row.appointment_updated_at,
+      } as AppointmentEntity,
+      patient: {
+        id: row.patient_id,
+        patientNumber: row.patient_patient_number,
+        firstName: row.patient_first_name,
+        lastName: row.patient_last_name,
+        middleName: row.patient_middle_name,
+        dateOfBirth: row.patient_date_of_birth,
+        gender: row.patient_gender,
+        contactNumber: row.patient_contact_number,
+        houseNumber: row.patient_house_number,
+        streetName: row.patient_street_name,
+        province: row.patient_province,
+        cityMunicipality: row.patient_city_municipality,
+        barangay: row.patient_barangay,
+        guardianName: row.patient_guardian_name,
+        guardianGender: row.patient_guardian_gender,
+        guardianRelationship: row.patient_guardian_relationship,
+        guardianContactNumber: row.patient_guardian_contact_number,
+        guardianHouseNumber: row.patient_guardian_house_number,
+        guardianStreetName: row.patient_guardian_street_name,
+        guardianProvince: row.patient_guardian_province,
+        guardianCityMunicipality: row.patient_guardian_city_municipality,
+        guardianBarangay: row.patient_guardian_barangay,
+        createdAt: row.patient_created_at,
+        updatedAt: row.patient_updated_at,
+      } as PatientEntity,
+      doctor: {
+        id: row.doctor_id,
+        userId: row.doctor_user_id,
+        specialization: row.doctor_Specialization,
+        licenseNumber: row.doctor_license_number,
+        yearsOfExperience: row.doctor_years_of_experience,
+        isActive: row.doctor_is_active,
+      } as DoctorEntity,
+      doctorUser: {
+        id: row.doctorUser_id,
+        firstName: row.doctorUser_firstName,
+        lastName: row.doctorUser_lastName,
+        email: row.doctorUser_email,
+        username: row.doctorUser_username,
+        hashedPassword: row.doctorUser_hashedPassword,
+        role: row.doctorUser_role,
+        mobile: row.doctorUser_mobile,
+        createdAt: row.doctorUser_createdAt,
+      } as UserEntity
+    }));
   }
 
   async getConfirmedAppointments(): Promise<Appointment[]> {

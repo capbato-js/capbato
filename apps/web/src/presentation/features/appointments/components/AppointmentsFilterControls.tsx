@@ -2,6 +2,13 @@ import React from 'react';
 import { Box, Text, Group, Checkbox, useMantineTheme } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Icon } from '../../../components/common';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+// Configure dayjs plugins for timezone handling
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface AppointmentsFilterControlsProps {
   selectedDate: Date;
@@ -44,7 +51,7 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
           Select Date:
         </Text>
         <DateInput
-          value={selectedDate.toISOString().split('T')[0]}
+          value={dayjs(selectedDate).tz('Asia/Manila').format('YYYY-MM-DD')}
           onChange={onDateChange}
           placeholder="Enter date"
           size="sm"

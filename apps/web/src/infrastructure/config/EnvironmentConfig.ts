@@ -62,6 +62,7 @@ export function getEnvironmentConfig(): AppConfig {
           cancel: (id: string) => `/api/appointments/${id}/cancel`,
           complete: (id: string) => `/api/appointments/${id}/complete`,
           reconfirm: (id: string) => `/api/appointments/${id}/reconfirm`,
+          todayConfirmed: '/api/appointments/today/confirmed',
         },
         doctors: {
           base: '/api/doctors',
