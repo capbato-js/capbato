@@ -309,10 +309,17 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   };
 
   // Check if form is valid and complete
-  const isFormValid = patientName && reasonForVisit && date && time && assignedDoctor && !assignedDoctor.startsWith('Error') && assignedDoctor !== 'No doctor assigned';
+  // In edit mode, patientName might be empty (since it's read-only), but we consider it valid if initialData exists
+  const isPatientValid = editMode ? (initialData?.patientId || initialData?.patientName) : patientName;
+  const isFormValid = isPatientValid && reasonForVisit && date && time && assignedDoctor && !assignedDoctor.startsWith('Error') && assignedDoctor !== 'No doctor assigned';
 
   // Form submission handler
   const handleFormSubmit = handleSubmit(async (data) => {
+    // In edit mode, if patientName is empty, use the original patient ID from initialData
+    if (editMode && !data.patientName && initialData?.patientId) {
+      data.patientName = initialData.patientId;
+    }
+    
     // Data is already in the correct format (date as string)
     const success = await onSubmit(data);
     // Only reset form on successful submission
@@ -352,25 +359,64 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           control={control}
           render={({ field, fieldState }) => (
             <Box>
-              <FormSelect
-                {...field}
-                label="Patient Name"
-                placeholder="Search and select patient"
-                data={patients}
-                error={fieldState.error}
-                disabled={isLoading || patientStore.getIsLoading()}
-                onChange={(value) => {
-                  field.onChange(value);
-                  if (value) handlePatientChange(value);
-                  handleInputChange();
-                }}
-                leftSection={<Icon icon="fas fa-user" size={16} />}
-              />
-              {/* Patient Number Display */}
-              {selectedPatientNumber && (
-                <Text size="sm" c="dimmed" mt={4}>
-                  Patient #: {selectedPatientNumber}
-                </Text>
+              {editMode ? (
+                // Edit mode - Display patient name as read-only text
+                <Box>
+                  <Text size="sm" fw={500} mb={8}>
+                    Patient Name
+                    <Text component="span" c="red" ml={4}>*</Text>
+                  </Text>
+                  <Box
+                    style={{
+                      padding: '10px 12px',
+                      border: '1px solid #e9ecef',
+                      borderRadius: '6px',
+                      backgroundColor: '#f8f9fa',
+                      minHeight: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Icon icon="fas fa-user" size={16} style={{ color: '#6c757d' }} />
+                    <Text c="dark" size="sm" fw={500}>
+                      {initialData?.patientName || 'Unknown Patient'}
+                    </Text>
+                  </Box>
+                  {/* Patient Number Display */}
+                  {selectedPatientNumber && (
+                    <Text size="sm" c="dimmed" mt={4}>
+                      Patient #: {selectedPatientNumber}
+                    </Text>
+                  )}
+                  <Text size="xs" c="dimmed" mt={4} fs="italic">
+                    Patient information cannot be changed when modifying an appointment
+                  </Text>
+                </Box>
+              ) : (
+                // Add mode - Editable FormSelect
+                <>
+                  <FormSelect
+                    {...field}
+                    label="Patient Name"
+                    placeholder="Search and select patient"
+                    data={patients}
+                    error={fieldState.error}
+                    disabled={isLoading || patientStore.getIsLoading()}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      if (value) handlePatientChange(value);
+                      handleInputChange();
+                    }}
+                    leftSection={<Icon icon="fas fa-user" size={16} />}
+                  />
+                  {/* Patient Number Display */}
+                  {selectedPatientNumber && (
+                    <Text size="sm" c="dimmed" mt={4}>
+                      Patient #: {selectedPatientNumber}
+                    </Text>
+                  )}
+                </>
               )}
             </Box>
           )}
@@ -482,7 +528,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           size="md"
           loading={isLoading}
           disabled={!isFormValid || isLoading}
-          leftSection={<Icon icon="fas fa-calendar-plus" />}
+          leftSection={<Icon icon={editMode ? "fas fa-edit" : "fas fa-calendar-plus"} />}
           style={{
             marginRight: '4px'
           }}
