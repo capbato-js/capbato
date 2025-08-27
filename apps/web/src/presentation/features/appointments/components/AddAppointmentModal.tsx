@@ -12,6 +12,8 @@ interface AddAppointmentModalProps {
   editMode?: boolean;
   appointment?: AppointmentDto | null;
   onAppointmentUpdated?: () => void;
+  // Reschedule mode props
+  isRescheduleMode?: boolean;
 }
 
 export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
@@ -21,6 +23,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   editMode = false,
   appointment,
   onAppointmentUpdated,
+  isRescheduleMode = false,
 }) => {
   
   // Store the appointmentId when modal first opens in edit mode
@@ -68,16 +71,24 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     patientNumber: appointment.patient?.patientNumber,
     reasonForVisit: appointment.reasonForVisit,
     appointmentDate: appointment.appointmentDate,
-    appointmentTime: appointment.appointmentTime,
+    appointmentTime: isRescheduleMode ? '' : appointment.appointmentTime, // Clear time in reschedule mode
     doctorId: appointment.doctor?.id,
     doctorName: appointment.doctor ? `Dr. ${appointment.doctor.fullName} - ${appointment.doctor.specialization}` : undefined,
   } : undefined;
+
+  // Determine the modal title
+  const getModalTitle = () => {
+    if (isRescheduleMode) {
+      return "Update Appointment Time";
+    }
+    return editMode ? "Update Appointment" : "Add New Appointment";
+  };
 
   return (
     <Modal
       opened={isOpen}
       onClose={onClose}
-      title={editMode ? "Update Appointment" : "Add New Appointment"}
+      title={getModalTitle()}
     >
       <AddAppointmentForm
         onSubmit={handleSubmit}
@@ -87,6 +98,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         editMode={editMode}
         currentAppointmentId={stableAppointmentId}
         initialData={initialData}
+        isRescheduleMode={isRescheduleMode}
       />
     </Modal>
   );

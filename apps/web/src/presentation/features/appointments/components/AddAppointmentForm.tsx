@@ -34,6 +34,8 @@ export interface AddAppointmentFormProps {
     doctorId?: string;
     doctorName?: string;
   };
+  // Reschedule mode props
+  isRescheduleMode?: boolean;
 }
 
 /**
@@ -55,6 +57,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   editMode = false,
   currentAppointmentId,
   initialData,
+  isRescheduleMode = false,
 }) => {
   // State for patients and doctors
   const [patients, setPatients] = useState<Array<{ value: string; label: string; patientNumber: string }>>([]);
@@ -397,7 +400,10 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
                     </Text>
                   )}
                   <Text size="xs" c="dimmed" mt={4} fs="italic">
-                    Patient information cannot be changed when modifying an appointment
+                    {isRescheduleMode 
+                      ? 'Patient information is readonly when rescheduling'
+                      : 'Patient information cannot be changed when modifying an appointment'
+                    }
                   </Text>
                 </Box>
               ) : (
@@ -434,19 +440,51 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           name="reasonForVisit"
           control={control}
           render={({ field, fieldState }) => (
-            <FormSelect
-              {...field}
-              label="Reason for Visit"
-              placeholder="Select reason for visit"
-              data={reasonsForVisit}
-              error={fieldState.error}
-              disabled={isLoading}
-              onChange={(value) => {
-                field.onChange(value);
-                handleInputChange();
-              }}
-              leftSection={<Icon icon="fas fa-stethoscope" size={16} />}
-            />
+            <>
+              {isRescheduleMode ? (
+                // Reschedule mode - Display reason as read-only text
+                <Box>
+                  <Text size="sm" fw={500} mb={8}>
+                    Reason for Visit
+                    <Text component="span" c="red" ml={4}>*</Text>
+                  </Text>
+                  <Box
+                    style={{
+                      padding: '10px 12px',
+                      border: '1px solid #e9ecef',
+                      borderRadius: '6px',
+                      backgroundColor: '#f8f9fa',
+                      minHeight: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Icon icon="fas fa-stethoscope" size={16} style={{ color: '#6c757d' }} />
+                    <Text c="dark" size="sm" fw={500}>
+                      {initialData?.reasonForVisit || 'Unknown Reason'}
+                    </Text>
+                  </Box>
+                  <Text size="xs" c="dimmed" mt={4} fs="italic">
+                    Reason for visit is readonly when rescheduling
+                  </Text>
+                </Box>
+              ) : (
+                <FormSelect
+                  {...field}
+                  label="Reason for Visit"
+                  placeholder="Select reason for visit"
+                  data={reasonsForVisit}
+                  error={fieldState.error}
+                  disabled={isLoading}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    handleInputChange();
+                  }}
+                  leftSection={<Icon icon="fas fa-stethoscope" size={16} />}
+                />
+              )}
+            </>
           )}
         />
 
@@ -455,32 +493,64 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
           name="date"
           control={control}
           render={({ field, fieldState }) => (
-            <DateInput
-              label="Appointment Date"
-              placeholder="Select appointment date"
-              minDate={today}
-              error={fieldState.error?.message}
-              disabled={isLoading}
-              value={field.value ? new Date(field.value) : null}
-              onChange={(value) => {
-                // Handle different types that DateInput might pass
-                let dateString = '';
-                if (value && typeof value === 'object' && 'getTime' in value && !isNaN((value as Date).getTime())) {
-                  dateString = (value as Date).toISOString().split('T')[0];
-                } else if (typeof value === 'string' && value) {
-                  // If it's already a string, try to parse it
-                  const parsedDate = new Date(value);
-                  if (!isNaN(parsedDate.getTime())) {
-                    dateString = parsedDate.toISOString().split('T')[0];
-                  }
-                }
-                
-                field.onChange(dateString);
-                handleDateChange(value && typeof value === 'object' && 'getTime' in value ? value as Date : (value ? new Date(value as string) : null));
-                handleInputChange();
-              }}
-              leftSection={<Icon icon="fas fa-calendar" size={16} />}
-            />
+            <>
+              {isRescheduleMode ? (
+                // Reschedule mode - Display date as read-only text
+                <Box>
+                  <Text size="sm" fw={500} mb={8}>
+                    Appointment Date
+                    <Text component="span" c="red" ml={4}>*</Text>
+                  </Text>
+                  <Box
+                    style={{
+                      padding: '10px 12px',
+                      border: '1px solid #e9ecef',
+                      borderRadius: '6px',
+                      backgroundColor: '#f8f9fa',
+                      minHeight: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Icon icon="fas fa-calendar" size={16} style={{ color: '#6c757d' }} />
+                    <Text c="dark" size="sm" fw={500}>
+                      {initialData?.appointmentDate ? new Date(initialData.appointmentDate + 'T00:00:00').toLocaleDateString() : 'Unknown Date'}
+                    </Text>
+                  </Box>
+                  <Text size="xs" c="dimmed" mt={4} fs="italic">
+                    Date is readonly when rescheduling - only time can be changed
+                  </Text>
+                </Box>
+              ) : (
+                <DateInput
+                  label="Appointment Date"
+                  placeholder="Select appointment date"
+                  minDate={today}
+                  error={fieldState.error?.message}
+                  disabled={isLoading}
+                  value={field.value ? new Date(field.value) : null}
+                  onChange={(value) => {
+                    // Handle different types that DateInput might pass
+                    let dateString = '';
+                    if (value && typeof value === 'object' && 'getTime' in value && !isNaN((value as Date).getTime())) {
+                      dateString = (value as Date).toISOString().split('T')[0];
+                    } else if (typeof value === 'string' && value) {
+                      // If it's already a string, try to parse it
+                      const parsedDate = new Date(value);
+                      if (!isNaN(parsedDate.getTime())) {
+                        dateString = parsedDate.toISOString().split('T')[0];
+                      }
+                    }
+                    
+                    field.onChange(dateString);
+                    handleDateChange(value && typeof value === 'object' && 'getTime' in value ? value as Date : (value ? new Date(value as string) : null));
+                    handleInputChange();
+                  }}
+                  leftSection={<Icon icon="fas fa-calendar" size={16} />}
+                />
+              )}
+            </>
           )}
         />
 

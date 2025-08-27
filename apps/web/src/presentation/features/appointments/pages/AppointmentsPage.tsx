@@ -35,6 +35,7 @@ export const AppointmentsPage: React.FC = () => {
   // Modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDto | null>(null);
+  const [isRescheduleMode, setIsRescheduleMode] = useState(false);
   
   // Confirmation modal states
   const [confirmationModal, setConfirmationModal] = useState<{
@@ -74,6 +75,7 @@ export const AppointmentsPage: React.FC = () => {
     const appointment = viewModel.appointments.find(apt => apt.id === appointmentId);
     if (appointment) {
       setSelectedAppointment(appointment);
+      setIsRescheduleMode(false); // Regular edit mode
       setIsEditModalOpen(true);
     }
   };
@@ -81,6 +83,7 @@ export const AppointmentsPage: React.FC = () => {
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setSelectedAppointment(null);
+    setIsRescheduleMode(false); // Reset reschedule mode
   };
 
   const handleCancelAppointment = (appointmentId: string) => {
@@ -108,34 +111,41 @@ export const AppointmentsPage: React.FC = () => {
     const appointment = viewModel.appointments.find(apt => apt.id === appointmentId);
     const appointmentName = appointment?.patient?.fullName || 'this appointment';
     
-    // Check if there are already 4 confirmed appointments for the same date and time
-    const sameSlotAppointments = viewModel.appointments.filter(apt => 
-      apt.appointmentDate === appointment?.appointmentDate &&
-      apt.appointmentTime === appointment?.appointmentTime &&
-      apt.status === 'confirmed'
-    );
-    
-    if (sameSlotAppointments.length >= 4) {
-      // If slot is full, open edit modal to reschedule
-      handleModifyAppointment(appointmentId);
-    } else {
-      // Otherwise, show confirmation to reconfirm
-      setConfirmationModal({
-        isOpen: true,
-        title: 'Reconfirm Appointment',
-        message: `Reconfirm the appointment for ${appointmentName}?`,
-        confirmText: 'Reconfirm',
-        confirmColor: 'green',
-        onConfirm: async () => {
+    // Always show the reconfirm modal first
+    setConfirmationModal({
+      isOpen: true,
+      title: 'Reconfirm Appointment',
+      message: `Reconfirm the appointment for ${appointmentName}?`,
+      confirmText: 'Reconfirm',
+      confirmColor: 'green',
+      onConfirm: async () => {
+        // Check if there are already 4 confirmed appointments for the same date and time
+        const sameSlotAppointments = viewModel.appointments.filter(apt => 
+          apt.appointmentDate === appointment?.appointmentDate &&
+          apt.appointmentTime === appointment?.appointmentTime &&
+          apt.status === 'confirmed'
+        );
+        
+        if (sameSlotAppointments.length > 0) {
+          // If slot is taken, close confirmation modal and open the reschedule appointment form
+          setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+          // Open the Update Appointment modal with the selected appointment in reschedule mode
+          if (appointment) {
+            setSelectedAppointment(appointment);
+            setIsRescheduleMode(true); // Special reschedule mode
+            setIsEditModalOpen(true);
+          }
+        } else {
+          // Otherwise, proceed with simple reconfirmation
           try {
             await viewModel.confirmAppointment(appointmentId);
             setConfirmationModal(prev => ({ ...prev, isOpen: false }));
           } catch (error) {
             console.error('Failed to reconfirm appointment:', error);
           }
-        },
-      });
-    }
+        }
+      },
+    });
   };
 
   const handleCompleteAppointment = (appointmentId: string) => {
@@ -257,6 +267,7 @@ export const AppointmentsPage: React.FC = () => {
         onClose={handleCloseEditModal}
         editMode={true}
         appointment={selectedAppointment}
+        isRescheduleMode={isRescheduleMode}
         onAppointmentUpdated={() => {
           // Refresh the appointments list after update
           viewModel.loadAppointments();
