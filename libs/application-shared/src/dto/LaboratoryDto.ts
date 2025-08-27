@@ -609,6 +609,11 @@ export interface UpdateLabTestResultRequestDto {
     typhoidTest?: string;
     pregnancyTest?: string;
   };
+  dengue?: {
+    igg?: string;
+    igm?: string;
+    ns1?: string;
+  };
   ecg?: {
     rhythm?: string;
     rate?: string;
