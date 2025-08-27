@@ -53,7 +53,7 @@ export const useViewLabTestResultViewModel = (): ViewLabTestResultViewModelRetur
   const getPatientInfo = useCallback(async (patientId: string): Promise<PatientInfo> => {
     let patientInfo: PatientInfo = {
       patientNumber: patientId,
-      patientName: `Patient ${patientId.slice(0, 8)}...`,
+      patientName: '',
       age: undefined,
       sex: undefined
     };

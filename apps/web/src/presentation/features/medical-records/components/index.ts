@@ -10,3 +10,6 @@ export { ViewPrescriptionModal } from './ViewPrescriptionModal';
 export { LaboratoryTestsPageHeader } from './LaboratoryTestsPageHeader';
 export { LaboratoryTestsTable } from './LaboratoryTestsTable';
 export { LaboratoryTestsModals } from './LaboratoryTestsModals';
+
+// Report view components
+export { UrinalysisReportView } from './UrinalysisReportView';

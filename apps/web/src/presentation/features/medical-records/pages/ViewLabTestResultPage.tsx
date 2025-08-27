@@ -2,12 +2,15 @@ import React from 'react';
 import { Box, Button, Group, Title, useMantineTheme } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { AddLabTestResultForm } from '../components';
+import { AddLabTestResultForm, UrinalysisReportView } from '../components';
 import { useViewLabTestResultViewModel } from '../view-models/useViewLabTestResultViewModel';
 
 export const ViewLabTestResultPage: React.FC = () => {
   const theme = useMantineTheme();
   const viewModel = useViewLabTestResultViewModel();
+
+  // Check if this is a urinalysis test to decide which component to render
+  const isUrinalysisTest = viewModel.selectedLabTest?.testCategory === 'urinalysis';
 
   return (
     <MedicalClinicLayout>
@@ -49,22 +52,37 @@ export const ViewLabTestResultPage: React.FC = () => {
         </Group>
       </Box>
 
-      <AddLabTestResultForm
-        testType={viewModel.selectedLabTest?.testCategory}
-        viewMode={true}
-        enabledFields={viewModel.selectedLabTest?.enabledFields || []}
-        existingData={viewModel.bloodChemistryData}
-        isLoadingData={viewModel.isLoading}
-        patientData={{
-          patientNumber: viewModel.patientInfo?.patientNumber || '',
-          patientName: viewModel.patientInfo?.patientName || '',
-          age: viewModel.patientInfo?.age || 0,
-          sex: viewModel.patientInfo?.sex || ''
-        }}
-        onSubmit={() => { /* No-op for view mode */ }}
-        onCancel={viewModel.handleBack}
-        error={viewModel.error}
-      />
+      {/* Conditionally render the appropriate component based on test type */}
+      {isUrinalysisTest ? (
+        <UrinalysisReportView
+          patientData={{
+            patientNumber: viewModel.patientInfo?.patientNumber || '',
+            patientName: viewModel.patientInfo?.patientName || '',
+            age: viewModel.patientInfo?.age || 0,
+            sex: viewModel.patientInfo?.sex || '',
+            dateRequested: viewModel.selectedLabTest?.date || ''
+          }}
+          labData={viewModel.bloodChemistryData}
+          onBack={viewModel.handleBack}
+        />
+      ) : (
+        <AddLabTestResultForm
+          testType={viewModel.selectedLabTest?.testCategory}
+          viewMode={true}
+          enabledFields={viewModel.selectedLabTest?.enabledFields || []}
+          existingData={viewModel.bloodChemistryData}
+          isLoadingData={viewModel.isLoading}
+          patientData={{
+            patientNumber: viewModel.patientInfo?.patientNumber || '',
+            patientName: viewModel.patientInfo?.patientName || '',
+            age: viewModel.patientInfo?.age || 0,
+            sex: viewModel.patientInfo?.sex || ''
+          }}
+          onSubmit={() => { /* No-op for view mode */ }}
+          onCancel={viewModel.handleBack}
+          error={viewModel.error}
+        />
+      )}
     </MedicalClinicLayout>
   );
 };

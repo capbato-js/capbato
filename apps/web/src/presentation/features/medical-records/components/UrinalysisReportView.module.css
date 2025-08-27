@@ -1,0 +1,139 @@
+.printArea {
+  background: white !important;
+  color: black !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+.noPrint {
+  display: block;
+}
+
+/* Print-specific styles */
+@media print {
+  .noPrint {
+    display: none !important;
+  }
+  
+  .printArea {
+    margin: 50px 0 0 0 !important;
+    padding: 20px !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Ensure proper page breaks */
+  .printArea {
+    page-break-inside: avoid;
+  }
+  
+  /* Remove background colors and shadows for print */
+  * {
+    background: transparent !important;
+    color: black !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Ensure borders show in print */
+  .printArea * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Show borders and underlines in print */
+  .printArea [style*="border-bottom"] {
+    border-bottom: 1px solid black !important;
+  }
+  
+  /* Ensure proper font sizes for print */
+  .printArea h1,
+  .printArea h2,
+  .printArea h3 {
+    font-weight: bold !important;
+    color: black !important;
+  }
+  
+  /* Make sure text is black */
+  .printArea p,
+  .printArea span,
+  .printArea div {
+    color: black !important;
+  }
+}
+
+/* Enhanced underline styles for form fields */
+.formUnderline {
+  border-bottom: 1px solid #000 !important;
+  padding-bottom: 2px;
+  display: inline-block;
+  min-width: 100px;
+}
+
+/* Signature section styling */
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
+
+.signatureBlock {
+  text-align: center;
+  flex: 1;
+}
+
+.signatureLine {
+  font-weight: bold;
+  font-size: 12px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 2px;
+  margin-bottom: 5px;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.signatureTitle {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* Enhanced underline styles for form fields */
+.form-underline {
+  border-bottom: 1px solid #000;
+  padding-bottom: 2px;
+  display: inline-block;
+  min-width: 100px;
+}
+
+/* Signature section styling */
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
+
+.signature-block {
+  text-align: center;
+  flex: 1;
+}
+
+.signature-line {
+  font-weight: bold;
+  font-size: 12px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 2px;
+  margin-bottom: 5px;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.signature-title {
+  font-weight: bold;
+  font-size: 12px;
+}

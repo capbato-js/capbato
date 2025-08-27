@@ -56,8 +56,6 @@ export class PatientApiService implements IPatientApiService {
   }
 
   async updatePatient(command: UpdatePatientCommand): Promise<PatientResponse> {
-    console.log('🌐 PatientApiService.updatePatient called with:', command);
-    
     // Map UpdatePatientCommand to UpdatePatientRequestDto for API consistency
     const requestDto: UpdatePatientRequestDto = {
       id: command.id,
@@ -88,18 +86,13 @@ export class PatientApiService implements IPatientApiService {
       guardianCityMunicipality: command.guardianCityMunicipality,
       guardianBarangay: command.guardianBarangay,
     };
-
-    console.log('🌐 Request DTO prepared:', requestDto);
     
     const endpoint = this.apiConfig.endpoints.patients.update(command.id);
-    console.log('🌐 Making PUT request to endpoint:', endpoint);
 
     const response = await this.httpClient.put<PatientResponse>(
       endpoint,
       requestDto
     );
-    
-    console.log('🌐 HTTP response received:', response);
     
     if (!response.data.success) {
       throw new Error(`Failed to update patient with ID: ${command.id}`);

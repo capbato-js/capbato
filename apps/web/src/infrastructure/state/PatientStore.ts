@@ -161,16 +161,13 @@ export const usePatientStore = create<PatientStore>()(
           },
 
           async updatePatient(command) {
-            console.log('🔄 PatientStore.updatePatient called with:', command);
             set((state) => {
               state.updatePatientStatus[command.id] = 'loading';
               state.updatePatientErrors[command.id] = null;
             });
 
             try {
-              console.log('📡 Calling API service updatePatient...');
               const response = await getApiService().updatePatient(command);
-              console.log('✅ API response received:', response);
               const updatedPatient = response.data;
               
               set((state) => {

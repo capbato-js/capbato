@@ -45,7 +45,7 @@ export interface LaboratoryTestsViewModelReturn {
 }
 
 export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn => {
-  const { patientId } = useParams<{ patientId: string }>();
+  const { patientId } = useParams<{ patientId: string; labRequestId?: string }>();
   const navigate = useNavigate();
   const laboratoryStore = useLaboratoryStore();
   const patientStore = usePatientStore();
@@ -58,82 +58,34 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
   // Load data on mount
   useEffect(() => {
     const fetchData = async () => {
-      if (!patientId) return;
+      if (!patientId) {
+        return;
+      }
       
       try {
-        // Fetch lab tests
+        // Fetch lab tests and patient details
         await laboratoryStore.fetchLabTestsByPatientId(patientId);
+        await patientStore.loadPatientById(patientId);
         
-        // Try to fetch patient information from lab request
-        try {
-          const labRequest = await laboratoryStore.fetchLabRequestByPatientId(patientId);
-          if (labRequest && labRequest.patient) {
-            const patient = labRequest.patient;
-            
-            // Extract age and sex from ageGender field (e.g., "35/M" or "28/F")
-            let age: number | undefined;
-            let sex: string | undefined;
-            
-            if (patient.ageGender) {
-              const ageGenderParts = patient.ageGender.split('/');
-              if (ageGenderParts.length >= 2) {
-                age = parseInt(ageGenderParts[0]);
-                sex = ageGenderParts[1];
-              }
-            }
-            
-            // Use proper patient name
-            let patientName = patient.name;
-            if (!patientName && patient.firstName && patient.lastName) {
-              patientName = `${patient.firstName} ${patient.lastName}`.trim();
-            }
-            
-            setPatientInfo({
-              id: patient.id,
-              fullName: patientName || `Patient ${patient.id}`,
-              patientNumber: patient.patientNumber || patient.id,
-              patientName: patientName || `Patient ${patient.id}`,
-              age,
-              sex,
-              gender: sex || 'Unknown',
-              dateOfBirth: '1990-01-01' // Default if not available from lab request
-            });
-          }
-        } catch (requestError) {
+        const patientDetails = patientStore.getPatientDetails(patientId);
+        
+        if (patientDetails) {
+          const patientInfo = {
+            id: patientDetails.id,
+            fullName: `${patientDetails.firstName} ${patientDetails.lastName}`.trim(),
+            patientNumber: patientDetails.patientNumber,
+            patientName: `${patientDetails.firstName} ${patientDetails.lastName}`.trim(),
+            age: patientDetails.age,
+            sex: patientDetails.gender,
+            gender: patientDetails.gender,
+            dateOfBirth: patientDetails.dateOfBirth || '1990-01-01'
+          };
           
-          // Fallback to direct patient fetch
-          try {
-            await patientStore.loadPatientById(patientId);
-            const patientDetails = patientStore.getPatientDetails(patientId);
-            
-            if (patientDetails) {
-              setPatientInfo({
-                id: patientDetails.id,
-                fullName: `${patientDetails.firstName} ${patientDetails.lastName}`.trim(),
-                patientNumber: patientDetails.patientNumber,
-                patientName: `${patientDetails.firstName} ${patientDetails.lastName}`.trim(),
-                age: patientDetails.age,
-                sex: patientDetails.gender,
-                gender: patientDetails.gender,
-                dateOfBirth: patientDetails.dateOfBirth || '1990-01-01'
-              });
-            }
-          } catch (patientError) {
-            console.error('❌ Error fetching patient details:', patientError);
-            // Final fallback
-            setPatientInfo({
-              id: patientId,
-              fullName: `Patient ${patientId}`,
-              patientNumber: patientId,
-              patientName: `Patient ${patientId}`,
-              dateOfBirth: '1990-01-01',
-              gender: 'Unknown'
-            });
-          }
+          setPatientInfo(patientInfo);
         }
         
-      } catch (error) {
-        console.error('❌ Error fetching lab tests:', error);
+      } catch {
+        // Error handling for lab tests fetch or patient fetch
       }
     };
 
@@ -192,8 +144,8 @@ export const useLaboratoryTestsViewModel = (): LaboratoryTestsViewModelReturn =>
         
         // Reload lab tests to reflect the cancellation
         await laboratoryStore.fetchLabTestsByPatientId(patientId);
-      } catch (error) {
-        console.error('❌ Failed to cancel lab test:', error);
+      } catch {
+        // Handle cancellation error silently
       } finally {
         handleCloseCancelConfirmation();
       }
