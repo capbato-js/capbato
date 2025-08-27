@@ -112,11 +112,12 @@ export const useDashboardViewModel = (): DashboardViewModel => {
         return dateTimeA.getTime() - dateTimeB.getTime();
       });
 
-    // Find first non-completed appointment that is either:
+    // Find first active appointment that is either:
     // 1. From the past or current time (has started or should have started)
     // 2. Scheduled for today (regardless of time)
+    // Exclude completed and cancelled appointments
     const currentAppointment = allAppointmentsSorted.find(apt => {
-      if (apt.status === 'completed') return false;
+      if (apt.status === 'completed' || apt.status === 'cancelled') return false;
       
       const appointmentDate = new Date(apt.date);
       const appointmentDateTime = new Date(`${apt.date} ${apt.time}`);

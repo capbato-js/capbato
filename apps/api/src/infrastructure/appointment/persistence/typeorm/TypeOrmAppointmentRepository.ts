@@ -355,8 +355,10 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
       order: { appointmentDate: 'ASC', appointmentTime: 'ASC' },
     });
 
-    // Find first non-completed appointment (confirmed or cancelled, but not completed)
-    const currentEntity = entities.find(entity => entity.status !== 'completed');
+    // Find first active appointment (exclude completed and cancelled appointments)
+    const currentEntity = entities.find(entity => 
+      entity.status !== 'completed' && entity.status !== 'cancelled'
+    );
     return currentEntity ? this.toDomain(currentEntity) : undefined;
   }
 

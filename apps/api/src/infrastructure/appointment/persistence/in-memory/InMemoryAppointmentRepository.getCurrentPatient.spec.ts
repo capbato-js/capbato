@@ -91,4 +91,49 @@ describe('InMemoryAppointmentRepository - getCurrentPatientAppointment', () => {
     expect(currentAppointment!.patientId).toBe('patient-2');
     expect(currentAppointment!.timeValue).toBe('09:00');
   });
+
+  it('should return undefined when all appointments are cancelled', async () => {
+    // Arrange
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const appointment = Appointment.create('patient-1', 'Checkup', tomorrow, '10:00', 'doctor-1');
+    const id = await repository.create(appointment);
+    
+    // Cancel the appointment
+    const cancelledAppointment = appointment.cancel();
+    await repository.update(id, cancelledAppointment);
+
+    // Act
+    const currentAppointment = await repository.getCurrentPatientAppointment();
+
+    // Assert
+    expect(currentAppointment).toBeUndefined();
+  });
+
+  it('should skip cancelled appointments and find next active appointment', async () => {
+    // Arrange
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const nextDay = new Date(tomorrow);
+    nextDay.setDate(tomorrow.getDate() + 1);
+
+    const earlierAppointment = Appointment.create('patient-1', 'Cancelled checkup', tomorrow, '09:00', 'doctor-1');
+    const laterAppointment = Appointment.create('patient-2', 'Active checkup', nextDay, '10:00', 'doctor-1');
+
+    const id1 = await repository.create(earlierAppointment);
+    await repository.create(laterAppointment);
+    
+    // Cancel the earlier appointment
+    const cancelledAppointment = earlierAppointment.cancel();
+    await repository.update(id1, cancelledAppointment);
+
+    // Act
+    const currentAppointment = await repository.getCurrentPatientAppointment();
+
+    // Assert - Should return the later active appointment
+    expect(currentAppointment).toBeDefined();
+    expect(currentAppointment!.patientId).toBe('patient-2');
+    expect(currentAppointment!.statusValue).toBe('confirmed');
+  });
 });

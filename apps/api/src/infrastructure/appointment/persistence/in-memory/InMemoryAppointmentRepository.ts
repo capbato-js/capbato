@@ -179,7 +179,9 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
         return a.appointmentTime.toMinutes() - b.appointmentTime.toMinutes();
       });
 
-    // Find first non-completed appointment
-    return allAppointments.find(appointment => !appointment.isCompleted());
+    // Find first active appointment (exclude completed and cancelled appointments)
+    return allAppointments.find(appointment => 
+      !appointment.isCompleted() && !appointment.isCancelled()
+    );
   }
 }
