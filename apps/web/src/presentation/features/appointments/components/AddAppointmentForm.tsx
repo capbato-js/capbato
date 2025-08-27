@@ -155,6 +155,7 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
   };
 
   // Generate available time slots based on selected date, filtering out booked times
+  // Only confirmed appointments block time slots - cancelled appointments make slots available again
   const getAvailableTimeSlots = (selectedDate: string, excludeCurrentAppointmentId?: string) => {
     const slots = [];
     const now = new Date();
@@ -165,7 +166,13 @@ export const AddAppointmentForm: React.FC<AddAppointmentFormProps> = ({
     const bookedTimes = existingAppointments
       .filter(apt => {
         // In edit mode, exclude the current appointment being edited
-        return excludeCurrentAppointmentId ? apt.id !== excludeCurrentAppointmentId : true;
+        const isNotCurrentEdit = excludeCurrentAppointmentId ? apt.id !== excludeCurrentAppointmentId : true;
+        
+        // Only count confirmed appointments as blocking time slots
+        // Cancelled and completed appointments should not block new appointments
+        const isConfirmed = apt.status === 'confirmed';
+        
+        return isNotCurrentEdit && isConfirmed;
       })
       .map(apt => apt.appointmentTime);
     
