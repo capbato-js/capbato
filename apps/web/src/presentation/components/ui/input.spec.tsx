@@ -21,4 +21,27 @@ describe('Input Component', () => {
     expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute('placeholder', 'Enter text');
   });
+
+  it('should render input with different types', () => {
+    render(
+      <TestWrapper>
+        <Input data-testid="email-input" type="email" placeholder="Enter email" />
+      </TestWrapper>
+    );
+
+    const input = screen.getByTestId('email-input');
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute('type', 'email');
+  });
+
+  it('should handle disabled state', () => {
+    render(
+      <TestWrapper>
+        <Input data-testid="disabled-input" disabled />
+      </TestWrapper>
+    );
+
+    const input = screen.getByTestId('disabled-input');
+    expect(input).toBeDisabled();
+  });
 });
