@@ -27,6 +27,9 @@ export class Role extends ValueObject<string> {
   }
 
   public static create(value: string): Role {
+    if (!value || typeof value !== 'string') {
+      throw new InvalidRoleException('Role cannot be null or undefined');
+    }
     const normalizedRole = value.toLowerCase().trim();
     return new Role(normalizedRole);
   }
