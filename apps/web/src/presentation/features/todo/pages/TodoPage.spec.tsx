@@ -28,7 +28,7 @@ vi.mock('../components/TodoStats', () => ({
   TodoStats: () => <div data-testid="todo-stats">TodoStats</div>,
 }));
 
-vi.mock('../../../components/common/ErrorBanner', () => ({
+vi.mock('../../shared/components/ErrorBanner', () => ({
   ErrorBanner: () => <div data-testid="error-banner">ErrorBanner</div>,
 }));
 

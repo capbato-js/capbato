@@ -8,8 +8,8 @@ describe('App', () => {
     expect(baseElement).toBeTruthy();
   });
 
-  it('should have Todo App as the title', () => {
-    const { getByText } = render(<App />);
-    expect(getByText('Todo App')).toBeInTheDocument();
+  it('should show loading indicator while checking authentication', () => {
+    const { getByTestId } = render(<App />);
+    expect(getByTestId('page-loading-indicator')).toBeInTheDocument();
   });
 });

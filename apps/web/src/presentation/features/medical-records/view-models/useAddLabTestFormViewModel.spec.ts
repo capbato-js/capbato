@@ -56,13 +56,18 @@ describe('useAddLabTestFormViewModel', () => {
 
     expect(mockCreateLabRequest).toHaveBeenCalledWith(
       expect.objectContaining({
-        patientName: 'test-patient-id',
-        ageGender: '30/M',
+        patientId: 'test-patient-id',
         requestDate: new Date('2024-01-01'),
         others: 'Additional tests',
-        cbcWithPlatelet: 'Yes',
-        fbs: 'Yes',
-        dengueNs1: 'Yes',
+        routine: {
+          cbcWithPlatelet: true,
+        },
+        bloodChemistry: {
+          fbs: true,
+        },
+        serology: {
+          dengueNs1: true,
+        },
       })
     );
     expect(mockFetchAllLabRequests).toHaveBeenCalled();
@@ -76,7 +81,7 @@ describe('useAddLabTestFormViewModel', () => {
       patientName: 'test-patient-id',
       ageGender: '25/F',
       requestDate: '2024-01-01',
-      selectedTests: ['hepa_c', 'crp', 'aso', 'ra_rf', 'tumor_markers', 'beta_hcg'],
+      selectedTests: ['serology_hepatitis_c_screening', 'serology_crp', 'serology_aso', 'serology_ra_rf', 'serology_tumor_markers', 'serology_beta_hcg'],
       otherTests: '',
     };
 
@@ -86,12 +91,16 @@ describe('useAddLabTestFormViewModel', () => {
 
     expect(mockCreateLabRequest).toHaveBeenCalledWith(
       expect.objectContaining({
-        hepaCScreening: 'Yes',
-        crp: 'Yes',
-        aso: 'Yes',
-        raRf: 'Yes',
-        tumorMarkers: 'Yes',
-        betaHcg: 'Yes',
+        patientId: 'test-patient-id',
+        requestDate: new Date('2024-01-01'),
+        serology: {
+          hepatitisCScreening: true,
+          crp: true,
+          aso: true,
+          raRf: true,
+          tumorMarkers: true,
+          betaHcg: true,
+        },
       })
     );
   });

@@ -4,6 +4,13 @@ import { MantineProvider } from '@mantine/core';
 import { AppointmentsPage } from './AppointmentsPage';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
+// Create mock functions that can be accessed in tests
+const mockConfirmAppointment = vi.fn().mockResolvedValue(undefined);
+const mockHandleAppointmentCreated = vi.fn();
+const mockFetchAppointments = vi.fn();
+const mockRefreshAppointments = vi.fn();
+const mockLoadAppointments = vi.fn().mockResolvedValue(undefined);
+
 // Mock the view model
 vi.mock('../view-models/useAppointmentPageViewModel', () => ({
   useAppointmentPageViewModel: () => ({
@@ -30,10 +37,11 @@ vi.mock('../view-models/useAppointmentPageViewModel', () => ({
     filteredAppointments: [],
     isLoading: false,
     error: null,
-    confirmAppointment: vi.fn().mockResolvedValue(undefined),
-    handleAppointmentCreated: vi.fn(),
-    fetchAppointments: vi.fn(),
-    refreshAppointments: vi.fn()
+    confirmAppointment: mockConfirmAppointment,
+    handleAppointmentCreated: mockHandleAppointmentCreated,
+    fetchAppointments: mockFetchAppointments,
+    refreshAppointments: mockRefreshAppointments,
+    loadAppointments: mockLoadAppointments
   })
 }));
 
@@ -108,38 +116,14 @@ describe('AppointmentsPage - Reconfirm Flow', () => {
   });
 
   it('should proceed with reconfirmation when slot is available', async () => {
-    const mockConfirmAppointment = vi.fn().mockResolvedValue(undefined);
+    // Clear any previous calls to the mock
+    mockConfirmAppointment.mockClear();
     
-    // Re-mock with fewer confirmed appointments (slot available)
-    vi.doMock('../view-models/useAppointmentPageViewModel', () => ({
-      useAppointmentPageViewModel: () => ({
-        appointments: [
-          {
-            id: 'apt-1',
-            appointmentDate: '2025-08-27',
-            appointmentTime: '10:00',
-            status: 'cancelled',
-            patient: { fullName: 'John Doe' }
-          }
-          // Only 0 confirmed appointments at this time slot
-        ],
-        confirmAppointment: mockConfirmAppointment,
-        filteredAppointments: [],
-        isLoading: false,
-        error: null,
-        handleAppointmentCreated: vi.fn(),
-        fetchAppointments: vi.fn(),
-        refreshAppointments: vi.fn()
-      })
-    }));
-
     render(
       <MantineProvider>
         <AppointmentsPage />
       </MantineProvider>
-    );
-
-    // Click reconfirm
+    );    // Click reconfirm
     const reconfirmButton = screen.getByTestId('reconfirm-button');
     fireEvent.click(reconfirmButton);
 

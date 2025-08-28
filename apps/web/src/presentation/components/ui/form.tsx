@@ -35,6 +35,7 @@ function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
     <FormItemContext.Provider value={{ id }}>
       <div
         data-slot="form-item"
+        data-testid="form-item"
         className={cn('grid gap-2', className)}
         {...props}
       />
@@ -51,6 +52,7 @@ function FormLabel({
   return (
     <Label
       data-slot="form-label"
+      data-testid="form-label"
       data-error={!!error}
       className={cn('data-[error=true]:text-destructive', className)}
       htmlFor={formItemId}
@@ -66,6 +68,7 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
   return (
     <Slot
       data-slot="form-control"
+      data-testid="form-control"
       id={formItemId}
       aria-describedby={
         !error
@@ -84,6 +87,7 @@ function FormDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
     <p
       data-slot="form-description"
+      data-testid="form-description"
       id={formDescriptionId}
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
@@ -102,6 +106,7 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   return (
     <p
       data-slot="form-message"
+      data-testid="form-message"
       id={formMessageId}
       className={cn('text-destructive text-sm', className)}
       {...props}

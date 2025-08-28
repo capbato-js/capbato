@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MantineProvider } from '@mantine/core';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../../../../test/test-utils';
 import { UpdateUserDetailsForm } from './UpdateUserDetailsForm';
 import { UpdateUserDetailsFormData, UpdateUserDetailsCommand } from '@nx-starter/application-shared';
 
@@ -32,14 +32,6 @@ vi.mock('../../../components/ui/FormTextInput', () => ({
     </div>
   )
 }));
-
-const renderWithProviders = (component: React.ReactNode) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
-};
 
 describe('UpdateUserDetailsForm', () => {
   const mockUserData: UpdateUserDetailsFormData = {

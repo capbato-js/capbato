@@ -1,26 +1,40 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { PrintReceiptModal } from './PrintReceiptModal';
-import { Transaction } from '../types';
+import { Transaction } from '../types/TransactionTypes';
 
 // Mock Mantine components
-jest.mock('@mantine/core', () => ({
-  Modal: ({ children, opened, title }: any) => {
-    return opened ? <div data-testid="modal" aria-label={title}>{children}</div> : null;
-  },
-  Box: ({ children }: any) => <div>{children}</div>,
-  Text: ({ children }: any) => <span>{children}</span>,
-  Group: ({ children }: any) => <div>{children}</div>,
-  Stack: ({ children }: any) => <div>{children}</div>,
-  Table: ({ children }: any) => <table>{children}</table>,
-  Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
-  Divider: () => <hr />,
-  Paper: ({ children }: any) => <div>{children}</div>,
+vi.mock('@mantine/core', () => {
+  const MockTable = ({ children }: any) => <table>{children}</table>;
+  MockTable.Thead = ({ children }: any) => <thead>{children}</thead>;
+  MockTable.Tbody = ({ children }: any) => <tbody>{children}</tbody>;
+  MockTable.Tr = ({ children }: any) => <tr>{children}</tr>;
+  MockTable.Th = ({ children }: any) => <th>{children}</th>;
+  MockTable.Td = ({ children }: any) => <td>{children}</td>;
+
+  return {
+    Modal: ({ children, opened, title }: any) => {
+      return opened ? <div data-testid="modal" aria-label={title}>{children}</div> : null;
+    },
+    Box: ({ children }: any) => <div>{children}</div>,
+    Text: ({ children }: any) => <span>{children}</span>,
+    Group: ({ children }: any) => <div>{children}</div>,
+    Stack: ({ children }: any) => <div>{children}</div>,
+    Table: MockTable,
+    Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
+    Divider: () => <hr />,
+    Paper: ({ children }: any) => <div>{children}</div>,
+  };
+});
+
+vi.mock('../../../components/common', () => ({
+  Icon: ({ icon }: any) => <span data-testid="icon">{icon}</span>,
 }));
 
-jest.mock('../../../components/common', () => ({
-  Icon: ({ icon }: any) => <span data-testid="icon">{icon}</span>,
+vi.mock('react-to-print', () => ({
+  useReactToPrint: vi.fn(() => vi.fn()),
 }));
 
 describe('PrintReceiptModal', () => {
@@ -34,7 +48,10 @@ describe('PrintReceiptModal', () => {
       firstName: 'John',
       lastName: 'Doe',
       middleName: 'M',
-      fullName: 'John M. Doe'
+      fullName: 'John M. Doe',
+      address: '123 Test Street',
+      contactNumber: '09123456789',
+      email: 'john.doe@example.com'
     },
     totalAmount: 1500.00,
     paymentMethod: 'Cash',
@@ -62,12 +79,12 @@ describe('PrintReceiptModal', () => {
 
   const defaultProps = {
     opened: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     transaction: mockTransaction,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the modal when opened', () => {
@@ -93,8 +110,8 @@ describe('PrintReceiptModal', () => {
     render(<PrintReceiptModal {...defaultProps} />);
     
     expect(screen.getByText('RECEIPT')).toBeInTheDocument();
-    expect(screen.getByText('[YOUR BUSINESS NAME HERE]')).toBeInTheDocument();
-    expect(screen.getByText('[BUSINESS ADDRESS]')).toBeInTheDocument();
+    expect(screen.getByText('M.G. Amores Medical Clinic')).toBeInTheDocument();
+    expect(screen.getByText('[CLINIC ADDRESS]')).toBeInTheDocument();
     expect(screen.getByText('[PHONE NUMBER]')).toBeInTheDocument();
   });
 
@@ -105,7 +122,7 @@ describe('PrintReceiptModal', () => {
     expect(screen.getByText('John M. Doe')).toBeInTheDocument();
     expect(screen.getByText('P001')).toBeInTheDocument();
     expect(screen.getByText('Cash')).toBeInTheDocument();
-    expect(screen.getByText('Staff A')).toBeInTheDocument();
+    expect(screen.getByText('Received by: Staff A')).toBeInTheDocument();
   });
 
   it('displays transaction items', () => {
@@ -120,17 +137,24 @@ describe('PrintReceiptModal', () => {
   it('displays formatted currency amounts', () => {
     render(<PrintReceiptModal {...defaultProps} />);
     
-    expect(screen.getByText('₱500.00')).toBeInTheDocument();
-    expect(screen.getByText('₱1,000.00')).toBeInTheDocument();
-    expect(screen.getByText('₱1,500.00')).toBeInTheDocument();
+    // ₱500.00 appears twice (unit price and total for consultation)
+    const fiveHundred = screen.getAllByText('₱500.00');
+    expect(fiveHundred).toHaveLength(2);
+    
+    // ₱1,000.00 appears twice (unit price and total for lab test)  
+    const oneThousand = screen.getAllByText('₱1,000.00');
+    expect(oneThousand).toHaveLength(2);
+    
+    // ₱1,500.00 appears twice (amount paid and total)
+    const fifteenHundred = screen.getAllByText('₱1,500.00');
+    expect(fifteenHundred).toHaveLength(2);
   });
 
-  it('displays customer information placeholders', () => {
+  it('displays customer information correctly', () => {
     render(<PrintReceiptModal {...defaultProps} />);
     
-    expect(screen.getByText('[CUSTOMER ADDRESS]')).toBeInTheDocument();
-    expect(screen.getByText('[CUSTOMER PHONE]')).toBeInTheDocument();
-    expect(screen.getByText('[CUSTOMER EMAIL]')).toBeInTheDocument();
+    expect(screen.getByText('123 Test Street')).toBeInTheDocument();
+    expect(screen.getByText('09123456789')).toBeInTheDocument();
   });
 
   it('has a print button', () => {
@@ -146,25 +170,18 @@ describe('PrintReceiptModal', () => {
     expect(screen.getByText('PAYMENT INFORMATION')).toBeInTheDocument();
     expect(screen.getByText('PAYMENT METHOD:')).toBeInTheDocument();
     expect(screen.getByText('AMOUNT PAID:')).toBeInTheDocument();
-    expect(screen.getByText('BALANCE:')).toBeInTheDocument();
-    expect(screen.getByText('₱0.00')).toBeInTheDocument(); // Balance should be 0
   });
 
-  it('displays totals section correctly', () => {
+  it('displays total correctly', () => {
     render(<PrintReceiptModal {...defaultProps} />);
     
-    expect(screen.getByText('SUBTOTAL:')).toBeInTheDocument();
-    expect(screen.getByText('TAX:')).toBeInTheDocument();
-    expect(screen.getByText('SHIPPING:')).toBeInTheDocument();
-    expect(screen.getByText('DISCOUNT:')).toBeInTheDocument();
     expect(screen.getByText('TOTAL:')).toBeInTheDocument();
   });
 
-  it('displays additional information section', () => {
+  it('displays received by information', () => {
     render(<PrintReceiptModal {...defaultProps} />);
     
-    expect(screen.getByText('ADDITIONAL INFORMATION')).toBeInTheDocument();
-    expect(screen.getByText('[ADDITIONAL NOTES OR INFORMATION]')).toBeInTheDocument();
+    expect(screen.getByText('Received by: Staff A')).toBeInTheDocument();
   });
 
   it('formats date correctly', () => {

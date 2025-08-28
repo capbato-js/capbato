@@ -111,11 +111,12 @@ export const LoginForm: React.FC = () => {
             {/* Username/Email Field */}
             <FormTextInput
               {...register('identifier')}
+              type="text"
               label="Username or Email"
               placeholder="Enter your username or email"
               leftSection={<IconUser size={18} />}
               disabled={viewModel.isSubmitting}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 register('identifier').onChange(e);
                 handleInputChange();
               }}
@@ -131,7 +132,7 @@ export const LoginForm: React.FC = () => {
               placeholder="Enter your password"
               leftSection={<IconLock size={18} />}
               disabled={viewModel.isSubmitting}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 register('password').onChange(e);
                 handleInputChange();
               }}
@@ -167,7 +168,7 @@ export const LoginForm: React.FC = () => {
         </form>
 
         {/* Forgot Password Link */}
-        {/* <Group justify="center" mt="lg">
+        <Group justify="center" mt="lg">
           <Button
             variant="subtle"
             size="sm"
@@ -179,7 +180,7 @@ export const LoginForm: React.FC = () => {
           >
             Forgot Password?
           </Button>
-        </Group> */}
+        </Group>
     </div>
   );
 };

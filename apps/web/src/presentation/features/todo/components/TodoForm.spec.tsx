@@ -1,7 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MantineProvider } from '@mantine/core';
+import React from 'react';
 import { TodoForm } from './TodoForm';
+
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <MantineProvider>{children}</MantineProvider>
+);
 
 // Mock the view model
 const mockViewModel = {
@@ -24,14 +30,14 @@ describe('TodoForm', () => {
   });
 
   it('should render form with input and button', () => {
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
-    expect(
-      screen.getByPlaceholderText('What needs to be done?')
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Add Todo' })
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('todo-input')).toBeInTheDocument();
+    expect(screen.getByTestId('add-todo-button')).toBeInTheDocument();
   });
 
   it('should show loading state when isGlobalLoading is true', () => {
@@ -39,10 +45,14 @@ describe('TodoForm', () => {
     // Individual form submissions don't use loading states for fast local DB operations
     mockViewModel.isGlobalLoading = true;
 
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
-    const input = screen.getByPlaceholderText('What needs to be done?');
-    const button = screen.getByRole('button');
+    const input = screen.getByTestId('todo-input');
+    const button = screen.getByTestId('add-todo-button');
 
     expect(input).toBeDisabled();
     expect(button).toBeDisabled();
@@ -51,25 +61,29 @@ describe('TodoForm', () => {
   it('should submit form with valid data', async () => {
     const user = userEvent.setup();
 
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
-    const input = screen.getByPlaceholderText('What needs to be done?');
-    const button = screen.getByRole('button', { name: 'Add Todo' });
+    const input = screen.getByTestId('todo-input');
+    const button = screen.getByTestId('add-todo-button');
 
-    await user.type(input, 'Test todo item');
+    await user.type(input, 'New todo item');
     await user.click(button);
 
-    await waitFor(() => {
-      expect(mockViewModel.handleFormSubmit).toHaveBeenCalledWith(
-        'Test todo item'
-      );
-    });
+    expect(mockViewModel.handleFormSubmit).toHaveBeenCalledWith('New todo item');
   });
 
   it('should trim whitespace from input before submission', async () => {
     const user = userEvent.setup();
 
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
     const input = screen.getByPlaceholderText('What needs to be done?');
     const button = screen.getByRole('button', { name: 'Add Todo' });
@@ -87,7 +101,11 @@ describe('TodoForm', () => {
   it('should reset form after successful submission', async () => {
     const user = userEvent.setup();
 
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
     const input = screen.getByPlaceholderText('What needs to be done?');
     const button = screen.getByRole('button', { name: 'Add Todo' });
@@ -103,7 +121,11 @@ describe('TodoForm', () => {
   it('should show submitting state during form submission', () => {
     mockViewModel.isSubmitting = true;
 
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
     const input = screen.getByPlaceholderText('What needs to be done?');
     const button = screen.getByRole('button', { name: 'Adding...' });
@@ -120,7 +142,11 @@ describe('TodoForm', () => {
       .mockImplementation(() => {});
     mockViewModel.handleFormSubmit.mockResolvedValue(false);
 
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
     const input = screen.getByPlaceholderText('What needs to be done?');
     const button = screen.getByRole('button', { name: 'Add Todo' });
@@ -148,7 +174,11 @@ describe('TodoForm', () => {
     // Form submissions themselves don't use loading states for fast IndexedDB operations
     mockViewModel.isGlobalLoading = true;
 
-    render(<TodoForm />);
+    render(
+      <TestWrapper>
+        <TodoForm />
+      </TestWrapper>
+    );
 
     const input = screen.getByPlaceholderText('What needs to be done?');
     const button = screen.getByRole('button');

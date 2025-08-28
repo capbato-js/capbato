@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../../../../test/test-utils';
+import { renderWithProviders } from '../../../test/test-utils';
 import { LoginForm } from './LoginForm';
 
 // Mock the view model
@@ -64,11 +64,9 @@ describe('LoginForm', () => {
 
     renderWithProviders(<LoginForm />);
 
-    // Should show loading state on the button (Mantine button has loading prop)
-    const submitButton = screen.getByTestId('login-submit-button');
-    expect(submitButton).toBeDisabled();
-    // The loading state is handled by Mantine internally, so we check if button is in loading state
-    expect(submitButton).toHaveAttribute('data-loading', 'true');
+    // Should show loading spinner (animate-spin class)
+    const spinner = document.querySelector('.animate-spin');
+    expect(spinner).toBeInTheDocument();
   });
 
   it('should call handleFormSubmit when form is submitted with valid data', async () => {
@@ -141,7 +139,7 @@ describe('LoginForm', () => {
     expect(passwordInput).toHaveAttribute('placeholder', 'Enter your password');
     
     expect(submitButton).toHaveAttribute('type', 'submit');
-    expect(rememberMeCheckbox).toHaveAttribute('type', 'checkbox');
+    expect(rememberMeCheckbox).toHaveAttribute('role', 'checkbox');
   });
 
   it('should disable submit button when fields are empty', () => {

@@ -43,9 +43,10 @@ describe('useAddressSelector', () => {
     mockAddressApiService.getBarangaysByCity.mockResolvedValue(mockBarangays);
   });
 
-  it('should initialize with correct default state', () => {
+  it('should initialize with correct default state', async () => {
     const { result } = renderHook(() => useAddressSelector());
 
+    // Initial state check
     expect(result.current.provinces).toEqual([]);
     expect(result.current.cities).toEqual([]);
     expect(result.current.barangays).toEqual([]);
@@ -56,6 +57,11 @@ describe('useAddressSelector', () => {
     expect(result.current.isLoadingCities).toBe(false);
     expect(result.current.isLoadingBarangays).toBe(false);
     expect(result.current.error).toBeNull();
+    
+    // Wait for the loadProvinces effect to complete to avoid act warnings
+    await waitFor(() => {
+      expect(result.current.isLoadingProvinces).toBe(false);
+    });
   });
 
   it('should load provinces on mount', async () => {

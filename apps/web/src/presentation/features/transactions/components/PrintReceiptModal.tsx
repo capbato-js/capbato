@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Modal, Box, Text, Group, Stack, Table, Button, Paper } from '@mantine/core';
 import { useReactToPrint } from 'react-to-print';
 import { Icon } from '../../../components/common';
-import { Transaction } from '../types';
+import { Transaction } from '../types/TransactionTypes';
 
 interface PrintReceiptModalProps {
   opened: boolean;

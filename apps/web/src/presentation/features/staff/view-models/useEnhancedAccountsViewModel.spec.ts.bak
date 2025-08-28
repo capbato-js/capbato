@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useAccountsViewModel } from './useEnhancedAccountsViewModel';
 import type { UpdateAccountData } from './useEnhancedAccountsViewModel';
 
@@ -95,7 +95,7 @@ describe('useAccountsViewModel', () => {
   });
 
   it('should update account successfully', async () => {
-    mockUserCommandService.updateUserDetails.mockResolvedValue({});
+    mockUpdateUserDetailsUseCase.execute.mockResolvedValue({});
     mockFetchUsers.mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useAccountsViewModel());
@@ -109,13 +109,10 @@ describe('useAccountsViewModel', () => {
       mobile: '09123456789'
     };
 
-    let success;
-    await act(async () => {
-      success = await result.current.updateAccount(updateData);
-    });
+    const success = await result.current.updateAccount(updateData);
 
     expect(success).toBe(true);
-    expect(mockUserCommandService.updateUserDetails).toHaveBeenCalledWith({
+    expect(mockUpdateUserDetailsUseCase.execute).toHaveBeenCalledWith({
       id: '1',
       firstName: 'Johnny',
       lastName: 'Doe',
@@ -131,7 +128,7 @@ describe('useAccountsViewModel', () => {
   });
 
   it('should update doctor account with profile fields', async () => {
-    mockUserCommandService.updateUserDetails.mockResolvedValue({});
+    mockUpdateUserDetailsUseCase.execute.mockResolvedValue({});
     mockFetchUsers.mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useAccountsViewModel());
@@ -149,13 +146,10 @@ describe('useAccountsViewModel', () => {
       schedulePattern: 'MWF'
     };
 
-    let success;
-    await act(async () => {
-      success = await result.current.updateAccount(updateData);
-    });
+    const success = await result.current.updateAccount(updateData);
 
     expect(success).toBe(true);
-    expect(mockUserCommandService.updateUserDetails).toHaveBeenCalledWith({
+    expect(mockUpdateUserDetailsUseCase.execute).toHaveBeenCalledWith({
       id: '2',
       firstName: 'Dr. Jane',
       lastName: 'Smith',
@@ -171,7 +165,7 @@ describe('useAccountsViewModel', () => {
 
   it('should handle update errors', async () => {
     const error = new Error('Update failed');
-    mockUserCommandService.updateUserDetails.mockRejectedValue(error);
+    mockUpdateUserDetailsUseCase.execute.mockRejectedValue(error);
 
     const { result } = renderHook(() => useAccountsViewModel());
 
@@ -184,10 +178,7 @@ describe('useAccountsViewModel', () => {
       mobile: '09123456789'
     };
 
-    let success;
-    await act(async () => {
-      success = await result.current.updateAccount(updateData);
-    });
+    const success = await result.current.updateAccount(updateData);
 
     expect(success).toBe(false);
     expect(result.current.error).toBe('Update failed');
@@ -206,7 +197,7 @@ describe('useAccountsViewModel', () => {
       }
     };
     
-    mockUserCommandService.updateUserDetails.mockRejectedValue(validationError);
+    mockUpdateUserDetailsUseCase.execute.mockRejectedValue(validationError);
 
     const { result } = renderHook(() => useAccountsViewModel());
 
@@ -218,10 +209,7 @@ describe('useAccountsViewModel', () => {
       role: 'admin'
     };
 
-    let success;
-    await act(async () => {
-      success = await result.current.updateAccount(updateData);
-    });
+    const success = await result.current.updateAccount(updateData);
 
     expect(success).toBe(false);
     expect(result.current.fieldErrors).toEqual({
@@ -235,10 +223,8 @@ describe('useAccountsViewModel', () => {
     const { result } = renderHook(() => useAccountsViewModel());
 
     // Manually set errors to test clearing
-    act(() => {
-      result.current.clearError();
-      result.current.clearFieldErrors();
-    });
+    result.current.clearError();
+    result.current.clearFieldErrors();
 
     expect(mockClearStoreError).toHaveBeenCalled();
   });
@@ -283,10 +269,7 @@ describe('useAccountsViewModel', () => {
 
     const { result } = renderHook(() => useAccountsViewModel());
 
-    let doctorDetails;
-    await act(async () => {
-      doctorDetails = await result.current.getDoctorDetails('2');
-    });
+    const doctorDetails = await result.current.getDoctorDetails('2');
 
     expect(doctorDetails).toEqual(mockDoctorDetails);
     expect(mockDoctorApiService.getDoctorByUserId).toHaveBeenCalledWith('2');
@@ -297,10 +280,7 @@ describe('useAccountsViewModel', () => {
 
     const { result } = renderHook(() => useAccountsViewModel());
 
-    let doctorDetails;
-    await act(async () => {
-      doctorDetails = await result.current.getDoctorDetails('2');
-    });
+    const doctorDetails = await result.current.getDoctorDetails('2');
 
     expect(doctorDetails).toBeNull();
     expect(mockDoctorApiService.getDoctorByUserId).toHaveBeenCalledWith('2');

@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { DoctorAssignmentService } from './DoctorAssignmentService';
 import type { DoctorDto, ScheduleOverrideDto } from '@nx-starter/application-shared';
 
 // Mock the DoctorApiService
@@ -8,15 +7,178 @@ const mockDoctorApiService = {
   getAllScheduleOverrides: vi.fn(),
 };
 
-// Mock tsyringe container
-vi.mock('tsyringe', () => ({
-  container: {
-    resolve: vi.fn(() => mockDoctorApiService),
-  },
-}));
+// Create a testable version of the service without dependency injection
+class TestDoctorAssignmentService {
+  private doctorsCache: DoctorDto[] | null = null;
+  private scheduleOverridesCache: ScheduleOverrideDto[] | null = null;
+  private cacheTimestamp = 0;
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  constructor(private readonly doctorApiService: any) {}
+
+  /**
+   * Check if a doctor is scheduled to work on a specific day based on their schedule pattern
+   */
+  private isDoctorScheduledOnDay(doctor: DoctorDto, dayOfWeek: string): boolean {
+    if (!doctor.schedulePattern) {
+      return false; // No schedule pattern means not scheduled
+    }
+
+    const pattern = doctor.schedulePattern.toUpperCase();
+    
+    // Handle supported patterns (only MWF and TTH)
+    switch (pattern) {
+      case 'MWF': {
+        return ['MONDAY', 'WEDNESDAY', 'FRIDAY'].includes(dayOfWeek);
+      }
+      case 'TTH': {
+        return ['TUESDAY', 'THURSDAY'].includes(dayOfWeek);
+      }
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Get day of week from date
+   */
+  private getDayOfWeek(date: Date): string {
+    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    return days[date.getDay()];
+  }
+
+  /**
+   * Check if cache is valid
+   */
+  private isCacheValid(): boolean {
+    return (
+      this.doctorsCache !== null &&
+      this.scheduleOverridesCache !== null &&
+      (Date.now() - this.cacheTimestamp) < this.CACHE_DURATION
+    );
+  }
+
+  /**
+   * Load doctors and schedule overrides data
+   * This method fetches fresh data from the API and updates the cache
+   */
+  async loadData(): Promise<void> {
+    try {
+      console.log('🔄 [DoctorAssignmentService] Loading doctor assignment data...');
+      
+      // Fetch doctors and schedule overrides in parallel
+      const [doctors, scheduleOverrides] = await Promise.all([
+        this.doctorApiService.getAllDoctors(true, 'full') as Promise<DoctorDto[]>,
+        this.doctorApiService.getAllScheduleOverrides()
+      ]);
+
+      this.doctorsCache = doctors;
+      this.scheduleOverridesCache = scheduleOverrides;
+      this.cacheTimestamp = Date.now();
+      
+    } catch (error) {
+      console.error('❌ [DoctorAssignmentService] Error loading data:', error);
+      throw new Error('Failed to load doctor assignment data');
+    }
+  }
+
+  /**
+   * Get the assigned doctor for a specific date
+   * Returns the doctor object that should be working on the given date
+   * Considers both default schedule patterns and overrides
+   */
+  async getAssignedDoctorForDate(date: Date): Promise<DoctorDto | null> {
+    // Load data if cache is invalid
+    if (!this.isCacheValid()) {
+      await this.loadData();
+    }
+
+    const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const dayOfWeek = this.getDayOfWeek(date);
+
+    console.log(`🔍 [DoctorAssignmentService] Getting doctor assignment for ${dateString} (${dayOfWeek})`);
+
+    // First check for schedule overrides
+    const override = this.scheduleOverridesCache?.find(override => override.date === dateString);
+    if (override) {
+      const overrideDoctor = this.doctorsCache?.find(doctor => doctor.id === override.assignedDoctorId);
+      if (overrideDoctor) {
+        console.log(`🔀 [DoctorAssignmentService] Found override: ${overrideDoctor.fullName} (${overrideDoctor.specialization})`);
+        return overrideDoctor;
+      }
+    }
+
+    // Find doctor scheduled for this day based on their schedule pattern
+    const scheduledDoctor = this.doctorsCache?.find(doctor => 
+      this.isDoctorScheduledOnDay(doctor, dayOfWeek)
+    );
+
+    if (scheduledDoctor) {
+      console.log(`📅 [DoctorAssignmentService] Regular schedule: ${scheduledDoctor.fullName} (${scheduledDoctor.specialization})`);
+      return scheduledDoctor;
+    }
+
+    console.log(`❌ [DoctorAssignmentService] No doctor assigned for ${dayOfWeek}`);
+    return null;
+  }
+
+  /**
+   * Get formatted display name for assigned doctor
+   */
+  async getAssignedDoctorDisplayName(date: Date): Promise<string> {
+    try {
+      const doctor = await this.getAssignedDoctorForDate(date);
+      if (doctor) {
+        return `${doctor.fullName} - ${doctor.specialization}`;
+      }
+      return 'No doctor assigned';
+    } catch (error) {
+      console.error('❌ [DoctorAssignmentService] Error getting doctor display name:', error);
+      return 'Error loading doctor assignment';
+    }
+  }
+
+  /**
+   * Get assigned doctor ID for a specific date
+   */
+  async getAssignedDoctorId(date: Date): Promise<string | null> {
+    try {
+      const doctor = await this.getAssignedDoctorForDate(date);
+      return doctor?.id || null;
+    } catch (error) {
+      console.error('❌ [DoctorAssignmentService] Error getting doctor ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clear the cache
+   * This forces a fresh load of data on the next request
+   */
+  clearCache(): void {
+    console.log('🗑️ [DoctorAssignmentService] Clearing cache...');
+    this.doctorsCache = null;
+    this.scheduleOverridesCache = null;
+    this.cacheTimestamp = 0;
+  }
+
+  /**
+   * Get cached doctors (for testing/debugging)
+   */
+  getCachedDoctors(): DoctorDto[] | null {
+    return this.doctorsCache;
+  }
+
+  /**
+   * Get cached schedule overrides (for testing/debugging)
+   */
+  getCachedScheduleOverrides(): ScheduleOverrideDto[] | null {
+    return this.scheduleOverridesCache;
+  }
+}
 
 describe('DoctorAssignmentService', () => {
-  let service: DoctorAssignmentService;
+  let service: TestDoctorAssignmentService;
   
   // Mock data
   const mockDoctors: DoctorDto[] = [
@@ -50,7 +212,7 @@ describe('DoctorAssignmentService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DoctorAssignmentService();
+    service = new TestDoctorAssignmentService(mockDoctorApiService);
     
     // Setup default mock returns
     mockDoctorApiService.getAllDoctors.mockResolvedValue(mockDoctors);

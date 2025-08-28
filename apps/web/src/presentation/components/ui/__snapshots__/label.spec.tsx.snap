@@ -3,7 +3,7 @@
 exports[`Label Component Snapshots > accessibility > renders label with aria-describedby 1`] = `
 <label
   aria-describedby="help-text"
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
 >
   Label with Help
@@ -13,7 +13,7 @@ exports[`Label Component Snapshots > accessibility > renders label with aria-des
 exports[`Label Component Snapshots > accessibility > renders label with aria-label 1`] = `
 <label
   aria-label="Accessible label"
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
 >
   Visible Text
@@ -22,7 +22,7 @@ exports[`Label Component Snapshots > accessibility > renders label with aria-lab
 
 exports[`Label Component Snapshots > accessibility > renders label with data attributes 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-required="true"
   data-slot="label"
   data-testid="test-label"
@@ -33,7 +33,7 @@ exports[`Label Component Snapshots > accessibility > renders label with data att
 
 exports[`Label Component Snapshots > basic label > renders basic label 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
 >
   Basic Label
@@ -42,7 +42,7 @@ exports[`Label Component Snapshots > basic label > renders basic label 1`] = `
 
 exports[`Label Component Snapshots > basic label > renders label with htmlFor attribute 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
   for="input-id"
 >
@@ -52,7 +52,7 @@ exports[`Label Component Snapshots > basic label > renders label with htmlFor at
 
 exports[`Label Component Snapshots > basic label > renders label with id attribute 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
   id="label-id"
 >
@@ -63,7 +63,7 @@ exports[`Label Component Snapshots > basic label > renders label with id attribu
 exports[`Label Component Snapshots > combined attributes > renders label with all common attributes 1`] = `
 <label
   aria-describedby="help-text"
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 form-label"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50 form-label"
   data-slot="label"
   data-testid="complex-label"
   for="complex-input"
@@ -75,7 +75,7 @@ exports[`Label Component Snapshots > combined attributes > renders label with al
 
 exports[`Label Component Snapshots > combined attributes > renders label with custom styling and associations 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-blue-600 font-semibold hover:text-blue-800"
+  class="flex items-center gap-2 text-sm leading-none select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-blue-600 font-semibold hover:text-blue-800"
   data-slot="label"
   for="styled-input"
 >
@@ -85,14 +85,14 @@ exports[`Label Component Snapshots > combined attributes > renders label with cu
 
 exports[`Label Component Snapshots > content variations > renders empty label 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
 />
 `;
 
 exports[`Label Component Snapshots > content variations > renders label with emoji 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
 >
   📧 Email Address
@@ -101,7 +101,7 @@ exports[`Label Component Snapshots > content variations > renders label with emo
 
 exports[`Label Component Snapshots > content variations > renders label with required indicator 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
 >
   Required Field *
@@ -110,7 +110,7 @@ exports[`Label Component Snapshots > content variations > renders label with req
 
 exports[`Label Component Snapshots > content variations > renders label with text content 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
   data-slot="label"
 >
   Simple Text Label
@@ -119,7 +119,7 @@ exports[`Label Component Snapshots > content variations > renders label with tex
 
 exports[`Label Component Snapshots > customization > renders label with custom className 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 custom-label"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50 custom-label"
   data-slot="label"
 >
   Custom Label
@@ -128,7 +128,7 @@ exports[`Label Component Snapshots > customization > renders label with custom c
 
 exports[`Label Component Snapshots > customization > renders label with multiple custom classes 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-red-500 font-bold"
+  class="flex items-center gap-2 text-sm leading-none select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-red-500 font-bold"
   data-slot="label"
 >
   Red Bold Label
@@ -138,7 +138,7 @@ exports[`Label Component Snapshots > customization > renders label with multiple
 exports[`Label Component Snapshots > form associations > renders label associated with input 1`] = `
 <div>
   <label
-    class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+    class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
     data-slot="label"
     for="email-input"
   >
@@ -153,7 +153,7 @@ exports[`Label Component Snapshots > form associations > renders label associate
 
 exports[`Label Component Snapshots > form associations > renders label with required and htmlFor 1`] = `
 <label
-  class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 required"
+  class="flex items-center gap-2 text-sm leading-none font-medium select-none cursor-pointer group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 group-data-[disabled=true]:cursor-not-allowed peer-disabled:cursor-not-allowed peer-disabled:opacity-50 required"
   data-slot="label"
   for="required-field"
 >

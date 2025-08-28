@@ -26,7 +26,7 @@ export const Modal: React.FC<CustomModalProps> = ({
       ...customStyles.header,
     },
     title: {
-      color: theme.colors.customGray[8],
+      color: theme.colors.gray?.[8] || '#000',
       fontSize: '20px',
       fontWeight: 'bold',
       textAlign: 'center' as const,
@@ -35,7 +35,7 @@ export const Modal: React.FC<CustomModalProps> = ({
       ...customStyles.title,
     },
     close: {
-      color: theme.colors.customGray[7],
+      color: theme.colors.gray?.[7] || '#666',
       fontSize: '22px',
       ...customStyles.close,
     },
@@ -55,9 +55,15 @@ export const Modal: React.FC<CustomModalProps> = ({
       withCloseButton={withCloseButton}
       styles={defaultStyles}
       className={className}
+      data-testid="modal"
+      closeButtonProps={{
+        'aria-label': 'Close modal'
+      }}
       {...rest}
     >
-      {children}
+      <div data-testid="modal-content">
+        {children}
+      </div>
     </MantineModal>
   );
 };

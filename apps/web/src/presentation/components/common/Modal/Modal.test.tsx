@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Modal } from '../Modal';
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -10,13 +11,13 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 describe('Modal Component', () => {
   const defaultProps = {
     opened: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     title: 'Test Modal',
     children: <div>Modal content</div>,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders correctly when opened', () => {
@@ -26,6 +27,8 @@ describe('Modal Component', () => {
       </TestWrapper>
     );
 
+    expect(screen.getByTestId('modal')).toBeInTheDocument();
+    expect(screen.getByTestId('modal-content')).toBeInTheDocument();
     expect(screen.getByText('Test Modal')).toBeInTheDocument();
     expect(screen.getByText('Modal content')).toBeInTheDocument();
   });
@@ -37,12 +40,14 @@ describe('Modal Component', () => {
       </TestWrapper>
     );
 
-    expect(screen.queryByText('Test Modal')).not.toBeInTheDocument();
+    // Mantine Modal might still have DOM elements but they should be hidden
+    // Check if modal content is not visible
     expect(screen.queryByText('Modal content')).not.toBeInTheDocument();
+    expect(screen.queryByText('Test Modal')).not.toBeInTheDocument();
   });
 
   it('calls onClose when close button is clicked', () => {
-    const onCloseMock = jest.fn();
+    const onCloseMock = vi.fn();
     
     render(
       <TestWrapper>
@@ -50,7 +55,7 @@ describe('Modal Component', () => {
       </TestWrapper>
     );
 
-    const closeButton = screen.getByRole('button', { name: /close/i });
+    const closeButton = screen.getByRole('button', { name: /close modal/i });
     fireEvent.click(closeButton);
 
     expect(onCloseMock).toHaveBeenCalledTimes(1);
@@ -79,6 +84,6 @@ describe('Modal Component', () => {
       </TestWrapper>
     );
 
-    expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /close modal/i })).not.toBeInTheDocument();
   });
 });

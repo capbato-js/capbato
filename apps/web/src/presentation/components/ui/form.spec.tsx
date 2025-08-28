@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
+import { MantineProvider } from '@mantine/core';
 import {
   Form,
   FormField,
@@ -12,6 +13,12 @@ import {
 } from './form';
 import { FormTextInput } from './FormTextInput';
 import React from 'react';
+
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <MantineProvider>
+    {children}
+  </MantineProvider>
+);
 
 // Test wrapper component that uses react-hook-form
 const TestForm = ({
@@ -51,7 +58,11 @@ const TestForm = ({
 describe('Form Components', () => {
   describe('Form Provider', () => {
     it('should render form with all form components', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       expect(screen.getByLabelText('Test Label')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Test input')).toBeInTheDocument();
@@ -64,7 +75,11 @@ describe('Form Components', () => {
     });
 
     it('should apply data-slot attribute to form item', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       const formItem = screen
         .getByText('Test Label')
@@ -75,7 +90,11 @@ describe('Form Components', () => {
 
   describe('FormField', () => {
     it('should connect form field with react-hook-form', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       const input = screen.getByPlaceholderText('Test input');
       expect(input).toHaveAttribute('name', 'testField');
@@ -117,11 +136,13 @@ describe('Form Components', () => {
 
   describe('FormItem', () => {
     it('should render as a div with proper grid layout', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
-      const formItem = screen
-        .getByText('Test Label')
-        .closest('[data-slot="form-item"]');
+      const formItem = screen.getByTestId('form-item');
       expect(formItem).toHaveClass('grid', 'gap-2');
     });
 
@@ -183,9 +204,13 @@ describe('Form Components', () => {
 
   describe('FormLabel', () => {
     it('should render label with proper association', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
-      const label = screen.getByText('Test Label');
+      const label = screen.getByTestId('form-label');
       const input = screen.getByPlaceholderText('Test input');
 
       expect(label).toBeInTheDocument();
@@ -223,7 +248,11 @@ describe('Form Components', () => {
         );
       };
 
-      render(<ErrorForm />);
+      render(
+        <TestWrapper>
+          <ErrorForm />
+        </TestWrapper>
+      );
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });
       submitButton.click();
@@ -264,7 +293,11 @@ describe('Form Components', () => {
 
   describe('FormControl', () => {
     it('should render form control with proper attributes', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       const input = screen.getByPlaceholderText('Test input');
       expect(input).toHaveAttribute('id');
@@ -302,7 +335,11 @@ describe('Form Components', () => {
         );
       };
 
-      render(<ErrorForm />);
+      render(
+        <TestWrapper>
+          <ErrorForm />
+        </TestWrapper>
+      );
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });
       submitButton.click();
@@ -323,7 +360,11 @@ describe('Form Components', () => {
     });
 
     it('should only include description id in aria-describedby when no error', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       const input = screen.getByPlaceholderText('Test input');
       const description = screen.getByText('This is a test description');
@@ -336,7 +377,11 @@ describe('Form Components', () => {
 
   describe('FormDescription', () => {
     it('should render description with proper id', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       const description = screen.getByText('This is a test description');
       const input = screen.getByPlaceholderText('Test input');
@@ -350,7 +395,11 @@ describe('Form Components', () => {
     });
 
     it('should apply muted text styles', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       const description = screen.getByText('This is a test description');
       expect(description).toHaveClass('text-sm', 'text-muted-foreground');
@@ -389,7 +438,11 @@ describe('Form Components', () => {
 
   describe('FormMessage', () => {
     it('should render empty when there is no error', () => {
-      render(<TestForm />);
+      render(
+        <TestWrapper>
+          <TestForm />
+        </TestWrapper>
+      );
 
       const input = screen.getByPlaceholderText('Test input');
       const describedBy = input.getAttribute('aria-describedby');
@@ -428,7 +481,11 @@ describe('Form Components', () => {
         );
       };
 
-      render(<ErrorForm />);
+      render(
+        <TestWrapper>
+          <ErrorForm />
+        </TestWrapper>
+      );
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });
       submitButton.click();
@@ -472,7 +529,11 @@ describe('Form Components', () => {
         );
       };
 
-      const { container } = render(<ErrorForm />);
+      const { container } = render(
+        <TestWrapper>
+          <ErrorForm />
+        </TestWrapper>
+      );
 
       // Should not render FormMessage when error has no message
       const messageElement = container.querySelector(
@@ -594,7 +655,11 @@ describe('Form Components', () => {
         );
       };
 
-      render(<ValidationForm />);
+      render(
+        <TestWrapper>
+          <ValidationForm />
+        </TestWrapper>
+      );
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });
       submitButton.click();
