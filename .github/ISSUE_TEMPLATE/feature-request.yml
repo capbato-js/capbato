@@ -1,0 +1,120 @@
+name: ✨ Feature Request
+description: Suggest an idea for this project
+title: "[component] [FEATURE] "
+labels: ["feature", "enhancement"]
+assignees: []
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component/Area
+      description: Which component or area would this feature affect?
+      options:
+        - api
+        - web
+        - domain
+        - application-api
+        - application-shared
+        - application-web
+        - utils-core
+        - build system
+        - deployment
+        - documentation
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: setup-prerequisites
+    attributes:
+      label: "📋 Setup Prerequisites"
+      description: "**IMPORTANT**: Before working on this issue, ensure you have the correct package manager setup!"
+      value: |
+        ## 🚀 Required Setup Steps
+        
+        **⚠️ CRITICAL**: This project uses **pnpm** as the package manager. Using npm or yarn will cause issues!
+        
+        ### 1. Install pnpm globally (if not already installed)
+        ```bash
+        npm install -g pnpm
+        ```
+        
+        ### 2. Install project dependencies
+        ```bash
+        pnpm install
+        ```
+        
+        ### 3. Verify setup by running tests
+        ```bash
+        # For API components
+        pnpm nx test api
+        
+        # For PWA components  
+        pnpm nx test web
+        
+        # For library components
+        pnpm nx test domain
+        pnpm nx test application-api
+        pnpm nx test application-shared
+        pnpm nx test application-web
+        pnpm nx test utils-core
+        ```
+        
+        **✅ You're ready to work on this issue once these commands run successfully!**
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: "I'm always frustrated when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution-description
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see.
+      placeholder: "I would like to see..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: "Alternative approaches could be..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: architecture-compliance
+    attributes:
+      label: Architecture Compliance
+      description: Ensure the feature aligns with project principles
+      options:
+        - label: Feature follows clean architecture principles
+          required: true
+        - label: Feature maintains SOLID principles compliance
+          required: true
+        - label: Feature doesn't introduce unnecessary coupling
+          required: true
+        - label: Feature includes appropriate testing strategy
+          required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - High - Critical for project success
+        - Medium - Important improvement
+        - Low - Nice to have enhancement
+    validations:
+      required: true
