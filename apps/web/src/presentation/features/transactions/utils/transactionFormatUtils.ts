@@ -25,3 +25,16 @@ export const enhanceTransactionWithSearchFields = <T extends { patient: { patien
   patientNumber: transaction.patient.patientNumber,
   patientName: transaction.patient.fullName,
 });
+
+export const transformFormDataToTransaction = (data: any) => ({
+  patientId: data.patientId,
+  date: data.date,
+  paymentMethod: data.paymentMethod,
+  receivedById: data.receivedById,
+  items: data.items.map((item: any) => ({
+    serviceName: item.serviceName,
+    description: item.description || '',
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+  })),
+});
