@@ -143,3 +143,45 @@ export const validateAppointmentForm = (
     assignedDoctor !== 'No doctor assigned'
   );
 };
+
+/**
+ * Prepares initial data for appointment form in edit mode
+ * @param appointment - Appointment DTO object
+ * @param isRescheduleMode - Whether in reschedule mode (clears time)
+ * @returns Formatted initial data for the form
+ */
+export const prepareAppointmentInitialData = (
+  appointment: any, 
+  isRescheduleMode: boolean = false
+) => {
+  if (!appointment) return undefined;
+
+  return {
+    patientId: appointment.patient?.id,
+    patientName: appointment.patient?.fullName,
+    patientNumber: appointment.patient?.patientNumber,
+    reasonForVisit: appointment.reasonForVisit,
+    appointmentDate: appointment.appointmentDate,
+    appointmentTime: isRescheduleMode ? '' : appointment.appointmentTime,
+    doctorId: appointment.doctor?.id,
+    doctorName: appointment.doctor 
+      ? `Dr. ${appointment.doctor.fullName} - ${appointment.doctor.specialization}` 
+      : undefined,
+  };
+};
+
+/**
+ * Gets the appropriate modal title based on mode
+ * @param editMode - Whether in edit mode
+ * @param isRescheduleMode - Whether in reschedule mode
+ * @returns Modal title string
+ */
+export const getAppointmentModalTitle = (
+  editMode: boolean = false, 
+  isRescheduleMode: boolean = false
+): string => {
+  if (isRescheduleMode) {
+    return "Update Appointment Time";
+  }
+  return editMode ? "Update Appointment" : "Add New Appointment";
+};
