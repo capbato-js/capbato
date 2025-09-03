@@ -1,8 +1,8 @@
 import React from 'react';
-import { LaboratoryTestsTableContainer } from './LaboratoryTestsTableContainer';
+import { LaboratoryTestsTablePresenter } from './LaboratoryTestsTablePresenter';
 import { LabTest } from '../types';
 
-interface LaboratoryTestsTableProps {
+interface LaboratoryTestsTableContainerProps {
   labTests: LabTest[];
   isLoading: boolean;
   errorMessage: string | null;
@@ -12,6 +12,6 @@ interface LaboratoryTestsTableProps {
   onCancelTest: (test: LabTest) => void;
 }
 
-export const LaboratoryTestsTable: React.FC<LaboratoryTestsTableProps> = (props) => {
-  return <LaboratoryTestsTableContainer {...props} />;
+export const LaboratoryTestsTableContainer: React.FC<LaboratoryTestsTableContainerProps> = (props) => {
+  return <LaboratoryTestsTablePresenter {...props} />;
 };

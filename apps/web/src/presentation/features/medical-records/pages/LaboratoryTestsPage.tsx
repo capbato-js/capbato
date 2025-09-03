@@ -6,6 +6,7 @@ import {
   LaboratoryTestsModals 
 } from '../components';
 import { useLaboratoryTestsViewModel } from '../view-models';
+import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
 
 export const LaboratoryTestsPage: React.FC = () => {
   const {
@@ -31,6 +32,8 @@ export const LaboratoryTestsPage: React.FC = () => {
     // Store states
     errorStates,
   } = useLaboratoryTestsViewModel();
+
+  useOverflowHidden();
 
   return (
     <MedicalClinicLayout>
