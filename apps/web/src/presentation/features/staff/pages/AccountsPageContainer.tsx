@@ -4,6 +4,7 @@ import { useAccountModalState } from '../hooks/useAccountModalState';
 import { useAccountActions } from '../hooks/useAccountActions';
 import { transformAccountsWithFullName } from '../utils/accountTransformUtils';
 import { AccountsPagePresenter } from './AccountsPagePresenter';
+import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
 
 export const AccountsPageContainer: React.FC = () => {
   const {
@@ -40,12 +41,7 @@ export const AccountsPageContainer: React.FC = () => {
     clearFieldErrors
   );
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
+  useOverflowHidden();
 
   const accountsWithFullName = transformAccountsWithFullName(accounts);
 

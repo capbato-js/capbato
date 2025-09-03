@@ -5,6 +5,7 @@ import { useAppointmentFilters } from '../hooks/useAppointmentFilters';
 import { useAppointmentActions } from '../hooks/useAppointmentActions';
 import { mapAppointmentDtoToAppointment } from '../utils/appointmentUtils';
 import { AppointmentsPagePresenter } from './AppointmentsPagePresenter';
+import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
 
 export const AppointmentsPageContainer: React.FC = () => {
   const viewModel = useAppointmentPageViewModel();
@@ -18,12 +19,7 @@ export const AppointmentsPageContainer: React.FC = () => {
     modalState.openEditModal
   );
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
+  useOverflowHidden();
 
   useEffect(() => {
     viewModel.loadAppointments();

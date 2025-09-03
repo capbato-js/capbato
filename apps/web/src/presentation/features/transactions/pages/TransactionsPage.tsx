@@ -6,6 +6,7 @@ import { TransactionsTable, AddReceiptModal, ViewTransactionModal, DeleteTransac
 import { useTransactionViewModel } from '../view-models';
 import { useTransactionItemViewModel } from '../view-models/useTransactionItemViewModel';
 import type { Transaction } from '../types';
+import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
 
 export const TransactionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,12 +19,7 @@ export const TransactionsPage: React.FC = () => {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
+  useOverflowHidden();
 
   useEffect(() => {
     // loadTransactions is no longer needed - the view model handles loading automatically

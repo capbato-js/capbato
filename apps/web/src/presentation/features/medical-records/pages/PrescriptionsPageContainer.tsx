@@ -3,6 +3,7 @@ import { usePrescriptionData } from '../hooks/usePrescriptionData';
 import { usePrescriptionModalState } from '../hooks/usePrescriptionModalState';
 import { usePrescriptionActions } from '../hooks/usePrescriptionActions';
 import { PrescriptionsPagePresenter } from './PrescriptionsPagePresenter';
+import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
 
 export const PrescriptionsPageContainer: React.FC = () => {
   const { displayPrescriptions, prescriptionListViewModel, isLoading, error } = usePrescriptionData();
@@ -18,12 +19,7 @@ export const PrescriptionsPageContainer: React.FC = () => {
     }
   );
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
+  useOverflowHidden();
 
   const handleConfirmDelete = async () => {
     const success = await actions.handleConfirmDelete(modalState.selectedPrescription);
