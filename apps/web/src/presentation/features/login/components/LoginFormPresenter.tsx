@@ -24,13 +24,17 @@ interface LoginFormPresenterProps {
   };
 }
 
+const containerStyles = {
+  width: '100%'
+};
+
 export const LoginFormPresenter: React.FC<LoginFormPresenterProps> = ({
   viewModel,
   formState,
   formActions,
 }) => {
   return (
-    <div style={{ width: '100%' }}>
+    <div style={containerStyles}>
       <LoginTitle />
       
       <LoginErrorMessage error={viewModel.error} />
