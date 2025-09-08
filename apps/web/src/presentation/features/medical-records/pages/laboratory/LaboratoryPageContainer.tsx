@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { useLaboratoryData } from '../hooks/useLaboratoryData';
-import { useLaboratoryNavigation } from '../hooks/useLaboratoryNavigation';
+import { useLaboratoryData } from '../../hooks/useLaboratoryData';
+import { useLaboratoryNavigation } from '../../hooks/useLaboratoryNavigation';
 import { LaboratoryPagePresenter } from './LaboratoryPagePresenter';
-import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
+import { useOverflowHidden } from '../../../../hooks/useOverflowHidden';
 
 export const LaboratoryPageContainer: React.FC = () => {
   const { 

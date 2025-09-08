@@ -1,8 +1,8 @@
 import React from 'react';
-import { DataTable, DataTableHeader } from '../../../components/common/DataTable';
-import { MedicalClinicLayout } from '../../../components/layout';
-import { LaboratoryResult } from '../types';
-import { getLaboratoryTableColumns, getLaboratoryTableActions } from '../config/laboratoryTableConfig';
+import { DataTable, DataTableHeader } from '../../../../components/common/DataTable';
+import { MedicalClinicLayout } from '../../../../components/layout';
+import { LaboratoryResult } from '../../types';
+import { getLaboratoryTableColumns, getLaboratoryTableActions } from '../../config/laboratoryTableConfig';
 
 interface LaboratoryPagePresenterProps {
   laboratoryResults: LaboratoryResult[];
