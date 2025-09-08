@@ -1,12 +1,12 @@
 import React from 'react';
-import { DataTable, DataTableHeader } from '../../../components/common/DataTable';
-import { MedicalClinicLayout } from '../../../components/layout';
-import { Prescription } from '../types';
-import { DisplayPrescription } from '../hooks/usePrescriptionData';
-import { AddPrescriptionModal } from '../components/AddPrescriptionModal';
-import { ViewPrescriptionModal } from '../components/ViewPrescriptionModal';
-import { DeletePrescriptionModal } from '../components/DeletePrescriptionModal';
-import { getPrescriptionTableColumns, getPrescriptionTableActions } from '../config/prescriptionTableConfig';
+import { DataTable, DataTableHeader } from '../../../../components/common/DataTable';
+import { MedicalClinicLayout } from '../../../../components/layout';
+import { Prescription } from '../../types';
+import { DisplayPrescription } from '../../hooks/usePrescriptionData';
+import { AddPrescriptionModal } from '../../components/AddPrescriptionModal';
+import { ViewPrescriptionModal } from '../../components/ViewPrescriptionModal';
+import { DeletePrescriptionModal } from '../../components/DeletePrescriptionModal';
+import { getPrescriptionTableColumns, getPrescriptionTableActions } from '../../config/prescriptionTableConfig';
 
 interface PrescriptionsPagePresenterProps {
   // Data

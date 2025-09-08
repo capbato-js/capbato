@@ -1,7 +1,7 @@
 import React from 'react';
-import { MedicalClinicLayout } from '../../../components/layout';
-import { LabTestPageHeader } from '../components/LabTestPageHeader';
-import { LabTestContentRenderer, LabTestContentProps } from '../components/LabTestContentRenderer';
+import { MedicalClinicLayout } from '../../../../components/layout';
+import { LabTestPageHeader } from '../../components/LabTestPageHeader';
+import { LabTestContentRenderer, LabTestContentProps } from '../../components/LabTestContentRenderer';
 
 interface ViewLabTestResultPagePresenterProps extends LabTestContentProps {}
 

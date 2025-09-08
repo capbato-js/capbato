@@ -1,8 +1,8 @@
 import React from 'react';
-import { MedicalClinicLayout } from '../../../components/layout';
-import { AddLabTestResultForm } from '../components';
-import { PageHeader } from '../components/PageHeader';
-import type { EDIT_LAB_TEST_RESULT_PAGE_CONFIG } from '../config/editLabTestResultPageConfig';
+import { MedicalClinicLayout } from '../../../../components/layout';
+import { AddLabTestResultForm } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import type { EDIT_LAB_TEST_RESULT_PAGE_CONFIG } from '../../config/editLabTestResultPageConfig';
 
 interface EditLabTestResultPagePresenterProps {
   config: typeof EDIT_LAB_TEST_RESULT_PAGE_CONFIG;

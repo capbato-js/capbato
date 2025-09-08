@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { usePrescriptionData } from '../hooks/usePrescriptionData';
-import { usePrescriptionModalState } from '../hooks/usePrescriptionModalState';
-import { usePrescriptionActions } from '../hooks/usePrescriptionActions';
+import { usePrescriptionData } from '../../hooks/usePrescriptionData';
+import { usePrescriptionModalState } from '../../hooks/usePrescriptionModalState';
+import { usePrescriptionActions } from '../../hooks/usePrescriptionActions';
 import { PrescriptionsPagePresenter } from './PrescriptionsPagePresenter';
-import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
+import { useOverflowHidden } from '../../../../hooks/useOverflowHidden';
 
 export const PrescriptionsPageContainer: React.FC = () => {
   const { displayPrescriptions, prescriptionListViewModel, isLoading, error } = usePrescriptionData();

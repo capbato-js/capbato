@@ -1,12 +1,12 @@
 import React from 'react';
-import { MedicalClinicLayout } from '../../../components/layout';
+import { MedicalClinicLayout } from '../../../../components/layout';
 import { 
   LaboratoryTestsPageHeader, 
   LaboratoryTestsTable, 
   LaboratoryTestsModals 
-} from '../components';
-import { useLaboratoryTestsViewModel } from '../view-models';
-import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
+} from '../../components';
+import { useLaboratoryTestsViewModel } from '../../view-models';
+import { useOverflowHidden } from '../../../../hooks/useOverflowHidden';
 
 export const LaboratoryTestsPage: React.FC = () => {
   const {

@@ -1,10 +1,10 @@
 export { LaboratoryPage } from './pages/laboratory/LaboratoryPage';
-export { LaboratoryTestsPage } from './pages/LaboratoryTestsPage';
-export { PrescriptionsPage } from './pages/PrescriptionsPage';
-export { AddLabTestPage } from './pages/AddLabTestPage';
-export { AddLabTestResultPage } from './pages/AddLabTestResultPage';
-export { EditLabTestResultPage } from './pages/EditLabTestResultPage';
-export { ViewLabTestResultPage } from './pages/ViewLabTestResultPage';
+export { LaboratoryTestsPage } from './pages/laboratory/LaboratoryTestsPage';
+export { PrescriptionsPage } from './pages/prescriptions/PrescriptionsPage';
+export { AddLabTestPage } from './pages/laboratory/AddLabTestPage';
+export { AddLabTestResultPage } from './pages/laboratory/AddLabTestResultPage';
+export { EditLabTestResultPage } from './pages/laboratory/EditLabTestResultPage';
+export { ViewLabTestResultPage } from './pages/laboratory/ViewLabTestResultPage';
 
 // Components
 export { AddPrescriptionForm } from './components/AddPrescriptionForm';

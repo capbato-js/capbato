@@ -1,9 +1,9 @@
 import React from 'react';
-import { useViewLabTestResultViewModel } from '../view-models/useViewLabTestResultViewModel';
+import { useViewLabTestResultViewModel } from '../../view-models/useViewLabTestResultViewModel';
 import {
   isUrinalysisTest,
   preparePatientData,
-} from '../utils/viewLabTestResultUtils';
+} from '../../utils/viewLabTestResultUtils';
 import { ViewLabTestResultPagePresenter } from './ViewLabTestResultPagePresenter';
 
 export const ViewLabTestResultPageContainer: React.FC = () => {
