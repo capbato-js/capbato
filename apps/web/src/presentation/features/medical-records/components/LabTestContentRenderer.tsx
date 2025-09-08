@@ -1,8 +1,8 @@
 import React from 'react';
 import { AddLabTestResultForm } from './AddLabTestResultForm';
-import { UrinalysisReportView } from './UrinalysisReportView';
 import { LabTest } from '../types';
 import { PatientData } from '../utils/viewLabTestResultUtils';
+import { UrinalysisReportView } from './urinalysis-report/UrinalysisReportView';
 
 export interface LabTestContentProps {
   isUrinalysisTest: boolean;
