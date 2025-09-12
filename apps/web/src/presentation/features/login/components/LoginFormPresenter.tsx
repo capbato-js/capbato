@@ -3,7 +3,6 @@ import { LoginTitle } from './LoginTitle';
 import { LoginErrorMessage } from './LoginErrorMessage';
 import { LoginFormFields } from './LoginFormFields';
 import { LoginSubmitButton } from './LoginSubmitButton';
-import { ForgotPasswordLink } from './ForgotPasswordLink';
 
 interface LoginFormPresenterProps {
   viewModel: {
@@ -55,7 +54,6 @@ export const LoginFormPresenter: React.FC<LoginFormPresenterProps> = ({
         />
       </form>
 
-      <ForgotPasswordLink />
     </div>
   );
 };
