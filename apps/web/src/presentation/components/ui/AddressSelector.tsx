@@ -15,6 +15,8 @@ interface AddressSelectProps extends Omit<SelectProps, 'data' | 'searchable' | '
   error?: string | null;
   /** Placeholder when disabled */
   disabledPlaceholder?: string;
+  /** Test ID for the select element */
+  'data-testid'?: string;
 }
 
 /**
@@ -34,6 +36,7 @@ export const AddressSelect: React.FC<AddressSelectProps> = ({
   disabledPlaceholder = 'Select...',
   disabled,
   placeholder,
+  'data-testid': testId,
   ...props
 }) => {
   // Convert options to Select data format
@@ -58,6 +61,7 @@ export const AddressSelect: React.FC<AddressSelectProps> = ({
       searchable
       clearable
       error={error}
+      data-testid={testId}
       rightSection={loading ? <Icon icon="fas fa-spinner fa-spin" size={14} /> : undefined}
       comboboxProps={{
         transitionProps: { duration: 200, transition: 'pop' }
@@ -84,6 +88,7 @@ export interface AddressSelectorProps {
     onChange: (value: string | null) => void;
     error?: string;
     disabled?: boolean;
+    'data-testid'?: string;
   };
   
   /** City field props */
@@ -92,6 +97,7 @@ export interface AddressSelectorProps {
     onChange: (value: string | null) => void;
     error?: string;
     disabled?: boolean;
+    'data-testid'?: string;
   };
   
   /** Barangay field props */
@@ -100,6 +106,7 @@ export interface AddressSelectorProps {
     onChange: (value: string | null) => void;
     error?: string;
     disabled?: boolean;
+    'data-testid'?: string;
   };
   
   /** Address data and state */
@@ -181,6 +188,7 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
             value={provinceProps.value}
             onChange={provinceProps.onChange}
             disabled={provinceProps.disabled || isLoadingProvinces}
+            data-testid={provinceProps['data-testid']}
             required
           />
         </Grid.Col>
@@ -195,6 +203,7 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
             value={cityProps.value}
             onChange={cityProps.onChange}
             disabled={cityProps.disabled || !provinceProps.value || isLoadingCities}
+            data-testid={cityProps['data-testid']}
             required
           />
         </Grid.Col>
@@ -211,6 +220,7 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
         value={barangayProps.value}
         onChange={barangayProps.onChange}
         disabled={barangayProps.disabled || !cityProps.value || isLoadingBarangays}
+        data-testid={barangayProps['data-testid']}
         required
       />
     </div>

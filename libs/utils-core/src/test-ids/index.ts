@@ -35,7 +35,8 @@ export type {
 
 export type {
   PatientsPageTestIds,
-  PatientFormTestIds
+  PatientFormTestIds,
+  AddPatientPageTestIds
 } from './patients'
 
 export type {

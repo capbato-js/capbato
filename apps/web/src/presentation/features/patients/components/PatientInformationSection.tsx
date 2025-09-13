@@ -13,6 +13,7 @@ import {
   getDateInputProps 
 } from '../config/patientFormConfig';
 import { getErrorMessage, calculateAge } from '../utils/patientFormUtils';
+import { patientFormTestIds } from '@nx-starter/utils-core';
 
 interface PatientInformationSectionProps {
   control: any;
@@ -73,6 +74,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
               error={getErrorMessage(errors.lastName)}
               disabled={isLoading}
               required
+              data-testid={patientFormTestIds.lastNameInput}
               {...register('lastName', {
                 onBlur: () => handleNameFieldBlur('lastName')
               })}
@@ -85,6 +87,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
               error={getErrorMessage(errors.firstName)}
               disabled={isLoading}
               required
+              data-testid={patientFormTestIds.firstNameInput}
               {...register('firstName', {
                 onBlur: () => handleNameFieldBlur('firstName')
               })}
@@ -96,6 +99,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
               placeholder={FORM_FIELD_CONFIG.placeholders.middleName}
               error={getErrorMessage(errors.middleName)}
               disabled={isLoading}
+              data-testid={patientFormTestIds.middleNameInput}
               {...register('middleName', {
                 onBlur: () => handleNameFieldBlur('middleName')
               })}
@@ -118,6 +122,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
                   error={fieldState.error?.message}
                   disabled={isLoading}
                   required
+                  data-testid={patientFormTestIds.dateOfBirthInput}
                   onBlur={() => handleFieldBlur('dateOfBirth')}
                 />
               )}
@@ -129,6 +134,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
               placeholder=""
               disabled
               value={ageDisplayValue}
+              data-testid={patientFormTestIds.ageInput}
             />
           </Grid.Col>
           <Grid.Col span={3}>
@@ -144,6 +150,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
                   data={GENDER_OPTIONS}
                   disabled={isLoading}
                   required
+                  data-testid={patientFormTestIds.genderSelect}
                   onBlur={() => handleFieldBlur('gender')}
                 />
               )}
@@ -157,6 +164,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
               maxLength={FORM_FIELD_CONFIG.maxLengths.contactNumber}
               disabled={isLoading}
               required
+              data-testid={patientFormTestIds.contactNumberInput}
               {...register('contactNumber', {
                 onBlur: () => handleFieldBlur('contactNumber'),
                 onChange: () => handleFieldChange('contactNumber')
@@ -176,6 +184,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
                   placeholder={FORM_FIELD_CONFIG.placeholders.houseNumber}
                   error={getErrorMessage(errors.houseNumber)}
                   disabled={isLoading}
+                  data-testid={patientFormTestIds.houseNumberInput}
                   {...register('houseNumber', {
                     onBlur: () => handleFieldBlur('houseNumber')
                   })}
@@ -187,6 +196,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
                   placeholder={FORM_FIELD_CONFIG.placeholders.streetName}
                   error={getErrorMessage(errors.streetName)}
                   disabled={isLoading}
+                  data-testid={patientFormTestIds.streetNameInput}
                   {...register('streetName', {
                     onBlur: () => handleFieldBlur('streetName')
                   })}
@@ -200,18 +210,21 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
                 onChange: handlePatientProvinceChange,
                 error: getErrorMessage(errors.province),
                 disabled: isLoading,
+                'data-testid': patientFormTestIds.patientProvinceSelect,
               }}
               cityProps={{
                 value: patientAddressSelector.selectedCity,
                 onChange: handlePatientCityChange,
                 error: getErrorMessage(errors.cityMunicipality),
                 disabled: isLoading,
+                'data-testid': patientFormTestIds.patientCitySelect,
               }}
               barangayProps={{
                 value: patientAddressSelector.selectedBarangay,
                 onChange: handlePatientBarangayChange,
                 error: getErrorMessage(errors.barangay),
                 disabled: isLoading,
+                'data-testid': patientFormTestIds.patientBarangaySelect,
               }}
               addressData={{
                 provinces: patientAddressSelector.provinces,

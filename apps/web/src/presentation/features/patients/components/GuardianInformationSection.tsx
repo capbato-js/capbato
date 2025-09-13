@@ -11,6 +11,7 @@ import {
   FORM_STYLES
 } from '../config/patientFormConfig';
 import { getErrorMessage } from '../utils/patientFormUtils';
+import { patientFormTestIds } from '@nx-starter/utils-core';
 
 interface GuardianInformationSectionProps {
   control: any;
@@ -61,6 +62,7 @@ export const GuardianInformationSection: React.FC<GuardianInformationSectionProp
           placeholder={FORM_FIELD_CONFIG.placeholders.guardianName}
           error={getErrorMessage(errors.guardianName)}
           disabled={isLoading}
+          data-testid={patientFormTestIds.guardianNameInput}
           {...register('guardianName', {
             onBlur: () => handleNameFieldBlur('guardianName')
           })}
@@ -79,6 +81,7 @@ export const GuardianInformationSection: React.FC<GuardianInformationSectionProp
                   error={fieldState.error?.message}
                   data={GENDER_OPTIONS}
                   disabled={isLoading}
+                  data-testid={patientFormTestIds.guardianGenderSelect}
                   onBlur={() => handleFieldBlur('guardianGender')}
                 />
               )}
@@ -90,6 +93,7 @@ export const GuardianInformationSection: React.FC<GuardianInformationSectionProp
               placeholder={FORM_FIELD_CONFIG.placeholders.guardianRelationship}
               error={getErrorMessage(errors.guardianRelationship)}
               disabled={isLoading}
+              data-testid={patientFormTestIds.guardianRelationshipInput}
               {...register('guardianRelationship', {
                 onBlur: () => handleFieldBlur('guardianRelationship')
               })}
@@ -102,6 +106,7 @@ export const GuardianInformationSection: React.FC<GuardianInformationSectionProp
               error={getErrorMessage(errors.guardianContactNumber)}
               maxLength={FORM_FIELD_CONFIG.maxLengths.guardianContactNumber}
               disabled={isLoading}
+              data-testid={patientFormTestIds.guardianContactInput}
               {...register('guardianContactNumber', {
                 onBlur: () => handleFieldBlur('guardianContactNumber'),
                 onChange: () => handleFieldChange('guardianContactNumber')
@@ -121,6 +126,7 @@ export const GuardianInformationSection: React.FC<GuardianInformationSectionProp
                   placeholder={FORM_FIELD_CONFIG.placeholders.guardianHouseNumber}
                   error={getErrorMessage(errors.guardianHouseNumber)}
                   disabled={isLoading}
+                  data-testid={patientFormTestIds.guardianHouseNumberInput}
                   {...register('guardianHouseNumber', {
                     onBlur: () => handleFieldBlur('guardianHouseNumber')
                   })}
@@ -132,6 +138,7 @@ export const GuardianInformationSection: React.FC<GuardianInformationSectionProp
                   placeholder={FORM_FIELD_CONFIG.placeholders.guardianStreetName}
                   error={getErrorMessage(errors.guardianStreetName)}
                   disabled={isLoading}
+                  data-testid={patientFormTestIds.guardianStreetNameInput}
                   {...register('guardianStreetName', {
                     onBlur: () => handleFieldBlur('guardianStreetName')
                   })}
@@ -145,18 +152,21 @@ export const GuardianInformationSection: React.FC<GuardianInformationSectionProp
                 onChange: handleGuardianProvinceChange,
                 error: getErrorMessage(errors.guardianProvince),
                 disabled: isLoading,
+                'data-testid': patientFormTestIds.guardianProvinceSelect,
               }}
               cityProps={{
                 value: guardianAddressSelector.selectedCity,
                 onChange: handleGuardianCityChange,
                 error: getErrorMessage(errors.guardianCityMunicipality),
                 disabled: isLoading,
+                'data-testid': patientFormTestIds.guardianCitySelect,
               }}
               barangayProps={{
                 value: guardianAddressSelector.selectedBarangay,
                 onChange: handleGuardianBarangayChange,
                 error: getErrorMessage(errors.guardianBarangay),
                 disabled: isLoading,
+                'data-testid': patientFormTestIds.guardianBarangaySelect,
               }}
               addressData={{
                 provinces: guardianAddressSelector.provinces,

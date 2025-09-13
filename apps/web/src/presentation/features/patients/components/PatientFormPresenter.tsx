@@ -5,6 +5,7 @@ import { GuardianInformationSection } from './GuardianInformationSection';
 import { PatientFormActions } from './PatientFormActions';
 import { FORM_STYLES } from '../config/patientFormConfig';
 import { PatientFormData } from '../hooks/usePatientFormState';
+import { patientFormTestIds } from '@nx-starter/utils-core';
 import type { CreatePatientCommand, UpdatePatientCommand } from '@nx-starter/application-shared';
 
 interface PatientFormPresenterProps {
@@ -58,7 +59,7 @@ export const PatientFormPresenter: React.FC<PatientFormPresenterProps> = ({
   isFormEmpty
 }) => {
   return (
-    <form onSubmit={form.handleSubmit(submission.handleFormSubmit)} noValidate>
+    <form onSubmit={form.handleSubmit(submission.handleFormSubmit)} noValidate data-testid={patientFormTestIds.form}>
       <Stack gap="lg">
         {generalError && (
           <Alert color="red" style={FORM_STYLES.alertStyle}>
