@@ -186,6 +186,8 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
         cursor="pointer"
         useViewportHeight={true}
         bottomPadding={90}
+        testId="patients-table"
+        searchInputTestId="search-patients"
       />
     </Box>
   );

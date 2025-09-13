@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Group, Title, useMantineTheme } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
+import { addPatientPageTestIds } from '@nx-starter/utils-core';
 
 interface PatientPageHeaderProps {
   title: string;
@@ -31,6 +32,7 @@ export const PatientPageHeader: React.FC<PatientPageHeaderProps> = ({
           leftSection={<IconArrowLeft size={16} />}
           onClick={onBack}
           size="sm"
+          data-testid={addPatientPageTestIds.backButton}
           style={{
             fontSize: '14px'
           }}
@@ -39,6 +41,7 @@ export const PatientPageHeader: React.FC<PatientPageHeaderProps> = ({
         </Button>
         <Title
           order={2}
+          data-testid={addPatientPageTestIds.pageTitle}
           style={{
             fontSize: '32px',
             fontWeight: 700,

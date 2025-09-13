@@ -1,15 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
-import { workspaceRoot } from '@nx/devkit';
-
-// For CI, you may want to set BASE_URL to the deployed application.
-const baseURL = process.env['BASE_URL'] || 'http://localhost:3000';
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/.env' });
+
+// For CI, you may want to set BASE_URL to the deployed application.
+const baseURL = process.env['BASE_URL'] || 'http://localhost:3000';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -17,7 +16,7 @@ const baseURL = process.env['BASE_URL'] || 'http://localhost:3000';
 export default defineConfig({
   ...nxE2EPreset(__filename, { testDir: './src' }),
   /* Global setup for test environment */
-  globalSetup: require.resolve('./src/utils/global-setup.ts'),
+  // globalSetup: require.resolve('./src/utils/global-setup.ts'),
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL,
@@ -29,32 +28,11 @@ export default defineConfig({
   expect: {
     timeout: 10000, // 10 seconds for assertions
   },
+  fullyParallel: true,
   retries: 1, // Retry once on failure
   /* Workers should run serially to avoid conflicts with shared backend */
   workers: 1,
   /* Run your local dev server before starting the tests */
-  webServer: [
-    {
-      command: 'npx nx run api:serve',
-      url: 'http://localhost:4000',
-      reuseExistingServer: true,
-      cwd: workspaceRoot,
-      env: {
-        NODE_ENV: 'development',
-        DB_TYPE: 'memory',
-      },
-    },
-    {
-      command: 'npx nx run web:serve',
-      url: 'http://localhost:3000',
-      reuseExistingServer: true,
-      cwd: workspaceRoot,
-      env: {
-        VITE_USE_API_BACKEND: 'true',
-        VITE_API_BASE_URL: 'http://localhost:4000',
-      },
-    },
-  ],
   projects: [
     {
       name: 'chromium',
