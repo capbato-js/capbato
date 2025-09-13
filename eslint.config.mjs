@@ -40,6 +40,10 @@ export default [
                 'type:util',
               ],
             },
+            {
+              sourceTag: 'type:e2e',
+              onlyDependOnLibsWithTags: ['type:util'],
+            },
           ],
         },
       ],

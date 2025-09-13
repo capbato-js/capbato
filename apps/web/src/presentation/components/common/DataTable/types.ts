@@ -36,6 +36,8 @@ export interface DataTableProps<T> {
   scrollAreaProps?: Omit<ScrollAreaProps, 'children'>;
   useViewportHeight?: boolean;
   bottomPadding?: number;
+  testId?: string;
+  searchInputTestId?: string;
 }
 
 export interface SearchableItem {

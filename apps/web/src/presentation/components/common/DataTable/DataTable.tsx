@@ -18,7 +18,9 @@ export function DataTable<T extends SearchableItem>({
   maxHeight = '400px',
   scrollAreaProps,
   useViewportHeight = false,
-  bottomPadding = 20
+  bottomPadding = 20,
+  testId = 'data-table',
+  searchInputTestId = 'search-input'
 }: DataTableProps<T>) {
   const theme = useMantineTheme();
   const [searchQuery, setSearchQuery] = useState('');
@@ -145,10 +147,11 @@ export function DataTable<T extends SearchableItem>({
   ));
 
   return (
-    <Box>
+    <Box data-testid={testId}>
       {/* Search Bar - Always visible */}
       {searchable && (
         <TextInput
+          data-testid={searchInputTestId}
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.currentTarget.value)}

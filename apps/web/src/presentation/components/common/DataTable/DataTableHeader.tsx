@@ -28,6 +28,7 @@ export const DataTableHeader: React.FC<DataTableHeaderProps> = ({
     >
       <Title
         order={1}
+        data-testid="page-title"
         style={{
           color: theme.colors.customGray[8],
           fontSize: '28px',
@@ -42,6 +43,7 @@ export const DataTableHeader: React.FC<DataTableHeaderProps> = ({
       {onAddItem && (
         <Button
           onClick={onAddItem}
+          data-testid="add-new-button"
           leftSection={<Icon icon={addButtonIcon} />}
           style={{
             position: 'absolute',
