@@ -100,6 +100,8 @@ export const AccountsPagePresenter: React.FC<AccountsPagePresenterProps> = ({
         isLoading={isLoading}
         useViewportHeight={true}
         bottomPadding={90}
+        testId="accounts-table"
+        searchInputTestId="search-accounts"
       />
 
       {/* Create Account Modal */}

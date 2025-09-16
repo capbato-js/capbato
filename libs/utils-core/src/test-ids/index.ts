@@ -13,6 +13,9 @@ export * from './auth'
 // Patients Feature Test IDs
 export * from './patients'
 
+// Accounts Feature Test IDs
+export * from './accounts'
+
 // Appointments Feature Test IDs
 export * from './appointments'
 
@@ -41,6 +44,11 @@ export type {
   PatientFormTestIds,
   AddPatientPageTestIds
 } from './patients'
+
+export type {
+  AccountsPageTestIds,
+  AccountFormTestIds
+} from './accounts'
 
 export type {
   AppointmentsPageTestIds,
