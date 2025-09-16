@@ -89,62 +89,85 @@ export class AddPatientPage {
   // Helper methods for Mantine Select components
   async selectGender(value: string) {
     await this.genderSelect.click()
-    // Wait for dropdown to open
-    await this.page.waitForTimeout(500)
-    // Use a simpler approach: find the visible dropdown and select the option
-    await this.page.locator('[role="option"]').filter({ hasText: value }).first().click()
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
   }
 
   async selectPatientProvince(value: string) {
     await this.patientProvinceSelect.click()
-    // Wait for dropdown to open and load options
-    await this.page.waitForTimeout(300)
-    // Select from the specific dropdown that's open
-    await this.page.getByRole('option', { name: value, exact: true }).first().click()
-    // Wait for cascading effect
-    await this.page.waitForTimeout(500)
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
+    
+    // Wait for cascading effect - city dropdown should be enabled
+    await this.page.waitForTimeout(300) // Small delay for cascading to complete
   }
 
   async selectPatientCity(value: string) {
     await this.patientCitySelect.click()
-    await this.page.waitForTimeout(300)
-    await this.page.getByRole('option', { name: value, exact: true }).first().click()
-    await this.page.waitForTimeout(500)
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
+    
+    // Wait for cascading effect - barangay dropdown should be enabled
+    await this.page.waitForTimeout(300) // Small delay for cascading to complete
   }
 
   async selectPatientBarangay(value: string) {
     await this.patientBarangaySelect.click()
-    await this.page.waitForTimeout(300)
-    await this.page.getByRole('option', { name: value, exact: true }).first().click()
-    await this.page.waitForTimeout(200)
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
   }
 
   async selectGuardianGender(value: string) {
     await this.guardianGenderSelect.click()
-    // Wait for dropdown to open
-    await this.page.waitForTimeout(200)
-    // Use a simpler approach - get all options and find the one we want
-    await this.page.getByRole('option', { name: value, exact: true }).last().click()
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
   }
 
   async selectGuardianProvince(value: string) {
     await this.guardianProvinceSelect.click()
-    await this.page.waitForTimeout(300)
-    await this.page.getByRole('option', { name: value, exact: true }).first().click()
-    await this.page.waitForTimeout(500)
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
+    
+    // Wait for cascading effect - guardian city dropdown should be enabled
+    await this.page.waitForTimeout(300) // Small delay for cascading to complete
   }
 
   async selectGuardianCity(value: string) {
     await this.guardianCitySelect.click()
-    await this.page.waitForTimeout(300)
-    await this.page.getByRole('option', { name: value, exact: true }).first().click()
-    await this.page.waitForTimeout(500)
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
+    
+    // Wait for cascading effect - guardian barangay dropdown should be enabled
+    await this.page.waitForTimeout(300) // Small delay for cascading to complete
   }
 
   async selectGuardianBarangay(value: string) {
     await this.guardianBarangaySelect.click()
-    await this.page.waitForTimeout(300)
-    await this.page.getByRole('option', { name: value, exact: true }).first().click()
-    await this.page.waitForTimeout(200)
+    
+    // Wait for the specific option to be available with timeout
+    const option = this.page.getByRole('option', { name: value, exact: true })
+    await option.waitFor({ state: 'visible', timeout: 5000 })
+    await option.click()
   }
 }
