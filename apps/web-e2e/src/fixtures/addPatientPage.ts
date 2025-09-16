@@ -25,6 +25,8 @@ export const test = authenticatedTest.extend<AddPatientPageFixtures>({
     await authenticatedPage.waitForLoadState('domcontentloaded')
     
     await use(addPatientPage)
+    
+    // No cleanup needed - unique data generation prevents conflicts
   }
 })
 

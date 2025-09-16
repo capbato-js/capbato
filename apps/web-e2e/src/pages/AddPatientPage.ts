@@ -170,4 +170,14 @@ export class AddPatientPage {
     await option.waitFor({ state: 'visible', timeout: 5000 })
     await option.click()
   }
+
+  /**
+   * Submit patient form
+   */
+  async submitPatientForm() {
+    await this.saveButton.click()
+    
+    // Wait for form submission to complete
+    await this.page.waitForLoadState('networkidle')
+  }
 }

@@ -1,11 +1,14 @@
 import { expect, test } from '../../fixtures/addPatientPage'
 import { ADD_PATIENT_TEST_DATA } from '../../data/addPatientPage/testData'
+import { TestDataGenerator } from '../../utils/testDataGenerator'
 
 test.describe('Add Patient Submission', () => {
   test('should successfully submit minimal patient data', async ({ 
     addPatientPage
   }) => {
-    const patient = ADD_PATIENT_TEST_DATA.SAMPLE_DATA.MINIMAL_PATIENT
+    // Generate unique patient data to avoid conflicts
+    const basePatient = ADD_PATIENT_TEST_DATA.SAMPLE_DATA.MINIMAL_PATIENT
+    const patient = TestDataGenerator.generateUniquePatientData(basePatient)
     
     // Fill required patient information
     await addPatientPage.firstNameInput.fill(patient.firstName)
@@ -22,7 +25,7 @@ test.describe('Add Patient Submission', () => {
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Submit the form
-    await addPatientPage.saveButton.click()
+    await addPatientPage.submitPatientForm()
     
     // Should redirect to patients page or show success message
     await expect(addPatientPage.page).toHaveURL(/\/patients/)
@@ -37,42 +40,48 @@ test.describe('Add Patient Submission', () => {
   test('should successfully submit complete patient data with guardian', async ({ 
     addPatientPage
   }) => {
-    const patient = ADD_PATIENT_TEST_DATA.SAMPLE_DATA.COMPLETE_PATIENT
+    // Generate unique patient data to avoid conflicts
+    const basePatient = ADD_PATIENT_TEST_DATA.SAMPLE_DATA.COMPLETE_PATIENT
+    const patient = TestDataGenerator.generateUniquePatientData(basePatient)
     
     // Fill all patient information
     await addPatientPage.firstNameInput.fill(patient.firstName)
-    await addPatientPage.middleNameInput.fill(patient.middleName)
+    await addPatientPage.middleNameInput.fill(patient.middleName as string)
     await addPatientPage.lastNameInput.fill(patient.lastName)
-    await addPatientPage.dateOfBirthInput.fill(patient.dateOfBirth)
-    await addPatientPage.selectGender(patient.gender)
+    await addPatientPage.dateOfBirthInput.fill(patient.dateOfBirth as string)
+    await addPatientPage.selectGender(patient.gender as string)
     await addPatientPage.contactNumberInput.fill(patient.contactNumber)
     
     // Fill patient address
-    await addPatientPage.houseNumberInput.fill(patient.houseNumber)
-    await addPatientPage.streetNameInput.fill(patient.streetName)
-    await addPatientPage.selectPatientProvince(patient.province)
+    await addPatientPage.houseNumberInput.fill(patient.houseNumber as string)
+    await addPatientPage.streetNameInput.fill(patient.streetName as string)
+    await addPatientPage.selectPatientProvince(patient.province as string)
     await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
-    await addPatientPage.selectPatientCity(patient.city)
+    await addPatientPage.selectPatientCity(patient.city as string)
     await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
-    await addPatientPage.selectPatientBarangay(patient.barangay)
+    await addPatientPage.selectPatientBarangay(patient.barangay as string)
     
     // Fill guardian information
-    await addPatientPage.guardianNameInput.fill(patient.guardianName)
-    await addPatientPage.selectGuardianGender(patient.guardianGender)
-    await addPatientPage.guardianRelationshipInput.fill(patient.guardianRelationship)
-    await addPatientPage.guardianContactInput.fill(patient.guardianContact)
+    await addPatientPage.guardianNameInput.fill(patient.guardianName as string)
+    await addPatientPage.selectGuardianGender(patient.guardianGender as string)
+    await addPatientPage.guardianRelationshipInput.fill(patient.guardianRelationship as string)
+    await addPatientPage.guardianContactInput.fill(patient.guardianContact as string)
     
     // Fill guardian address
-    await addPatientPage.guardianHouseNumberInput.fill(patient.guardianHouseNumber)
-    await addPatientPage.guardianStreetNameInput.fill(patient.guardianStreetName)
-    await addPatientPage.selectGuardianProvince(patient.guardianProvince)
+    await addPatientPage.guardianHouseNumberInput.fill(patient.guardianHouseNumber as string)
+    await addPatientPage.guardianStreetNameInput.fill(patient.guardianStreetName as string)
+    await addPatientPage.selectGuardianProvince(patient.guardianProvince as string)
     await expect(addPatientPage.guardianCitySelect).toBeEnabled({ timeout: 5000 })
-    await addPatientPage.selectGuardianCity(patient.guardianCity)
+    await addPatientPage.selectGuardianCity(patient.guardianCity as string)
     await expect(addPatientPage.guardianBarangaySelect).toBeEnabled({ timeout: 5000 })
-    await addPatientPage.selectGuardianBarangay(patient.guardianBarangay)
+    await addPatientPage.selectGuardianBarangay(patient.guardianBarangay as string)
+    
+    // Verify guardian fields are filled before submission
+    await expect(addPatientPage.guardianNameInput).toHaveValue(patient.guardianName as string)
+    console.log('Guardian fields verification passed')
     
     // Submit the form
-    await addPatientPage.saveButton.click()
+    await addPatientPage.submitPatientForm()
     
     // Should redirect to patients page
     await expect(addPatientPage.page).toHaveURL(/\/patients/)
@@ -105,7 +114,7 @@ test.describe('Add Patient Submission', () => {
     // For now, just test that the form stays accessible if submission fails
     
     // Submit the form
-    await addPatientPage.saveButton.click()
+    await addPatientPage.submitPatientForm()
     
     // If there's a server error, the form should still be usable
     // The save button should remain enabled for retry
@@ -136,11 +145,8 @@ test.describe('Add Patient Submission', () => {
     // Save button should be enabled before clicking
     await expect(addPatientPage.saveButton).toBeEnabled()
     
-    // Click save and wait for any loading state changes
-    await addPatientPage.saveButton.click()
-    
-    // Wait for submission to complete
-    await addPatientPage.page.waitForLoadState('networkidle')
+    // Submit the form and wait for loading state changes
+    await addPatientPage.submitPatientForm()
     
     // Test completes successfully regardless of loading state implementation
     expect(true).toBeTruthy()
@@ -166,8 +172,8 @@ test.describe('Add Patient Submission', () => {
     // Save button should be enabled before submission
     await expect(addPatientPage.saveButton).toBeEnabled()
     
-    // Click save button once
-    await addPatientPage.saveButton.click()
+    // Submit form once
+    await addPatientPage.submitPatientForm()
     
     // Test that form submission completes (implementation may prevent double submission in various ways)
     // Just verify the button exists and form can handle submission
@@ -186,7 +192,7 @@ test.describe('Add Patient Submission', () => {
     await addPatientPage.contactNumberInput.fill('123') // Invalid contact
     
     // Try to submit
-    await addPatientPage.saveButton.click()
+    await addPatientPage.submitPatientForm()
     
     // Form should still have the valid data
     await expect(addPatientPage.firstNameInput).toHaveValue(patient.firstName)
@@ -207,7 +213,7 @@ test.describe('Add Patient Submission', () => {
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Now submission should work
-    await addPatientPage.saveButton.click()
+    await addPatientPage.submitPatientForm()
     
     // Should redirect successfully
     await expect(addPatientPage.page).toHaveURL(/\/patients/)
@@ -241,7 +247,7 @@ test.describe('Add Patient Submission', () => {
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Submit with calculated age
-    await addPatientPage.saveButton.click()
+    await addPatientPage.submitPatientForm()
     
     // Should redirect successfully
     await expect(addPatientPage.page).toHaveURL(/\/patients/)

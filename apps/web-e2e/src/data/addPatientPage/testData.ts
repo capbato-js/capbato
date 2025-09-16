@@ -34,7 +34,7 @@ export const ADD_PATIENT_TEST_DATA = {
   SAMPLE_DATA: {
     MINIMAL_PATIENT: {
       firstName: 'Juan',
-      lastName: 'Dela Cruz', // Match the capitalized form
+      lastName: 'Dela Cruz',
       dateOfBirth: '1995-05-15',
       gender: 'Male',
       contactNumber: '09123456789',
