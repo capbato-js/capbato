@@ -38,11 +38,8 @@ test.describe('Add Patient Form Interactions', () => {
     // Click away to trigger age calculation
     await addPatientPage.firstNameInput.click()
     
-    // Wait for age calculation
-    await addPatientPage.page.waitForTimeout(500)
-    
-    // Age should be calculated automatically
-    await expect(addPatientPage.ageInput).not.toHaveValue('')
+    // Wait for age calculation - check that age field is no longer empty
+    await expect(addPatientPage.ageInput).not.toHaveValue('', { timeout: 5000 })
     
     // Age should be a number
     const ageValue = await addPatientPage.ageInput.inputValue()
@@ -68,20 +65,14 @@ test.describe('Add Patient Form Interactions', () => {
     // Select a province
     await addPatientPage.selectPatientProvince(patient.province)
     
-    // Wait for city dropdown to load
-    await addPatientPage.page.waitForTimeout(1000)
-    
-    // City dropdown should now be enabled
-    await expect(addPatientPage.patientCitySelect).toBeEnabled()
+    // Wait for city dropdown to be enabled
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     
     // Select a city
     await addPatientPage.selectPatientCity(patient.city)
     
-    // Wait for barangay dropdown to load
-    await addPatientPage.page.waitForTimeout(1000)
-    
-    // Barangay dropdown should now be enabled
-    await expect(addPatientPage.patientBarangaySelect).toBeEnabled()
+    // Wait for barangay dropdown to be enabled
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     
     // Select a barangay
     await addPatientPage.selectPatientBarangay(patient.barangay)
@@ -130,20 +121,14 @@ test.describe('Add Patient Form Interactions', () => {
     // Select guardian province
     await addPatientPage.selectGuardianProvince(patient.guardianProvince)
     
-    // Wait for city dropdown to load
-    await addPatientPage.page.waitForTimeout(1000)
-    
-    // Guardian city dropdown should now be enabled
-    await expect(addPatientPage.guardianCitySelect).toBeEnabled()
+    // Wait for guardian city dropdown to be enabled
+    await expect(addPatientPage.guardianCitySelect).toBeEnabled({ timeout: 5000 })
     
     // Select guardian city
     await addPatientPage.selectGuardianCity(patient.guardianCity)
     
-    // Wait for barangay dropdown to load
-    await addPatientPage.page.waitForTimeout(1000)
-    
-    // Guardian barangay dropdown should now be enabled
-    await expect(addPatientPage.guardianBarangaySelect).toBeEnabled()
+    // Wait for guardian barangay dropdown to be enabled
+    await expect(addPatientPage.guardianBarangaySelect).toBeEnabled({ timeout: 5000 })
     
     // Select guardian barangay
     await addPatientPage.selectGuardianBarangay(patient.guardianBarangay)
@@ -171,10 +156,10 @@ test.describe('Add Patient Form Interactions', () => {
     
     // Select LEYTE > BURAUEN > HAPUNAN first
     await addPatientPage.selectPatientProvince(patient.province) // LEYTE
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     
     await addPatientPage.selectPatientCity(patient.city) // BURAUEN
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     
     await addPatientPage.selectPatientBarangay(patient.barangay) // HAPUNAN
     
@@ -186,14 +171,11 @@ test.describe('Add Patient Form Interactions', () => {
     // Change to a different province (just to test the functionality works)
     await addPatientPage.selectPatientProvince('NATIONAL CAPITAL REGION - MANILA')
     
-    // Wait for cascade effects
-    await addPatientPage.page.waitForTimeout(1000)
+    // Wait for cascade effects - city should be enabled for new province
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     
     // Verify the province changed successfully
     await expect(addPatientPage.patientProvinceSelect).toHaveValue('NATIONAL CAPITAL REGION - MANILA')
-    
-    // The cascade functionality should be working (city dropdown should be enabled for new province)
-    await expect(addPatientPage.patientCitySelect).toBeEnabled()
   })
 
   test('should fill complete patient form', async ({ addPatientPage }) => {
@@ -211,9 +193,9 @@ test.describe('Add Patient Form Interactions', () => {
     await addPatientPage.houseNumberInput.fill(patient.houseNumber)
     await addPatientPage.streetNameInput.fill(patient.streetName)
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Fill guardian information
@@ -226,9 +208,9 @@ test.describe('Add Patient Form Interactions', () => {
     await addPatientPage.guardianHouseNumberInput.fill(patient.guardianHouseNumber)
     await addPatientPage.guardianStreetNameInput.fill(patient.guardianStreetName)
     await addPatientPage.selectGuardianProvince(patient.guardianProvince)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.guardianCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectGuardianCity(patient.guardianCity)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.guardianBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectGuardianBarangay(patient.guardianBarangay)
     
     // Verify save button is enabled
@@ -252,9 +234,9 @@ test.describe('Add Patient Form Interactions', () => {
     
     // Fill address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Verify save button is enabled

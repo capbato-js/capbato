@@ -13,11 +13,8 @@ test.describe('Add Patient Form Validation', () => {
       // Try to save without filling required fields
       await addPatientPage.saveButton.click()
       
-      // Wait a bit for validation to trigger
-      await addPatientPage.page.waitForTimeout(1000)
-      
-      // Should still be on the same page (not submitted)
-      await expect(addPatientPage.page).toHaveURL(/\/patients\/new/)
+      // Should still be on the same page (not submitted) - wait for URL to stay the same
+      await expect(addPatientPage.page).toHaveURL(/\/patients\/new/, { timeout: 5000 })
     }
     
     // If save button is disabled, that's also a valid form of validation
@@ -39,11 +36,8 @@ test.describe('Add Patient Form Validation', () => {
       // Try to save
       await addPatientPage.saveButton.click()
       
-      // Wait for any validation
-      await addPatientPage.page.waitForTimeout(1000)
-      
       // Should still be on the same page (validation should prevent submission)
-      await expect(addPatientPage.page).toHaveURL(/\/patients\/new/)
+      await expect(addPatientPage.page).toHaveURL(/\/patients\/new/, { timeout: 5000 })
     }
     
     // Test passes if we reach here without errors
@@ -166,9 +160,9 @@ test.describe('Add Patient Form Validation', () => {
     
     // Fill address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Save button should be enabled

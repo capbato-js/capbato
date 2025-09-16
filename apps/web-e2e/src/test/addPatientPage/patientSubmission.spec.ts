@@ -16,9 +16,9 @@ test.describe('Add Patient Submission', () => {
     
     // Fill required address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Submit the form
@@ -51,9 +51,9 @@ test.describe('Add Patient Submission', () => {
     await addPatientPage.houseNumberInput.fill(patient.houseNumber)
     await addPatientPage.streetNameInput.fill(patient.streetName)
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Fill guardian information
@@ -66,9 +66,9 @@ test.describe('Add Patient Submission', () => {
     await addPatientPage.guardianHouseNumberInput.fill(patient.guardianHouseNumber)
     await addPatientPage.guardianStreetNameInput.fill(patient.guardianStreetName)
     await addPatientPage.selectGuardianProvince(patient.guardianProvince)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.guardianCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectGuardianCity(patient.guardianCity)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.guardianBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectGuardianBarangay(patient.guardianBarangay)
     
     // Submit the form
@@ -96,9 +96,9 @@ test.describe('Add Patient Submission', () => {
     
     // Fill address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Mock server error (this would be done differently in actual implementation)
@@ -128,9 +128,9 @@ test.describe('Add Patient Submission', () => {
     
     // Fill address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Save button should be enabled before clicking
@@ -158,9 +158,9 @@ test.describe('Add Patient Submission', () => {
     
     // Fill address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Save button should be enabled before submission
@@ -201,9 +201,9 @@ test.describe('Add Patient Submission', () => {
     
     // Complete the address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Now submission should work
@@ -227,7 +227,7 @@ test.describe('Add Patient Submission', () => {
     
     // Trigger age calculation
     await addPatientPage.firstNameInput.click()
-    await addPatientPage.page.waitForTimeout(500)
+    await expect(addPatientPage.ageInput).not.toHaveValue('', { timeout: 5000 })
     
     // Verify age is calculated
     const ageValue = await addPatientPage.ageInput.inputValue()
@@ -235,9 +235,9 @@ test.describe('Add Patient Submission', () => {
     
     // Fill address
     await addPatientPage.selectPatientProvince(patient.province)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientCitySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientCity(patient.city)
-    await addPatientPage.page.waitForTimeout(1000)
+    await expect(addPatientPage.patientBarangaySelect).toBeEnabled({ timeout: 5000 })
     await addPatientPage.selectPatientBarangay(patient.barangay)
     
     // Submit with calculated age
