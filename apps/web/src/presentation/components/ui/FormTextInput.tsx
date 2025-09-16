@@ -29,12 +29,15 @@ interface FormTextInputProps extends Omit<TextInputProps, 'placeholder' | 'error
  * />
  * ```
  */
-export const FormTextInput: React.FC<FormTextInputProps> = ({
+export const FormTextInput = React.forwardRef<
+  HTMLInputElement,
+  FormTextInputProps
+>(({
   placeholder = '',
   error,
   errorPlaceholder = '',
   ...props
-}) => {
+}, ref) => {
   // Determine if there's an error message
   const hasError = Boolean(error);
   const errorMessage = typeof error === 'string' ? error : error?.message;
@@ -44,9 +47,12 @@ export const FormTextInput: React.FC<FormTextInputProps> = ({
   
   return (
     <TextInput
+      ref={ref}
       {...props}
       placeholder={finalPlaceholder}
       error={errorMessage}
     />
   );
-};
+});
+
+FormTextInput.displayName = 'FormTextInput';

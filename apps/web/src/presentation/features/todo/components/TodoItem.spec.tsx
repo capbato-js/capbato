@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../../../../test/test-utils';
 import { TodoItem } from './TodoItem';
 import { Todo } from '@nx-starter/domain';
 import { TEST_UUIDS } from '../../../../test/test-helpers';
@@ -39,7 +40,7 @@ describe('TodoItem', () => {
   });
 
   it('should render todo item with checkbox, title, and buttons', () => {
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     expect(screen.getByText(mockTodo.titleValue)).toBeInTheDocument();
     expect(screen.getByRole('checkbox')).toBeInTheDocument();
@@ -54,14 +55,14 @@ describe('TodoItem', () => {
       new Date('2024-01-01T10:00:00Z'),
       TEST_UUIDS.TODO_2
     );
-    render(<TodoItem todo={completedTodo} />);
+    renderWithProviders(<TodoItem todo={completedTodo} />);
 
     const checkbox = screen.getByRole('checkbox');
     expect(checkbox).toBeChecked();
   });
 
   it('should call toggleComplete when checkbox is clicked', async () => {
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const checkbox = screen.getByRole('checkbox');
     fireEvent.click(checkbox);
@@ -70,7 +71,7 @@ describe('TodoItem', () => {
   });
 
   it('should call deleteTodo when delete button is clicked', async () => {
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const deleteButton = screen.getByTestId('delete-todo');
     fireEvent.click(deleteButton);
@@ -79,7 +80,7 @@ describe('TodoItem', () => {
   });
 
   it('should call startEditing when edit button is clicked', () => {
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const editButton = screen.getByTestId('edit-todo');
     fireEvent.click(editButton);
@@ -88,7 +89,7 @@ describe('TodoItem', () => {
   });
 
   it('should call startEditing when title is clicked', () => {
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const titleSpan = screen.getByTestId('todo-title');
     fireEvent.click(titleSpan);
@@ -98,7 +99,7 @@ describe('TodoItem', () => {
 
   it('should render edit mode when isEditing is true', () => {
     mockViewModel.isEditing = true;
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     expect(screen.getByTestId('todo-edit-input')).toBeInTheDocument();
     expect(screen.getByTestId('save-todo')).toBeInTheDocument();
@@ -107,7 +108,7 @@ describe('TodoItem', () => {
 
   it('should call cancelEditing when cancel button is clicked', () => {
     mockViewModel.isEditing = true;
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const cancelButton = screen.getByTestId('cancel-edit');
     fireEvent.click(cancelButton);
@@ -117,7 +118,7 @@ describe('TodoItem', () => {
 
   it('should call handleKeyDown when key is pressed in edit input', () => {
     mockViewModel.isEditing = true;
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const input = screen.getByTestId('todo-edit-input');
     fireEvent.keyDown(input, { key: 'Enter' });
@@ -127,7 +128,7 @@ describe('TodoItem', () => {
 
   it('should call saveEdit when save button is clicked', () => {
     mockViewModel.isEditing = true;
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const saveButton = screen.getByTestId('save-todo');
     fireEvent.click(saveButton);
@@ -143,7 +144,7 @@ describe('TodoItem', () => {
       TEST_UUIDS.TODO_3
     );
     vi.spyOn(overdueTodo, 'isOverdue').mockReturnValue(true);
-    render(<TodoItem todo={overdueTodo} />);
+    renderWithProviders(<TodoItem todo={overdueTodo} />);
 
     expect(screen.getByText('• Overdue')).toBeInTheDocument();
   });
@@ -155,7 +156,7 @@ describe('TodoItem', () => {
       new Date('2024-01-01T10:00:00Z'),
       TEST_UUIDS.TODO_4
     );
-    render(<TodoItem todo={completedTodo} />);
+    renderWithProviders(<TodoItem todo={completedTodo} />);
 
     const titleSpan = screen.getByText(completedTodo.titleValue);
     expect(titleSpan).toHaveClass('line-through');
@@ -164,7 +165,7 @@ describe('TodoItem', () => {
   it('should disable save button when editTitle is empty', () => {
     mockViewModel.isEditing = true;
     mockViewModel.editTitle = '';
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const saveButton = screen.getByTestId('save-todo');
     expect(saveButton).toBeDisabled();
@@ -172,7 +173,7 @@ describe('TodoItem', () => {
 
   it('should call handleEditTitleChange when input changes', () => {
     mockViewModel.isEditing = true;
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const input = screen.getByTestId('todo-edit-input');
     fireEvent.change(input, { target: { value: 'New title' } });
@@ -182,7 +183,7 @@ describe('TodoItem', () => {
 
   it('should show opacity when isUpdating is true', () => {
     mockViewModel.isUpdating = true;
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const todoItem = screen.getByTestId('todo-item');
     expect(todoItem).toHaveClass('opacity-50');
@@ -191,7 +192,7 @@ describe('TodoItem', () => {
   it('should render edit input with current editTitle value', () => {
     mockViewModel.isEditing = true;
     mockViewModel.editTitle = 'Current edit title';
-    render(<TodoItem todo={mockTodo} />);
+    renderWithProviders(<TodoItem todo={mockTodo} />);
 
     const input = screen.getByTestId('todo-edit-input');
     expect(input).toHaveValue('Current edit title');
