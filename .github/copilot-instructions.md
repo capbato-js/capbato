@@ -7,3 +7,6 @@
 4. Don't run any nx build, run and test commands. I'll be the one to test the app and give you the errors I encounter.
 5. You are allowed to run all available MCP server commands.
 6. Before you start, always use "tree apps" and tree "libs" so you will have idea about the project.
+
+Note! Very Important!!
+- always include timeout xx where xx is the timeout value in seconds for every test you run, whether just one test case or one test suite or all tests
