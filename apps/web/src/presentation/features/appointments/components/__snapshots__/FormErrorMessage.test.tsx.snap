@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FormErrorMessage Component > snapshots > matches snapshot with error message 1`] = `
+<div
+  class="text-red-600 text-sm mb-4 text-center"
+  data-testid="add-appointment-error"
+>
+  Sample error message
+</div>
+`;
+
+exports[`FormErrorMessage Component > snapshots > matches snapshot with long error message 1`] = `
+<div
+  class="text-red-600 text-sm mb-4 text-center"
+  data-testid="add-appointment-error"
+>
+  This is a very long error message that should still be displayed correctly and maintain proper styling even when it wraps to multiple lines.
+</div>
+`;
+
+exports[`FormErrorMessage Component > snapshots > matches snapshot with no error (null return) 1`] = `null`;
