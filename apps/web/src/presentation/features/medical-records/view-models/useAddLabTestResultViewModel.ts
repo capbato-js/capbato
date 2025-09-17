@@ -72,7 +72,6 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
           age: patientDetails.age,
           sex: patientDetails.gender // ✅ PatientDto uses 'gender' field
         };
-        console.log('✅ Got patient info from PatientStore:', patientInfo);
         return patientInfo;
       }
     } catch (error) {
@@ -107,7 +106,6 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
           age,
           sex
         };
-        console.log('✅ Got patient info from LabRequest:', patientInfo);
       }
     } catch (error) {
       console.warn('⚠️ LabRequest approach also failed:', error);
@@ -133,7 +131,6 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
       try {
         // If we have labTest from navigation state, use it immediately (push architecture)
         if (navigationLabTest) {
-          console.log('🚀 Using labTest data from navigation state:', navigationLabTest);
           
           // Set the lab test immediately - no API call needed
           setSelectedLabTest(navigationLabTest);
@@ -240,9 +237,6 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
     setError(null);
     
     try {
-      console.log('🔄 Starting lab test result submission...');
-      console.log('📋 Form data received:', formData);
-
       // Convert formData to Record<string, string> by filtering out undefined values
       const cleanedFormData: Record<string, string> = Object.entries(formData)
         .filter(([, value]) => value !== undefined && value !== '' && value !== null)
@@ -257,7 +251,6 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
         'Lab test results submitted' // Default remarks
       );
 
-      console.log('✨ Transformed API payload:', apiPayload);
 
       // Validate the transformed data before submission
       const validationErrors = LabTestResultTransformer.validateFormData(
@@ -270,10 +263,8 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
         throw new Error(`Validation errors: ${validationErrors.join(', ')}`);
       }
 
-      console.log('➕ Creating new lab test result...');
       const createResult = await createLabTestResult(apiPayload);
       const success = !!createResult;
-      console.log(success ? '✅ Lab test result created successfully!' : '❌ Failed to create lab test result');
 
       if (success) {
         // Navigate back to laboratory tests page

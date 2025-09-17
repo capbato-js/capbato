@@ -218,17 +218,6 @@ class ConfigurationProvider {
       
       this._isInitialized = true;
       
-      // Log successful configuration info in development/debug mode
-      if (this._config.logging.level === 'debug' || environment === 'development') {
-        console.log('✅ Configuration initialized successfully:', {
-          environment,
-          serverPort: this._config.server.port,
-          databaseType: this._config.database.type,
-          logLevel: this._config.logging.level,
-          apiPrefix: this._config.api.prefix,
-          attempts: this._initializationAttempts,
-        });
-      }
     } catch (error) {
       console.error(`❌ Configuration initialization failed (attempt ${this._initializationAttempts}/${this._maxInitializationAttempts}):`, error);
       
@@ -241,19 +230,8 @@ class ConfigurationProvider {
       
       // Use fallback configuration if we've exceeded max attempts
       if (this._initializationAttempts >= this._maxInitializationAttempts) {
-        console.warn('⚠️  Using fallback configuration due to repeated initialization failures');
-        console.warn('⚠️  Please check your environment variables and configuration');
-        
         this._config = getFallbackConfig();
         this._isInitialized = true;
-        
-        // Log fallback configuration details
-        console.log('🔄 Fallback configuration loaded:', {
-          serverPort: this._config.server.port,
-          databaseType: this._config.database.type,
-          logLevel: this._config.logging.level,
-          apiPrefix: this._config.api.prefix,
-        });
         
         return;
       }

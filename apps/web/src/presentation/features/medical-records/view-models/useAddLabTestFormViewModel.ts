@@ -54,9 +54,6 @@ export const useAddLabTestFormViewModel = (): IAddLabTestFormViewModel => {
       setIsLoading(true);
       setError(null);
       
-      console.log('🔍 Form data received:', data);
-      console.log('🔍 Selected tests:', data.selectedTests);
-      
       // Convert to CreateLabRequestCommand format with grouped structure
       const command: CreateLabRequestCommand = {
         patientId: data.patientName, // Use the selected patient ID from the form
@@ -166,11 +163,9 @@ export const useAddLabTestFormViewModel = (): IAddLabTestFormViewModel => {
         command.others = data.otherTests;
       }
       
-      console.log('🔍 New grouped command to be sent:', command);
       
       const success = await createLabRequest(command);
       
-      console.log('🔍 Create lab request returned:', success);
       
       if (success) {
         // Success - navigate back to laboratory list
@@ -179,7 +174,6 @@ export const useAddLabTestFormViewModel = (): IAddLabTestFormViewModel => {
         // Refresh the lab tests list
         await fetchAllLabRequests();
         
-        console.log('Lab test request submitted successfully!');
       } else {
         throw new Error('Failed to submit lab test request');
       }

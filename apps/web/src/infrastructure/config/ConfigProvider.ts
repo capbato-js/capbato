@@ -47,15 +47,6 @@ class ConfigurationProvider {
       
       this._isInitialized = true;
       
-      // Log configuration info in development
-      if (this._config.app.debugMode) {
-        console.log('🔧 Configuration initialized:', {
-          environment,
-          apiBackend: this._config.features.useApiBackend,
-          apiBaseUrl: this._config.api.baseUrl,
-          features: this._config.features,
-        });
-      }
     } catch (error) {
       console.error('❌ Configuration initialization failed:', error);
       throw error;

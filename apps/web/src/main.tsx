@@ -11,7 +11,6 @@ import { mantineTheme } from './lib/mantine-theme';
 // Initialize configuration and validate environment variables
 try {
   configProvider.initialize();
-  console.log('✅ Configuration initialized successfully');
 } catch (error) {
   console.error('❌ Configuration validation failed:', error);
   // In production, you might want to show a user-friendly error page instead

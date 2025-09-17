@@ -108,16 +108,13 @@ export const configureDI = () => {
   
   // Auth API Service - use mock in development if auth is not enabled
   if (enableAuth && useApiBackend) {
-    console.log('🔐 Using real AuthApiService for authentication');
     container.registerSingleton<IAuthApiService>(TOKENS.AuthApiService, AuthApiService);
   } else {
-    console.log('🧪 Using MockAuthApiService for development');
     container.registerSingleton<IAuthApiService>(TOKENS.AuthApiService, MockAuthApiService);
   }
 
   // Infrastructure Layer - Repository (conditionally based on environment)
   if (useApiBackend) {
-    console.log('📡 Using API backend for data storage');
     container.registerSingleton<ITodoRepository>(
       TOKENS.TodoRepository,
       ApiTodoRepository
@@ -131,7 +128,6 @@ export const configureDI = () => {
       ApiPrescriptionRepository
     );
   } else {
-    console.log('💾 Using local Dexie.js for data storage');
     container.registerSingleton<ITodoRepository>(
       TOKENS.TodoRepository,
       TodoRepository
