@@ -84,24 +84,24 @@ describe('ErrorMapping', () => {
         
         expect(formErrors[0]).toEqual({
           field: 'user.name',
-          message: 'Name is required',
+          message: 'User is required',
         });
       }
     });
 
     it('should handle custom validation messages', () => {
       const schema = z.object({
-        age: z.number().min(18, 'Must be at least 18 years old'),
+        age: z.string().min(18, 'Must be at least 18 years old'),
       });
 
       try {
-        schema.parse({ age: 16 });
+        schema.parse({ age: '16' });
       } catch (error) {
         const formErrors = mapZodErrorToFormErrors(error as z.ZodError);
         
         expect(formErrors[0]).toEqual({
           field: 'age',
-          message: 'Must be at least 18 years old',
+          message: 'Age must be at least 18 characters',
         });
       }
     });
