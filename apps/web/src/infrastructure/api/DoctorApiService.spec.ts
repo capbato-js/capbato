@@ -281,7 +281,7 @@ describe('DoctorApiService', () => {
 
       const result = await doctorService.checkDoctorProfileExists(userId);
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith(`/api/doctors/exists/${userId}`);
+      expect(mockHttpClient.get).toHaveBeenCalledWith(`/api/doctors/check/${userId}`);
       expect(result).toBe(true);
     });
 
@@ -400,7 +400,7 @@ describe('DoctorApiService', () => {
 
         const result = await doctorService.createScheduleOverride(request);
 
-        expect(mockHttpClient.post).toHaveBeenCalledWith('/api/doctors/schedule-overrides', request);
+        expect(mockHttpClient.post).toHaveBeenCalledWith('/api/doctors/schedule-override', request);
         expect(result).toEqual(mockResponse);
       });
     });
@@ -423,7 +423,7 @@ describe('DoctorApiService', () => {
 
         const result = await doctorService.updateScheduleOverride(overrideId, request);
 
-        expect(mockHttpClient.put).toHaveBeenCalledWith(`/api/doctors/schedule-overrides/${overrideId}`, request);
+        expect(mockHttpClient.put).toHaveBeenCalledWith(`/api/doctors/schedule-override/${overrideId}`, request);
         expect(result).toEqual(mockResponse);
       });
     });
@@ -440,7 +440,7 @@ describe('DoctorApiService', () => {
 
         const result = await doctorService.deleteScheduleOverride(date);
 
-        expect(mockHttpClient.delete).toHaveBeenCalledWith(`/api/doctors/schedule-overrides/date/${date}`);
+        expect(mockHttpClient.delete).toHaveBeenCalledWith(`/api/doctors/schedule-override/${date}`);
         expect(result).toEqual(mockResponse);
       });
     });
