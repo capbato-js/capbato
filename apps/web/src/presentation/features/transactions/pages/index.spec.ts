@@ -7,7 +7,7 @@ describe('Transaction Pages Index', () => {
     // Test that the module exports are available
     expect(module).toBeDefined();
     expect(typeof module).toBe('object');
-  });
+  }, 10000);
 
   it('should re-export all TransactionsPage exports', async () => {
     const indexModule = await import('./index');

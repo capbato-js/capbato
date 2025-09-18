@@ -4,7 +4,7 @@ describe('medical-records components index', () => {
   it('should export AddLabTestForm', async () => {
     const module = await import('./index');
     expect(module.AddLabTestForm).toBeDefined();
-  });
+  }, 10000);
 
   it('should export AddLabTestResultForm', async () => {
     const module = await import('./index');

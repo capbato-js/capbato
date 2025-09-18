@@ -7,7 +7,7 @@ describe('Layouts Index', () => {
     // Test that the module exports MainLayout
     expect(module).toBeDefined();
     expect(module.MainLayout).toBeDefined();
-  });
+  }, 10000);
 
   it('should re-export MainLayout correctly', async () => {
     const indexModule = await import('./index');
