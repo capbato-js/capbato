@@ -19,7 +19,10 @@ export * from './appointments'
 // Medical Records Feature Test IDs
 export * from './medical-records'
 
-// Navigation Feature Test IDs
+// Doctors Feature Test IDs
+export * from './doctors'
+
+// Navigation Test IDs
 export * from './navigation'
 
 // Re-export types for convenience

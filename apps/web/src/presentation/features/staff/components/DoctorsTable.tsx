@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button, Text, Alert } from '@mantine/core';
 import { DataTable, DataTableHeader, TableColumn } from '../../../components/common/DataTable';
 import { DoctorDto } from '@nx-starter/application-shared';
+import { doctorsPageTestIds } from '@nx-starter/utils-core';
 import { useDoctorListViewModel } from '../view-models/useDoctorListViewModel';
 
 export const DoctorsTable: React.FC = () => {
@@ -45,11 +46,20 @@ export const DoctorsTable: React.FC = () => {
 
   if (viewModel.hasError) {
     return (
-      <Box style={{ marginBottom: '35px' }}>
+      <Box style={{ marginBottom: '35px' }} data-testid={doctorsPageTestIds.pageContainer}>
         <DataTableHeader title="Doctors" />
-        <Alert color="red" title="Error loading doctors">
-          <Text>{viewModel.error}</Text>
-          <Button onClick={handleRetry} mt="md" size="sm">
+        <Alert 
+          color="red" 
+          title="Error loading doctors"
+          data-testid={doctorsPageTestIds.errorAlert}
+        >
+          <Text data-testid={doctorsPageTestIds.errorMessage}>{viewModel.error}</Text>
+          <Button 
+            onClick={handleRetry} 
+            mt="md" 
+            size="sm"
+            data-testid={doctorsPageTestIds.retryButton}
+          >
             Retry
           </Button>
         </Alert>
@@ -58,7 +68,7 @@ export const DoctorsTable: React.FC = () => {
   }
 
   return (
-    <Box style={{ marginBottom: '35px' }}>
+    <Box style={{ marginBottom: '35px' }} data-testid={doctorsPageTestIds.pageContainer}>
       <DataTableHeader title="Doctors" />
       
       <DataTable
@@ -75,6 +85,7 @@ export const DoctorsTable: React.FC = () => {
         skeletonRowCount={2}
         useViewportHeight={true}
         bottomPadding={90}
+        testId={doctorsPageTestIds.doctorsTable}
       />
     </Box>
   );

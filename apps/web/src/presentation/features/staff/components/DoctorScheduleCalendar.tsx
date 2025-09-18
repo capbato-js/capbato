@@ -102,9 +102,13 @@ export const DoctorScheduleCalendar: React.FC<DoctorScheduleCalendarProps> = ({
   };
 
   return (
-    <Box style={{ marginTop: '30px' }}>
+    <Box 
+      data-testid="doctors-schedule-calendar"
+      style={{ marginTop: '30px' }}
+    >
       {/* Top Row: Title + Edit */}
       <Box 
+        data-testid="doctors-calendar-container"
         style={{ 
           display: 'flex',
           flexDirection: 'column',
