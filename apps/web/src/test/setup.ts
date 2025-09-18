@@ -3,6 +3,9 @@ import { vi } from 'vitest';
 import { configureDI } from '../infrastructure/di/container';
 import { configProvider } from '../infrastructure/config';
 
+// Set NODE_ENV to development for React to enable act() functionality
+process.env.NODE_ENV = 'development';
+
 // Initialize configuration and DI for tests
 beforeAll(async () => {
   // Reset configuration for test environment
@@ -26,6 +29,7 @@ beforeEach(() => {
       typeof args[0] === 'string' &&
       (args[0].includes('Warning: ReactDOM.render is deprecated') ||
         args[0].includes('Warning: An invalid form control') ||
+        args[0].includes('act(...) is not supported in production builds') ||
         args[0].includes(
           'Warning: When testing, code that causes React state updates'
         ))
@@ -62,15 +66,20 @@ declare global {
 }
 
 // Mock IntersectionObserver
-global.IntersectionObserver = vi.fn(() => ({
-  observe: vi.fn(),
-  disconnect: vi.fn(),
-  unobserve: vi.fn(),
-  root: null,
-  rootMargin: '',
-  thresholds: [],
-  takeRecords: vi.fn(() => []),
-})) as any;
+global.IntersectionObserver = class IntersectionObserver {
+  observe = vi.fn();
+  disconnect = vi.fn();
+  unobserve = vi.fn();
+  root = null;
+  rootMargin = '';
+  thresholds: number[] = [];
+  takeRecords = vi.fn(() => []);
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(_callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {
+    // Mock implementation
+  }
+};
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn(() => ({

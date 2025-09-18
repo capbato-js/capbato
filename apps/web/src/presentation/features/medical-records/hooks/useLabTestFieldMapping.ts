@@ -72,10 +72,13 @@ export const useLabTestFieldMapping = () => {
         testLower === identifier.toLowerCase()
       );
       
-      const isPartialMatch = lipidProfileIdentifiers.some(identifier => 
-        testLower.includes(identifier.toLowerCase()) || 
-        identifier.toLowerCase().includes(testLower)
-      );
+      const isPartialMatch = lipidProfileIdentifiers.some(identifier => {
+        const identifierLower = identifier.toLowerCase();
+        // Only allow partial match if the test is a meaningful substring
+        // Avoid matching individual components like 'cholesterol' with 'cholesterol panel'
+        return identifierLower.includes(testLower) && testLower.length >= 4 && 
+               (testLower === 'lipid' || testLower === 'panel' || testLower === 'profile');
+      });
       
       if (isExactMatch || isPartialMatch) {
         hasLipidProfile = true;
@@ -99,11 +102,11 @@ export const useLabTestFieldMapping = () => {
       // Add components that aren't already present (case-insensitive check)
       for (const component of lipidProfileComponents) {
         const componentLower = component.toLowerCase();
-        const alreadyExists = expandedTests.some(test => 
-          test.toLowerCase() === componentLower ||
-          test.toLowerCase().includes(componentLower) ||
-          componentLower.includes(test.toLowerCase())
-        );
+        const alreadyExists = expandedTests.some(test => {
+          const testLower = test.toLowerCase();
+          // Check for exact match or if the component exists as part of another test
+          return testLower === componentLower || testLower.includes(componentLower);
+        });
         
         if (!alreadyExists) {
           expandedTests.push(component);
@@ -111,11 +114,17 @@ export const useLabTestFieldMapping = () => {
       }
     }
     
-    // Remove duplicates (case-insensitive)
+    // Remove duplicates (case-insensitive, but preserve empty strings)
     const uniqueTests = [];
     const seenLower = new Set();
     
     for (const test of expandedTests) {
+      // Handle empty strings specially - don't deduplicate them
+      if (test === '') {
+        uniqueTests.push(test);
+        continue;
+      }
+      
       const testLower = test.toLowerCase();
       if (!seenLower.has(testLower)) {
         uniqueTests.push(test);
