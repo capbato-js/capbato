@@ -263,15 +263,11 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
         throw new Error(`Validation errors: ${validationErrors.join(', ')}`);
       }
 
-      const createResult = await createLabTestResult(apiPayload);
-      const success = !!createResult;
-
-      if (success) {
-        // Navigate back to laboratory tests page
-        navigate(`/laboratory/tests/${patientId}`);
-      } else {
-        throw new Error('Failed to create lab test result');
-      }
+      await createLabTestResult(apiPayload);
+      
+      // If we reach here, creation was successful (no error thrown)
+      // Navigate back to laboratory tests page
+      navigate(`/laboratory/tests/${patientId}`);
       
     } catch (err) {
       console.error('❌ Error submitting result:', err);

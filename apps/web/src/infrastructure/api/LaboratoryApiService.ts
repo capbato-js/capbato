@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
-import { 
-  CreateLabRequestCommand, 
+import {
+  CreateLabRequestCommand,
   CreateLabTestResultRequestDto,
   UpdateLabTestResultRequestDto,
   LabRequestResponse,
@@ -8,10 +8,11 @@ import {
   LabTestListResponse,
   LaboratoryOperationResponse,
   LabTestResultResponse,
-  TOKENS 
+  TOKENS
 } from '@nx-starter/application-shared';
 import { IHttpClient } from '../http/IHttpClient';
 import { ILaboratoryApiService } from './ILaboratoryApiService';
+import { ApiError } from './errors/ApiError';
 
 /**
  * API Service for Laboratory Operations
@@ -22,6 +23,17 @@ export class LaboratoryApiService implements ILaboratoryApiService {
   constructor(
     @inject(TOKENS.HttpClient) private httpClient: IHttpClient
   ) {}
+
+  /**
+   * Extract error message from ApiError or fallback to generic message
+   */
+  private getErrorMessage(error: unknown, fallbackMessage: string): string {
+    if (error instanceof ApiError && error.data && typeof error.data === 'object') {
+      const errorData = error.data as { message?: string };
+      return errorData.message || error.message || fallbackMessage;
+    }
+    return error instanceof Error ? error.message : fallbackMessage;
+  }
 
   /**
    * Create a new laboratory test request
@@ -38,7 +50,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error creating lab request:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to create lab request'
+        message: this.getErrorMessage(error, 'Failed to create lab request')
       } as LabRequestResponse;
     }
   }
@@ -59,7 +71,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch lab requests',
+        message: this.getErrorMessage(error, 'Failed to fetch lab requests'),
         data: []
       };
     }
@@ -78,7 +90,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error fetching lab request for patient:', patientId, error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch lab request'
+        message: this.getErrorMessage(error, 'Failed to fetch lab request')
       } as LabRequestResponse;
     }
   }
@@ -95,7 +107,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error fetching lab tests for patient:', patientId, error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch lab tests',
+        message: this.getErrorMessage(error, 'Failed to fetch lab tests'),
         data: []
       };
     }
@@ -124,7 +136,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error updating lab results:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to update lab results'
+        message: this.getErrorMessage(error, 'Failed to update lab results')
       };
     }
   }
@@ -142,7 +154,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error fetching completed lab requests:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch completed lab requests',
+        message: this.getErrorMessage(error, 'Failed to fetch completed lab requests'),
         data: []
       };
     }
@@ -161,7 +173,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error creating lab test result:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to create lab test result'
+        message: this.getErrorMessage(error, 'Failed to create lab test result')
       } as LabTestResultResponse;
     }
   }
@@ -179,7 +191,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error fetching lab test result for ID:', id, error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch lab test result'
+        message: this.getErrorMessage(error, 'Failed to fetch lab test result')
       } as LabTestResultResponse;
     }
   }
@@ -197,7 +209,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error fetching lab test result for lab request ID:', labRequestId, error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch lab test result'
+        message: this.getErrorMessage(error, 'Failed to fetch lab test result')
       } as LabTestResultResponse;
     }
   }
@@ -215,7 +227,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error updating lab test result:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to update lab test result'
+        message: this.getErrorMessage(error, 'Failed to update lab test result')
       } as LabTestResultResponse;
     }
   }
@@ -233,7 +245,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       console.error('❌ Error cancelling lab request:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to cancel lab request'
+        message: this.getErrorMessage(error, 'Failed to cancel lab request')
       } as LaboratoryOperationResponse;
     }
   }

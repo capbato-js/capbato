@@ -349,15 +349,24 @@ export const useLaboratoryStore = create<LaboratoryStore>((set, get) => {
           return true;
         }
         
-        throw new Error('Failed to create lab test result');
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        // Handle API error response - set state and throw to let view model handle
+        const errorMessage = response.message || 'Failed to create lab test result';
         set(state => ({
           ...state,
           loadingStates: { ...state.loadingStates, creating: false },
           errorStates: { ...state.errorStates, createError: errorMessage }
         }));
-        return false;
+        throw new Error(errorMessage);
+        
+      } catch (error) {
+        // Set loading state to false
+        set(state => ({
+          ...state,
+          loadingStates: { ...state.loadingStates, creating: false }
+        }));
+        
+        // Re-throw the error to let the view model handle it
+        throw error;
       }
     },
 
