@@ -1,32 +1,34 @@
-import React from 'react';
-import { Box, Stack, Divider } from '@mantine/core';
-import { LabResultFormHeader } from './LabResultFormHeader';
-import { PatientInfoSection } from './PatientInfoSection';
-import { LabTestFieldsGrid } from './LabTestFieldsGrid';
-import { ErrorDisplay } from './ErrorDisplay';
-import { SignatureSection } from './SignatureSection';
-import { FormActionButtons } from './FormActionButtons';
-import { getContainerStyles } from '../utils/labTestResultFormUtils';
-import type { ADD_LAB_TEST_RESULT_FORM_CONFIG } from '../config/addLabTestResultFormConfig';
+import React from 'react'
+import { Box, Stack, Divider } from '@mantine/core'
+import { LabResultFormHeader } from './LabResultFormHeader'
+import { PatientInfoSection } from './PatientInfoSection'
+import { LabTestFieldsGrid } from './LabTestFieldsGrid'
+import { ErrorDisplay } from './ErrorDisplay'
+import { SignatureSection } from './SignatureSection'
+import { FormActionButtons } from './FormActionButtons'
+import { getContainerStyles } from '../utils/labTestResultFormUtils'
+import type { ADD_LAB_TEST_RESULT_FORM_CONFIG } from '../config/addLabTestResultFormConfig'
 
 interface AddLabTestResultFormPresenterProps {
-  config: typeof ADD_LAB_TEST_RESULT_FORM_CONFIG;
-  testConfig: { title: string };
-  leftFields: any[];
-  rightFields: any[];
-  formMethods: any;
-  handleFormSubmit: (data: any) => void;
-  enabledFields?: string[];
-  viewMode: boolean;
-  isLoadingData: boolean;
-  submitButtonText: string;
-  patientData?: any;
-  onCancel?: () => void;
-  isSubmitting: boolean;
-  error: string | null;
+  config: typeof ADD_LAB_TEST_RESULT_FORM_CONFIG
+  testConfig: { title: string }
+  leftFields: any[]
+  rightFields: any[]
+  formMethods: any
+  handleFormSubmit: (data: any) => void
+  enabledFields?: string[]
+  viewMode: boolean
+  isLoadingData: boolean
+  submitButtonText: string
+  patientData?: any
+  onCancel?: () => void
+  isSubmitting: boolean
+  error: string | null
 }
 
-export const AddLabTestResultFormPresenter: React.FC<AddLabTestResultFormPresenterProps> = ({
+export const AddLabTestResultFormPresenter: React.FC<
+  AddLabTestResultFormPresenterProps
+> = ({
   config,
   testConfig,
   leftFields,
@@ -87,5 +89,5 @@ export const AddLabTestResultFormPresenter: React.FC<AddLabTestResultFormPresent
         </Stack>
       </form>
     </Box>
-  );
-};
+  )
+}

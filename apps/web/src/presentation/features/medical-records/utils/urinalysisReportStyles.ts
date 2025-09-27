@@ -1,4 +1,4 @@
-export const getReportStyles = () => ({
+export const getReportStyles = (editable?: boolean) => ({
   // Container styles
   reportContainer: {
     backgroundColor: 'white',
@@ -70,51 +70,51 @@ export const getReportStyles = () => ({
   
   // Input field styles
   fieldInput: {
-    borderBottom: '1px solid #000',
+    borderBottom: editable ? 'none' : '1px solid #000',
     minWidth: '210px',
-    paddingBottom: '2px',
+    // paddingBottom: '2px',
     textAlign: 'center' as const,
-    height: '22px',
+    height: editable ? 'auto' : '22px',
   },
   
   fieldInputSmall: {
-    borderBottom: '1px solid #000',
+    borderBottom: editable ? 'none' : '1px solid #000',
     minWidth: '100px',
-    paddingBottom: '2px',
+    // paddingBottom: '2px',
     textAlign: 'center' as const,
-    height: '22px',
+    height: editable ? 'auto' : '22px',
   },
   
   fieldInputMedium: {
-    borderBottom: '1px solid #000',
+    borderBottom: editable ? 'none' : '1px solid #000',
     minWidth: '150px',
-    paddingBottom: '2px',
+    // paddingBottom: '2px',
     textAlign: 'center' as const,
-    height: '22px',
+    height: editable ? 'auto' : '22px',
   },
   
   fieldInputLarge: {
-    borderBottom: '1px solid #000',
-    minWidth: '200px',
-    paddingBottom: '2px',
+    borderBottom: editable ? 'none' : '1px solid #000',
+    minWidth: '210px',
+    // paddingBottom: '2px',
     textAlign: 'center' as const,
-    height: '22px',
+    height: editable ? 'auto' : '22px',
   },
   
   fieldInputXLarge: {
-    borderBottom: '1px solid #000',
+    borderBottom: editable ? 'none' : '1px solid #000',
     minWidth: '250px',
-    paddingBottom: '2px',
+    // paddingBottom: '2px',
     textAlign: 'left' as const,
-    height: '22px',
+    height: editable ? 'auto' : '22px',
   },
   
   fieldInputFull: {
-    borderBottom: '1px solid #000',
+    borderBottom: editable ? 'none' : '1px solid #000',
     minWidth: '580px',
-    paddingBottom: '2px',
+    // paddingBottom: '2px',
     textAlign: 'center' as const,
-    height: '22px',
+    height: editable ? 'auto' : '22px',
   },
   
   // Section styles
@@ -146,7 +146,7 @@ export const getReportStyles = () => ({
   signatureName: {
     fontWeight: 'bold',
     fontSize: '12px',
-    borderBottom: '1px solid #000',
+    borderBottom: editable ? 'none' : '1px solid #000',
     paddingBottom: '2px',
     marginBottom: '5px',
     display: 'inline-block',
@@ -161,7 +161,10 @@ export const getReportStyles = () => ({
   // Utility styles
   referenceValue: {
     fontSize: '12px',
-    marginLeft: '10px',
+    width: editable ? '50px' : '40px',
+    marginLeft: editable ? 0: '10px',
+    marginBottom: editable ? '-3px' : '-12px',
+    paddingBottom: 0
   },
   
   printButtonContainer: {

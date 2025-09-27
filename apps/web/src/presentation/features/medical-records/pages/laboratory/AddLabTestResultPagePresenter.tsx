@@ -1,6 +1,7 @@
 import React from 'react';
 import { MedicalClinicLayout } from '../../../../components/layout';
 import { AddLabTestResultForm } from '../../components';
+import { UrinalysisReportView } from '../../components/urinalysis-report/UrinalysisReportView';
 import { PageHeader } from '../../components/PageHeader';
 import type { ADD_LAB_TEST_RESULT_PAGE_CONFIG } from '../../config/addLabTestResultPageConfig';
 
@@ -25,10 +26,30 @@ interface AddLabTestResultPagePresenterProps {
   };
 }
 
-export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresenterProps> = ({ 
-  config, 
-  viewModel 
+export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresenterProps> = ({
+  config,
+  viewModel
 }) => {
+  const isUrinalysis = viewModel.selectedLabTest?.testCategory?.toLowerCase() === 'urinalysis';
+
+  const formProps = {
+    testType: viewModel.selectedLabTest?.testCategory,
+    enabledFields: viewModel.selectedLabTest?.enabledFields || [],
+    existingData: undefined,
+    isLoadingData: viewModel.isLoading,
+    submitButtonText: "Submit Result",
+    patientData: {
+      patientNumber: viewModel.patientInfo?.patientNumber || '',
+      patientName: viewModel.patientInfo?.patientName || '',
+      age: viewModel.patientInfo?.age || 0,
+      sex: viewModel.patientInfo?.sex || ''
+    },
+    onSubmit: viewModel.handleFormSubmit,
+    onCancel: viewModel.handleCancel,
+    isSubmitting: viewModel.isSubmitting,
+    error: viewModel.error
+  };
+
   return (
     <MedicalClinicLayout>
       <PageHeader
@@ -37,23 +58,27 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
         onBackClick={viewModel.handleCancel}
       />
 
-      <AddLabTestResultForm
-        testType={viewModel.selectedLabTest?.testCategory}
-        enabledFields={viewModel.selectedLabTest?.enabledFields || []}
-        existingData={undefined}
-        isLoadingData={viewModel.isLoading}
-        submitButtonText="Submit Result"
-        patientData={{
-          patientNumber: viewModel.patientInfo?.patientNumber || '',
-          patientName: viewModel.patientInfo?.patientName || '',
-          age: viewModel.patientInfo?.age || 0,
-          sex: viewModel.patientInfo?.sex || ''
-        }}
-        onSubmit={viewModel.handleFormSubmit}
-        onCancel={viewModel.handleCancel}
-        isSubmitting={viewModel.isSubmitting}
-        error={viewModel.error}
-      />
+      {isUrinalysis ? (
+        <UrinalysisReportView
+          patientData={{
+            patientNumber: viewModel.patientInfo?.patientNumber || '',
+            patientName: viewModel.patientInfo?.patientName || '',
+            age: viewModel.patientInfo?.age || 0,
+            sex: viewModel.patientInfo?.sex || '',
+            dateRequested: new Date().toLocaleDateString()
+          }}
+          labData={formProps.existingData}
+          editable={true}
+          enabledFields={formProps.enabledFields}
+          onSubmit={formProps.onSubmit}
+          onCancel={formProps.onCancel}
+          isSubmitting={formProps.isSubmitting}
+          error={formProps.error}
+          submitButtonText={formProps.submitButtonText}
+        />
+      ) : (
+        <AddLabTestResultForm {...formProps} />
+      )}
     </MedicalClinicLayout>
   );
 };

@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import {
   UrinalysisPatientData,
-  UrinalysisLabData,
   formatValue,
   usePrintReport,
 } from '../../utils/urinalysisReportUtils';
@@ -19,11 +18,11 @@ export const UrinalysisReportViewContainer: React.FC<UrinalysisReportViewContain
   onBack,
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
-  const handlePrint = usePrintReport(printRef, patientData?.patientName);
+  const handlePrint = usePrintReport(printRef as React.RefObject<HTMLDivElement>, patientData?.patientName);
 
   return (
     <UrinalysisReportViewPresenter
-      printRef={printRef}
+      printRef={printRef as React.RefObject<HTMLDivElement>}
       patientData={patientData}
       labData={labData}
       formatValue={formatValue}
