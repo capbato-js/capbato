@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { generateLabTestSchema } from '../../constants/labTestFormConfig';
@@ -46,7 +46,14 @@ export const UrinalysisUnifiedContainer: React.FC<UrinalysisUnifiedContainerProp
     defaultValues: labData || {},
   });
 
-  const { handleSubmit, setValue, watch, formState: { errors } } = formMethods;
+  const { handleSubmit, setValue, watch, reset, formState: { errors } } = formMethods;
+
+  // Reset form with new data when labData changes (for edit mode)
+  useEffect(() => {
+    if (editable && labData && Object.keys(labData).length > 0) {
+      reset(labData);
+    }
+  }, [editable, labData, reset]);
 
   // Watch all form values to get current state
   const currentFormData = watch();

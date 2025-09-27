@@ -571,7 +571,7 @@ export class LabTestResultTransformer {
     const stringFields = [
       'color', 'transparency', 'specificGravity', 'ph', 'protein', 'glucose',
       'epithelialCells', 'redCells', 'pusCells', 'mucusThread', 'bacteria',
-      'amorphousUrates', 'casts', 'crystals'
+      'amorphousUrates', 'casts', 'crystals', 'pregnancyTest'
     ];
 
     stringFields.forEach(field => {
