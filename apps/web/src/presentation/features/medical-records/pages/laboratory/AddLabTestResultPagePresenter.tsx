@@ -2,6 +2,7 @@ import React from 'react';
 import { MedicalClinicLayout } from '../../../../components/layout';
 import { AddLabTestResultForm } from '../../components';
 import { UrinalysisReportView } from '../../components/urinalysis-report/UrinalysisReportView';
+import { BloodChemistryReportView } from '../../components/blood-chemistry-report/BloodChemistryReportView';
 import { PageHeader } from '../../components/PageHeader';
 import type { ADD_LAB_TEST_RESULT_PAGE_CONFIG } from '../../config/addLabTestResultPageConfig';
 
@@ -30,7 +31,9 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
   config,
   viewModel
 }) => {
-  const isUrinalysis = viewModel.selectedLabTest?.testCategory?.toLowerCase() === 'urinalysis';
+  const testCategory = viewModel.selectedLabTest?.testCategory?.toLowerCase();
+  const isUrinalysis = testCategory === 'urinalysis';
+  const isBloodChemistry = testCategory === 'bloodchemistry' || testCategory === 'blood chemistry';
 
   const formProps = {
     testType: viewModel.selectedLabTest?.testCategory,
@@ -50,6 +53,24 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
     error: viewModel.error
   };
 
+  const reportProps = {
+    patientData: {
+      patientNumber: viewModel.patientInfo?.patientNumber || '',
+      patientName: viewModel.patientInfo?.patientName || '',
+      age: viewModel.patientInfo?.age || 0,
+      sex: viewModel.patientInfo?.sex || '',
+      dateRequested: new Date().toLocaleDateString()
+    },
+    labData: formProps.existingData,
+    editable: true,
+    enabledFields: formProps.enabledFields,
+    onSubmit: formProps.onSubmit,
+    onCancel: formProps.onCancel,
+    isSubmitting: formProps.isSubmitting,
+    error: formProps.error,
+    submitButtonText: formProps.submitButtonText
+  };
+
   return (
     <MedicalClinicLayout>
       <PageHeader
@@ -59,23 +80,9 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
       />
 
       {isUrinalysis ? (
-        <UrinalysisReportView
-          patientData={{
-            patientNumber: viewModel.patientInfo?.patientNumber || '',
-            patientName: viewModel.patientInfo?.patientName || '',
-            age: viewModel.patientInfo?.age || 0,
-            sex: viewModel.patientInfo?.sex || '',
-            dateRequested: new Date().toLocaleDateString()
-          }}
-          labData={formProps.existingData}
-          editable={true}
-          enabledFields={formProps.enabledFields}
-          onSubmit={formProps.onSubmit}
-          onCancel={formProps.onCancel}
-          isSubmitting={formProps.isSubmitting}
-          error={formProps.error}
-          submitButtonText={formProps.submitButtonText}
-        />
+        <UrinalysisReportView {...reportProps} />
+      ) : isBloodChemistry ? (
+        <BloodChemistryReportView {...reportProps} />
       ) : (
         <AddLabTestResultForm {...formProps} />
       )}

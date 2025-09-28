@@ -3,9 +3,11 @@ import { AddLabTestResultForm } from './AddLabTestResultForm';
 import { LabTest } from '../types';
 import { PatientData } from '../utils/viewLabTestResultUtils';
 import { UrinalysisReportView } from './urinalysis-report/UrinalysisReportView';
+import { BloodChemistryReportView } from './blood-chemistry-report/BloodChemistryReportView';
 
 export interface LabTestContentProps {
   isUrinalysisTest: boolean;
+  isBloodChemistryTest: boolean;
   patientData: PatientData;
   labData: Record<string, string> | null;
   selectedLabTest: LabTest | null;
@@ -16,6 +18,7 @@ export interface LabTestContentProps {
 
 export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   isUrinalysisTest,
+  isBloodChemistryTest,
   patientData,
   labData,
   selectedLabTest,
@@ -23,19 +26,39 @@ export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   error,
   onBack,
 }) => {
-  return isUrinalysisTest ? (
-    <UrinalysisReportView
-      patientData={{
-        patientNumber: patientData.patientNumber,
-        patientName: patientData.patientName,
-        age: patientData.age,
-        sex: patientData.sex,
-        dateRequested: selectedLabTest?.date || ''
-      }}
-      labData={labData}
-      onBack={onBack}
-    />
-  ) : (
+  if (isUrinalysisTest) {
+    return (
+      <UrinalysisReportView
+        patientData={{
+          patientNumber: patientData.patientNumber,
+          patientName: patientData.patientName,
+          age: patientData.age,
+          sex: patientData.sex,
+          dateRequested: selectedLabTest?.date || ''
+        }}
+        labData={labData}
+        onBack={onBack}
+      />
+    );
+  }
+
+  if (isBloodChemistryTest) {
+    return (
+      <BloodChemistryReportView
+        patientData={{
+          patientNumber: patientData.patientNumber,
+          patientName: patientData.patientName,
+          age: patientData.age,
+          sex: patientData.sex,
+          dateRequested: selectedLabTest?.date || ''
+        }}
+        labData={labData}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
     <AddLabTestResultForm
       testType={selectedLabTest?.testCategory}
       viewMode={true}

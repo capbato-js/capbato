@@ -9,6 +9,11 @@ export const isUrinalysisTest = (testCategory?: string): boolean => {
   return testCategory === 'urinalysis';
 };
 
+export const isBloodChemistryTest = (testCategory?: string): boolean => {
+  const normalized = testCategory?.toLowerCase();
+  return normalized === 'bloodchemistry' || normalized === 'blood chemistry';
+};
+
 export const preparePatientData = (
   patientInfo?: {
     patientNumber?: string;

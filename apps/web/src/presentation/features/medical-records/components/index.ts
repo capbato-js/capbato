@@ -13,5 +13,6 @@ export { LaboratoryTestsModals } from './LaboratoryTestsModals';
 
 // Report view components
 export { UrinalysisReportView } from './urinalysis-report/UrinalysisReportView';
+export { BloodChemistryReportView } from './blood-chemistry-report/BloodChemistryReportView';
 
-// Form components are now handled by the unified UrinalysisReportView
+// Form components are now handled by the unified report view components
