@@ -88,7 +88,7 @@ export const ReportField: React.FC<ReportFieldProps> = ({
           styles={{
             input: {
               ...getInputStyle(),
-              border: error ? '1px solid red' : (fieldEnabled ? '1px solid #ccc' : '1px solid #e9ecef'),
+              border: error ? '1px solid red' : (fieldEnabled ? '1px solid #007bff' : '1px solid #e9ecef'),
               backgroundColor: fieldEnabled ? 'white' : '#f5f5f5',
               color: fieldEnabled ? 'inherit' : '#999',
               cursor: fieldEnabled ? 'text' : 'not-allowed',
