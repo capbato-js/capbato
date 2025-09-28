@@ -32,7 +32,7 @@
  */
 
 import { AppConfig } from './AppConfig';
-import { getEnvironmentConfig, environmentOverrides, ConfigParsingError } from './EnvironmentConfig';
+import { getEnvironmentConfig, ConfigParsingError } from './EnvironmentConfig';
 
 /**
  * Configuration validation errors
@@ -203,15 +203,8 @@ class ConfigurationProvider {
     this._initializationAttempts++;
 
     try {
-      // Get base configuration from environment
-      const baseConfig = getEnvironmentConfig();
-      
-      // Apply environment-specific overrides
-      const environment = this.getCurrentEnvironment();
-      const overrides = environmentOverrides[environment];
-      
-      // Deep merge configuration with overrides
-      this._config = this.deepMerge(baseConfig, overrides || {});
+      // Get configuration from environment
+      this._config = getEnvironmentConfig();
       
       // Validate configuration
       this.validateConfiguration(this._config);

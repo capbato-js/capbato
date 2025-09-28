@@ -21,7 +21,7 @@ export type {
 } from './AppConfig';
 
 // Environment Configuration
-export { getEnvironmentConfig, environmentOverrides, ConfigParsingError } from './EnvironmentConfig';
+export { getEnvironmentConfig, ConfigParsingError } from './EnvironmentConfig';
 
 // Configuration Provider - Main API
 export {
