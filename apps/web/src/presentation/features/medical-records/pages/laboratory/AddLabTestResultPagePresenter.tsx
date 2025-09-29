@@ -3,6 +3,7 @@ import { MedicalClinicLayout } from '../../../../components/layout';
 import { AddLabTestResultForm } from '../../components';
 import { UrinalysisReportView } from '../../components/urinalysis-report/UrinalysisReportView';
 import { BloodChemistryReportView } from '../../components/blood-chemistry-report/BloodChemistryReportView';
+import { FecalysisReportView } from '../../components/fecalysis-report/FecalysisReportView';
 import { PageHeader } from '../../components/PageHeader';
 import type { ADD_LAB_TEST_RESULT_PAGE_CONFIG } from '../../config/addLabTestResultPageConfig';
 
@@ -34,6 +35,7 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
   const testCategory = viewModel.selectedLabTest?.testCategory?.toLowerCase();
   const isUrinalysis = testCategory === 'urinalysis';
   const isBloodChemistry = testCategory === 'bloodchemistry' || testCategory === 'blood chemistry';
+  const isFecalysis = testCategory === 'fecalysis';
 
   const formProps = {
     testType: viewModel.selectedLabTest?.testCategory,
@@ -83,6 +85,8 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
         <UrinalysisReportView {...reportProps} />
       ) : isBloodChemistry ? (
         <BloodChemistryReportView {...reportProps} />
+      ) : isFecalysis ? (
+        <FecalysisReportView {...reportProps} />
       ) : (
         <AddLabTestResultForm {...formProps} />
       )}

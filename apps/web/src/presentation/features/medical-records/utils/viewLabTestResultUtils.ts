@@ -14,6 +14,10 @@ export const isBloodChemistryTest = (testCategory?: string): boolean => {
   return normalized === 'bloodchemistry' || normalized === 'blood chemistry';
 };
 
+export const isFecalysisTest = (testCategory?: string): boolean => {
+  return testCategory === 'fecalysis';
+};
+
 export const preparePatientData = (
   patientInfo?: {
     patientNumber?: string;

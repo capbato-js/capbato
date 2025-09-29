@@ -3,6 +3,7 @@ import { useViewLabTestResultViewModel } from '../../view-models/useViewLabTestR
 import {
   isUrinalysisTest,
   isBloodChemistryTest,
+  isFecalysisTest,
   preparePatientData,
 } from '../../utils/viewLabTestResultUtils';
 import { ViewLabTestResultPagePresenter } from './ViewLabTestResultPagePresenter';
@@ -14,11 +15,13 @@ export const ViewLabTestResultPageContainer: React.FC = () => {
   const patientData = preparePatientData(viewModel.patientInfo);
   const isUrinalysis = isUrinalysisTest(viewModel.selectedLabTest?.testCategory);
   const isBloodChemistry = isBloodChemistryTest(viewModel.selectedLabTest?.testCategory);
+  const isFecalysis = isFecalysisTest(viewModel.selectedLabTest?.testCategory);
 
   return (
     <ViewLabTestResultPagePresenter
       isUrinalysisTest={isUrinalysis}
       isBloodChemistryTest={isBloodChemistry}
+      isFecalysisTest={isFecalysis}
       patientData={patientData}
       labData={viewModel.bloodChemistryData}
       selectedLabTest={viewModel.selectedLabTest}

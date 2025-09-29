@@ -4,10 +4,12 @@ import { LabTest } from '../types';
 import { PatientData } from '../utils/viewLabTestResultUtils';
 import { UrinalysisReportView } from './urinalysis-report/UrinalysisReportView';
 import { BloodChemistryReportView } from './blood-chemistry-report/BloodChemistryReportView';
+import { FecalysisReportView } from './fecalysis-report/FecalysisReportView';
 
 export interface LabTestContentProps {
   isUrinalysisTest: boolean;
   isBloodChemistryTest: boolean;
+  isFecalysisTest: boolean;
   patientData: PatientData;
   labData: Record<string, string> | null;
   selectedLabTest: LabTest | null;
@@ -19,6 +21,7 @@ export interface LabTestContentProps {
 export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   isUrinalysisTest,
   isBloodChemistryTest,
+  isFecalysisTest,
   patientData,
   labData,
   selectedLabTest,
@@ -45,6 +48,22 @@ export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   if (isBloodChemistryTest) {
     return (
       <BloodChemistryReportView
+        patientData={{
+          patientNumber: patientData.patientNumber,
+          patientName: patientData.patientName,
+          age: patientData.age,
+          sex: patientData.sex,
+          dateRequested: selectedLabTest?.date || ''
+        }}
+        labData={labData}
+        onBack={onBack}
+      />
+    );
+  }
+
+  if (isFecalysisTest) {
+    return (
+      <FecalysisReportView
         patientData={{
           patientNumber: patientData.patientNumber,
           patientName: patientData.patientName,

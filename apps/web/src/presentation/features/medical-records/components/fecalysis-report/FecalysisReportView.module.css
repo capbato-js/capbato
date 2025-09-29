@@ -1,0 +1,52 @@
+/* Print specific styles */
+@media print {
+  .printArea {
+    margin: 0;
+    padding: 20px;
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .noPrint {
+    display: none !important;
+  }
+
+  /* Force black text for all elements during print */
+  .printArea * {
+    color: black !important;
+    background-color: transparent !important;
+  }
+
+  /* Ensure proper page breaks */
+  .printArea {
+    page-break-inside: avoid;
+  }
+
+  /* Hide any interactive elements */
+  input,
+  button,
+  select,
+  textarea {
+    display: none !important;
+  }
+
+  /* Show only the text content for input fields */
+  .printArea input {
+    display: inline-block !important;
+    border: none !important;
+    background: transparent !important;
+    color: black !important;
+  }
+}
+
+/* Screen specific styles */
+@media screen {
+  .printArea {
+    background-color: white;
+    color: inherit;
+  }
+
+  .noPrint {
+    display: block;
+  }
+}
