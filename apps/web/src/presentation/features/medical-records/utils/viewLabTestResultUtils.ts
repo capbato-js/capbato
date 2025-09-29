@@ -18,6 +18,11 @@ export const isFecalysisTest = (testCategory?: string): boolean => {
   return testCategory === 'fecalysis';
 };
 
+export const isEcgTest = (testCategory?: string): boolean => {
+  const normalized = testCategory?.toLowerCase();
+  return normalized === 'ecg' || normalized === 'electrocardiogram';
+};
+
 export const preparePatientData = (
   patientInfo?: {
     patientNumber?: string;

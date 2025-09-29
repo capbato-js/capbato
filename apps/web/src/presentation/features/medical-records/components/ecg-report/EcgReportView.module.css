@@ -1,0 +1,28 @@
+/* Print-specific styles */
+@media print {
+  .noPrint {
+    display: none !important;
+  }
+
+  .printArea {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 40px !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Ensure proper page breaks */
+  .printArea * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}
+
+/* Screen styles */
+@media screen {
+  .printArea {
+    margin: 20px auto;
+  }
+}
