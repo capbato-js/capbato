@@ -1054,9 +1054,10 @@ export class LaboratoryMapper {
       id: result.id!,
       labRequestId: result.labRequestId,
       patientId: result.patientId,
-      dateTested: result.dateTested instanceof Date 
-        ? result.dateTested.toISOString() 
+      dateTested: result.dateTested instanceof Date
+        ? result.dateTested.toISOString()
         : new Date(result.dateTested).toISOString(),
+      doctorId: result.doctorId,
       status: 'completed',
       bloodChemistry: result.bloodChemistry ? {
         fbs: result.bloodChemistry.fbs,

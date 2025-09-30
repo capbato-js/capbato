@@ -65,6 +65,7 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
     entity.labRequestId = domain.labRequestId;
     entity.patientId = domain.patientId;
     entity.dateTested = domain.dateTested;
+    entity.doctorId = domain.doctorId;
     entity.remarks = domain.remarks;
 
     // Map blood chemistry results
@@ -281,6 +282,7 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
       entity.labRequestId,
       entity.patientId,
       entity.dateTested || new Date(), // Handle nullable dateTested
+      entity.doctorId, // Add missing doctorId
       bloodChemistry,
       urinalysis,
       hematology,

@@ -21,8 +21,8 @@ export class LabTestResultEntity {
   @Column({ name: 'examination', type: 'varchar', length: 255, nullable: true })
   examination?: string;
 
-  @Column({ name: 'doctor', type: 'varchar', length: 255, nullable: true })
-  doctor?: string;
+  @Column({ name: 'doctor_id', type: 'varchar', length: 36, nullable: true })
+  doctorId?: string;
 
   // Blood Chemistry Results
   @Column({ name: 'result_blood_fbs', type: 'decimal', precision: 6, scale: 2, nullable: true })

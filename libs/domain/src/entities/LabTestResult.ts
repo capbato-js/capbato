@@ -100,6 +100,7 @@ interface ILabTestResult {
   labRequestId: string;
   patientId: string;
   dateTested: Date;
+  doctorId?: string;
   bloodChemistry?: LabTestBloodChemistryResults;
   urinalysis?: LabTestUrinalysisResults;
   hematology?: LabTestHematologyResults;
@@ -118,6 +119,7 @@ export class LabTestResult implements ILabTestResult {
   private readonly _labRequestId: string;
   private readonly _patientId: string;
   private readonly _dateTested: Date;
+  private readonly _doctorId?: string;
   private readonly _bloodChemistry?: LabTestBloodChemistryResults;
   private readonly _urinalysis?: LabTestUrinalysisResults;
   private readonly _hematology?: LabTestHematologyResults;
@@ -134,6 +136,7 @@ export class LabTestResult implements ILabTestResult {
     labRequestId: string,
     patientId: string,
     dateTested: Date,
+    doctorId?: string,
     bloodChemistry?: LabTestBloodChemistryResults,
     urinalysis?: LabTestUrinalysisResults,
     hematology?: LabTestHematologyResults,
@@ -150,6 +153,7 @@ export class LabTestResult implements ILabTestResult {
     this._labRequestId = labRequestId;
     this._patientId = patientId;
     this._dateTested = dateTested;
+    this._doctorId = doctorId;
     this._bloodChemistry = bloodChemistry;
     this._urinalysis = urinalysis;
     this._hematology = hematology;
@@ -178,6 +182,10 @@ export class LabTestResult implements ILabTestResult {
 
   get dateTested(): Date {
     return this._dateTested;
+  }
+
+  get doctorId(): string | undefined {
+    return this._doctorId;
   }
 
   get bloodChemistry(): LabTestBloodChemistryResults | undefined {
@@ -297,6 +305,7 @@ export class LabTestResult implements ILabTestResult {
       this._labRequestId,
       this._patientId,
       this._dateTested,
+      this._doctorId,
       this._bloodChemistry,
       this._urinalysis,
       this._hematology,
@@ -313,6 +322,7 @@ export class LabTestResult implements ILabTestResult {
   }
 
   update(
+    doctorId?: string,
     bloodChemistry?: LabTestBloodChemistryResults,
     urinalysis?: LabTestUrinalysisResults,
     hematology?: LabTestHematologyResults,
@@ -327,6 +337,7 @@ export class LabTestResult implements ILabTestResult {
       this._labRequestId,
       this._patientId,
       this._dateTested,
+      doctorId ?? this._doctorId,
       bloodChemistry ?? this._bloodChemistry,
       urinalysis ?? this._urinalysis,
       hematology ?? this._hematology,

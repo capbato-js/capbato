@@ -485,6 +485,9 @@ export const CreateLabTestResultCommandSchema = z.object({
     .min(1, 'Lab request ID cannot be empty')
     .regex(/^[0-9a-fA-F]{32}$/, 'Lab request ID must be a valid dashless UUID format (32 hexadecimal characters)'),
   dateTested: z.string().datetime().describe('Date and time when tests were performed'),
+  doctorId: z.string()
+    .regex(/^[0-9a-fA-F]{32}$/, 'Doctor ID must be a valid dashless UUID format (32 hexadecimal characters)')
+    .optional(),
   bloodChemistry: BloodChemistryResultsSchema,
   urinalysis: UrinalysisResultsSchema,
   hematology: HematologyResultsSchema,
@@ -547,6 +550,9 @@ export const UpdateLabTestResultCommandSchema = z.object({
     .regex(/^[0-9a-fA-F]{32}$/, 'Lab request ID must be a valid dashless UUID format (32 hexadecimal characters)')
     .optional(),
   dateTested: z.string().datetime().describe('Date and time when tests were performed').optional(),
+  doctorId: z.string()
+    .regex(/^[0-9a-fA-F]{32}$/, 'Doctor ID must be a valid dashless UUID format (32 hexadecimal characters)')
+    .optional(),
   bloodChemistry: BloodChemistryResultsSchema.optional(),
   urinalysis: UrinalysisResultsSchema.optional(),
   hematology: HematologyResultsSchema.optional(),

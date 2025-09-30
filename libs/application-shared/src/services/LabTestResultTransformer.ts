@@ -141,6 +141,11 @@ export class LabTestResultTransformer {
     // Remove empty/undefined values from form data
     const cleanedFormData = this.cleanFormData(formData);
 
+    // Extract doctorId from form data and add to payload at top level
+    if (cleanedFormData.doctorId) {
+      payload.doctorId = cleanedFormData.doctorId;
+    }
+
     // Group fields by category and transform data types
     switch (testCategory) {
       case 'bloodChemistry':
@@ -194,6 +199,11 @@ export class LabTestResultTransformer {
 
     // Remove empty/undefined values from form data
     const cleanedFormData = this.cleanFormData(formData);
+
+    // Extract doctorId from form data and add to payload at top level
+    if (cleanedFormData.doctorId) {
+      payload.doctorId = cleanedFormData.doctorId;
+    }
 
     // Group fields by category and transform data types
     switch (testCategory) {
@@ -547,7 +557,7 @@ export class LabTestResultTransformer {
           'monocyte', 'basophils', 'eosinophils', 'platelet', 'others'
         ];
       case 'serology':
-        return ['ft3', 'ft4', 'tsh'];
+        return ['ft3', 'ft4', 'tsh', 'doctorId'];
       case 'dengue':
         return ['igg', 'igm', 'ns1'];
       case 'ecg':

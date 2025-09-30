@@ -41,6 +41,7 @@ export class CreateLabTestResultUseCase {
       command.labRequestId,
       patientId,
       new Date(command.dateTested),
+      command.doctorId,
       command.bloodChemistry,
       command.urinalysis,
       command.hematology,

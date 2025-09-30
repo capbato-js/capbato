@@ -357,6 +357,7 @@ export interface LabTestResultDto {
   labRequestId: string;
   patientId: string;
   dateTested: string;
+  doctorId?: string;
   status: string;
   bloodChemistry?: {
     fbs?: number;
@@ -453,6 +454,7 @@ export interface LabTestResultDto {
 export interface CreateLabTestResultRequestDto {
   labRequestId: string;
   dateTested: string;
+  doctorId?: string;
   bloodChemistry?: {
     fbs?: number;
     bun?: number;
@@ -546,6 +548,7 @@ export interface CreateLabTestResultRequestDto {
 export interface UpdateLabTestResultRequestDto {
   labRequestId?: string;
   dateTested?: string;
+  doctorId?: string;
   bloodChemistry?: {
     fbs?: number;
     bun?: number;
