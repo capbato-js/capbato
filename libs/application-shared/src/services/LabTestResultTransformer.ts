@@ -639,20 +639,19 @@ export class LabTestResultTransformer {
   }
 
   /**
-   * Transform serology fields for update DTO (infection tests instead of thyroid)
+   * Transform serology fields for update DTO (thyroid function tests)
    */
   private static transformSerologyDataForUpdate(formData: Record<string, string>) {
-    const serology: Record<string, string> = {};
+    const serology: Record<string, number> = {};
 
-    // Fields for update DTO (infection tests)
-    const stringFields = [
-      'vdrl', 'hepatitisB', 'hepatitisA', 'hepatitisC', 
-      'dengueTest', 'typhoidTest', 'pregnancyTest'
-    ];
-
-    stringFields.forEach(field => {
+    // Numeric fields for thyroid tests (same as create method)
+    const numericFields = ['ft3', 'ft4', 'tsh'];
+    numericFields.forEach(field => {
       if (formData[field]) {
-        serology[field] = formData[field];
+        const numValue = parseFloat(formData[field]);
+        if (!isNaN(numValue)) {
+          serology[field] = numValue;
+        }
       }
     });
 

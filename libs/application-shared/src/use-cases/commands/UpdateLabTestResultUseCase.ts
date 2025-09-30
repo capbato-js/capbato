@@ -27,6 +27,7 @@ export class UpdateLabTestResultUseCase {
       command.labRequestId || existingLabTestResult.labRequestId,
       existingLabTestResult.patientId,
       command.dateTested ? new Date(command.dateTested) : existingLabTestResult.dateTested,
+      command.doctorId !== undefined ? command.doctorId : existingLabTestResult.doctorId, // Add missing doctorId
       command.bloodChemistry !== undefined ? command.bloodChemistry : existingLabTestResult.bloodChemistry,
       command.urinalysis !== undefined ? command.urinalysis : existingLabTestResult.urinalysis,
       command.hematology !== undefined ? command.hematology : existingLabTestResult.hematology,
