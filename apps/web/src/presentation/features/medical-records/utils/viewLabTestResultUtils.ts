@@ -23,6 +23,11 @@ export const isEcgTest = (testCategory?: string): boolean => {
   return normalized === 'ecg' || normalized === 'electrocardiogram';
 };
 
+export const isSerologyTest = (testCategory?: string): boolean => {
+  const normalized = testCategory?.toLowerCase();
+  return normalized === 'serology' || normalized === 'serology & immunology';
+};
+
 export const preparePatientData = (
   patientInfo?: {
     patientNumber?: string;

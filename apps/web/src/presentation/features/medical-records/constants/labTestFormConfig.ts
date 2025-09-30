@@ -104,6 +104,7 @@ const SEROLOGY_FIELDS: LabTestFieldConfig[] = [
   { id: 'ft3', label: 'FT3', normalRange: '3.1-6.8 pmol/L', column: 'left', order: 1 },
   { id: 'ft4', label: 'FT4', normalRange: '12-22 pmol/L', column: 'left', order: 2 },
   { id: 'tsh', label: 'TSH', normalRange: '0.27-4.2 mIU/L', column: 'left', order: 3 },
+  { id: 'doctorId', label: 'Doctor', column: 'left', order: 4 },
 ];
 
 // Dengue Test Configuration - separate category with its own form
@@ -192,12 +193,16 @@ export const getFieldsByColumn = (testType: LabTestType, column: 'left' | 'right
 // Helper function to generate Zod schema for a test type
 export const generateLabTestSchema = (testType: LabTestType) => {
   const config = getLabTestConfig(testType);
-  const schemaFields: Record<string, z.ZodOptional<z.ZodString>> = {};
-  
+  const schemaFields: Record<string, z.ZodOptional<z.ZodString> | z.ZodString> = {};
+
   config.fields.forEach(field => {
-    schemaFields[field.id] = z.string().optional();
+    if (field.id === 'doctorId' && testType === 'serology') {
+      schemaFields[field.id] = z.string().min(1, 'Doctor selection is required');
+    } else {
+      schemaFields[field.id] = z.string().optional();
+    }
   });
-  
+
   return z.object(schemaFields);
 };
 

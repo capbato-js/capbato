@@ -6,12 +6,14 @@ import { UrinalysisReportView } from './urinalysis-report/UrinalysisReportView';
 import { BloodChemistryReportView } from './blood-chemistry-report/BloodChemistryReportView';
 import { FecalysisReportView } from './fecalysis-report/FecalysisReportView';
 import { EcgReportView } from './ecg-report/EcgReportView';
+import { SerologyReportView } from './serology-report/SerologyReportView';
 
 export interface LabTestContentProps {
   isUrinalysisTest: boolean;
   isBloodChemistryTest: boolean;
   isFecalysisTest: boolean;
   isEcgTest: boolean;
+  isSerologyTest: boolean;
   patientData: PatientData;
   labData: Record<string, string> | null;
   selectedLabTest: LabTest | null;
@@ -25,6 +27,7 @@ export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   isBloodChemistryTest,
   isFecalysisTest,
   isEcgTest,
+  isSerologyTest,
   patientData,
   labData,
   selectedLabTest,
@@ -83,6 +86,22 @@ export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   if (isEcgTest) {
     return (
       <EcgReportView
+        patientData={{
+          patientNumber: patientData.patientNumber,
+          patientName: patientData.patientName,
+          age: patientData.age,
+          sex: patientData.sex,
+          dateRequested: selectedLabTest?.date || ''
+        }}
+        labData={labData}
+        onBack={onBack}
+      />
+    );
+  }
+
+  if (isSerologyTest) {
+    return (
+      <SerologyReportView
         patientData={{
           patientNumber: patientData.patientNumber,
           patientName: patientData.patientName,
