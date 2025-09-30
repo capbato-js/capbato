@@ -504,7 +504,7 @@ export class LabTestResultTransformer {
    * Used when viewing existing lab test results
    */
   static transformApiResultToFormData(
-    apiResult: ApiResultData,
+    apiResult: ApiResultData & { doctorId?: string },
     testCategory: string
   ): Record<string, string> {
     if (!apiResult || !testCategory) {
@@ -519,13 +519,18 @@ export class LabTestResultTransformer {
 
     // Convert all values to strings for form display
     const formData: Record<string, string> = {};
-    
+
     Object.entries(categoryData as Record<string, unknown>).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
         // Convert all values to strings for form inputs
         formData[key] = String(value);
       }
     });
+
+    // Extract doctorId from top-level API result
+    if (apiResult.doctorId) {
+      formData.doctorId = apiResult.doctorId;
+    }
 
     return formData;
   }
