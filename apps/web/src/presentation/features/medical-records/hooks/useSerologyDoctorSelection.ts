@@ -39,7 +39,7 @@ export const useSerologyDoctorSelection = () => {
     if (doctorSummaries.length > 0) {
       const formattedDoctors = doctorSummaries.map(doctor => ({
         value: doctor.id,
-        label: `${doctor.fullName} - ${doctor.specialization}`,
+        label: doctor.fullName,
       }));
       setDoctors(formattedDoctors);
     } else {
