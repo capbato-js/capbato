@@ -68,28 +68,30 @@ export const AddAppointmentFormContainer: React.FC<AddAppointmentFormProps> = ({
 
   // Initialize form in edit mode
   useEffect(() => {
-    if (editMode && initialData) {
-      reset({
-        patientName: initialData.patientId || '',
-        reasonForVisit: initialData.reasonForVisit || '',
-        date: initialData.appointmentDate || '',
-        time: initialData.appointmentTime || '',
-        doctor: initialData.doctorId || '',
-      });
-      
-      if (initialData.patientNumber) {
-        setSelectedPatientNumber(initialData.patientNumber);
-      }
-      
-      if (initialData.doctorName) {
-        setAssignedDoctor(initialData.doctorName);
-      }
-      
-      if (initialData.appointmentDate) {
-        updateTimeSlotsForDate(initialData.appointmentDate);
-      }
+    if (!editMode || !initialData || !currentAppointmentId) {
+      return;
     }
-  }, [editMode, initialData, reset, currentAppointmentId, setSelectedPatientNumber, setAssignedDoctor, updateTimeSlotsForDate]);
+
+    reset({
+      patientName: initialData.patientId || '',
+      reasonForVisit: initialData.reasonForVisit || '',
+      date: initialData.appointmentDate || '',
+      time: initialData.appointmentTime || '',
+      doctor: initialData.doctorId || '',
+    });
+    
+    if (initialData.patientNumber) {
+      setSelectedPatientNumber(initialData.patientNumber);
+    }
+    
+    if (initialData.doctorName) {
+      setAssignedDoctor(initialData.doctorName);
+    }
+    
+    if (initialData.appointmentDate) {
+      updateTimeSlotsForDate(initialData.appointmentDate);
+    }
+  }, [currentAppointmentId]); // Only trigger when the appointment ID changes (i.e., when editing a different appointment)
 
   // Handle patient selection
   const onPatientChange = useCallback((patientId: string) => {

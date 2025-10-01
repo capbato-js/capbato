@@ -13,9 +13,9 @@ export const useAppointmentModalState = (
   
   // When modal opens with a valid appointment, store the ID
   useEffect(() => {
-    if (isOpen && editMode && appointmentId) {
+    if (isOpen && editMode && appointmentId && appointmentIdRef.current !== appointmentId) {
       appointmentIdRef.current = appointmentId;
-    } else if (!isOpen) {
+    } else if (!isOpen && appointmentIdRef.current !== undefined) {
       // Clear when modal closes
       appointmentIdRef.current = undefined;
     }

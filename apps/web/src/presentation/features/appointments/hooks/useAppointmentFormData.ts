@@ -43,7 +43,7 @@ export const useAppointmentFormData = () => {
     };
 
     loadData();
-  }, [patientStore, doctorStore, appointmentStore]);
+  }, []); // Remove store dependencies to prevent infinite loop
 
   // Format patients for select component
   useEffect(() => {

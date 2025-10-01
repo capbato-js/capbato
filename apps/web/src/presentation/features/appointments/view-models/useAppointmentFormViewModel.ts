@@ -108,7 +108,7 @@ export const useAppointmentFormViewModel = (appointmentId?: string): IAppointmen
       console.error('Failed to create appointment:', error);
       return false;
     }
-  }, [createAppointment, clearStoreError]);
+  }, [createAppointment, updateAppointment, clearStoreError, appointmentId]);
 
   const clearError = useCallback(() => {
     setLocalError(null);
