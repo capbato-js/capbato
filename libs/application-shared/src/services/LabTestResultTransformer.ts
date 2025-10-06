@@ -142,8 +142,8 @@ export class LabTestResultTransformer {
     const cleanedFormData = this.cleanFormData(formData);
 
     // Extract doctorId from form data and add to payload at top level
-    if (cleanedFormData.doctorId) {
-      payload.doctorId = cleanedFormData.doctorId;
+    if (cleanedFormData['doctorId']) {
+      payload.doctorId = cleanedFormData['doctorId'];
     }
 
     // Group fields by category and transform data types
@@ -201,8 +201,8 @@ export class LabTestResultTransformer {
     const cleanedFormData = this.cleanFormData(formData);
 
     // Extract doctorId from form data and add to payload at top level
-    if (cleanedFormData.doctorId) {
-      payload.doctorId = cleanedFormData.doctorId;
+    if (cleanedFormData['doctorId']) {
+      payload.doctorId = cleanedFormData['doctorId'];
     }
 
     // Group fields by category and transform data types
@@ -529,7 +529,7 @@ export class LabTestResultTransformer {
 
     // Extract doctorId from top-level API result
     if (apiResult.doctorId) {
-      formData.doctorId = apiResult.doctorId;
+      formData['doctorId'] = apiResult.doctorId;
     }
 
     return formData;
