@@ -33,6 +33,11 @@ export const isDengueTest = (testCategory?: string): boolean => {
   return normalized === 'dengue' || normalized === 'dengue test' || normalized === 'dengue duo';
 };
 
+export const isCoagulationTest = (testCategory?: string): boolean => {
+  const normalized = testCategory?.toLowerCase();
+  return normalized === 'coagulation' || normalized === 'coagulation studies' || normalized === 'pt ptt';
+};
+
 export const preparePatientData = (
   patientInfo?: {
     patientNumber?: string;

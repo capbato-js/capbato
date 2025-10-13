@@ -7,6 +7,7 @@ import { FecalysisReportView } from '../../components/fecalysis-report/Fecalysis
 import { EcgReportView } from '../../components/ecg-report/EcgReportView';
 import { SerologyReportView } from '../../components/serology-report/SerologyReportView';
 import { DengueReportView } from '../../components/dengue-report/DengueReportView';
+import { CoagulationReportView } from '../../components/coagulation-report/CoagulationReportView';
 import { PageHeader } from '../../components/PageHeader';
 import type { ADD_LAB_TEST_RESULT_PAGE_CONFIG } from '../../config/addLabTestResultPageConfig';
 
@@ -42,6 +43,7 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
   const isEcg = testCategory === 'ecg' || testCategory === 'electrocardiogram';
   const isSerology = testCategory === 'serology' || testCategory === 'serology & immunology';
   const isDengue = testCategory === 'dengue' || testCategory === 'dengue test' || testCategory === 'dengue duo';
+  const isCoagulation = testCategory === 'coagulation' || testCategory === 'coagulation studies' || testCategory === 'pt ptt';
 
   const formProps = {
     testType: viewModel.selectedLabTest?.testCategory,
@@ -99,6 +101,8 @@ export const AddLabTestResultPagePresenter: React.FC<AddLabTestResultPagePresent
         <SerologyReportView {...reportProps} />
       ) : isDengue ? (
         <DengueReportView {...reportProps} />
+      ) : isCoagulation ? (
+        <CoagulationReportView {...reportProps} />
       ) : (
         <AddLabTestResultForm {...formProps} />
       )}
