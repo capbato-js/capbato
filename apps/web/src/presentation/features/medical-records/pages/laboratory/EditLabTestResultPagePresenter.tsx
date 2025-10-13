@@ -6,6 +6,7 @@ import { BloodChemistryReportView } from '../../components/blood-chemistry-repor
 import { FecalysisReportView } from '../../components/fecalysis-report/FecalysisReportView';
 import { EcgReportView } from '../../components/ecg-report/EcgReportView';
 import { SerologyReportView } from '../../components/serology-report/SerologyReportView';
+import { DengueReportView } from '../../components/dengue-report/DengueReportView';
 import { PageHeader } from '../../components/PageHeader';
 import type { EDIT_LAB_TEST_RESULT_PAGE_CONFIG } from '../../config/editLabTestResultPageConfig';
 
@@ -41,6 +42,7 @@ export const EditLabTestResultPagePresenter: React.FC<EditLabTestResultPagePrese
   const isFecalysis = testCategory === 'fecalysis';
   const isEcg = testCategory === 'ecg' || testCategory === 'electrocardiogram';
   const isSerology = testCategory === 'serology' || testCategory === 'serology & immunology';
+  const isDengue = testCategory === 'dengue' || testCategory === 'dengue test' || testCategory === 'dengue duo';
 
   const formProps = {
     testType: viewModel.selectedLabTest?.testCategory,
@@ -96,6 +98,8 @@ export const EditLabTestResultPagePresenter: React.FC<EditLabTestResultPagePrese
         <EcgReportView {...reportProps} />
       ) : isSerology ? (
         <SerologyReportView {...reportProps} />
+      ) : isDengue ? (
+        <DengueReportView {...reportProps} />
       ) : (
         <AddLabTestResultForm {...formProps} />
       )}

@@ -28,6 +28,11 @@ export const isSerologyTest = (testCategory?: string): boolean => {
   return normalized === 'serology' || normalized === 'serology & immunology';
 };
 
+export const isDengueTest = (testCategory?: string): boolean => {
+  const normalized = testCategory?.toLowerCase();
+  return normalized === 'dengue' || normalized === 'dengue test' || normalized === 'dengue duo';
+};
+
 export const preparePatientData = (
   patientInfo?: {
     patientNumber?: string;

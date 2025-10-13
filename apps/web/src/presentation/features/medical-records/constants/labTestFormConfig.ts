@@ -112,6 +112,7 @@ const DENGUE_FIELDS: LabTestFieldConfig[] = [
   { id: 'igg', label: 'DENGUE IgG', normalRange: 'Negative', column: 'left', order: 1 },
   { id: 'igm', label: 'DENGUE IgM', normalRange: 'Negative', column: 'left', order: 2 },
   { id: 'ns1', label: 'DENGUE NS1', normalRange: 'Negative', column: 'right', order: 1 },
+  { id: 'doctorId', label: 'Doctor', column: 'right', order: 2 },
 ];
 
 // ECG Test Configuration - aligned with backend API structure
@@ -196,7 +197,7 @@ export const generateLabTestSchema = (testType: LabTestType) => {
   const schemaFields: Record<string, z.ZodOptional<z.ZodString> | z.ZodString> = {};
 
   config.fields.forEach(field => {
-    if (field.id === 'doctorId' && testType === 'serology') {
+    if (field.id === 'doctorId' && (testType === 'serology' || testType === 'dengue')) {
       schemaFields[field.id] = z.string().min(1, 'Doctor selection is required');
     } else {
       schemaFields[field.id] = z.string().optional();
