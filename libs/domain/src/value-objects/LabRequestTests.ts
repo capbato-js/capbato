@@ -50,6 +50,13 @@ export interface LabTestData {
     ft4: boolean;
     tsh: boolean;
   };
+
+  coagulation: {
+    ptPtt: boolean;
+    pt: boolean;
+    ptt: boolean;
+    inr: boolean;
+  };
 }
 
 export class LabRequestTests {
@@ -70,13 +77,14 @@ export class LabRequestTests {
 
   validate(): void {
     // Check if at least one test is selected across all categories
-    const hasAnyTest = 
+    const hasAnyTest =
       Object.values(this._tests.routine).some(v => v === true) ||
       Object.values(this._tests.serology).some(v => v === true) ||
       Object.values(this._tests.bloodChemistry).some(v => v === true) ||
       Object.values(this._tests.miscellaneous).some(v => v === true) ||
-      Object.values(this._tests.thyroid).some(v => v === true);
-    
+      Object.values(this._tests.thyroid).some(v => v === true) ||
+      Object.values(this._tests.coagulation).some(v => v === true);
+
     if (!hasAnyTest) {
       throw new Error('At least one laboratory test must be selected');
     }
@@ -85,14 +93,15 @@ export class LabRequestTests {
   equals(other: LabRequestTests): boolean {
     const thisTests = this._tests;
     const otherTests = other._tests;
-    
+
     // Deep compare all categories
     return (
       JSON.stringify(thisTests.routine) === JSON.stringify(otherTests.routine) &&
       JSON.stringify(thisTests.serology) === JSON.stringify(otherTests.serology) &&
       JSON.stringify(thisTests.bloodChemistry) === JSON.stringify(otherTests.bloodChemistry) &&
       JSON.stringify(thisTests.miscellaneous) === JSON.stringify(otherTests.miscellaneous) &&
-      JSON.stringify(thisTests.thyroid) === JSON.stringify(otherTests.thyroid)
+      JSON.stringify(thisTests.thyroid) === JSON.stringify(otherTests.thyroid) &&
+      JSON.stringify(thisTests.coagulation) === JSON.stringify(otherTests.coagulation)
     );
   }
 
@@ -179,13 +188,27 @@ export class LabRequestTests {
       ft4: 'FT4',
       tsh: 'TSH',
     };
-    
+
     for (const [key, displayName] of Object.entries(thyroidTestMap)) {
       if (this._tests.thyroid[key as keyof typeof this._tests.thyroid]) {
         selectedTests.push(displayName);
       }
     }
-    
+
+    // Coagulation Tests
+    const coagulationTestMap = {
+      ptPtt: 'PT/PTT',
+      pt: 'PT',
+      ptt: 'PTT',
+      inr: 'INR',
+    };
+
+    for (const [key, displayName] of Object.entries(coagulationTestMap)) {
+      if (this._tests.coagulation[key as keyof typeof this._tests.coagulation]) {
+        selectedTests.push(displayName);
+      }
+    }
+
     return selectedTests;
   }
 
@@ -201,8 +224,9 @@ export class LabRequestTests {
       bloodChemistry: { ...this._tests.bloodChemistry, ...updatedTests.bloodChemistry },
       miscellaneous: { ...this._tests.miscellaneous, ...updatedTests.miscellaneous },
       thyroid: { ...this._tests.thyroid, ...updatedTests.thyroid },
+      coagulation: { ...this._tests.coagulation, ...updatedTests.coagulation },
     };
-    
+
     return new LabRequestTests(mergedTests);
   }
 }

@@ -86,13 +86,13 @@ export class LabTestFieldMappingService {
       }
     }
 
-    // Coagulation field enabling (placeholder for future implementation)
-    // if (requestedTests.coagulation) {
-    //   const coagulationFields = this.getEnabledCoagulationFields(requestedTests.coagulation);
-    //   if (coagulationFields.length > 0) {
-    //     enabledFields.coagulation = coagulationFields;
-    //   }
-    // }
+    // Coagulation field enabling
+    if (requestedTests.coagulation) {
+      const coagulationFields = this.getEnabledCoagulationFields(requestedTests.coagulation);
+      if (coagulationFields.length > 0) {
+        enabledFields.coagulation = coagulationFields;
+      }
+    }
 
     return enabledFields;
   }
@@ -224,6 +224,31 @@ export class LabTestFieldMappingService {
         'av', 'qrs', 'axis', 'pr', 'qt', 'stT', 'rhythm',
         'others', 'interpretation', 'interpreter'
       );
+    }
+
+    return enabled;
+  }
+
+  /**
+   * Coagulation field mapping - matches CreateLabTestResultUseCase validation
+   */
+  private static getEnabledCoagulationFields(coagulation: LabTestData['coagulation']): string[] {
+    const enabled: string[] = [];
+
+    // PT/PTT comprehensive test (enables all 6 fields)
+    if (coagulation.ptPtt) {
+      enabled.push('patientPt', 'controlPt', 'inr', 'activityPercent', 'patientPtt', 'controlPtt');
+    } else {
+      // Individual tests (partial enabling)
+      if (coagulation.pt) {
+        enabled.push('patientPt', 'controlPt');
+      }
+      if (coagulation.ptt) {
+        enabled.push('patientPtt', 'controlPtt');
+      }
+      if (coagulation.inr) {
+        enabled.push('inr', 'activityPercent');
+      }
     }
 
     return enabled;

@@ -306,7 +306,7 @@ export class LaboratoryMapper {
     ];
     const dengueTests = ['Dengue NS1']; // result_dengue_* fields - separate from serology
     const ecgTests = ['ECG']; // result_ecg_* fields
-    const coagulationTests: string[] = []; // result_coag_* fields - no tests defined in LabRequestTests yet
+    const coagulationTests = ['PT/PTT', 'PT', 'PTT', 'INR']; // result_coag_* fields
     const bloodChemistryTests = ['FBS', 'BUN', 'Creatinine', 'Blood Uric Acid', 'Lipid Profile', 'SGOT', 'SGPT', 'HBA1C', 'Alkaline Phosphatase', 'Sodium', 'Potassium']; // result_blood_* fields
     
     let detectedCategory: string;
@@ -496,6 +496,12 @@ export class LaboratoryMapper {
         ft4: command.thyroid?.ft4 || false,
         tsh: command.thyroid?.tsh || false,
       },
+      coagulation: {
+        ptPtt: command.coagulation?.ptPtt || false,
+        pt: command.coagulation?.pt || false,
+        ptt: command.coagulation?.ptt || false,
+        inr: command.coagulation?.inr || false,
+      },
     });
 
     const status = LabRequestStatus.create('pending');
@@ -623,6 +629,12 @@ export class LaboratoryMapper {
         ft4: Boolean(data['ft4']),
         tsh: Boolean(data['tsh']),
       },
+      coagulation: {
+        ptPtt: Boolean(data['coagulation_pt_ptt']),
+        pt: Boolean(data['coagulation_pt']),
+        ptt: Boolean(data['coagulation_ptt']),
+        inr: Boolean(data['coagulation_inr']),
+      },
     });
 
     const status = LabRequestStatus.create(String(data['status'] || 'pending'));
@@ -682,6 +694,10 @@ export class LaboratoryMapper {
       ft3: labRequest.tests.tests.thyroid.ft3,
       ft4: labRequest.tests.tests.thyroid.ft4,
       tsh: labRequest.tests.tests.thyroid.tsh,
+      coagulation_pt_ptt: labRequest.tests.tests.coagulation.ptPtt,
+      coagulation_pt: labRequest.tests.tests.coagulation.pt,
+      coagulation_ptt: labRequest.tests.tests.coagulation.ptt,
+      coagulation_inr: labRequest.tests.tests.coagulation.inr,
       created_at: labRequest.createdAt,
       updated_at: labRequest.updatedAt,
     };

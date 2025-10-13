@@ -61,6 +61,13 @@ const ThyroidTestsSchema = z.object({
   tsh: z.boolean().optional().default(false),
 }).optional();
 
+const CoagulationTestsSchema = z.object({
+  ptPtt: z.boolean().optional().default(false),
+  pt: z.boolean().optional().default(false),
+  ptt: z.boolean().optional().default(false),
+  inr: z.boolean().optional().default(false),
+}).optional();
+
 // Lab Request Validation Schemas
 export const CreateLabRequestCommandSchema = z.object({
   patientId: z.string().min(1, 'Patient ID is required'),
@@ -73,15 +80,17 @@ export const CreateLabRequestCommandSchema = z.object({
   bloodChemistry: BloodChemistryTestsSchema,
   miscellaneous: MiscellaneousTestsSchema,
   thyroid: ThyroidTestsSchema,
+  coagulation: CoagulationTestsSchema,
 }).refine((data) => {
   // Check if at least one test is selected across all categories
-  const hasAnyTest = 
+  const hasAnyTest =
     (data.routine && Object.values(data.routine).some(v => v === true)) ||
     (data.serology && Object.values(data.serology).some(v => v === true)) ||
     (data.bloodChemistry && Object.values(data.bloodChemistry).some(v => v === true)) ||
     (data.miscellaneous && Object.values(data.miscellaneous).some(v => v === true)) ||
-    (data.thyroid && Object.values(data.thyroid).some(v => v === true));
-  
+    (data.thyroid && Object.values(data.thyroid).some(v => v === true)) ||
+    (data.coagulation && Object.values(data.coagulation).some(v => v === true));
+
   return hasAnyTest;
 }, {
   message: 'At least one laboratory test must be selected',
@@ -101,6 +110,7 @@ export const UpdateLabRequestCommandSchema = z.object({
   bloodChemistry: BloodChemistryTestsSchema.optional(),
   miscellaneous: MiscellaneousTestsSchema.optional(),
   thyroid: ThyroidTestsSchema.optional(),
+  coagulation: CoagulationTestsSchema.optional(),
 });
 
 export const DeleteLabRequestCommandSchema = z.object({
@@ -119,6 +129,7 @@ export const UpdateLabRequestResultsCommandSchema = z.object({
   bloodChemistry: BloodChemistryTestsSchema.optional(),
   miscellaneous: MiscellaneousTestsSchema.optional(),
   thyroid: ThyroidTestsSchema.optional(),
+  coagulation: CoagulationTestsSchema.optional(),
 });
 
 // Blood Chemistry Validation Schemas

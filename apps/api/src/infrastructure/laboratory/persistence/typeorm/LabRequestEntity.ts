@@ -141,6 +141,19 @@ export class LabRequestEntity {
   @Column({ name: 'thyroid_tsh', type: 'boolean', default: false })
   thyroidTsh!: boolean;
 
+  // COAGULATION Studies Tests
+  @Column({ name: 'coagulation_pt_ptt', type: 'boolean', default: false })
+  coagulationPtPtt!: boolean;
+
+  @Column({ name: 'coagulation_pt', type: 'boolean', default: false })
+  coagulationPt!: boolean;
+
+  @Column({ name: 'coagulation_ptt', type: 'boolean', default: false })
+  coagulationPtt!: boolean;
+
+  @Column({ name: 'coagulation_inr', type: 'boolean', default: false })
+  coagulationInr!: boolean;
+
   // Custom/Other tests
   @Column({ name: 'others', type: 'text', nullable: true })
   others?: string;
