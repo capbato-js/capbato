@@ -383,6 +383,12 @@ export class SqliteLabRequestRepository implements ILabRequestRepository {
         ft4: !!record.ft4,
         tsh: !!record.tsh,
       },
+      coagulation: {
+        ptPtt: false, // Not stored in SQLite yet
+        pt: false,    // Not stored in SQLite yet
+        ptt: false,   // Not stored in SQLite yet
+        inr: false,   // Not stored in SQLite yet
+      },
     });
 
     const status = LabRequestStatus.create(record.status);

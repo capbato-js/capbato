@@ -219,6 +219,12 @@ export class MongooseLabRequestRepository implements ILabRequestRepository {
         ft4: !!document.ft4,
         tsh: !!document.tsh,
       },
+      coagulation: {
+        ptPtt: false, // Not stored in MongoDB document yet
+        pt: false,    // Not stored in MongoDB document yet
+        ptt: false,   // Not stored in MongoDB document yet
+        inr: false,   // Not stored in MongoDB document yet
+      },
     });
 
     const status = LabRequestStatus.create(document.status);

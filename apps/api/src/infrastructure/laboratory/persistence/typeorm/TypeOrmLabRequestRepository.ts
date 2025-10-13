@@ -265,6 +265,12 @@ export class TypeOrmLabRequestRepository implements ILabRequestRepository {
         ft4: entity.thyroidFt4,
         tsh: entity.thyroidTsh,
       },
+      coagulation: {
+        ptPtt: entity.coagulationPtPtt,
+        pt: entity.coagulationPt,
+        ptt: entity.coagulationPtt,
+        inr: entity.coagulationInr,
+      },
     });
 
     const status = LabRequestStatus.create(entity.status as 'pending' | 'in_progress' | 'completed' | 'cancelled');
