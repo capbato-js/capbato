@@ -8,7 +8,8 @@ export const COMMON_SERVICES = [
 export const PAYMENT_METHOD_OPTIONS = [
   { value: 'Cash', label: 'Cash' },
   { value: 'GCash', label: 'GCash' },
-  { value: 'Card', label: 'Credit/Debit Card' },
+  { value: 'Credit Card', label: 'Credit Card' },
+  { value: 'Debit Card', label: 'Debit Card' },
   { value: 'Bank Transfer', label: 'Bank Transfer' },
   { value: 'Check', label: 'Check' },
 ];

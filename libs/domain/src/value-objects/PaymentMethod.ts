@@ -1,4 +1,4 @@
-export type PaymentMethodType = 'Cash' | 'Credit Card' | 'Debit Card' | 'Bank Transfer' | 'Check';
+export type PaymentMethodType = 'Cash' | 'GCash' | 'Card' | 'Credit Card' | 'Debit Card' | 'Bank Transfer' | 'Check';
 
 export class PaymentMethod {
   private readonly _value: PaymentMethodType;
@@ -13,7 +13,7 @@ export class PaymentMethod {
   }
 
   private validate(value: PaymentMethodType): void {
-    const validMethods: PaymentMethodType[] = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check'];
+    const validMethods: PaymentMethodType[] = ['Cash', 'GCash', 'Card', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check'];
     
     if (!validMethods.includes(value)) {
       throw new Error(`Invalid payment method. Must be one of: ${validMethods.join(', ')}`);
@@ -33,6 +33,6 @@ export class PaymentMethod {
   }
 
   isElectronic(): boolean {
-    return ['Credit Card', 'Debit Card', 'Bank Transfer'].includes(this._value);
+    return ['GCash', 'Card', 'Credit Card', 'Debit Card', 'Bank Transfer'].includes(this._value);
   }
 }

@@ -67,7 +67,8 @@ describe('Receipt Form Config', () => {
       
       expect(values).toContain('Cash');
       expect(values).toContain('GCash');
-      expect(values).toContain('Card');
+      expect(values).toContain('Credit Card');
+      expect(values).toContain('Debit Card');
       expect(values).toContain('Bank Transfer');
       expect(values).toContain('Check');
     });
@@ -75,13 +76,15 @@ describe('Receipt Form Config', () => {
     it('should have descriptive labels', () => {
       const cashOption = PAYMENT_METHOD_OPTIONS.find(o => o.value === 'Cash');
       const gcashOption = PAYMENT_METHOD_OPTIONS.find(o => o.value === 'GCash');
-      const cardOption = PAYMENT_METHOD_OPTIONS.find(o => o.value === 'Card');
+      const creditCardOption = PAYMENT_METHOD_OPTIONS.find(o => o.value === 'Credit Card');
+      const debitCardOption = PAYMENT_METHOD_OPTIONS.find(o => o.value === 'Debit Card');
       const bankOption = PAYMENT_METHOD_OPTIONS.find(o => o.value === 'Bank Transfer');
       const checkOption = PAYMENT_METHOD_OPTIONS.find(o => o.value === 'Check');
 
       expect(cashOption?.label).toBe('Cash');
       expect(gcashOption?.label).toBe('GCash');
-      expect(cardOption?.label).toBe('Credit/Debit Card');
+      expect(creditCardOption?.label).toBe('Credit Card');
+      expect(debitCardOption?.label).toBe('Debit Card');
       expect(bankOption?.label).toBe('Bank Transfer');
       expect(checkOption?.label).toBe('Check');
     });

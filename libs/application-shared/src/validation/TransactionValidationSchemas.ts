@@ -29,7 +29,7 @@ export const TRANSACTION_VALIDATION_ERRORS = {
 } as const;
 
 // Base validation schemas
-export const PaymentMethodSchema = z.enum(['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check']);
+export const PaymentMethodSchema = z.enum(['Cash', 'GCash', 'Card', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check']);
 
 // Enhanced service name validation
 const validateServiceName = (serviceName: string, ctx: z.RefinementCtx) => {
