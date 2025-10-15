@@ -30,9 +30,9 @@ export const useTransactionsTableConfig = () => {
       align: 'center',
       searchable: false,
       render: (value) => (
-        <Text style={textStyle}>
+        <TableTextCell>
           {formatDate(value as string)}
-        </Text>
+        </TableTextCell>
       )
     },
     {
@@ -78,9 +78,9 @@ export const useTransactionsTableConfig = () => {
       align: 'center',
       searchable: false,
       render: (value) => (
-        <Text style={textStyle}>
+        <TableTextCell>
           {formatCurrency(value as number)}
-        </Text>
+        </TableTextCell>
       )
     },
     {
