@@ -13,10 +13,20 @@
     max-width: none !important;
   }
 
-  /* Ensure proper page breaks */
+  /* Ensure proper page breaks and color preservation */
   .printArea * {
     -webkit-print-color-adjust: exact !important;
-    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Force preserve red colors in print - multiple selectors for maximum compatibility */
+  .printArea [style*="color: red"],
+  .printArea [style*="color:red"],
+  .printArea *[style*="color: red"],
+  .printArea *[style*="color:red"] {
+    color: red !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 

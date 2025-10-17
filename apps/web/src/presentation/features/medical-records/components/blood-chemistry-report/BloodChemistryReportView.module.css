@@ -37,6 +37,12 @@
     box-shadow: none !important;
   }
 
+  /* Exception: Keep red color for report titles */
+  .printArea [style*="color: red"],
+  .printArea [style*="color:red"] {
+    color: red !important;
+  }
+
   /* Ensure borders show in print */
   .printArea * {
     -webkit-print-color-adjust: exact !important;

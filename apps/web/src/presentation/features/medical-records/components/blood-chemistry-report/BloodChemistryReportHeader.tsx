@@ -28,12 +28,11 @@ export const BloodChemistryReportHeader: React.FC = () => {
       >
         {LAB_INFO.license}
       </Text>
-      <Title
-        order={3}
+      <Text
         style={styles.reportTitle}
       >
         {LAB_INFO.reportTitle}
-      </Title>
+      </Text>
     </Box>
   );
 };

@@ -11,10 +11,16 @@
     display: none !important;
   }
 
-  /* Force black text for all elements during print */
+  /* Force black text for all elements during print except report titles */
   .printArea * {
     color: black !important;
     background-color: transparent !important;
+  }
+
+  /* Exception: Keep red color for report titles */
+  .printArea [style*="color: red"],
+  .printArea [style*="color:red"] {
+    color: red !important;
   }
 
   /* Ensure table borders appear in print */
