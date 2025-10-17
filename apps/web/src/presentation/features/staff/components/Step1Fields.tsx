@@ -1,7 +1,7 @@
 import React from 'react';
 import { Control, FieldErrors, UseFormRegister, Controller, UseFormSetValue, UseFormWatch, UseFormTrigger } from 'react-hook-form';
 import { Stack, Select, Group } from '@mantine/core';
-import { FormTextInput } from '../../../components/ui/FormTextInput';
+import { FormTextInput, PasswordInput } from '../../../components/ui';
 import { NameFormattingService } from '@nx-starter/domain';
 import { RegisterUserFormData } from '@nx-starter/application-shared';
 
@@ -88,9 +88,8 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
         }}
       />
       
-      <FormTextInput
+      <PasswordInput
         label="Password"
-        type="password"
         placeholder="Enter password"
         error={errors.password || fieldErrors.password}
         disabled={isLoading}
@@ -102,9 +101,8 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({
         }}
       />
       
-      <FormTextInput
+      <PasswordInput
         label="Confirm Password"
-        type="password"
         placeholder="Confirm password"
         error={errors.confirmPassword || fieldErrors.confirmPassword}
         disabled={isLoading}

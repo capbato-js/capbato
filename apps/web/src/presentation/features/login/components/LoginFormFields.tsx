@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormTextInput } from '../../../components/ui/FormTextInput';
+import { FormTextInput, PasswordInput } from '../../../components/ui';
 import { Checkbox, Group, Stack } from '@mantine/core';
 import { IconUser, IconLock } from '@tabler/icons-react';
 import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
@@ -41,9 +41,8 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
       />
 
       {/* Password Field */}
-      <FormTextInput
+      <PasswordInput
         {...register('password')}
-        type="password"
         label="Password"
         placeholder="Enter your password"
         leftSection={<IconLock size={18} />}

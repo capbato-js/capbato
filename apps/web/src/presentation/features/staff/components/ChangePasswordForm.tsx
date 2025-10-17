@@ -9,7 +9,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { ChangePasswordFormSchema } from '@nx-starter/application-shared';
-import { FormTextInput } from '../../../components/ui/FormTextInput';
+import { PasswordInput } from '../../../components/ui';
 import { Icon } from '../../../components/common';
 import type { Account } from '../view-models/useEnhancedAccountsViewModel';
 
@@ -77,20 +77,18 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
           New Password for <strong style={{ color: theme.colors.blue[7] }}>{account.firstName} {account.lastName}</strong>
         </Text>
 
-        <FormTextInput
+        <PasswordInput
           {...register('newPassword')}
           label="New Password"
-          type="password"
           placeholder="Enter new password"
           disabled={isLoading}
           required
           error={errors.newPassword}
         />
         
-        <FormTextInput
+        <PasswordInput
           {...register('confirmPassword')}
           label="Confirm Password"
-          type="password"
           placeholder="Confirm new password"
           disabled={isLoading}
           required
