@@ -110,7 +110,9 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
     // Map hematology results
     if (domain.hematology) {
       entity.resultHematologyHematocrit = domain.hematology.hematocrit;
+      entity.resultHematologyHematocritCategory = domain.hematology.hematocritCategory;
       entity.resultHematologyHemoglobin = domain.hematology.hemoglobin;
+      entity.resultHematologyHemoglobinCategory = domain.hematology.hemoglobinCategory;
       entity.resultHematologyRbc = domain.hematology.rbc;
       entity.resultHematologyWbc = domain.hematology.wbc;
       entity.resultHematologySegmenters = domain.hematology.segmenters;
@@ -217,7 +219,9 @@ export class TypeOrmLabTestResultRepository implements ILabTestResultRepository 
     // Map hematology results
     const hematology = this.hasHematologyResults(entity) ? {
       hematocrit: entity.resultHematologyHematocrit,
+      hematocritCategory: entity.resultHematologyHematocritCategory,
       hemoglobin: entity.resultHematologyHemoglobin,
+      hemoglobinCategory: entity.resultHematologyHemoglobinCategory,
       rbc: entity.resultHematologyRbc,
       wbc: entity.resultHematologyWbc,
       segmenters: entity.resultHematologySegmenters,

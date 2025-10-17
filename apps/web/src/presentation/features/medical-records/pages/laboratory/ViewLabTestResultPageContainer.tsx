@@ -8,6 +8,7 @@ import {
   isSerologyTest,
   isDengueTest,
   isCoagulationTest,
+  isHematologyTest,
   preparePatientData,
 } from '../../utils/viewLabTestResultUtils';
 import { ViewLabTestResultPagePresenter } from './ViewLabTestResultPagePresenter';
@@ -24,6 +25,7 @@ export const ViewLabTestResultPageContainer: React.FC = () => {
   const isSerology = isSerologyTest(viewModel.selectedLabTest?.testCategory);
   const isDengue = isDengueTest(viewModel.selectedLabTest?.testCategory);
   const isCoagulation = isCoagulationTest(viewModel.selectedLabTest?.testCategory);
+  const isHematology = isHematologyTest(viewModel.selectedLabTest?.testCategory);
 
   return (
     <ViewLabTestResultPagePresenter
@@ -34,6 +36,7 @@ export const ViewLabTestResultPageContainer: React.FC = () => {
       isSerologyTest={isSerology}
       isDengueTest={isDengue}
       isCoagulationTest={isCoagulation}
+      isHematologyTest={isHematology}
       patientData={patientData}
       labData={viewModel.bloodChemistryData}
       selectedLabTest={viewModel.selectedLabTest}

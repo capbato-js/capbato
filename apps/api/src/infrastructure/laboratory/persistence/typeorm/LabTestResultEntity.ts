@@ -174,8 +174,14 @@ export class LabTestResultEntity {
   @Column({ name: 'result_hematology_hematocrit', type: 'varchar', length: 50, nullable: true })
   resultHematologyHematocrit?: string;
 
+  @Column({ name: 'result_hematology_hematocrit_category', type: 'varchar', length: 20, nullable: true })
+  resultHematologyHematocritCategory?: string;
+
   @Column({ name: 'result_hematology_hemoglobin', type: 'varchar', length: 50, nullable: true })
   resultHematologyHemoglobin?: string;
+
+  @Column({ name: 'result_hematology_hemoglobin_category', type: 'varchar', length: 20, nullable: true })
+  resultHematologyHemoglobinCategory?: string;
 
   @Column({ name: 'result_hematology_rbc', type: 'varchar', length: 50, nullable: true })
   resultHematologyRbc?: string;

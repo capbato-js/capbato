@@ -11,7 +11,9 @@ export interface CreateHematologyResultDto {
   sex?: string;
   dateTaken: string; // DateTime string
   hemoglobin?: string;
+  hemoglobinCategory?: string; // 'male' | 'female' | 'child' | 'newborn' | 'pregnant'
   hematocrit?: string;
+  hematocritCategory?: string; // 'male' | 'female' | 'child' | 'newborn'
   rbc?: string;
   wbc?: string;
   plateletCount?: string;
@@ -44,7 +46,9 @@ export const CreateHematologyResultSchema = z.object({
   sex: z.string().optional(),
   dateTaken: z.string().datetime('Invalid date format'),
   hemoglobin: z.string().optional(),
+  hemoglobinCategory: z.enum(['male', 'female', 'child', 'newborn', 'pregnant']).optional(),
   hematocrit: z.string().optional(),
+  hematocritCategory: z.enum(['male', 'female', 'child', 'newborn']).optional(),
   rbc: z.string().optional(),
   wbc: z.string().optional(),
   plateletCount: z.string().optional(),

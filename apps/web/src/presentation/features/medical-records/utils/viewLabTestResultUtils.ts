@@ -38,6 +38,14 @@ export const isCoagulationTest = (testCategory?: string): boolean => {
   return normalized === 'coagulation' || normalized === 'coagulation studies' || normalized === 'pt ptt';
 };
 
+export const isHematologyTest = (testCategory?: string): boolean => {
+  const normalized = testCategory?.toLowerCase();
+  return normalized?.includes('hematology') || 
+         normalized?.includes('cbc') || 
+         normalized === 'hematology' || 
+         normalized === 'cbc with platelet';
+};
+
 export const preparePatientData = (
   patientInfo?: {
     patientNumber?: string;

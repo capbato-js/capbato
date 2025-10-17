@@ -1112,7 +1112,9 @@ export class LaboratoryMapper {
       } : undefined,
       hematology: result.hematology ? {
         hematocrit: result.hematology.hematocrit,
+        hematocritCategory: result.hematology.hematocritCategory,
         hemoglobin: result.hematology.hemoglobin,
+        hemoglobinCategory: result.hematology.hemoglobinCategory,
         rbc: result.hematology.rbc,
         wbc: result.hematology.wbc,
         segmenters: result.hematology.segmenters,

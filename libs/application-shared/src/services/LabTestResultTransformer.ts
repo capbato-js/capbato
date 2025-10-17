@@ -59,7 +59,9 @@ interface FecalysisData {
 
 interface HematologyData {
   hematocrit?: string;
+  hematocritCategory?: string;
   hemoglobin?: string;
+  hemoglobinCategory?: string;
   rbc?: string;
   wbc?: string;
   segmenters?: string;
@@ -330,7 +332,7 @@ export class LabTestResultTransformer {
 
     // All fields are strings according to the DTO
     const stringFields = [
-      'hematocrit', 'hemoglobin', 'rbc', 'wbc', 'segmenters', 
+      'hematocrit', 'hematocritCategory', 'hemoglobin', 'hemoglobinCategory', 'rbc', 'wbc', 'segmenters', 
       'lymphocyte', 'monocyte', 'basophils', 'eosinophils', 'platelet', 'others'
     ];
     
@@ -558,7 +560,7 @@ export class LabTestResultTransformer {
         return ['color', 'consistency', 'rbc', 'wbc', 'occultBlood', 'urobilinogen', 'others'];
       case 'hematology':
         return [
-          'hematocrit', 'hemoglobin', 'rbc', 'wbc', 'segmenters', 'lymphocyte',
+          'hematocrit', 'hematocritCategory', 'hemoglobin', 'hemoglobinCategory', 'rbc', 'wbc', 'segmenters', 'lymphocyte',
           'monocyte', 'basophils', 'eosinophils', 'platelet', 'others'
         ];
       case 'serology':
@@ -622,11 +624,10 @@ export class LabTestResultTransformer {
   private static transformHematologyDataForUpdate(formData: Record<string, string>) {
     const hematology: Record<string, string> = {};
 
-    // Fields for update DTO (different from create)
+    // Fields for update DTO - should match the create method fields
     const stringFields = [
-      'hemoglobin', 'hematocrit', 'wbcCount', 'rbcCount', 'plateletCount',
-      'mchc', 'mch', 'mcv', 'neutrophils', 'lymphocytes', 'monocytes',
-      'eosinophils', 'basophils'
+      'hematocrit', 'hematocritCategory', 'hemoglobin', 'hemoglobinCategory', 'rbc', 'wbc', 'segmenters', 
+      'lymphocyte', 'monocyte', 'basophils', 'eosinophils', 'platelet', 'others'
     ];
     
     stringFields.forEach(field => {

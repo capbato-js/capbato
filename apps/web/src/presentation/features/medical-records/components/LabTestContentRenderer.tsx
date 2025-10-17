@@ -9,6 +9,7 @@ import { EcgReportView } from './ecg-report/EcgReportView';
 import { SerologyReportView } from './serology-report/SerologyReportView';
 import { DengueReportView } from './dengue-report/DengueReportView';
 import { CoagulationReportView } from './coagulation-report/CoagulationReportView';
+import { HematologyReportView } from './hematology-report/HematologyReportView';
 
 export interface LabTestContentProps {
   isUrinalysisTest: boolean;
@@ -18,6 +19,7 @@ export interface LabTestContentProps {
   isSerologyTest: boolean;
   isDengueTest: boolean;
   isCoagulationTest: boolean;
+  isHematologyTest: boolean;
   patientData: PatientData;
   labData: Record<string, string> | null;
   selectedLabTest: LabTest | null;
@@ -34,6 +36,7 @@ export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   isSerologyTest,
   isDengueTest,
   isCoagulationTest,
+  isHematologyTest,
   patientData,
   labData,
   selectedLabTest,
@@ -140,6 +143,22 @@ export const LabTestContentRenderer: React.FC<LabTestContentProps> = ({
   if (isCoagulationTest) {
     return (
       <CoagulationReportView
+        patientData={{
+          patientNumber: patientData.patientNumber,
+          patientName: patientData.patientName,
+          age: patientData.age,
+          sex: patientData.sex,
+          dateRequested: selectedLabTest?.date || ''
+        }}
+        labData={labData}
+        onBack={onBack}
+      />
+    );
+  }
+
+  if (isHematologyTest) {
+    return (
+      <HematologyReportView
         patientData={{
           patientNumber: patientData.patientNumber,
           patientName: patientData.patientName,

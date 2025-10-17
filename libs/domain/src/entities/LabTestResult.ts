@@ -39,7 +39,9 @@ export interface LabTestUrinalysisResults {
 
 export interface LabTestHematologyResults {
   hematocrit?: string;
+  hematocritCategory?: string; // 'male' | 'female' | 'child' | 'newborn'
   hemoglobin?: string;
+  hemoglobinCategory?: string; // 'male' | 'female' | 'child' | 'newborn' | 'pregnant'
   rbc?: string;
   wbc?: string;
   segmenters?: string;
