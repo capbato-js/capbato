@@ -164,7 +164,7 @@ export const PatientDetailsPagePresenter: React.FC<PatientDetailsPagePresenterPr
         {activeTab === 'patient-info' && <PatientInfoTab patient={patient} />}
         {activeTab === 'appointments' && <AppointmentsTab patientId={patient.id} />}
         {activeTab === 'prescriptions' && <PrescriptionsTab patientId={patient.id} />}
-        {activeTab === 'laboratories' && <LaboratoriesTab />}
+        {activeTab === 'laboratories' && <LaboratoriesTab patientId={patient.id} />}
       </Box>
     </MedicalClinicLayout>
   );
