@@ -35,16 +35,22 @@ export const useAvailableSchedulePatterns = () => {
           return acc;
         }, {} as Record<string, string>);
 
-        // Define all possible schedule patterns (only MWF and TTH)
+        // Define all possible schedule patterns (No Schedule, MWF, and TTH)
         const allPatterns: SchedulePatternOption[] = [
-          { 
-            value: 'MWF', 
+          {
+            value: '',
+            label: 'No Schedule',
+            available: true,
+            takenBy: undefined
+          },
+          {
+            value: 'MWF',
             label: 'MWF (Monday, Wednesday, Friday)',
             available: !takenPatterns['MWF'],
             takenBy: takenPatterns['MWF']
           },
-          { 
-            value: 'TTH', 
+          {
+            value: 'TTH',
             label: 'TTH (Tuesday, Thursday)',
             available: !takenPatterns['TTH'],
             takenBy: takenPatterns['TTH']
@@ -58,6 +64,7 @@ export const useAvailableSchedulePatterns = () => {
         
         // Fallback: return all patterns as available
         setScheduleOptions([
+          { value: '', label: 'No Schedule', available: true },
           { value: 'MWF', label: 'MWF (Monday, Wednesday, Friday)', available: true },
           { value: 'TTH', label: 'TTH (Tuesday, Thursday)', available: true }
         ]);

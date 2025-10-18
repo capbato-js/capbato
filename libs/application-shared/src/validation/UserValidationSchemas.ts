@@ -135,15 +135,6 @@ export const RegisterUserCommandSchema = z.object({
       message: 'Invalid schedule pattern. Valid options are: MWF, TTH'
     })
     .transform((pattern) => pattern ? pattern.toUpperCase().trim() : undefined),
-}).refine((data) => {
-  // Make schedulePattern required when role is 'doctor'
-  if (data.role === 'doctor') {
-    return !!data.schedulePattern;
-  }
-  return true;
-}, {
-  message: 'Schedule pattern is required when creating a user with doctor role',
-  path: ['schedulePattern'],
 });
 
 // Frontend form schema that includes confirmPassword for UI validation
@@ -190,7 +181,7 @@ export const ChangeUserPasswordCommandSchema = z.object({
 export const UpdateUserDetailsCommandSchema = z.object({
   id: z.string().min(1, 'User ID is required').regex(/^[0-9a-fA-F]{32}$/, 'Invalid user ID format - must be dashless UUID'),
   firstName: FirstNameSchema.optional(),
-  lastName: LastNameSchema.optional(), 
+  lastName: LastNameSchema.optional(),
   email: EmailSchema.optional(),
   mobile: MobileSchema,
   role: RoleSchema.optional(),
@@ -210,7 +201,7 @@ export const UpdateUserDetailsCommandSchema = z.object({
         const parsed = parseInt(val, 10);
         return isNaN(parsed) ? undefined : parsed;
       }
-      // Handle NaN values from form inputs  
+      // Handle NaN values from form inputs
       if (typeof val === 'number' && isNaN(val)) {
         return undefined;
       }
@@ -229,27 +220,35 @@ export const UpdateUserDetailsCommandSchema = z.object({
     .refine((pattern) => {
       // Skip validation if undefined (optional field)
       if (!pattern) return true;
+      // Empty string is valid (means "remove schedule pattern")
+      if (pattern.trim() === '') return true;
       // Validate against known patterns (only MWF and TTH supported)
       const validPatterns = ['MWF', 'TTH'];
       return validPatterns.includes(pattern.toUpperCase().trim());
     }, {
       message: 'Invalid schedule pattern. Valid options are: MWF, TTH'
     })
-    .transform((pattern) => pattern ? pattern.toUpperCase().trim() : undefined),
+    .transform((pattern) => {
+      // Preserve undefined as undefined
+      if (pattern === undefined) return undefined;
+      // Preserve empty string as empty string (means "remove schedule")
+      if (pattern.trim() === '') return '';
+      // Transform valid patterns to uppercase
+      return pattern.toUpperCase().trim();
+    }),
 }).refine((data) => {
-  // At least one field must be provided for update
-  return data.firstName || data.lastName || data.email || data.mobile || data.role || data.specialization || data.licenseNumber || data.experienceYears || data.schedulePattern;
+  // At least one field must be provided for update (check !== undefined to allow empty strings)
+  return data.firstName !== undefined ||
+         data.lastName !== undefined ||
+         data.email !== undefined ||
+         data.mobile !== undefined ||
+         data.role !== undefined ||
+         data.specialization !== undefined ||
+         data.licenseNumber !== undefined ||
+         data.experienceYears !== undefined ||
+         data.schedulePattern !== undefined;
 }, {
   message: 'At least one field must be provided for update',
-}).refine((data) => {
-  // Make schedulePattern required when role is being updated to 'doctor'
-  if (data.role === 'doctor') {
-    return !!data.schedulePattern;
-  }
-  return true;
-}, {
-  message: 'Schedule pattern is required when updating role to doctor',
-  path: ['schedulePattern'],
 });
 
 // Frontend form schema for updating user details (without password fields)
@@ -303,13 +302,13 @@ export const UpdateUserDetailsFormSchema = z.object({
     })
     .transform((pattern) => pattern ? pattern.toUpperCase().trim() : undefined),
 }).refine((data) => {
-  // Make doctor fields required when role is 'doctor'
+  // Make specialization required when role is 'doctor'
   if (data.role === 'doctor') {
-    return !!data.specialization && !!data.schedulePattern;
+    return !!data.specialization;
   }
   return true;
 }, {
-  message: 'Specialization and schedule pattern are required for doctor role',
+  message: 'Specialization is required for doctor role',
   path: ['specialization'],
 });
 

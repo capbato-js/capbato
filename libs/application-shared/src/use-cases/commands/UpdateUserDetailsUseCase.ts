@@ -18,6 +18,8 @@ export class UpdateUserDetailsUseCase {
   ) {}
 
   async execute(command: UpdateUserDetailsCommand): Promise<User> {
+    console.log('[UpdateUserDetailsUseCase] Received command:', JSON.stringify(command, null, 2));
+
     // Get existing user
     const existingUser = await this.userRepository.getById(command.id);
     if (!existingUser) {
@@ -96,18 +98,20 @@ export class UpdateUserDetailsUseCase {
       specialization: command.specialization,
       licenseNumber: command.licenseNumber || undefined,
       yearsOfExperience: command.experienceYears || undefined,
-      schedulePattern: command.schedulePattern || 'Mon-Fri: 9:00 AM - 5:00 PM', // Default pattern
+      schedulePattern: command.schedulePattern || undefined, // Optional schedule pattern
     };
 
     // Validate doctor profile data
     const validatedDoctorCommand = CreateDoctorProfileCommandSchema.parse(doctorProfileCommand);
 
-    // Parse schedule pattern
-    let schedulePattern: DoctorSchedulePattern;
-    try {
-      schedulePattern = DoctorSchedulePattern.fromString(validatedDoctorCommand.schedulePattern);
-    } catch {
-      throw new Error(`Invalid schedule pattern: ${validatedDoctorCommand.schedulePattern}`);
+    // Parse schedule pattern if provided
+    let schedulePattern: DoctorSchedulePattern | undefined = undefined;
+    if (validatedDoctorCommand.schedulePattern && validatedDoctorCommand.schedulePattern.trim() !== '') {
+      try {
+        schedulePattern = DoctorSchedulePattern.fromString(validatedDoctorCommand.schedulePattern);
+      } catch {
+        throw new Error(`Invalid schedule pattern: ${validatedDoctorCommand.schedulePattern}`);
+      }
     }
 
     // Create doctor entity using constructor (same pattern as CreateDoctorProfileCommandHandler)
@@ -118,7 +122,7 @@ export class UpdateUserDetailsUseCase {
       validatedDoctorCommand.licenseNumber,
       validatedDoctorCommand.yearsOfExperience,
       true, // isActive defaults to true
-      schedulePattern
+      schedulePattern // Can be undefined
     );
 
     await this.doctorRepository.create(doctor);
@@ -128,6 +132,9 @@ export class UpdateUserDetailsUseCase {
    * Update existing doctor profile
    */
   private async updateDoctorProfile(existingDoctor: Doctor, command: UpdateUserDetailsCommand): Promise<void> {
+    console.log('[updateDoctorProfile] Starting update for doctor:', existingDoctor.id);
+    console.log('[updateDoctorProfile] Command schedulePattern:', command.schedulePattern);
+
     let updatedDoctor = existingDoctor;
     let hasChanges = false;
 
@@ -152,19 +159,41 @@ export class UpdateUserDetailsUseCase {
     // Update schedule pattern if provided and different
     if (command.schedulePattern !== undefined) {
       const currentPatternString = existingDoctor.schedulePattern?.toString() || '';
-      if (command.schedulePattern !== currentPatternString) {
-        try {
-          updatedDoctor = updatedDoctor.updateSchedulePattern(command.schedulePattern);
+      const newPatternString = command.schedulePattern?.trim() || '';
+
+      console.log('[updateDoctorProfile] Current pattern:', currentPatternString);
+      console.log('[updateDoctorProfile] New pattern:', newPatternString);
+      console.log('[updateDoctorProfile] Are they different?', newPatternString !== currentPatternString);
+
+      if (newPatternString !== currentPatternString) {
+        // If new pattern is empty, remove the schedule pattern
+        if (newPatternString === '') {
+          console.log('[updateDoctorProfile] Removing schedule pattern');
+          updatedDoctor = updatedDoctor.removeSchedulePattern();
           hasChanges = true;
-        } catch (error) {
-          throw new Error(`Invalid schedule pattern: ${command.schedulePattern}`);
+        } else {
+          // Otherwise, update to the new pattern
+          console.log('[updateDoctorProfile] Updating schedule pattern to:', newPatternString);
+          try {
+            updatedDoctor = updatedDoctor.updateSchedulePattern(newPatternString);
+            hasChanges = true;
+          } catch (error) {
+            throw new Error(`Invalid schedule pattern: ${newPatternString}`);
+          }
         }
       }
+    } else {
+      console.log('[updateDoctorProfile] schedulePattern is undefined, skipping update');
     }
 
     // Only persist if something actually changed
+    console.log('[updateDoctorProfile] Has changes?', hasChanges);
     if (hasChanges) {
+      console.log('[updateDoctorProfile] Persisting doctor profile changes to repository');
       await this.doctorRepository.update(updatedDoctor);
+      console.log('[updateDoctorProfile] Doctor profile updated successfully');
+    } else {
+      console.log('[updateDoctorProfile] No changes detected, skipping repository update');
     }
   }
 }

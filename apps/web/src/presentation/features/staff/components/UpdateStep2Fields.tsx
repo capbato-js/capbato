@@ -77,8 +77,8 @@ export const UpdateStep2Fields: React.FC<UpdateStep2FieldsProps> = ({
             error={fieldState.error?.message || fieldErrors.schedulePattern}
             data={schedulePatternData}
             disabled={isLoading || scheduleLoading}
-            required
             description="Choose the days when this doctor will be available"
+            clearable
             {...field}
           />
         )}

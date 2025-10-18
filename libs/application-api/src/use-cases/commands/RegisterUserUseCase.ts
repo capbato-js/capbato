@@ -52,10 +52,7 @@ export class RegisterUserUseCase {
     // 4. If role is 'doctor', validate doctor profile data FIRST (before creating user)
     let validatedDoctorCommand: CreateDoctorProfileCommand | null = null;
     if (command.role === 'doctor') {
-      // schedulePattern is now required from frontend - no auto-assignment
-      if (!command.schedulePattern) {
-        throw new Error('schedulePattern is required when creating a user with doctor role');
-      }
+      // schedulePattern is now optional - doctors can be created without a schedule pattern
 
       // Prepare doctor profile command with required fields
       const doctorProfileCommand = {
@@ -63,7 +60,7 @@ export class RegisterUserUseCase {
         specialization: command.specialization || 'General Medicine',
         licenseNumber: command.licenseNumber || undefined,
         yearsOfExperience: command.experienceYears || undefined,
-        schedulePattern: command.schedulePattern, // Required from frontend
+        schedulePattern: command.schedulePattern || undefined, // Optional - can be undefined or empty
       };
 
       // Validate doctor profile data using the same validation as the dedicated endpoint

@@ -205,8 +205,8 @@ export const CreateAccountForm: React.FC<CreateAccountFormProps> = ({
                       !role?.trim();
   
   const isStep2Empty = isMultiStep && (
-    !watch('specialization')?.trim() ||
-    !watch('schedulePattern')?.trim()
+    !watch('specialization')?.trim()
+    // schedulePattern is now optional, so we don't check it
   );
   
   const isFormEmpty = isMultiStep 

@@ -15,7 +15,7 @@ export interface CreateDoctorProfileCommand {
   specialization: string;
   licenseNumber?: string;
   yearsOfExperience?: number;
-  schedulePattern: string; // Required schedule pattern for doctors
+  schedulePattern?: string; // Optional schedule pattern for doctors
 }
 
 /**
@@ -42,13 +42,15 @@ export class CreateDoctorProfileCommandHandler {
       throw new Error(`Doctor profile already exists for user ${command.userId}`);
     }
 
-    // Validate and parse the required schedule pattern
-    let schedulePattern: DoctorSchedulePattern;
-    
-    try {
-      schedulePattern = DoctorSchedulePattern.fromString(command.schedulePattern);
-    } catch {
-      throw new Error(`Invalid schedule pattern: ${command.schedulePattern}`);
+    // Validate and parse the schedule pattern if provided
+    let schedulePattern: DoctorSchedulePattern | undefined = undefined;
+
+    if (command.schedulePattern && command.schedulePattern.trim() !== '') {
+      try {
+        schedulePattern = DoctorSchedulePattern.fromString(command.schedulePattern);
+      } catch {
+        throw new Error(`Invalid schedule pattern: ${command.schedulePattern}`);
+      }
     }
 
     // Create doctor domain entity using constructor
@@ -59,7 +61,7 @@ export class CreateDoctorProfileCommandHandler {
       command.licenseNumber,
       command.yearsOfExperience,
       true, // isActive defaults to true
-      schedulePattern
+      schedulePattern // Can be undefined
     );
 
     // Save to repository

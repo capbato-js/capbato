@@ -16,17 +16,19 @@ export class UserCommandService {
 
   async updateUserDetails(command: UpdateUserDetailsCommand): Promise<UserDto> {
     // Transform command to API request format
+    // Note: We explicitly convert undefined to appropriate default values
+    // because Axios strips undefined values from the request body
     const requestData = {
       firstName: command.firstName,
       lastName: command.lastName,
       email: command.email,
       role: command.role,
-      mobile: command.mobile,
-      // Doctor profile fields
-      specialization: command.specialization,
-      licenseNumber: command.licenseNumber,
-      experienceYears: command.experienceYears,
-      schedulePattern: command.schedulePattern,
+      mobile: command.mobile || '', // Convert undefined to empty string
+      // Doctor profile fields - send even if empty/zero to ensure they're updated
+      specialization: command.specialization || '',
+      licenseNumber: command.licenseNumber || '',
+      experienceYears: command.experienceYears || undefined, // Keep as undefined if not set
+      schedulePattern: command.schedulePattern !== undefined ? command.schedulePattern : '', // Always include, default to empty string
     };
 
     return await this.userApiService.updateUserDetails(command.id, requestData);

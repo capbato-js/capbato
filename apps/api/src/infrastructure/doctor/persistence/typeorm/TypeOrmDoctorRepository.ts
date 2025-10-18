@@ -88,13 +88,23 @@ export class TypeOrmDoctorRepository implements IDoctorRepository {
     }
 
     const plainObject = DoctorMapper.toPlainObject(doctor);
-    await this.repository.update(doctor.stringId, {
+    console.log('[TypeOrmDoctorRepository] plainObject.schedulePattern:', plainObject.schedulePattern);
+    console.log('[TypeOrmDoctorRepository] plainObject.schedulePattern type:', typeof plainObject.schedulePattern);
+
+    // TypeORM ignores undefined values in updates, so we need to explicitly convert undefined to null
+    // to set the database column to NULL
+    const updateData = {
       specialization: plainObject.specialization,
-      licenseNumber: plainObject.licenseNumber,
-      yearsOfExperience: plainObject.yearsOfExperience,
+      licenseNumber: plainObject.licenseNumber ?? null,
+      yearsOfExperience: plainObject.yearsOfExperience ?? null,
       isActive: plainObject.isActive,
-      schedulePattern: plainObject.schedulePattern,
-    });
+      schedulePattern: plainObject.schedulePattern ?? null, // Convert undefined to null for TypeORM
+    };
+
+    console.log('[TypeOrmDoctorRepository] Updating doctor with ID:', doctor.stringId);
+    console.log('[TypeOrmDoctorRepository] Update data:', JSON.stringify(updateData, null, 2));
+
+    await this.repository.update(doctor.stringId, updateData);
 
     const updatedEntity = await this.repository.findOne({
       where: { id: doctor.stringId }

@@ -36,10 +36,12 @@ export class AuthController {
 
   /**
    * POST /api/auth/register - Register a new user
-   * 
+   *
    * Core Registration Processing:
    * WHEN a client sends POST request to /api/auth/register with firstName, lastName, email, password, and role
    * THE SYSTEM SHALL validate all required fields (including role: admin|doctor|receptionist), generate username from email prefix, create user account, and return HTTP 201 with user ID
+   *
+   * For doctors: schedulePattern is optional (valid values: "MWF", "TTH") to allow multiple doctors without schedule conflicts
    */
   @Post('/register')
   @HttpCode(201)

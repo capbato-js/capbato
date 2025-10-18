@@ -212,10 +212,10 @@ export class Doctor implements IDoctor {
       this._userId,
       updates.specialization || this._specialization,
       this._id,
-      updates.licenseNumber !== undefined ? updates.licenseNumber : this._licenseNumber,
-      updates.yearsOfExperience !== undefined ? updates.yearsOfExperience : this._yearsOfExperience,
-      updates.isActive !== undefined ? updates.isActive : this._isActive,
-      updates.schedulePattern !== undefined ? updates.schedulePattern : this._schedulePattern
+      'licenseNumber' in updates ? updates.licenseNumber : this._licenseNumber,
+      'yearsOfExperience' in updates ? updates.yearsOfExperience : this._yearsOfExperience,
+      'isActive' in updates ? updates.isActive : this._isActive,
+      'schedulePattern' in updates ? updates.schedulePattern : this._schedulePattern
     );
   }
 

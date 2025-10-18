@@ -34,23 +34,23 @@ describe('UpdateUserDetailsFormSchema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should require doctor fields when role is doctor', () => {
-    const doctorDataWithoutFields = {
+  it('should require specialization when role is doctor', () => {
+    const doctorDataWithoutSpecialization = {
       id: '1',
       firstName: 'Dr. Jane',
       lastName: 'Smith',
       email: 'jane@example.com',
       mobile: '09987654321',
       role: 'doctor'
-      // Missing specialization and schedulePattern
+      // Missing specialization (schedulePattern is now optional)
     };
 
-    const result = UpdateUserDetailsFormSchema.safeParse(doctorDataWithoutFields);
+    const result = UpdateUserDetailsFormSchema.safeParse(doctorDataWithoutSpecialization);
     expect(result.success).toBe(false);
     expect(result.error?.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          message: 'Specialization and schedule pattern are required for doctor role'
+          message: 'Specialization is required for doctor role'
         })
       ])
     );
@@ -234,21 +234,14 @@ describe('UpdateUserDetailsCommandSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('should require schedule pattern when updating role to doctor', () => {
+  it('should allow updating role to doctor without schedule pattern', () => {
     const doctorUpdateWithoutSchedule = {
       id: '1234567890abcdef1234567890abcdef',
       role: 'doctor'
-      // Missing schedulePattern
+      // schedulePattern is now optional
     };
 
     const result = UpdateUserDetailsCommandSchema.safeParse(doctorUpdateWithoutSchedule);
-    expect(result.success).toBe(false);
-    expect(result.error?.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          message: 'Schedule pattern is required when updating role to doctor'
-        })
-      ])
-    );
+    expect(result.success).toBe(true);
   });
 });
