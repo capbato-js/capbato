@@ -1,7 +1,11 @@
 import React from 'react';
 import { Box, Text, Alert, Skeleton, useMantineTheme } from '@mantine/core';
 import { usePatientAppointments } from '../../view-models';
-import { BaseAppointmentsTable } from '../../../../components/common';
+import { BaseAppointmentsTable, ConfirmationModal } from '../../../../components/common';
+import { AddAppointmentModal } from '../../../appointments/components';
+import { useModalState } from '../../../appointments/hooks/useModalState';
+import { useAppointmentActions } from '../../../appointments/hooks/useAppointmentActions';
+import { useAppointmentStore } from '../../../../../infrastructure/state/AppointmentStore';
 
 interface AppointmentsTabProps {
   patientId: string;
@@ -10,15 +14,40 @@ interface AppointmentsTabProps {
 export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ patientId }) => {
   const theme = useMantineTheme();
   const { appointments, isLoading, error } = usePatientAppointments(patientId);
+  const modalState = useModalState();
+
+  // Get appointments directly from the store (already filtered by patient ID via usePatientAppointments)
+  const appointmentDtos = useAppointmentStore((state) => state.appointments);
+  const fetchAppointmentsByPatientId = useAppointmentStore((state) => state.fetchAppointmentsByPatientId);
+
+  const actions = useAppointmentActions(
+    appointmentDtos,
+    modalState.openConfirmationModal,
+    modalState.closeConfirmationModal,
+    modalState.openEditModal
+  );
+
+  const handleAppointmentUpdated = () => {
+    // Reload appointments for this patient
+    fetchAppointmentsByPatientId(patientId);
+    modalState.closeEditModal();
+  };
 
   const config = {
-    showActions: false,
+    showActions: true,
     showContactColumn: false,
     showDateColumn: true,
     showPatientColumns: false,
     compactMode: false,
     useViewportHeight: false,
     emptyStateMessage: "No appointments found for this patient"
+  };
+
+  const callbacks = {
+    onModifyAppointment: actions.handleModifyAppointment,
+    onCancelAppointment: actions.handleCancelAppointment,
+    onReconfirmAppointment: actions.handleReconfirmAppointment,
+    onCompleteAppointment: actions.handleCompleteAppointment,
   };
 
   return (
@@ -36,7 +65,7 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ patientId }) =
       >
         Appointments
       </Text>
-      
+
       {isLoading && (
         <Box style={{ padding: '20px' }}>
           <Skeleton height={50} />
@@ -44,19 +73,42 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ patientId }) =
           <Skeleton height={50} mt="md" />
         </Box>
       )}
-      
+
       {error && (
         <Alert color="red" style={{ marginBottom: '20px' }}>
           {error}
         </Alert>
       )}
-      
+
       {!isLoading && !error && (
         <BaseAppointmentsTable
           appointments={appointments}
           config={config}
+          callbacks={callbacks}
         />
       )}
+
+      {/* Edit Modal */}
+      <AddAppointmentModal
+        isOpen={modalState.isEditModalOpen}
+        onClose={modalState.closeEditModal}
+        editMode={true}
+        appointment={modalState.selectedAppointment}
+        isRescheduleMode={modalState.isRescheduleMode}
+        onAppointmentUpdated={handleAppointmentUpdated}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={modalState.confirmationModal.isOpen}
+        onClose={modalState.closeConfirmationModal}
+        onConfirm={modalState.confirmationModal.onConfirm}
+        title={modalState.confirmationModal.title}
+        message={modalState.confirmationModal.message}
+        confirmText={modalState.confirmationModal.confirmText}
+        confirmColor={modalState.confirmationModal.confirmColor}
+        isLoading={isLoading}
+      />
     </Box>
   );
 };
