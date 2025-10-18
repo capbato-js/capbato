@@ -284,20 +284,39 @@ export const useEditLabTestResultViewModel = (): EditLabTestResultViewModelRetur
 
       // Use the actual lab test result ID (not the lab request ID)
       await updateLabTestResult(labTestResultId, transformedData);
-      
-      // Navigate back to the tests list
-      navigate(`/laboratory/tests/${patientId}`);
+
+      // Navigate back - check query params for context
+      const searchParams = new URLSearchParams(location.search);
+      const returnTo = searchParams.get('returnTo');
+      const returnTab = searchParams.get('returnTab');
+
+      if (returnTo === 'patient' && patientId) {
+        const tabParam = returnTab ? `?tab=${returnTab}` : '?tab=laboratories';
+        navigate(`/patients/${patientId}${tabParam}`);
+      } else {
+        navigate(`/laboratory/tests/${patientId}`);
+      }
     } catch (error) {
       console.error('❌ Error updating lab test result:', error);
       setError(error instanceof Error ? error.message : 'Failed to update lab test result');
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedLabTest, patientId, labTestResultId, updateLabTestResult, navigate]);
+  }, [selectedLabTest, patientId, labTestResultId, updateLabTestResult, navigate, location.search]);
 
   const handleCancel = useCallback(() => {
-    navigate(`/laboratory/tests/${patientId}`);
-  }, [navigate, patientId]);
+    // Check if we should return to patient page or laboratory page
+    const searchParams = new URLSearchParams(location.search);
+    const returnTo = searchParams.get('returnTo');
+    const returnTab = searchParams.get('returnTab');
+
+    if (returnTo === 'patient' && patientId) {
+      const tabParam = returnTab ? `?tab=${returnTab}` : '?tab=laboratories';
+      navigate(`/patients/${patientId}${tabParam}`);
+    } else {
+      navigate(`/laboratory/tests/${patientId}`);
+    }
+  }, [navigate, patientId, location.search]);
 
   return {
     // State

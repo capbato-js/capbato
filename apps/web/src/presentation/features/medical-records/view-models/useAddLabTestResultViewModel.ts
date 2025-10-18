@@ -264,22 +264,41 @@ export const useAddLabTestResultViewModel = (): AddLabTestResultViewModelReturn 
       }
 
       await createLabTestResult(apiPayload);
-      
+
       // If we reach here, creation was successful (no error thrown)
-      // Navigate back to laboratory tests page
-      navigate(`/laboratory/tests/${patientId}`);
-      
+      // Navigate back - check query params for context
+      const searchParams = new URLSearchParams(location.search);
+      const returnTo = searchParams.get('returnTo');
+      const returnTab = searchParams.get('returnTab');
+
+      if (returnTo === 'patient' && patientId) {
+        const tabParam = returnTab ? `?tab=${returnTab}` : '?tab=laboratories';
+        navigate(`/patients/${patientId}${tabParam}`);
+      } else {
+        navigate(`/laboratory/tests/${patientId}`);
+      }
+
     } catch (err) {
       console.error('❌ Error submitting result:', err);
       setError(err instanceof Error ? err.message : 'Failed to submit lab test result');
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedLabTest, patientInfo, createLabTestResult, navigate, patientId]);
+  }, [selectedLabTest, patientInfo, createLabTestResult, navigate, patientId, location.search]);
 
   const handleCancel = useCallback(() => {
-    navigate(`/laboratory/tests/${patientId}`);
-  }, [navigate, patientId]);
+    // Check if we should return to patient page or laboratory page
+    const searchParams = new URLSearchParams(location.search);
+    const returnTo = searchParams.get('returnTo');
+    const returnTab = searchParams.get('returnTab');
+
+    if (returnTo === 'patient' && patientId) {
+      const tabParam = returnTab ? `?tab=${returnTab}` : '?tab=laboratories';
+      navigate(`/patients/${patientId}${tabParam}`);
+    } else {
+      navigate(`/laboratory/tests/${patientId}`);
+    }
+  }, [navigate, patientId, location.search]);
 
   return {
     // State

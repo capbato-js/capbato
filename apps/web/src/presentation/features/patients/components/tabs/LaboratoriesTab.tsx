@@ -53,19 +53,19 @@ export const LaboratoriesTab: React.FC<LaboratoriesTabProps> = ({ patientId }) =
 
   // Navigation handlers
   const handleViewTest = (labTest: LabTest) => {
-    navigate(`/laboratory/tests/${patientId}/view-result/${labTest.id}`, {
+    navigate(`/laboratory/tests/${patientId}/view-result/${labTest.id}?returnTo=patient&returnTab=laboratories`, {
       state: { labTest }
     });
   };
 
   const handleEditTest = (labTest: LabTest) => {
-    navigate(`/laboratory/tests/${patientId}/edit-result/${labTest.id}`, {
+    navigate(`/laboratory/tests/${patientId}/edit-result/${labTest.id}?returnTo=patient&returnTab=laboratories`, {
       state: { labTest }
     });
   };
 
   const handleAddResult = (labTest: LabTest) => {
-    navigate(`/laboratory/tests/${patientId}/add-result/${labTest.id}`, {
+    navigate(`/laboratory/tests/${patientId}/add-result/${labTest.id}?returnTo=patient&returnTab=laboratories`, {
       state: { labTest }
     });
   };

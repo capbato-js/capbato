@@ -251,8 +251,20 @@ export const useViewLabTestResultViewModel = (): ViewLabTestResultViewModelRetur
   }, [patientId, testId, navigationLabTest, fetchLabTestsByPatientId, fetchLabRequestByPatientId, fetchLabTestResultByLabRequestId]);
 
   const handleBack = useCallback(() => {
-    navigate(`/laboratory/tests/${patientId}`);
-  }, [navigate, patientId]);
+    // Check if we should return to patient page or laboratory page
+    const searchParams = new URLSearchParams(location.search);
+    const returnTo = searchParams.get('returnTo');
+    const returnTab = searchParams.get('returnTab');
+
+    if (returnTo === 'patient' && patientId) {
+      // Return to patient details page with the laboratories tab active
+      const tabParam = returnTab ? `?tab=${returnTab}` : '?tab=laboratories';
+      navigate(`/patients/${patientId}${tabParam}`);
+    } else {
+      // Default: return to laboratory tests list
+      navigate(`/laboratory/tests/${patientId}`);
+    }
+  }, [navigate, patientId, location.search]);
 
   return {
     // State
