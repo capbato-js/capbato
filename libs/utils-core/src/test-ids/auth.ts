@@ -8,7 +8,6 @@ export const authTestIds = {
   passwordInput: 'login-password-input', 
   loginButton: 'login-submit-button',
   rememberMeCheckbox: 'login-remember-me-checkbox',
-  forgotPasswordLink: 'forgot-password-link',
   loginForm: 'login-form',
   loginError: 'login-error-message',
   logoutButton: 'logout-button',

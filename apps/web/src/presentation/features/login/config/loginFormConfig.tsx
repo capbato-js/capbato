@@ -31,12 +31,6 @@ export const LOGIN_FORM_CONFIG = {
     size: 'md' as const,
     testId: 'login-submit-button',
   },
-  forgotPassword: {
-    text: 'Forgot Password?',
-    variant: 'subtle' as const,
-    size: 'sm' as const,
-    testId: 'forgot-password-link',
-  },
   form: {
     mode: 'onBlur' as const,
     stackGap: 'md' as const,

@@ -119,13 +119,6 @@ describe('LoginForm', () => {
     }, { timeout: 1000 });
   });
 
-  it('should show forgot password link', () => {
-    renderWithProviders(<LoginForm />);
-
-    expect(screen.getByTestId('forgot-password-link')).toBeInTheDocument();
-    expect(screen.getByText('Forgot Password?')).toBeInTheDocument();
-  });
-
   it('should have proper accessibility attributes', () => {
     renderWithProviders(<LoginForm />);
 
