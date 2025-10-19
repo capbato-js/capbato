@@ -19,7 +19,7 @@ export const LoginSubmitButton: React.FC<LoginSubmitButtonProps> = ({
       leftSection={isSubmitting ? undefined : <IconLogin size={18} />}
       loading={isSubmitting}
       size="md"
-      mt="md"
+      mt="28px"
       data-testid="login-submit-button"
     >
       Login
