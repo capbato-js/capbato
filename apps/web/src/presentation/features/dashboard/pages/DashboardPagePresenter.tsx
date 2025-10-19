@@ -5,6 +5,8 @@ import { DashboardAppointmentsTable } from '../../../components/common';
 import { useMantineTheme } from '@mantine/core';
 import { getDashboardStatsCards, DashboardStats } from '../config/dashboardConfig';
 import { getDashboardStyles } from '../utils/dashboardStyles';
+import { WeeklyAppointmentTrendsChart, type TimeRange, type Granularity } from '../components';
+import { WeeklyAppointmentSummaryDto } from '@nx-starter/application-shared';
 
 interface DashboardPagePresenterProps {
   stats: DashboardStats;
@@ -12,6 +14,17 @@ interface DashboardPagePresenterProps {
   isLoading: boolean;
   isDoctorLoading: boolean;
   onSeeAllAppointments: () => void;
+  weeklyData: WeeklyAppointmentSummaryDto[];
+  isWeeklyDataLoading: boolean;
+  isAdmin: boolean;
+  timeRange: TimeRange;
+  granularity: Granularity;
+  customStartDate?: Date;
+  customEndDate?: Date;
+  onTimeRangeChange: (range: TimeRange) => void;
+  onGranularityChange: (granularity: Granularity) => void;
+  onCustomDateChange: (startDate: Date, endDate: Date) => void;
+  onRefresh: () => void;
 }
 
 export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
@@ -20,6 +33,17 @@ export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
   isLoading,
   isDoctorLoading,
   onSeeAllAppointments,
+  weeklyData,
+  isWeeklyDataLoading,
+  isAdmin,
+  timeRange,
+  granularity,
+  customStartDate,
+  customEndDate,
+  onTimeRangeChange,
+  onGranularityChange,
+  onCustomDateChange,
+  onRefresh,
 }) => {
   const theme = useMantineTheme();
   const styles = getDashboardStyles(theme);
@@ -45,8 +69,8 @@ export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
           See All
         </Box>
       </Box>
-      
-      {/* Today's Appointments Section - Now scrollable */}
+
+      {/* Today's Appointments Table */}
       <Box style={styles.appointmentsContainer}>
         {isLoading ? (
           <Box style={styles.loadingContainer}>
@@ -59,6 +83,32 @@ export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
           />
         )}
       </Box>
+
+      {/* Appointment Analytics Section - Admin Only */}
+      {isAdmin && (
+        <>
+          <Box style={{ ...styles.headerContainer, marginTop: '2rem' }}>
+            <Title order={2} style={styles.headerTitle}>
+              Appointment Analytics
+            </Title>
+          </Box>
+
+          <Box style={{ marginBottom: '2rem', marginTop: '1rem' }}>
+            <WeeklyAppointmentTrendsChart
+              data={weeklyData}
+              isLoading={isWeeklyDataLoading}
+              timeRange={timeRange}
+              granularity={granularity}
+              customStartDate={customStartDate}
+              customEndDate={customEndDate}
+              onTimeRangeChange={onTimeRangeChange}
+              onGranularityChange={onGranularityChange}
+              onCustomDateChange={onCustomDateChange}
+              onRefresh={onRefresh}
+            />
+          </Box>
+        </>
+      )}
     </MedicalClinicLayout>
   );
 };

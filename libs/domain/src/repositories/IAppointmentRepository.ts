@@ -1,5 +1,11 @@
 import { Appointment } from '../entities/Appointment';
 
+export interface AppointmentSummaryQuery {
+  startDate?: string;
+  endDate?: string;
+  granularity?: 'daily' | 'weekly' | 'monthly';
+}
+
 export interface IAppointmentRepository {
   getAll(): Promise<Appointment[]>;
   create(appointment: Appointment): Promise<string>;
@@ -12,7 +18,7 @@ export interface IAppointmentRepository {
   getConfirmedAppointments(): Promise<Appointment[]>;
   getAppointmentsByDate(date: Date): Promise<Appointment[]>;
   getAppointmentsByDateRange(startDate: Date, endDate: Date): Promise<Appointment[]>;
-  getWeeklyAppointmentSummary(): Promise<{ date: string; count: number }[]>;
+  getWeeklyAppointmentSummary(query?: AppointmentSummaryQuery): Promise<{ date: string; totalCount: number; completedCount: number; cancelledCount: number }[]>;
   checkTimeSlotAvailability(date: Date, time: string, excludeId?: string): Promise<boolean>;
   checkPatientDuplicateAppointment(patientId: string, date: Date, excludeId?: string): Promise<boolean>;
   getCurrentPatientAppointment(): Promise<Appointment | undefined>;

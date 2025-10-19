@@ -85,7 +85,9 @@ export interface AppointmentStatsDto {
 
 export interface WeeklyAppointmentSummaryDto {
   date: string; // YYYY-MM-DD format
-  count: number;
+  totalCount: number;
+  completedCount: number;
+  cancelledCount: number;
 }
 
 // API Response types (following TodoController pattern from ApiResponse.ts)

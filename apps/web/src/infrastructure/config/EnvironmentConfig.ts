@@ -63,6 +63,7 @@ export function getEnvironmentConfig(): AppConfig {
           complete: (id: string) => `/api/appointments/${id}/complete`,
           reconfirm: (id: string) => `/api/appointments/${id}/reconfirm`,
           todayConfirmed: '/api/appointments/today/confirmed',
+          weeklySummary: '/api/appointments/weekly-summary',
         },
         doctors: {
           base: '/api/doctors',

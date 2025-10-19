@@ -220,4 +220,31 @@ export class AppointmentApiService {
       throw new Error('Failed to reconfirm appointment');
     }
   }
+
+  /**
+   * Gets appointment summary with flexible date range and granularity
+   */
+  async getWeeklyAppointmentSummary(
+    startDate?: string,
+    endDate?: string,
+    granularity?: 'daily' | 'weekly' | 'monthly'
+  ): Promise<{ date: string; totalCount: number; completedCount: number; cancelledCount: number }[]> {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    if (granularity) params.append('granularity', granularity);
+
+    const url = `${this.apiConfig.endpoints.appointments.weeklySummary}?${params.toString()}`;
+
+    const response = await this.httpClient.get<{
+      success: boolean;
+      data: { date: string; totalCount: number; completedCount: number; cancelledCount: number }[];
+    }>(url);
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error('Failed to fetch weekly appointment summary');
+    }
+
+    return response.data.data;
+  }
 }

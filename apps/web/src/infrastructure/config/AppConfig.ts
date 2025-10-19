@@ -43,6 +43,7 @@ export interface ApiConfiguration {
       complete: (id: string) => string;
       reconfirm: (id: string) => string;
       todayConfirmed: string;
+      weeklySummary: string;
     };
     doctors: {
       base: string;

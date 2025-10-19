@@ -126,27 +126,58 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
       .sort((a, b) => a.appointmentDate.getTime() - b.appointmentDate.getTime());
   }
 
-  async getWeeklyAppointmentSummary(): Promise<{ date: string; count: number }[]> {
+  async getWeeklyAppointmentSummary(query?: any): Promise<{ date: string; totalCount: number; completedCount: number; cancelledCount: number }[]> {
+    // Default values: last 3 months, weekly granularity
+    const granularity = query?.granularity || 'weekly';
     const today = new Date();
-    const sixDaysAgo = new Date(today);
-    sixDaysAgo.setDate(today.getDate() - 6);
-    sixDaysAgo.setHours(0, 0, 0, 0);
+    const endDate = query?.endDate ? new Date(query.endDate) : today;
+    const startDate = query?.startDate ? new Date(query.startDate) : new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000); // 3 months ago
 
-    const confirmedAppointments = await this.getConfirmedAppointments();
-    const weeklyAppointments = confirmedAppointments.filter(appointment => 
-      appointment.appointmentDate.getTime() >= sixDaysAgo.getTime()
+    const allAppointments = await this.getAll();
+    const filteredAppointments = allAppointments.filter(appointment =>
+      appointment.appointmentDate.getTime() >= startDate.getTime() &&
+      appointment.appointmentDate.getTime() <= endDate.getTime()
     );
 
-    // Group by date
-    const dateGroups = new Map<string, number>();
-    weeklyAppointments.forEach(appointment => {
-      const dateString = appointment.appointmentDate.toISOString().split('T')[0];
-      dateGroups.set(dateString, (dateGroups.get(dateString) || 0) + 1);
+    // Group by date based on granularity
+    const dateGroups = new Map<string, { totalCount: number; completedCount: number; cancelledCount: number }>();
+
+    filteredAppointments.forEach(appointment => {
+      let dateKey: string;
+      const apptDate = new Date(appointment.appointmentDate);
+
+      switch (granularity) {
+        case 'daily':
+          dateKey = apptDate.toISOString().split('T')[0];
+          break;
+        case 'monthly':
+          dateKey = `${apptDate.getFullYear()}-${String(apptDate.getMonth() + 1).padStart(2, '0')}-01`;
+          break;
+        case 'weekly':
+        default:
+          // Get Monday of the week
+          const day = apptDate.getDay();
+          const diff = apptDate.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+          const monday = new Date(apptDate.setDate(diff));
+          dateKey = monday.toISOString().split('T')[0];
+          break;
+      }
+
+      const existing = dateGroups.get(dateKey) || { totalCount: 0, completedCount: 0, cancelledCount: 0 };
+
+      existing.totalCount += 1;
+      if (appointment.statusValue === 'completed') {
+        existing.completedCount += 1;
+      } else if (appointment.statusValue === 'cancelled') {
+        existing.cancelledCount += 1;
+      }
+
+      dateGroups.set(dateKey, existing);
     });
 
     // Convert to array and sort by date
     return Array.from(dateGroups.entries())
-      .map(([date, count]) => ({ date, count }))
+      .map(([date, counts]) => ({ date, ...counts }))
       .sort((a, b) => a.date.localeCompare(b.date));
   }
 

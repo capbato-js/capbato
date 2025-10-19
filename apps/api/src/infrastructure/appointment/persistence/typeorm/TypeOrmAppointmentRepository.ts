@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import { Repository, DataSource, Between } from 'typeorm';
-import { Appointment } from '@nx-starter/domain';
+import { Appointment, type AppointmentSummaryQuery } from '@nx-starter/domain';
 import type { IAppointmentRepository } from '@nx-starter/domain';
 import { AppointmentMapper } from '@nx-starter/application-shared';
 import { NameFormattingService } from '@nx-starter/domain';
@@ -12,10 +12,12 @@ import { UserEntity } from '../../../user/persistence/typeorm/UserEntity';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import isoWeek from 'dayjs/plugin/isoWeek';
 
 // Configure dayjs plugins
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(isoWeek);
 
 /**
  * Extended appointment data with populated patient and doctor information
@@ -365,25 +367,52 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
     return entities.map(this.toDomain);
   }
 
-  async getWeeklyAppointmentSummary(): Promise<{ date: string; count: number }[]> {
-    const today = new Date();
-    const sixDaysAgo = new Date(today);
-    sixDaysAgo.setDate(today.getDate() - 6);
-    sixDaysAgo.setHours(0, 0, 0, 0);
+  async getWeeklyAppointmentSummary(query?: AppointmentSummaryQuery): Promise<{ date: string; totalCount: number; completedCount: number; cancelledCount: number }[]> {
+    // Default values: last 3 months, weekly granularity
+    const granularity = query?.granularity || 'weekly';
+    const endDate = query?.endDate ? dayjs(query.endDate) : dayjs();
+    const startDate = query?.startDate ? dayjs(query.startDate) : endDate.subtract(3, 'months');
+
+    // Determine SQL grouping expression based on granularity
+    let dateGroupExpression: string;
+    let dateFormat: string;
+
+    switch (granularity) {
+      case 'daily':
+        dateGroupExpression = 'DATE(appointment.appointmentDate)';
+        dateFormat = '%Y-%m-%d';
+        break;
+      case 'monthly':
+        dateGroupExpression = 'DATE_FORMAT(appointment.appointmentDate, \'%Y-%m-01\')';
+        dateFormat = '%Y-%m-01';
+        break;
+      case 'weekly':
+      default:
+        // Group by week (Monday as start of week)
+        dateGroupExpression = 'DATE_SUB(DATE(appointment.appointmentDate), INTERVAL WEEKDAY(appointment.appointmentDate) DAY)';
+        dateFormat = '%Y-%m-%d';
+        break;
+    }
 
     const result = await this.repository
       .createQueryBuilder('appointment')
-      .select('DATE(appointment.appointmentDate)', 'date')
-      .addSelect('COUNT(*)', 'count')
-      .where('appointment.status = :status', { status: 'confirmed' })
-      .andWhere('appointment.appointmentDate >= :startDate', { startDate: sixDaysAgo })
-      .groupBy('DATE(appointment.appointmentDate)')
+      .select(dateGroupExpression, 'date')
+      .addSelect('COUNT(*)', 'totalCount')
+      .addSelect('SUM(CASE WHEN appointment.status = :completedStatus THEN 1 ELSE 0 END)', 'completedCount')
+      .addSelect('SUM(CASE WHEN appointment.status = :cancelledStatus THEN 1 ELSE 0 END)', 'cancelledCount')
+      .where('appointment.appointmentDate >= :startDate', { startDate: startDate.format('YYYY-MM-DD') })
+      .andWhere('appointment.appointmentDate <= :endDate', { endDate: endDate.format('YYYY-MM-DD') })
+      .setParameter('completedStatus', 'completed')
+      .setParameter('cancelledStatus', 'cancelled')
+      .groupBy(dateGroupExpression)
       .orderBy('date', 'ASC')
       .getRawMany();
 
     return result.map(row => ({
       date: row.date,
-      count: parseInt(row.count, 10),
+      totalCount: parseInt(row.totalCount, 10),
+      completedCount: parseInt(row.completedCount, 10),
+      cancelledCount: parseInt(row.cancelledCount, 10),
     }));
   }
 

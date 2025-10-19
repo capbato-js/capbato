@@ -8,6 +8,7 @@ import {
   Param,
   Body,
   HttpCode,
+  QueryParam,
 } from 'routing-controllers';
 import { DoctorNotFoundException } from '@nx-starter/domain';
 import {
@@ -153,11 +154,22 @@ export class AppointmentController {
   }
 
   /**
-   * GET /api/appointments/weekly-summary - Get weekly appointment summary
+   * GET /api/appointments/weekly-summary - Get appointment summary with flexible date range and granularity
+   * @param startDate - ISO date string for range start (optional, defaults to 3 months ago)
+   * @param endDate - ISO date string for range end (optional, defaults to today)
+   * @param granularity - 'daily' | 'weekly' | 'monthly' (optional, defaults to 'weekly')
    */
   @Get('/weekly-summary')
-  async getWeeklyAppointmentSummary(): Promise<WeeklyAppointmentSummaryResponse> {
-    const summary = await this.getWeeklyAppointmentSummaryQueryHandler.execute();
+  async getWeeklyAppointmentSummary(
+    @QueryParam('startDate') startDate?: string,
+    @QueryParam('endDate') endDate?: string,
+    @QueryParam('granularity') granularity?: string
+  ): Promise<WeeklyAppointmentSummaryResponse> {
+    const summary = await this.getWeeklyAppointmentSummaryQueryHandler.execute({
+      startDate,
+      endDate,
+      granularity: granularity as 'daily' | 'weekly' | 'monthly' | undefined
+    });
 
     return ApiResponseBuilder.success(summary);
   }
