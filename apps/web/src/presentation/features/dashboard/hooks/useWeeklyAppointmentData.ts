@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { container } from '../../../../infrastructure/di/container';
 import { AppointmentApiService } from '../../../../infrastructure/api/AppointmentApiService';
 import { WeeklyAppointmentSummaryDto } from '@nx-starter/application-shared';
@@ -16,8 +16,11 @@ export const useWeeklyAppointmentData = () => {
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>();
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>();
 
+  // Track scroll position to restore after data fetch
+  const scrollPositionRef = useRef<number>(0);
+
   // Calculate date range based on time range selection
-  const calculateDateRange = useCallback((range: TimeRange): { startDate: string; endDate: string } => {
+  const calculateDateRange = (range: TimeRange): { startDate: string; endDate: string } => {
     const end = dayjs();
     let start: dayjs.Dayjs;
 
@@ -60,7 +63,7 @@ export const useWeeklyAppointmentData = () => {
       startDate: start.format('YYYY-MM-DD'),
       endDate: end.format('YYYY-MM-DD'),
     };
-  }, [customStartDate, customEndDate]);
+  };
 
   // Auto-adjust granularity based on time range (with override capability)
   const autoAdjustGranularity = (range: TimeRange): Granularity => {
@@ -81,8 +84,13 @@ export const useWeeklyAppointmentData = () => {
     }
   };
 
-  const fetchWeeklyData = useCallback(async () => {
+  const fetchWeeklyData = useCallback(async (preserveScroll = false) => {
     try {
+      // Save scroll position before loading
+      if (preserveScroll && typeof window !== 'undefined') {
+        scrollPositionRef.current = window.scrollY;
+      }
+
       setIsLoading(true);
       setError(null);
 
@@ -95,6 +103,13 @@ export const useWeeklyAppointmentData = () => {
       );
 
       setWeeklyData(data);
+
+      // Restore scroll position after data loads
+      if (preserveScroll && typeof window !== 'undefined') {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollPositionRef.current);
+        });
+      }
     } catch (err) {
       console.error('Failed to fetch weekly appointment data:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch weekly data');
@@ -102,11 +117,11 @@ export const useWeeklyAppointmentData = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [timeRange, granularity, calculateDateRange]);
+  }, [timeRange, granularity, customStartDate, customEndDate]);
 
   useEffect(() => {
     fetchWeeklyData();
-  }, [fetchWeeklyData]);
+  }, [timeRange, customStartDate, customEndDate]); // Only refetch on time range or custom date changes, NOT on granularity
 
   const handleTimeRangeChange = (range: TimeRange) => {
     setTimeRange(range);
@@ -117,6 +132,8 @@ export const useWeeklyAppointmentData = () => {
 
   const handleGranularityChange = (newGranularity: Granularity) => {
     setGranularity(newGranularity);
+    // Fetch with scroll preservation
+    setTimeout(() => fetchWeeklyData(true), 0);
   };
 
   const handleCustomDateChange = (startDate: Date, endDate: Date) => {
@@ -125,7 +142,7 @@ export const useWeeklyAppointmentData = () => {
   };
 
   const handleRefresh = () => {
-    fetchWeeklyData();
+    fetchWeeklyData(true); // Preserve scroll on manual refresh too
   };
 
   return {

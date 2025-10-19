@@ -80,7 +80,9 @@ export const AppointmentTrendsFilters: React.FC<AppointmentTrendsFiltersProps> =
           <Select
             label="Granularity"
             value={granularity}
-            onChange={(value) => onGranularityChange(value as Granularity)}
+            onChange={(value) => {
+              if (value) onGranularityChange(value as Granularity);
+            }}
             data={[
               { value: 'daily', label: 'Daily' },
               { value: 'weekly', label: 'Weekly' },
@@ -88,6 +90,10 @@ export const AppointmentTrendsFilters: React.FC<AppointmentTrendsFiltersProps> =
             ]}
             size="sm"
             style={{ width: 120 }}
+            comboboxProps={{
+              withinPortal: true,
+              position: 'bottom-start'
+            }}
           />
 
           <Button
