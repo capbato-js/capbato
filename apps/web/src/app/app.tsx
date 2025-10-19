@@ -98,7 +98,9 @@ function App() {
         } />
         <Route path="/transactions" element={
           <AuthGuard requireAuth={true}>
-            <TransactionsPage />
+            <RoleGuard requiredRoute="/transactions">
+              <TransactionsPage />
+            </RoleGuard>
           </AuthGuard>
         } />
         <Route path="/doctors" element={

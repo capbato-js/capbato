@@ -25,7 +25,7 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   '/patients': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
   '/laboratory': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
   '/prescriptions': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
-  '/transactions': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
+  '/transactions': [UserRole.ADMIN, UserRole.RECEPTIONIST], // Only admin and receptionist can access transactions
   '/doctors': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
   '/accounts': [UserRole.ADMIN], // Only admin can access accounts
   '/todo': [UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST],
