@@ -106,6 +106,8 @@ export function getEnvironmentConfig(): AppConfig {
       enableOfflineMode: parseBoolean(import.meta.env.VITE_ENABLE_OFFLINE_MODE, true),
       enablePWA: parseBoolean(import.meta.env.VITE_ENABLE_PWA, true),
       enableAnalytics: parseBoolean(import.meta.env.VITE_ENABLE_ANALYTICS, true),
+      // Laboratory features
+      disableUnsupportedLabTests: parseBoolean(import.meta.env.VITE_DISABLE_UNSUPPORTED_LAB_TESTS, true),
     },
     app: {
       appName: import.meta.env.VITE_APP_NAME || 'Nx Starter',

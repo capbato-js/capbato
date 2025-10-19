@@ -85,6 +85,8 @@ export interface FeatureFlags {
   enableOfflineMode: boolean;
   enablePWA: boolean;
   enableAnalytics: boolean;
+  // Laboratory features
+  disableUnsupportedLabTests: boolean; // Disable lab test checkboxes that don't have result forms
 }
 
 export interface ApplicationSettings {

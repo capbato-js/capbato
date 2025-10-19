@@ -4,6 +4,8 @@ export interface LabTestItem {
   name: string;
   price?: number;
   category: 'ROUTINE' | 'BLOOD_CHEMISTRY' | 'SEROLOGY_IMMUNOLOGY' | 'THYROID_FUNCTION' | 'MISCELLANEOUS';
+  disabled?: boolean; // true if no corresponding lab test result form exists
+  disabledReason?: string; // explanation for why it's disabled
 }
 
 export const LAB_TEST_ITEMS: LabTestItem[] = [
@@ -15,21 +17,21 @@ export const LAB_TEST_ITEMS: LabTestItem[] = [
   { id: 'routine_occult_blood_test', name: 'Occult Blood Test', price: 150, category: 'ROUTINE' },
 
   // SEROLOGY & IMMUNOLOGY Tests
-  { id: 'serology_hepatitis_b_screening', name: 'Hepatitis B Screening', price: 250, category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_hepatitis_a_screening', name: 'Hepatitis A Screening', price: 450, category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_hepatitis_c_screening', name: 'Hepatitis C Screening', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_hepatitis_profile', name: 'Hepatitis Profile', price: 1700, category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_vdrl_rpr', name: 'VDRL/RPR', price: 250, category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_crp', name: 'CRP', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_dengue_ns1', name: 'Dengue NS1', price: 1200, category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_aso', name: 'ASO', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_crf', name: 'CRF', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_ra_rf', name: 'RA/RF', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_tumor_markers', name: 'Tumor Markers', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_ca_125', name: 'CA 125', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_cea', name: 'CEA', category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_psa', name: 'PSA', price: 1300, category: 'SEROLOGY_IMMUNOLOGY' },
-  { id: 'serology_beta_hcg', name: 'Beta HCG', category: 'SEROLOGY_IMMUNOLOGY' },
+  { id: 'serology_hepatitis_b_screening', name: 'Hepatitis B Screening', price: 250, category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_hepatitis_a_screening', name: 'Hepatitis A Screening', price: 450, category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_hepatitis_c_screening', name: 'Hepatitis C Screening', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_hepatitis_profile', name: 'Hepatitis Profile', price: 1700, category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_vdrl_rpr', name: 'VDRL/RPR', price: 250, category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_crp', name: 'CRP', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_dengue_ns1', name: 'Dengue NS1', price: 1200, category: 'SEROLOGY_IMMUNOLOGY' }, // HAS FORM - dengue report
+  { id: 'serology_aso', name: 'ASO', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_crf', name: 'CRF', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_ra_rf', name: 'RA/RF', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_tumor_markers', name: 'Tumor Markers', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_ca_125', name: 'CA 125', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_cea', name: 'CEA', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_psa', name: 'PSA', price: 1300, category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
+  { id: 'serology_beta_hcg', name: 'Beta HCG', category: 'SEROLOGY_IMMUNOLOGY', disabled: true, disabledReason: 'No result form available' },
 
   // BLOOD CHEMISTRY Tests
   { id: 'blood_chemistry_fbs', name: 'FBS', price: 120, category: 'BLOOD_CHEMISTRY' },
@@ -45,8 +47,8 @@ export const LAB_TEST_ITEMS: LabTestItem[] = [
   { id: 'blood_chemistry_hba1c', name: 'HBA1C', price: 550, category: 'BLOOD_CHEMISTRY' },
 
   // THYROID FUNCTION Tests
-  { id: 'thyroid_t3', name: 'T3', price: 500, category: 'THYROID_FUNCTION' },
-  { id: 'thyroid_t4', name: 'T4', price: 500, category: 'THYROID_FUNCTION' },
+  { id: 'thyroid_t3', name: 'T3', price: 500, category: 'THYROID_FUNCTION', disabled: true, disabledReason: 'No result form available' },
+  { id: 'thyroid_t4', name: 'T4', price: 500, category: 'THYROID_FUNCTION', disabled: true, disabledReason: 'No result form available' },
   { id: 'thyroid_ft3', name: 'FT3', price: 600, category: 'THYROID_FUNCTION' },
   { id: 'thyroid_ft4', name: 'FT4', price: 600, category: 'THYROID_FUNCTION' },
   { id: 'thyroid_tsh', name: 'TSH', price: 600, category: 'THYROID_FUNCTION' },
