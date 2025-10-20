@@ -108,8 +108,10 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
       <PrescriptionsTable
         prescriptions={prescriptions}
         onViewPrescription={handleViewPrescription}
-        onEditPrescription={canCreatePrescriptions ? handleEditPrescription : undefined}
-        onDeletePrescription={canCreatePrescriptions ? handleDeletePrescription : undefined}
+        onEditPrescription={handleEditPrescription}
+        onDeletePrescription={handleDeletePrescription}
+        canCreatePrescriptions={canCreatePrescriptions}
+        showPatientInfo={false}
       />
 
       {/* Edit Modal - Only show for users who can create prescriptions */}
@@ -144,7 +146,7 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
 };
 
 // Helper to transform domain prescription to UI prescription for modals
-function transformDomainToUIPrescriptionForModal(prescription: Prescription): any {
+function transformDomainToUIPrescriptionForModal(prescription: Prescription) {
   // Transform medications array
   const medications = prescription.medications?.map(med => ({
     name: med.medicationNameValue || '',
@@ -161,7 +163,19 @@ function transformDomainToUIPrescriptionForModal(prescription: Prescription): an
   }];
 
   // Type assertion to access populated data
-  const prescriptionWithPopulatedData = prescription as any;
+  const prescriptionWithPopulatedData = prescription as unknown as {
+    _populatedDoctor?: {
+      fullName?: string;
+      firstName?: string;
+      lastName?: string;
+    };
+    _populatedPatient?: {
+      patientNumber?: string;
+      name?: string;
+      firstName?: string;
+      lastName?: string;
+    };
+  };
 
   return {
     id: prescription.id?.value || '',
@@ -174,6 +188,6 @@ function transformDomainToUIPrescriptionForModal(prescription: Prescription): an
             `${prescriptionWithPopulatedData._populatedDoctor?.firstName || ''} ${prescriptionWithPopulatedData._populatedDoctor?.lastName || ''}`.trim() || '',
     datePrescribed: prescription.prescribedDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
     medications: medications,
-    notes: prescription.notes || '',
+    notes: prescription.additionalNotes || '',
   };
 }

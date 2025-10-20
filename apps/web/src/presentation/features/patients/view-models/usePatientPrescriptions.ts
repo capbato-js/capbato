@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react';
 import { usePrescriptionStore } from '../../../../infrastructure/state/PrescriptionStore';
 import { Prescription } from '@nx-starter/domain';
-import { BasePrescription } from '../../../components/common';
+
+// Define the prescription display format to match the main prescriptions page
+interface PrescriptionDisplay {
+  id: string;
+  patientNumber: string;
+  patientName: string;
+  doctor: string;
+  datePrescribed: string;
+  medications: Array<{ name: string }>;
+}
 
 /**
  * Hook to manage patient-specific prescriptions
  */
 export const usePatientPrescriptions = (patientId: string | undefined) => {
   const prescriptionStore = usePrescriptionStore();
-  const [patientPrescriptions, setPatientPrescriptions] = useState<BasePrescription[]>([]);
+  const [patientPrescriptions, setPatientPrescriptions] = useState<PrescriptionDisplay[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -28,12 +37,12 @@ export const usePatientPrescriptions = (patientId: string | undefined) => {
   }, [patientId]);
 
   useEffect(() => {
-    // Filter prescriptions for this specific patient and map to BasePrescription format
+    // Filter prescriptions for this specific patient and map to PrescriptionDisplay format
     const allPrescriptions = prescriptionStore.prescriptions;
     const filtered = allPrescriptions
       .filter(prescription => prescription.patientId === patientId)
-      .map(mapDomainPrescriptionToBase);
-    
+      .map(mapDomainPrescriptionToDisplay);
+
     setPatientPrescriptions(filtered);
   }, [prescriptionStore.prescriptions, patientId]);
 
@@ -47,12 +56,10 @@ export const usePatientPrescriptions = (patientId: string | undefined) => {
 };
 
 /**
- * Maps domain Prescription to BasePrescription for table display
+ * Maps domain Prescription to PrescriptionDisplay for table display
+ * Matches the format used in the main prescriptions page
  */
-function mapDomainPrescriptionToBase(prescription: Prescription): BasePrescription {
-  // Get the first medication for backward compatibility with single medication display
-  const primaryMedication = prescription.medications?.[0];
-  
+function mapDomainPrescriptionToDisplay(prescription: Prescription): PrescriptionDisplay {
   // Type assertion to access populated data that may be attached to the domain object
   const prescriptionWithData = prescription as unknown as {
     _populatedDoctor?: {
@@ -60,20 +67,38 @@ function mapDomainPrescriptionToBase(prescription: Prescription): BasePrescripti
       firstName: string;
       lastName: string;
     };
+    _populatedPatient?: {
+      patientNumber: string;
+      name: string;
+      firstName: string;
+      lastName: string;
+    };
   };
-  
+
+  // Get doctor name
+  const doctorName = prescriptionWithData._populatedDoctor?.fullName ||
+    (prescriptionWithData._populatedDoctor?.firstName && prescriptionWithData._populatedDoctor?.lastName
+      ? `${prescriptionWithData._populatedDoctor.firstName} ${prescriptionWithData._populatedDoctor.lastName}`.trim()
+      : 'TBD');
+
+  // Get patient info
+  const patientNumber = prescriptionWithData._populatedPatient?.patientNumber || 'N/A';
+  const patientName = prescriptionWithData._populatedPatient?.name ||
+    (prescriptionWithData._populatedPatient?.firstName && prescriptionWithData._populatedPatient?.lastName
+      ? `${prescriptionWithData._populatedPatient.firstName} ${prescriptionWithData._populatedPatient.lastName}`.trim()
+      : 'N/A');
+
+  // Map medications
+  const medications = prescription.medications?.map(med => ({
+    name: med.medicationNameValue || 'N/A'
+  })) || [];
+
   return {
     id: prescription.id?.value || '',
-    medicationName: primaryMedication?.medicationNameValue || 'N/A',
-    dosage: primaryMedication?.dosageValue || 'N/A',
-    instructions: primaryMedication?.instructionsValue || 'N/A',
-    frequency: primaryMedication?.frequency || 'N/A',
-    duration: primaryMedication?.duration || 'N/A',
-    prescribedDate: prescription.prescribedDate.toISOString().split('T')[0],
-    expiryDate: prescription.expiryDate?.toISOString().split('T')[0],
-    doctor: prescriptionWithData._populatedDoctor?.fullName || 
-            prescriptionWithData._populatedDoctor?.firstName + ' ' + prescriptionWithData._populatedDoctor?.lastName || 
-            'TBD', // Display doctor name or fallback
-    status: prescription.status || 'active', // Default to 'active' if status is undefined
+    patientNumber,
+    patientName,
+    doctor: doctorName,
+    datePrescribed: prescription.prescribedDate.toISOString().split('T')[0],
+    medications,
   };
 }

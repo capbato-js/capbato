@@ -2,36 +2,10 @@ import { Prescription } from '../types';
 import { DisplayPrescription } from '../hooks/usePrescriptionData';
 
 export const transformPrescriptionsForDisplay = (prescriptions: any[]): DisplayPrescription[] => {
-  // Group prescriptions by patient, doctor, and date to combine medications
-  const groupedPrescriptions = new Map<string, {
-    prescriptions: typeof prescriptions;
-    medications: string[];
-  }>();
-
-  prescriptions.forEach(prescription => {
-    const datePrescribed = prescription.prescribedDate.toISOString().split('T')[0];
-    const groupKey = `${prescription.patientId}-${prescription.doctorId}-${datePrescribed}`;
-
-    if (!groupedPrescriptions.has(groupKey)) {
-      groupedPrescriptions.set(groupKey, {
-        prescriptions: [],
-        medications: []
-      });
-    }
-
-    const group = groupedPrescriptions.get(groupKey);
-    if (group) {
-      group.prescriptions.push(prescription);
-      prescription.medications.forEach((medication: any) => {
-        group.medications.push(medication.medicationNameValue);
-      });
-    }
-  });
-
-  // Convert grouped prescriptions to display format
-  return Array.from(groupedPrescriptions.entries()).map(([, group]) => {
-    const firstPrescription = group.prescriptions[0];
-    const prescriptionWithData = firstPrescription as unknown as {
+  // Transform each prescription into display format without grouping
+  // Each prescription is its own row, showing all its medications
+  return prescriptions.map(prescription => {
+    const prescriptionWithData = prescription as unknown as {
       _populatedPatient?: {
         patientNumber: string;
         fullName: string;
@@ -41,16 +15,19 @@ export const transformPrescriptionsForDisplay = (prescriptions: any[]): DisplayP
       };
     };
 
+    // Get all medication names from this prescription
+    const medicationNames = prescription.medications.map((med: any) => med.medicationNameValue);
+
     return {
-      id: group.prescriptions.map((p: any) => p.stringId || '').join(','),
-      patientNumber: prescriptionWithData._populatedPatient?.patientNumber || `P${firstPrescription.patientId.slice(-3)}`,
-      patientName: prescriptionWithData._populatedPatient?.fullName || `Patient ${firstPrescription.patientId.slice(-4)}`,
-      patientId: firstPrescription.patientId,
-      doctor: prescriptionWithData._populatedDoctor?.fullName || `Dr. ${firstPrescription.doctorId.slice(-4)}`,
-      doctorId: firstPrescription.doctorId,
-      datePrescribed: firstPrescription.prescribedDate.toISOString().split('T')[0],
-      medications: group.medications.join(', '),
-      notes: firstPrescription.additionalNotes,
+      id: prescription.stringId || '',
+      patientNumber: prescriptionWithData._populatedPatient?.patientNumber || `P${prescription.patientId.slice(-3)}`,
+      patientName: prescriptionWithData._populatedPatient?.fullName || `Patient ${prescription.patientId.slice(-4)}`,
+      patientId: prescription.patientId,
+      doctor: prescriptionWithData._populatedDoctor?.fullName || `Dr. ${prescription.doctorId.slice(-4)}`,
+      doctorId: prescription.doctorId,
+      datePrescribed: prescription.prescribedDate.toISOString().split('T')[0],
+      medications: medicationNames.join(', '),
+      notes: prescription.additionalNotes,
     };
   });
 };
