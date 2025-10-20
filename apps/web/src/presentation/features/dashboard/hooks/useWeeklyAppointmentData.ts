@@ -120,8 +120,8 @@ export const useWeeklyAppointmentData = () => {
   }, [timeRange, granularity, customStartDate, customEndDate]);
 
   useEffect(() => {
-    fetchWeeklyData();
-  }, [timeRange, customStartDate, customEndDate]); // Only refetch on time range or custom date changes, NOT on granularity
+    fetchWeeklyData(true);
+  }, [timeRange, granularity, customStartDate, customEndDate]); // Refetch on time range, granularity, or custom date changes
 
   const handleTimeRangeChange = (range: TimeRange) => {
     setTimeRange(range);
@@ -132,8 +132,7 @@ export const useWeeklyAppointmentData = () => {
 
   const handleGranularityChange = (newGranularity: Granularity) => {
     setGranularity(newGranularity);
-    // Fetch with scroll preservation
-    setTimeout(() => fetchWeeklyData(true), 0);
+    // Data will be fetched automatically via useEffect when granularity state changes
   };
 
   const handleCustomDateChange = (startDate: Date, endDate: Date) => {
