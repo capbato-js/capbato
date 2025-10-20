@@ -2,6 +2,7 @@ import React from 'react';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardNavigation } from '../hooks/useDashboardNavigation';
 import { useWeeklyAppointmentData } from '../hooks/useWeeklyAppointmentData';
+import { useTopLabTestsData } from '../hooks/useTopLabTestsData';
 import { useAuthStore } from '../../../../infrastructure/state/AuthStore';
 import { DashboardPagePresenter } from './DashboardPagePresenter';
 
@@ -20,6 +21,18 @@ export const DashboardPageContainer: React.FC = () => {
     handleCustomDateChange,
     handleRefresh,
   } = useWeeklyAppointmentData();
+
+  const {
+    topLabTests,
+    isLoading: isTopLabTestsLoading,
+    timeRange: topLabTestsTimeRange,
+    customStartDate: topLabTestsCustomStartDate,
+    customEndDate: topLabTestsCustomEndDate,
+    handleTimeRangeChange: handleTopLabTestsTimeRangeChange,
+    handleCustomDateChange: handleTopLabTestsCustomDateChange,
+    handleRefresh: handleTopLabTestsRefresh,
+  } = useTopLabTestsData();
+
   const user = useAuthStore((state) => state.user);
 
   // Check if user is admin
@@ -43,6 +56,14 @@ export const DashboardPageContainer: React.FC = () => {
       onGranularityChange={handleGranularityChange}
       onCustomDateChange={handleCustomDateChange}
       onRefresh={handleRefresh}
+      topLabTests={topLabTests}
+      isTopLabTestsLoading={isTopLabTestsLoading}
+      topLabTestsTimeRange={topLabTestsTimeRange}
+      topLabTestsCustomStartDate={topLabTestsCustomStartDate}
+      topLabTestsCustomEndDate={topLabTestsCustomEndDate}
+      onTopLabTestsTimeRangeChange={handleTopLabTestsTimeRangeChange}
+      onTopLabTestsCustomDateChange={handleTopLabTestsCustomDateChange}
+      onTopLabTestsRefresh={handleTopLabTestsRefresh}
     />
   );
 };

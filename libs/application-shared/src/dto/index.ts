@@ -10,6 +10,7 @@ export * from './AppointmentCommands';
 export * from './AppointmentQueries';
 export * from './DoctorCommands';
 export * from './DoctorQueries';
+export * from './LabRequestQueries';
 export * from './LaboratoryDto';
 export * from './PatientCommands';
 export * from './PatientDto';

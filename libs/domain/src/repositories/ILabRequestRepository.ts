@@ -8,6 +8,14 @@ export interface LabRequestRepositoryFilter {
   dateTo?: Date;
 }
 
+export interface TopLabTestDto {
+  testName: string;
+  testKey: string;
+  category: string;
+  count: number;
+  percentage: number;
+}
+
 export interface ILabRequestRepository {
   save(labRequest: LabRequest): Promise<LabRequest>;
   findById(id: LabRequestId): Promise<LabRequest | null>;
@@ -17,4 +25,9 @@ export interface ILabRequestRepository {
   findCompleted(): Promise<LabRequest[]>;
   update(labRequest: LabRequest): Promise<LabRequest>;
   delete(id: LabRequestId): Promise<void>;
+  getTopLabTests(query?: {
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+  }): Promise<TopLabTestDto[]>;
 }

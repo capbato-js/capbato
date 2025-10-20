@@ -8,6 +8,7 @@ import {
   LabTestListResponse,
   LaboratoryOperationResponse,
   LabTestResultResponse,
+  TopLabTestDto,
   TOKENS
 } from '@nx-starter/application-shared';
 import { IHttpClient } from '../http/IHttpClient';
@@ -239,7 +240,7 @@ export class LaboratoryApiService implements ILaboratoryApiService {
     try {
 
       const response = await this.httpClient.put(`/api/laboratory/requests/${id}/cancel`);
-      
+
       return response.data;
     } catch (error) {
       console.error('❌ Error cancelling lab request:', error);
@@ -247,6 +248,34 @@ export class LaboratoryApiService implements ILaboratoryApiService {
         success: false,
         message: this.getErrorMessage(error, 'Failed to cancel lab request')
       } as LaboratoryOperationResponse;
+    }
+  }
+
+  /**
+   * Get top requested lab tests with optional date filtering
+   */
+  async getTopLabTests(
+    startDate?: string,
+    endDate?: string,
+    limit?: number
+  ): Promise<TopLabTestDto[]> {
+    try {
+      const params = new URLSearchParams();
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+      if (limit) params.append('limit', limit.toString());
+
+      const queryString = params.toString();
+      const url = queryString
+        ? `/api/laboratory/analytics/top-tests?${queryString}`
+        : '/api/laboratory/analytics/top-tests';
+
+      const response = await this.httpClient.get<{ success: true; data: TopLabTestDto[] }>(url);
+
+      return response.data.data;
+    } catch (error) {
+      console.error('❌ Error fetching top lab tests:', error);
+      return [];
     }
   }
 }

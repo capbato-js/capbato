@@ -146,6 +146,7 @@ export const TOKENS = {
   GetBloodChemistryByIdQueryHandler: 'GetBloodChemistryByIdQueryHandler',
   GetBloodChemistryByPatientIdQueryHandler: 'GetBloodChemistryByPatientIdQueryHandler',
   GetBloodChemistryByPatientNameQueryHandler: 'GetBloodChemistryByPatientNameQueryHandler',
+  GetTopLabTestsQueryHandler: 'GetTopLabTestsQueryHandler',
   GetAllProvincesQueryHandler: 'GetAllProvincesQueryHandler',
   GetCitiesByProvinceCodeQueryHandler: 'GetCitiesByProvinceCodeQueryHandler',
   GetBarangaysByCityCodeQueryHandler: 'GetBarangaysByCityCodeQueryHandler',

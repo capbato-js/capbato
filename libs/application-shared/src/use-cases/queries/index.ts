@@ -40,6 +40,7 @@ export * from './GetLabTestResultByIdQueryHandler';
 export * from './GetLabTestResultByLabRequestIdQueryHandler';
 export * from './GetAllLabTestResultsQueryHandler';
 export * from './GetBloodChemistryByPatientIdQueryHandler';
+export * from './GetTopLabTestsQueryHandler';
 export * from './PrescriptionQueryHandlers';
 export * from './TransactionQueryHandlers';
 export * from './GetAllScheduleOverridesQueryHandler';

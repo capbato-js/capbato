@@ -8,6 +8,7 @@ import {
   Param,
   Body,
   HttpCode,
+  QueryParams,
 } from 'routing-controllers';
 import {
   CreateLabRequestUseCase,
@@ -49,6 +50,7 @@ import {
   GetLabTestResultByLabRequestIdQueryHandler,
   GetAllLabTestResultsQueryHandler,
   GetBloodChemistryByPatientIdQueryHandler,
+  GetTopLabTestsQueryHandler,
   LaboratoryMapper,
   TOKENS,
   LaboratoryValidationService,
@@ -76,6 +78,8 @@ import {
   UpdateFecalysisResultCommand,
   CreateSerologyResultCommand,
   UpdateSerologyResultCommand,
+  TopLabTestsResponse,
+  GetTopLabTestsQuery,
 } from '@nx-starter/application-shared';
 import { ApiResponseBuilder, ApiSuccessResponse } from '../dto/ApiResponse';
 
@@ -171,7 +175,10 @@ export class LaboratoryController {
     private deleteLabTestResultUseCase: DeleteLabTestResultUseCase,
     // Blood Chemistry Query Handler
     @inject(TOKENS.GetBloodChemistryByPatientIdQueryHandler)
-    private getBloodChemistryByPatientIdQueryHandler: GetBloodChemistryByPatientIdQueryHandler
+    private getBloodChemistryByPatientIdQueryHandler: GetBloodChemistryByPatientIdQueryHandler,
+    // Analytics Query Handler
+    @inject(TOKENS.GetTopLabTestsQueryHandler)
+    private getTopLabTestsQueryHandler: GetTopLabTestsQueryHandler
   ) {}
 
   /**
@@ -247,6 +254,16 @@ export class LaboratoryController {
     const bloodChemistryDtos = LaboratoryMapper.toBloodChemistryDtoArray(bloodChemistryResults);
 
     return ApiResponseBuilder.success(bloodChemistryDtos);
+  }
+
+  /**
+   * GET /api/laboratory/analytics/top-tests - Get top requested lab tests
+   */
+  @Get('/analytics/top-tests')
+  async getTopLabTests(@QueryParams() query: GetTopLabTestsQuery): Promise<TopLabTestsResponse> {
+    const topTests = await this.getTopLabTestsQueryHandler.execute(query);
+
+    return ApiResponseBuilder.success(topTests);
   }
 
   /**

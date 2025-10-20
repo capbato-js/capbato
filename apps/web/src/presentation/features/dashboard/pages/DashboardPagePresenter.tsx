@@ -5,8 +5,8 @@ import { DashboardAppointmentsTable } from '../../../components/common';
 import { useMantineTheme } from '@mantine/core';
 import { getDashboardStatsCards, DashboardStats } from '../config/dashboardConfig';
 import { getDashboardStyles } from '../utils/dashboardStyles';
-import { WeeklyAppointmentTrendsChart, type TimeRange, type Granularity } from '../components';
-import { WeeklyAppointmentSummaryDto } from '@nx-starter/application-shared';
+import { WeeklyAppointmentTrendsChart, TopLabTestsChart, type TimeRange, type Granularity } from '../components';
+import { WeeklyAppointmentSummaryDto, TopLabTestDto } from '@nx-starter/application-shared';
 
 interface DashboardPagePresenterProps {
   stats: DashboardStats;
@@ -25,6 +25,14 @@ interface DashboardPagePresenterProps {
   onGranularityChange: (granularity: Granularity) => void;
   onCustomDateChange: (startDate: Date, endDate: Date) => void;
   onRefresh: () => void;
+  topLabTests: TopLabTestDto[];
+  isTopLabTestsLoading: boolean;
+  topLabTestsTimeRange: TimeRange;
+  topLabTestsCustomStartDate?: Date;
+  topLabTestsCustomEndDate?: Date;
+  onTopLabTestsTimeRangeChange: (range: TimeRange) => void;
+  onTopLabTestsCustomDateChange: (startDate: Date, endDate: Date) => void;
+  onTopLabTestsRefresh: () => void;
 }
 
 export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
@@ -44,6 +52,14 @@ export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
   onGranularityChange,
   onCustomDateChange,
   onRefresh,
+  topLabTests,
+  isTopLabTestsLoading,
+  topLabTestsTimeRange,
+  topLabTestsCustomStartDate,
+  topLabTestsCustomEndDate,
+  onTopLabTestsTimeRangeChange,
+  onTopLabTestsCustomDateChange,
+  onTopLabTestsRefresh,
 }) => {
   const theme = useMantineTheme();
   const styles = getDashboardStyles(theme);
@@ -105,6 +121,26 @@ export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
               onGranularityChange={onGranularityChange}
               onCustomDateChange={onCustomDateChange}
               onRefresh={onRefresh}
+            />
+          </Box>
+
+          {/* Top Lab Tests Section */}
+          <Box style={{ ...styles.headerContainer, marginTop: '2rem' }}>
+            <Title order={2} style={styles.headerTitle}>
+              Most Requested Lab Tests
+            </Title>
+          </Box>
+
+          <Box style={{ marginBottom: '2rem', marginTop: '1rem' }}>
+            <TopLabTestsChart
+              data={topLabTests}
+              isLoading={isTopLabTestsLoading}
+              timeRange={topLabTestsTimeRange}
+              customStartDate={topLabTestsCustomStartDate}
+              customEndDate={topLabTestsCustomEndDate}
+              onTimeRangeChange={onTopLabTestsTimeRangeChange}
+              onCustomDateChange={onTopLabTestsCustomDateChange}
+              onRefresh={onTopLabTestsRefresh}
             />
           </Box>
         </>
