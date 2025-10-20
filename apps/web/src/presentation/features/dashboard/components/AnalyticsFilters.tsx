@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Group, Button, Select, Modal } from '@mantine/core';
+import { Group, Button, Select, Modal, Stack } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { IconRefresh, IconCalendar } from '@tabler/icons-react';
+import dayjs from 'dayjs';
 
 export type TimeRange = '1d' | '3d' | '1w' | '1m' | '3m' | '6m' | '1y' | 'custom';
 
@@ -29,18 +30,34 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
   onGranularityChange,
 }) => {
   const [customDateModalOpened, setCustomDateModalOpened] = useState(false);
-  const [tempStartDate, setTempStartDate] = useState<Date | null>(customStartDate || null);
-  const [tempEndDate, setTempEndDate] = useState<Date | null>(customEndDate || null);
+  const [tempStartDate, setTempStartDate] = useState<Date | null>(customStartDate || dayjs().subtract(3, 'months').toDate());
+  const [tempEndDate, setTempEndDate] = useState<Date | null>(customEndDate || new Date());
 
-  const timeRangeOptions = [
-    { value: '1d', label: 'Last 24 hours' },
-    { value: '3d', label: 'Last 3 days' },
-    { value: '1w', label: 'Last week' },
-    { value: '1m', label: 'Last month' },
-    { value: '3m', label: 'Last 3 months' },
-    { value: '6m', label: 'Last 6 months' },
-    { value: '1y', label: 'Last year' },
-    { value: 'custom', label: 'Custom range' },
+  const handleTimeRangeClick = (range: TimeRange) => {
+    if (range === 'custom') {
+      setCustomDateModalOpened(true);
+    } else {
+      onTimeRangeChange(range);
+    }
+  };
+
+  const handleApplyCustomDates = () => {
+    if (tempStartDate && tempEndDate) {
+      onCustomDateChange(tempStartDate, tempEndDate);
+      onTimeRangeChange('custom');
+      setCustomDateModalOpened(false);
+    }
+  };
+
+  const timeRangeButtons: { value: TimeRange; label: string }[] = [
+    { value: '1d', label: '1d' },
+    { value: '3d', label: '3d' },
+    { value: '1w', label: '1w' },
+    { value: '1m', label: '1m' },
+    { value: '3m', label: '3m' },
+    { value: '6m', label: '6m' },
+    { value: '1y', label: '1y' },
+    { value: 'custom', label: 'Custom' },
   ];
 
   const granularityOptions = [
@@ -49,79 +66,87 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
     { value: 'monthly', label: 'Monthly' },
   ];
 
-  const handleTimeRangeChange = (value: string | null) => {
-    if (value === 'custom') {
-      setCustomDateModalOpened(true);
-    }
-    if (value) {
-      onTimeRangeChange(value as TimeRange);
-    }
-  };
-
-  const handleApplyCustomDates = () => {
-    if (tempStartDate && tempEndDate) {
-      onCustomDateChange(tempStartDate, tempEndDate);
-      setCustomDateModalOpened(false);
-    }
-  };
-
   return (
     <>
-      <Box mb="md">
-        <Group justify="space-between">
-          <Group>
-            <Select
-              value={timeRange}
-              onChange={handleTimeRangeChange}
-              data={timeRangeOptions}
-              style={{ width: 200 }}
-            />
+      <Group justify="space-between" mb="md">
+        <Group gap="xs">
+          {timeRangeButtons.map((btn) => (
+            <Button
+              key={btn.value}
+              size="sm"
+              variant={timeRange === btn.value ? 'filled' : 'light'}
+              onClick={() => handleTimeRangeClick(btn.value)}
+              leftSection={btn.value === 'custom' ? <IconCalendar size={16} /> : undefined}
+            >
+              {btn.label}
+            </Button>
+          ))}
+        </Group>
 
-            {showGranularity && granularity && onGranularityChange && (
-              <Select
-                value={granularity}
-                onChange={(value) => onGranularityChange(value as 'daily' | 'weekly' | 'monthly')}
-                data={granularityOptions}
-                style={{ width: 150 }}
-              />
-            )}
-          </Group>
+        <Group gap="md">
+          {showGranularity && granularity && onGranularityChange && (
+            <Select
+              label="Granularity"
+              value={granularity}
+              onChange={(value) => {
+                if (value) onGranularityChange(value as 'daily' | 'weekly' | 'monthly');
+              }}
+              data={granularityOptions}
+              size="sm"
+              style={{ width: 120 }}
+              comboboxProps={{
+                withinPortal: true,
+                position: 'bottom-start'
+              }}
+            />
+          )}
 
           <Button
-            leftSection={<IconRefresh size={16} />}
-            onClick={onRefresh}
+            size="sm"
             variant="light"
+            onClick={onRefresh}
+            leftSection={<IconRefresh size={16} />}
+            mt={showGranularity ? 20 : 0}
           >
             Refresh
           </Button>
         </Group>
-      </Box>
+      </Group>
 
+      {/* Custom Date Range Modal */}
       <Modal
         opened={customDateModalOpened}
         onClose={() => setCustomDateModalOpened(false)}
         title="Select Custom Date Range"
+        size="md"
       >
-        <DatePickerInput
-          label="Start Date"
-          value={tempStartDate}
-          onChange={setTempStartDate}
-          mb="md"
-        />
-        <DatePickerInput
-          label="End Date"
-          value={tempEndDate}
-          onChange={setTempEndDate}
-          mb="md"
-        />
-        <Group justify="flex-end">
-          <Button variant="subtle" onClick={() => setCustomDateModalOpened(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleApplyCustomDates} disabled={!tempStartDate || !tempEndDate}>
-            Apply
-          </Button>
-        </Group>
+        <Stack gap="md">
+          <DatePickerInput
+            label="Start Date"
+            placeholder="Pick start date"
+            value={tempStartDate}
+            onChange={(value: Date | null) => setTempStartDate(value)}
+            maxDate={tempEndDate || undefined}
+          />
+
+          <DatePickerInput
+            label="End Date"
+            placeholder="Pick end date"
+            value={tempEndDate}
+            onChange={(value: Date | null) => setTempEndDate(value)}
+            minDate={tempStartDate || undefined}
+            maxDate={new Date()}
+          />
+
+          <Group justify="flex-end" gap="sm">
+            <Button variant="light" onClick={() => setCustomDateModalOpened(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleApplyCustomDates} disabled={!tempStartDate || !tempEndDate}>
+              Apply
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
     </>
   );
