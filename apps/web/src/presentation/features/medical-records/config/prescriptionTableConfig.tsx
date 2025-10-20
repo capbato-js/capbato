@@ -1,4 +1,3 @@
-import React from 'react';
 import { TableColumn, TableActions } from '../../../components/common/DataTable';
 import { Prescription } from '../types';
 import { DisplayPrescription } from '../hooks/usePrescriptionData';
@@ -48,26 +47,39 @@ export const getPrescriptionTableColumns = (): TableColumn<Prescription>[] => [
   }
 ];
 
-export const getPrescriptionTableActions = (handlers: {
-  onView: (prescription: DisplayPrescription) => void;
-  onEdit: (prescription: DisplayPrescription) => void;
-  onDelete: (prescription: DisplayPrescription) => void;
-}): TableActions<DisplayPrescription> => ({
-  buttons: [
+export const getPrescriptionTableActions = (
+  handlers: {
+    onView: (prescription: DisplayPrescription) => void;
+    onEdit: (prescription: DisplayPrescription) => void;
+    onDelete: (prescription: DisplayPrescription) => void;
+  },
+  permissions: {
+    canCreatePrescriptions?: boolean;
+  } = {}
+): TableActions<DisplayPrescription> => {
+  const buttons = [
     {
       icon: 'fas fa-eye',
       tooltip: 'View Prescription Details',
       onClick: handlers.onView
-    },
-    {
-      icon: 'fas fa-edit',
-      tooltip: 'Update Prescription',
-      onClick: handlers.onEdit
-    },
-    {
-      icon: 'fas fa-trash',
-      tooltip: 'Delete Prescription',
-      onClick: handlers.onDelete
     }
-  ]
-});
+  ];
+
+  // Only add edit and delete actions if user has prescription creation permissions
+  if (permissions.canCreatePrescriptions) {
+    buttons.push(
+      {
+        icon: 'fas fa-edit',
+        tooltip: 'Update Prescription',
+        onClick: handlers.onEdit
+      },
+      {
+        icon: 'fas fa-trash',
+        tooltip: 'Delete Prescription',
+        onClick: handlers.onDelete
+      }
+    );
+  }
+
+  return { buttons };
+};

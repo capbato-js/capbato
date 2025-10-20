@@ -14,6 +14,9 @@ interface PrescriptionsPagePresenterProps {
   isLoading: boolean;
   error: string | null;
   
+  // Permissions
+  canCreatePrescriptions: boolean;
+  
   // Modal state
   addModalOpen: boolean;
   editModalOpen: boolean;
@@ -43,6 +46,7 @@ export const PrescriptionsPagePresenter: React.FC<PrescriptionsPagePresenterProp
   displayPrescriptions,
   isLoading,
   error,
+  canCreatePrescriptions,
   addModalOpen,
   editModalOpen,
   viewModalOpen,
@@ -65,13 +69,15 @@ export const PrescriptionsPagePresenter: React.FC<PrescriptionsPagePresenterProp
     onView: onViewPrescription,
     onEdit: onEditPrescription,
     onDelete: onDeletePrescription,
+  }, { 
+    canCreatePrescriptions 
   });
 
   return (
     <MedicalClinicLayout>
       <DataTableHeader 
         title="Prescriptions"
-        onAddItem={onAddPrescription}
+        onAddItem={canCreatePrescriptions ? onAddPrescription : undefined}
         addButtonText="Add Prescription"
         addButtonIcon="fas fa-pills"
       />

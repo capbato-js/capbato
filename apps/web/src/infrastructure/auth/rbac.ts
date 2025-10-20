@@ -100,6 +100,14 @@ export const canManageAccounts = (userRole: string): boolean => {
 };
 
 /**
+ * Check if user can create prescriptions (admin and doctor only)
+ * Receptionists can view prescriptions but cannot create, edit, or delete them
+ */
+export const canCreatePrescriptions = (userRole: string): boolean => {
+  return isAdmin(userRole) || isDoctor(userRole);
+};
+
+/**
  * Get filtered navigation items based on user role
  */
 export const getFilteredNavigationItems = (userRole: string) => {
@@ -127,6 +135,7 @@ export const permissions = {
     canManageAccounts: canManageAccounts,
     canManagePatients: canManagePatients,
     hasAdminPrivileges: hasAdminPrivileges,
+    canCreatePrescriptions: canCreatePrescriptions,
   },
   
   roles: {

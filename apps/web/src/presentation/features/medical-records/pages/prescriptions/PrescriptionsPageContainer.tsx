@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { usePrescriptionData } from '../../hooks/usePrescriptionData';
 import { usePrescriptionModalState } from '../../hooks/usePrescriptionModalState';
 import { usePrescriptionActions } from '../../hooks/usePrescriptionActions';
+import { usePermissions } from '../../../../../infrastructure/auth/useRBAC';
 import { PrescriptionsPagePresenter } from './PrescriptionsPagePresenter';
 import { useOverflowHidden } from '../../../../hooks/useOverflowHidden';
 
 export const PrescriptionsPageContainer: React.FC = () => {
   const { displayPrescriptions, prescriptionListViewModel, isLoading, error } = usePrescriptionData();
   const modalState = usePrescriptionModalState();
+  const { canCreatePrescriptions } = usePermissions();
   
   const actions = usePrescriptionActions(
     prescriptionListViewModel.filteredPrescriptions,
@@ -34,6 +36,9 @@ export const PrescriptionsPageContainer: React.FC = () => {
       displayPrescriptions={displayPrescriptions}
       isLoading={isLoading}
       error={error}
+      
+      // Permissions
+      canCreatePrescriptions={canCreatePrescriptions}
       
       // Modal state
       addModalOpen={modalState.addModalOpen}

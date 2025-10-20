@@ -3,6 +3,7 @@ import { Box, Text, Alert, Skeleton, useMantineTheme } from '@mantine/core';
 import { usePatientPrescriptions } from '../../view-models';
 import { PrescriptionsTable } from '../../components';
 import { usePrescriptionStore } from '../../../../../infrastructure/state/PrescriptionStore';
+import { usePermissions } from '../../../../../infrastructure/auth/useRBAC';
 import { usePrescriptionModalState } from '../../../medical-records/hooks/usePrescriptionModalState';
 import { AddPrescriptionModal, ViewPrescriptionModal, DeletePrescriptionModal } from '../../../medical-records/components';
 import { Prescription } from '@nx-starter/domain';
@@ -15,6 +16,7 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
   const theme = useMantineTheme();
   const { prescriptions, isLoading, error } = usePatientPrescriptions(patientId);
   const prescriptionStore = usePrescriptionStore();
+  const { canCreatePrescriptions } = usePermissions();
   const modalState = usePrescriptionModalState();
 
   // Get domain prescriptions from the store
@@ -106,18 +108,20 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
       <PrescriptionsTable
         prescriptions={prescriptions}
         onViewPrescription={handleViewPrescription}
-        onEditPrescription={handleEditPrescription}
-        onDeletePrescription={handleDeletePrescription}
+        onEditPrescription={canCreatePrescriptions ? handleEditPrescription : undefined}
+        onDeletePrescription={canCreatePrescriptions ? handleDeletePrescription : undefined}
       />
 
-      {/* Edit Modal */}
-      <AddPrescriptionModal
-        opened={modalState.editModalOpen}
-        onClose={modalState.closeEditModal}
-        editMode={true}
-        prescription={modalState.selectedPrescription}
-        onPrescriptionUpdated={handlePrescriptionUpdated}
-      />
+      {/* Edit Modal - Only show for users who can create prescriptions */}
+      {canCreatePrescriptions && (
+        <AddPrescriptionModal
+          opened={modalState.editModalOpen}
+          onClose={modalState.closeEditModal}
+          editMode={true}
+          prescription={modalState.selectedPrescription}
+          onPrescriptionUpdated={handlePrescriptionUpdated}
+        />
+      )}
 
       {/* View Modal */}
       <ViewPrescriptionModal
@@ -126,14 +130,15 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
         prescription={modalState.selectedPrescription}
       />
 
-      {/* Delete/Discontinue Modal */}
-      <DeletePrescriptionModal
-        opened={modalState.deleteModalOpen}
-        onClose={modalState.closeDeleteModal}
-        prescription={modalState.selectedPrescription}
-        onConfirm={handleConfirmDelete}
-        isLoading={isLoading}
-      />
+      {/* Delete/Discontinue Modal - Only show for users who can create prescriptions */}
+      {canCreatePrescriptions && (
+        <DeletePrescriptionModal
+          opened={modalState.deleteModalOpen}
+          onClose={modalState.closeDeleteModal}
+          prescription={modalState.selectedPrescription}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
     </Box>
   );
 };

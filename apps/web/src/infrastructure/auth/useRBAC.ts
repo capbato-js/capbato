@@ -77,6 +77,9 @@ export const usePermissions = () => {
     // Account management permissions
     canManageAccounts: canManageAccounts(userRole),
     
+    // Prescription permissions
+    canCreatePrescriptions: permissions.features.canCreatePrescriptions(userRole),
+    
     // General permissions
     hasAdminPrivileges: permissions.features.hasAdminPrivileges(userRole),
     canManagePatients: permissions.features.canManagePatients(userRole),
