@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import { Appointment } from '@nx-starter/domain';
-import type { IAppointmentRepository } from '@nx-starter/domain';
+import type { IAppointmentRepository, TopVisitReasonDto } from '@nx-starter/domain';
 import { generateId } from '@nx-starter/utils-core';
 
 /**
@@ -211,8 +211,54 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
       });
 
     // Find first active appointment (exclude completed and cancelled appointments)
-    return allAppointments.find(appointment => 
+    return allAppointments.find(appointment =>
       !appointment.isCompleted() && !appointment.isCancelled()
     );
+  }
+
+  async getTopVisitReasons(query?: {
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+  }): Promise<TopVisitReasonDto[]> {
+    let appointments = Array.from(this.appointments.values());
+
+    // Filter by date range if provided
+    if (query?.startDate && query?.endDate) {
+      const startDate = new Date(query.startDate);
+      const endDate = new Date(query.endDate);
+      appointments = appointments.filter(
+        (appointment) =>
+          appointment.appointmentDate >= startDate &&
+          appointment.appointmentDate <= endDate
+      );
+    }
+
+    // Only count non-cancelled appointments
+    appointments = appointments.filter(
+      (appointment) => appointment.statusValue !== 'cancelled'
+    );
+
+    // Count occurrences of each reason
+    const reasonCounts = new Map<string, number>();
+    appointments.forEach((appointment) => {
+      const reason = appointment.reasonForVisit;
+      reasonCounts.set(reason, (reasonCounts.get(reason) || 0) + 1);
+    });
+
+    // Calculate total for percentage
+    const totalAppointments = appointments.length;
+
+    // Convert to DTOs and sort by count
+    const topReasons: TopVisitReasonDto[] = Array.from(reasonCounts.entries())
+      .map(([reason, count]) => ({
+        reason,
+        count,
+        percentage: totalAppointments > 0 ? Number(((count / totalAppointments) * 100).toFixed(1)) : 0,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, query?.limit || 10);
+
+    return topReasons;
   }
 }

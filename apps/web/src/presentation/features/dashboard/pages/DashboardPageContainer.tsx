@@ -3,6 +3,7 @@ import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardNavigation } from '../hooks/useDashboardNavigation';
 import { useWeeklyAppointmentData } from '../hooks/useWeeklyAppointmentData';
 import { useTopLabTestsData } from '../hooks/useTopLabTestsData';
+import { useTopVisitReasonsData } from '../hooks/useTopVisitReasonsData';
 import { useAuthStore } from '../../../../infrastructure/state/AuthStore';
 import { DashboardPagePresenter } from './DashboardPagePresenter';
 
@@ -32,6 +33,17 @@ export const DashboardPageContainer: React.FC = () => {
     handleCustomDateChange: handleTopLabTestsCustomDateChange,
     handleRefresh: handleTopLabTestsRefresh,
   } = useTopLabTestsData();
+
+  const {
+    topVisitReasons,
+    isLoading: isTopVisitReasonsLoading,
+    timeRange: topVisitReasonsTimeRange,
+    customStartDate: topVisitReasonsCustomStartDate,
+    customEndDate: topVisitReasonsCustomEndDate,
+    handleTimeRangeChange: handleTopVisitReasonsTimeRangeChange,
+    handleCustomDateChange: handleTopVisitReasonsCustomDateChange,
+    handleRefresh: handleTopVisitReasonsRefresh,
+  } = useTopVisitReasonsData();
 
   const user = useAuthStore((state) => state.user);
 
@@ -64,6 +76,14 @@ export const DashboardPageContainer: React.FC = () => {
       onTopLabTestsTimeRangeChange={handleTopLabTestsTimeRangeChange}
       onTopLabTestsCustomDateChange={handleTopLabTestsCustomDateChange}
       onTopLabTestsRefresh={handleTopLabTestsRefresh}
+      topVisitReasons={topVisitReasons}
+      isTopVisitReasonsLoading={isTopVisitReasonsLoading}
+      topVisitReasonsTimeRange={topVisitReasonsTimeRange}
+      topVisitReasonsCustomStartDate={topVisitReasonsCustomStartDate}
+      topVisitReasonsCustomEndDate={topVisitReasonsCustomEndDate}
+      onTopVisitReasonsTimeRangeChange={handleTopVisitReasonsTimeRangeChange}
+      onTopVisitReasonsCustomDateChange={handleTopVisitReasonsCustomDateChange}
+      onTopVisitReasonsRefresh={handleTopVisitReasonsRefresh}
     />
   );
 };

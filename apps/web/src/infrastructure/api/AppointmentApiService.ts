@@ -1,7 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import { IHttpClient } from '../http/IHttpClient';
 import { getApiConfig } from './config/ApiConfig';
-import { AppointmentDto, TOKENS } from '@nx-starter/application-shared';
+import { AppointmentDto, TopVisitReasonDto, TOKENS } from '@nx-starter/application-shared';
 
 /**
  * API service for appointment HTTP communications
@@ -246,5 +246,33 @@ export class AppointmentApiService {
     }
 
     return response.data.data;
+  }
+
+  /**
+   * Get top visit reasons with optional date filtering
+   */
+  async getTopVisitReasons(
+    startDate?: string,
+    endDate?: string,
+    limit?: number
+  ): Promise<TopVisitReasonDto[]> {
+    try {
+      const params = new URLSearchParams();
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+      if (limit) params.append('limit', limit.toString());
+
+      const queryString = params.toString();
+      const url = queryString
+        ? `/api/appointments/analytics/top-visit-reasons?${queryString}`
+        : '/api/appointments/analytics/top-visit-reasons';
+
+      const response = await this.httpClient.get<{ success: true; data: TopVisitReasonDto[] }>(url);
+
+      return response.data.data;
+    } catch (error) {
+      console.error('❌ Error fetching top visit reasons:', error);
+      return [];
+    }
   }
 }

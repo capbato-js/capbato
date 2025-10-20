@@ -18,6 +18,7 @@ export * from './GetConfirmedAppointmentsQueryHandler';
 export * from './GetAppointmentsByDateQueryHandler';
 export * from './GetAppointmentsByDateRangeQueryHandler';
 export * from './GetWeeklyAppointmentSummaryQueryHandler';
+export * from './GetTopVisitReasonsQueryHandler';
 export * from './GetAppointmentStatsQueryHandler';
 export * from './GetCurrentPatientAppointmentQueryHandler';
 export * from './GetAllLabRequestsQueryHandler';

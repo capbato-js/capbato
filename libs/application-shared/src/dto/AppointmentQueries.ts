@@ -90,6 +90,18 @@ export interface WeeklyAppointmentSummaryDto {
   cancelledCount: number;
 }
 
+export interface TopVisitReasonDto {
+  reason: string;       // Reason for visit
+  count: number;        // Number of appointments
+  percentage: number;   // Percentage of total appointments
+}
+
+export interface GetTopVisitReasonsQuery {
+  startDate?: string;   // ISO date string (YYYY-MM-DD)
+  endDate?: string;     // ISO date string (YYYY-MM-DD)
+  limit?: number;       // Number of top reasons to return (default: 10)
+}
+
 // API Response types (following TodoController pattern from ApiResponse.ts)
 export interface AppointmentResponse {
   success: true;
@@ -114,4 +126,9 @@ export interface AppointmentOperationResponse {
 export interface WeeklyAppointmentSummaryResponse {
   success: true;
   data: WeeklyAppointmentSummaryDto[];
+}
+
+export interface TopVisitReasonsResponse {
+  success: true;
+  data: TopVisitReasonDto[];
 }

@@ -26,6 +26,7 @@ import {
   GetTodayConfirmedAppointmentsQueryHandler,
   GetConfirmedAppointmentsQueryHandler,
   GetWeeklyAppointmentSummaryQueryHandler,
+  GetTopVisitReasonsQueryHandler,
   GetAppointmentStatsQueryHandler,
   GetPatientByIdQueryHandler,
   GetDoctorByIdQueryHandler,
@@ -40,6 +41,7 @@ import {
   AppointmentStatsResponse,
   AppointmentOperationResponse,
   WeeklyAppointmentSummaryResponse,
+  TopVisitReasonsResponse,
   CreateAppointmentRequestDto,
   UpdateAppointmentRequestDto,
   RescheduleAppointmentRequestDto,
@@ -82,6 +84,8 @@ export class AppointmentController {
     private getConfirmedAppointmentsQueryHandler: GetConfirmedAppointmentsQueryHandler,
     @inject(TOKENS.GetWeeklyAppointmentSummaryQueryHandler)
     private getWeeklyAppointmentSummaryQueryHandler: GetWeeklyAppointmentSummaryQueryHandler,
+    @inject(TOKENS.GetTopVisitReasonsQueryHandler)
+    private getTopVisitReasonsQueryHandler: GetTopVisitReasonsQueryHandler,
     @inject(TOKENS.GetAppointmentStatsQueryHandler)
     private getAppointmentStatsQueryHandler: GetAppointmentStatsQueryHandler,
     @inject(TOKENS.GetPatientByIdQueryHandler)
@@ -172,6 +176,27 @@ export class AppointmentController {
     });
 
     return ApiResponseBuilder.success(summary);
+  }
+
+  /**
+   * GET /api/appointments/analytics/top-visit-reasons - Get top visit reasons with flexible date range
+   * @param startDate - ISO date string for range start (optional)
+   * @param endDate - ISO date string for range end (optional)
+   * @param limit - Number of top reasons to return (optional, defaults to 10)
+   */
+  @Get('/analytics/top-visit-reasons')
+  async getTopVisitReasons(
+    @QueryParam('startDate') startDate?: string,
+    @QueryParam('endDate') endDate?: string,
+    @QueryParam('limit') limit?: number
+  ): Promise<TopVisitReasonsResponse> {
+    const topReasons = await this.getTopVisitReasonsQueryHandler.execute({
+      startDate,
+      endDate,
+      limit
+    });
+
+    return ApiResponseBuilder.success(topReasons);
   }
 
   /**

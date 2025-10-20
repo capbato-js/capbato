@@ -166,6 +166,7 @@ export const TOKENS = {
   GetAppointmentsByDateQueryHandler: 'GetAppointmentsByDateQueryHandler',
   GetAppointmentsByDateRangeQueryHandler: 'GetAppointmentsByDateRangeQueryHandler',
   GetWeeklyAppointmentSummaryQueryHandler: 'GetWeeklyAppointmentSummaryQueryHandler',
+  GetTopVisitReasonsQueryHandler: 'GetTopVisitReasonsQueryHandler',
   GetAppointmentStatsQueryHandler: 'GetAppointmentStatsQueryHandler',
   GetCurrentPatientAppointmentQueryHandler: 'GetCurrentPatientAppointmentQueryHandler',
 

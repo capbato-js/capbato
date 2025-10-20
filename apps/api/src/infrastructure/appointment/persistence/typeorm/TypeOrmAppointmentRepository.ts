@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { Repository, DataSource, Between } from 'typeorm';
 import { Appointment, type AppointmentSummaryQuery } from '@nx-starter/domain';
-import type { IAppointmentRepository } from '@nx-starter/domain';
+import type { IAppointmentRepository, TopVisitReasonDto } from '@nx-starter/domain';
 import { AppointmentMapper } from '@nx-starter/application-shared';
 import { NameFormattingService } from '@nx-starter/domain';
 import { AppointmentEntity } from './AppointmentEntity';
@@ -413,6 +413,44 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
       totalCount: parseInt(row.totalCount, 10),
       completedCount: parseInt(row.completedCount, 10),
       cancelledCount: parseInt(row.cancelledCount, 10),
+    }));
+  }
+
+  async getTopVisitReasons(query?: {
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+  }): Promise<TopVisitReasonDto[]> {
+    const qb = this.repository.createQueryBuilder('appointment');
+
+    // Apply date filters if provided
+    if (query?.startDate && query?.endDate) {
+      qb.where('appointment.appointment_date BETWEEN :startDate AND :endDate', {
+        startDate: query.startDate,
+        endDate: query.endDate,
+      });
+    }
+
+    // Only count non-cancelled appointments
+    qb.andWhere('appointment.status != :status', { status: 'cancelled' });
+
+    // Group by reason and get counts
+    const result = await qb
+      .select('appointment.reason_for_visit', 'reason')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('appointment.reason_for_visit')
+      .orderBy('count', 'DESC')
+      .limit(query?.limit || 10)
+      .getRawMany();
+
+    // Calculate total for percentages
+    const totalCount = result.reduce((sum, row) => sum + parseInt(row.count, 10), 0);
+
+    // Map to DTOs with percentage calculation
+    return result.map(row => ({
+      reason: row.reason,
+      count: parseInt(row.count, 10),
+      percentage: totalCount > 0 ? Number(((parseInt(row.count, 10) / totalCount) * 100).toFixed(1)) : 0,
     }));
   }
 

@@ -213,6 +213,7 @@ import {
   GetTodayConfirmedAppointmentsQueryHandler,
   GetConfirmedAppointmentsQueryHandler,
   GetWeeklyAppointmentSummaryQueryHandler,
+  GetTopVisitReasonsQueryHandler,
   GetAppointmentStatsQueryHandler,
   GetCurrentPatientAppointmentQueryHandler,
   AppointmentValidationService,
@@ -554,6 +555,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.GetTodayConfirmedAppointmentsQueryHandler, GetTodayConfirmedAppointmentsQueryHandler);
   container.registerSingleton(TOKENS.GetConfirmedAppointmentsQueryHandler, GetConfirmedAppointmentsQueryHandler);
   container.registerSingleton(TOKENS.GetWeeklyAppointmentSummaryQueryHandler, GetWeeklyAppointmentSummaryQueryHandler);
+  container.registerSingleton(TOKENS.GetTopVisitReasonsQueryHandler, GetTopVisitReasonsQueryHandler);
   container.registerSingleton(TOKENS.GetAppointmentStatsQueryHandler, GetAppointmentStatsQueryHandler);
   container.registerSingleton(TOKENS.GetCurrentPatientAppointmentQueryHandler, GetCurrentPatientAppointmentQueryHandler);
 

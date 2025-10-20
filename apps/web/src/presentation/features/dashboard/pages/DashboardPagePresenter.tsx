@@ -5,8 +5,8 @@ import { DashboardAppointmentsTable } from '../../../components/common';
 import { useMantineTheme } from '@mantine/core';
 import { getDashboardStatsCards, DashboardStats } from '../config/dashboardConfig';
 import { getDashboardStyles } from '../utils/dashboardStyles';
-import { WeeklyAppointmentTrendsChart, TopLabTestsChart, type TimeRange, type Granularity } from '../components';
-import { WeeklyAppointmentSummaryDto, TopLabTestDto } from '@nx-starter/application-shared';
+import { WeeklyAppointmentTrendsChart, TopLabTestsChart, TopVisitReasonsChart, type TimeRange, type Granularity } from '../components';
+import { WeeklyAppointmentSummaryDto, TopLabTestDto, TopVisitReasonDto } from '@nx-starter/application-shared';
 
 interface DashboardPagePresenterProps {
   stats: DashboardStats;
@@ -33,6 +33,14 @@ interface DashboardPagePresenterProps {
   onTopLabTestsTimeRangeChange: (range: TimeRange) => void;
   onTopLabTestsCustomDateChange: (startDate: Date, endDate: Date) => void;
   onTopLabTestsRefresh: () => void;
+  topVisitReasons: TopVisitReasonDto[];
+  isTopVisitReasonsLoading: boolean;
+  topVisitReasonsTimeRange: TimeRange;
+  topVisitReasonsCustomStartDate?: Date;
+  topVisitReasonsCustomEndDate?: Date;
+  onTopVisitReasonsTimeRangeChange: (range: TimeRange) => void;
+  onTopVisitReasonsCustomDateChange: (startDate: Date, endDate: Date) => void;
+  onTopVisitReasonsRefresh: () => void;
 }
 
 export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
@@ -60,6 +68,14 @@ export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
   onTopLabTestsTimeRangeChange,
   onTopLabTestsCustomDateChange,
   onTopLabTestsRefresh,
+  topVisitReasons,
+  isTopVisitReasonsLoading,
+  topVisitReasonsTimeRange,
+  topVisitReasonsCustomStartDate,
+  topVisitReasonsCustomEndDate,
+  onTopVisitReasonsTimeRangeChange,
+  onTopVisitReasonsCustomDateChange,
+  onTopVisitReasonsRefresh,
 }) => {
   const theme = useMantineTheme();
   const styles = getDashboardStyles(theme);
@@ -141,6 +157,26 @@ export const DashboardPagePresenter: React.FC<DashboardPagePresenterProps> = ({
               onTimeRangeChange={onTopLabTestsTimeRangeChange}
               onCustomDateChange={onTopLabTestsCustomDateChange}
               onRefresh={onTopLabTestsRefresh}
+            />
+          </Box>
+
+          {/* Most Common Visit Reasons Section */}
+          <Box style={{ ...styles.headerContainer, marginTop: '2rem' }}>
+            <Title order={2} style={styles.headerTitle}>
+              Most Common Visit Reasons
+            </Title>
+          </Box>
+
+          <Box style={{ marginBottom: '2rem', marginTop: '1rem' }}>
+            <TopVisitReasonsChart
+              data={topVisitReasons}
+              isLoading={isTopVisitReasonsLoading}
+              timeRange={topVisitReasonsTimeRange}
+              customStartDate={topVisitReasonsCustomStartDate}
+              customEndDate={topVisitReasonsCustomEndDate}
+              onTimeRangeChange={onTopVisitReasonsTimeRangeChange}
+              onCustomDateChange={onTopVisitReasonsCustomDateChange}
+              onRefresh={onTopVisitReasonsRefresh}
             />
           </Box>
         </>
