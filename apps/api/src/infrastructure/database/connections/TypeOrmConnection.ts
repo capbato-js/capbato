@@ -1,17 +1,17 @@
 import { DataSource } from 'typeorm';
-import { TodoEntity } from '../../todo/persistence/typeorm/TodoEntity';
+// import { TodoEntity } from '../../todo/persistence/typeorm/TodoEntity'; // Outdated - not used in frontend
 import { UserEntity } from '../../user/persistence/typeorm/UserEntity';
 import { PatientEntity } from '../../patient/persistence/typeorm/PatientEntity';
 import { DoctorEntity } from '../../doctor/persistence/typeorm/DoctorEntity';
-import { ScheduleEntity } from '../../schedule/persistence/typeorm/ScheduleEntity';
+// import { ScheduleEntity } from '../../schedule/persistence/typeorm/ScheduleEntity'; // Outdated - not used in frontend
 import { AppointmentEntity } from '../../appointment/persistence/typeorm/AppointmentEntity';
 import { LabRequestEntity } from '../../laboratory/persistence/typeorm/LabRequestEntity';
 import { LabTestResultEntity } from '../../laboratory/persistence/typeorm/LabTestResultEntity';
-import { BloodChemistryEntity } from '../../laboratory/persistence/typeorm/BloodChemistryEntity';
-import { UrinalysisResultEntity } from '../../laboratory/persistence/typeorm/UrinalysisResultEntity';
-import { HematologyResultEntity } from '../../laboratory/persistence/typeorm/HematologyResultEntity';
-import { FecalysisResultEntity } from '../../laboratory/persistence/typeorm/FecalysisResultEntity';
-import { SerologyResultEntity } from '../../laboratory/persistence/typeorm/SerologyResultEntity';
+// import { BloodChemistryEntity } from '../../laboratory/persistence/typeorm/BloodChemistryEntity'; // Outdated - not used in frontend
+// import { UrinalysisResultEntity } from '../../laboratory/persistence/typeorm/UrinalysisResultEntity'; // Outdated - not used in frontend
+// import { HematologyResultEntity } from '../../laboratory/persistence/typeorm/HematologyResultEntity'; // Outdated - not used in frontend
+// import { FecalysisResultEntity } from '../../laboratory/persistence/typeorm/FecalysisResultEntity'; // Outdated - not used in frontend
+// import { SerologyResultEntity } from '../../laboratory/persistence/typeorm/SerologyResultEntity'; // Outdated - not used in frontend
 import { PrescriptionEntity } from '../../prescription/persistence/typeorm/PrescriptionEntity';
 import { MedicationEntity } from '../../prescription/persistence/typeorm/MedicationEntity';
 import { DoctorScheduleOverrideEntity } from '../../schedule-override/persistence/typeorm/DoctorScheduleOverrideEntity';
@@ -50,19 +50,19 @@ export const createTypeOrmDataSource = (): DataSource => {
   // Base configuration
   const baseConfig = {
     entities: [
-      TodoEntity, 
-      UserEntity, 
-      PatientEntity, 
-      DoctorEntity, 
-      ScheduleEntity, 
-      AppointmentEntity, 
+      // TodoEntity, // Outdated - not used in frontend
+      UserEntity,
+      PatientEntity,
+      DoctorEntity,
+      // ScheduleEntity, // Outdated - not used in frontend
+      AppointmentEntity,
       LabRequestEntity,
       LabTestResultEntity,
-      BloodChemistryEntity, 
-      UrinalysisResultEntity,
-      HematologyResultEntity,
-      FecalysisResultEntity,
-      SerologyResultEntity,
+      // BloodChemistryEntity, // Outdated - not used in frontend
+      // UrinalysisResultEntity, // Outdated - not used in frontend
+      // HematologyResultEntity, // Outdated - not used in frontend
+      // FecalysisResultEntity, // Outdated - not used in frontend
+      // SerologyResultEntity, // Outdated - not used in frontend
       PrescriptionEntity,
       MedicationEntity,
       DoctorScheduleOverrideEntity,
