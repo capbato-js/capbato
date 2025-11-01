@@ -16,7 +16,8 @@ export const AppointmentsPageContainer: React.FC = () => {
     viewModel.appointments,
     modalState.openConfirmationModal,
     modalState.closeConfirmationModal,
-    modalState.openEditModal
+    modalState.openEditModal,
+    viewModel.loadAppointments
   );
 
   useOverflowHidden();

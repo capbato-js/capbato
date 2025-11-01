@@ -6,7 +6,8 @@ export const useAppointmentActions = (
   appointments: AppointmentDto[],
   openConfirmationModal: (config: Omit<ConfirmationModalState, 'isOpen'>) => void,
   closeConfirmationModal: () => void,
-  openEditModal: (appointment: AppointmentDto, rescheduleMode?: boolean) => void
+  openEditModal: (appointment: AppointmentDto, rescheduleMode?: boolean) => void,
+  refreshAppointments?: () => void
 ) => {
   const viewModel = useAppointmentPageViewModel();
 
@@ -20,7 +21,7 @@ export const useAppointmentActions = (
   const handleCancelAppointment = (appointmentId: string) => {
     const appointment = appointments.find(apt => apt.id === appointmentId);
     const appointmentName = appointment?.patient?.fullName || 'this appointment';
-    
+
     openConfirmationModal({
       title: 'Cancel Appointment',
       message: `Are you sure you want to cancel the appointment for ${appointmentName}?`,
@@ -30,6 +31,9 @@ export const useAppointmentActions = (
         try {
           await viewModel.cancelAppointment(appointmentId);
           closeConfirmationModal();
+          if (refreshAppointments) {
+            refreshAppointments();
+          }
         } catch (error) {
           console.error('Failed to cancel appointment:', error);
         }
@@ -40,19 +44,19 @@ export const useAppointmentActions = (
   const handleReconfirmAppointment = (appointmentId: string) => {
     const appointment = appointments.find(apt => apt.id === appointmentId);
     const appointmentName = appointment?.patient?.fullName || 'this appointment';
-    
+
     openConfirmationModal({
       title: 'Reconfirm Appointment',
       message: `Reconfirm the appointment for ${appointmentName}?`,
       confirmText: 'Reconfirm',
       confirmColor: 'green',
       onConfirm: async () => {
-        const sameSlotAppointments = appointments.filter(apt => 
+        const sameSlotAppointments = appointments.filter(apt =>
           apt.appointmentDate === appointment?.appointmentDate &&
           apt.appointmentTime === appointment?.appointmentTime &&
           apt.status === 'confirmed'
         );
-        
+
         if (sameSlotAppointments.length > 0) {
           closeConfirmationModal();
           if (appointment) {
@@ -62,6 +66,9 @@ export const useAppointmentActions = (
           try {
             await viewModel.confirmAppointment(appointmentId);
             closeConfirmationModal();
+            if (refreshAppointments) {
+              refreshAppointments();
+            }
           } catch (error) {
             console.error('Failed to reconfirm appointment:', error);
           }
@@ -73,7 +80,7 @@ export const useAppointmentActions = (
   const handleCompleteAppointment = (appointmentId: string) => {
     const appointment = appointments.find(apt => apt.id === appointmentId);
     const appointmentName = appointment?.patient?.fullName || 'this appointment';
-    
+
     openConfirmationModal({
       title: 'Complete Appointment',
       message: `Mark the appointment for ${appointmentName} as completed?`,
@@ -83,6 +90,9 @@ export const useAppointmentActions = (
         try {
           await viewModel.completeAppointment(appointmentId);
           closeConfirmationModal();
+          if (refreshAppointments) {
+            refreshAppointments();
+          }
         } catch (error) {
           console.error('Failed to complete appointment:', error);
         }
