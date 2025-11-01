@@ -55,8 +55,10 @@ export const AppointmentsPageContainer: React.FC = () => {
       // Filter controls
       selectedDate={filters.selectedDate}
       showAll={filters.showAll}
+      selectedStatusFilter={filters.selectedStatusFilter}
       onDateChange={filters.handleDateChange}
       onShowAllChange={filters.handleShowAllChange}
+      onStatusFilterChange={filters.handleStatusFilterChange}
       
       // Add modal
       isAddModalOpen={viewModel.isAddModalOpen}

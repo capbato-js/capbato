@@ -6,16 +6,20 @@ import { Appointment } from '../types';
 import { AppointmentDto } from '@nx-starter/application-shared';
 import { ConfirmationModalState } from '../hooks/useModalState';
 
+type StatusFilter = 'all' | 'confirmed' | 'completed' | 'cancelled';
+
 interface AppointmentsPagePresenterProps {
   // Data
   appointments: Appointment[];
   isLoading: boolean;
-  
+
   // Filter controls
   selectedDate: Date;
   showAll: boolean;
+  selectedStatusFilter: StatusFilter;
   onDateChange: (value: string | null) => void;
   onShowAllChange: (checked: boolean) => void;
+  onStatusFilterChange: (status: StatusFilter) => void;
   
   // Add modal
   isAddModalOpen: boolean;
@@ -46,8 +50,10 @@ export const AppointmentsPagePresenter: React.FC<AppointmentsPagePresenterProps>
   isLoading,
   selectedDate,
   showAll,
+  selectedStatusFilter,
   onDateChange,
   onShowAllChange,
+  onStatusFilterChange,
   isAddModalOpen,
   onAddAppointment,
   onCloseAddModal,
@@ -78,6 +84,8 @@ export const AppointmentsPagePresenter: React.FC<AppointmentsPagePresenterProps>
         onDateChange={onDateChange}
         showAll={showAll}
         onShowAllChange={onShowAllChange}
+        selectedStatusFilter={selectedStatusFilter}
+        onStatusFilterChange={onStatusFilterChange}
       />
 
       <AppointmentCountDisplay count={appointments.length} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text, Group, Checkbox, useMantineTheme } from '@mantine/core';
+import { Box, Text, Group, Checkbox, Tabs, useMantineTheme } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Icon } from '../../../components/common';
 import dayjs from 'dayjs';
@@ -10,18 +10,24 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+type StatusFilter = 'all' | 'confirmed' | 'completed' | 'cancelled';
+
 interface AppointmentsFilterControlsProps {
   selectedDate: Date;
   onDateChange: (value: string | null) => void;
   showAll: boolean;
   onShowAllChange: (checked: boolean) => void;
+  selectedStatusFilter: StatusFilter;
+  onStatusFilterChange: (status: StatusFilter) => void;
 }
 
 export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProps> = ({
   selectedDate,
   onDateChange,
   showAll,
-  onShowAllChange
+  onShowAllChange,
+  selectedStatusFilter,
+  onStatusFilterChange
 }) => {
   const theme = useMantineTheme();
   return (
@@ -86,6 +92,57 @@ export const AppointmentsFilterControls: React.FC<AppointmentsFilterControlsProp
           Show All
         </Text>
       </Group>
+
+      <Box
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}
+      >
+        <Text
+          style={{
+            fontWeight: 600,
+            color: theme.colors.blue[9],
+            fontSize: '14px'
+          }}
+        >
+          Status:
+        </Text>
+        <Tabs
+          value={selectedStatusFilter}
+          onChange={(value) => onStatusFilterChange(value as StatusFilter)}
+          variant="pills"
+          radius="md"
+        >
+          <Tabs.List>
+            <Tabs.Tab value="all" style={{ fontSize: '13px', fontWeight: 500 }}>
+              All
+            </Tabs.Tab>
+            <Tabs.Tab
+              value="confirmed"
+              style={{ fontSize: '13px', fontWeight: 500 }}
+              color="green"
+            >
+              Confirmed
+            </Tabs.Tab>
+            <Tabs.Tab
+              value="completed"
+              style={{ fontSize: '13px', fontWeight: 500 }}
+              color="blue"
+            >
+              Completed
+            </Tabs.Tab>
+            <Tabs.Tab
+              value="cancelled"
+              style={{ fontSize: '13px', fontWeight: 500 }}
+              color="red"
+            >
+              Cancelled
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs>
+      </Box>
     </Box>
   );
 };
