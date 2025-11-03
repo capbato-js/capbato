@@ -17,7 +17,7 @@ import { MongooseScheduleRepository } from '../schedule/persistence/mongoose/Mon
 import { InMemoryAppointmentRepository } from '../appointment/persistence/in-memory/InMemoryAppointmentRepository';
 import { TypeOrmAppointmentRepository } from '../appointment/persistence/typeorm/TypeOrmAppointmentRepository';
 import {
-  InMemoryLabRequestRepository, 
+  InMemoryLabRequestRepository,
   InMemoryBloodChemistryRepository,
   TypeOrmLabRequestRepository,
   TypeOrmBloodChemistryRepository,
@@ -31,6 +31,7 @@ import {
   SqliteLabRequestRepository,
   SqliteBloodChemistryRepository
 } from '../laboratory/persistence';
+import { TypeOrmLabTestPriceRepository } from '../laboratory/persistence/typeorm/TypeOrmLabTestPriceRepository';
 import {
   InMemoryPrescriptionRepository,
   TypeOrmPrescriptionRepository,
@@ -352,6 +353,12 @@ export const configureDI = async () => {
   container.registerInstance<ILabTestResultRepository>(
     TOKENS.LabTestResultRepository,
     labTestResultRepositoryImplementation
+  );
+
+  const labTestPriceRepositoryImplementation = await getLabTestPriceRepositoryImplementation();
+  container.registerInstance(
+    TOKENS.LabTestPriceRepository,
+    labTestPriceRepositoryImplementation
   );
 
   const prescriptionRepositoryImplementation = await getPrescriptionRepositoryImplementation();
@@ -1213,6 +1220,17 @@ async function getLabTestResultRepositoryImplementation(): Promise<ILabTestResul
   const dataSource = await getTypeOrmDataSource();
   console.log('📦 Using TypeORM lab test result repository');
   return new TypeOrmLabTestResultRepository(dataSource);
+}
+
+async function getLabTestPriceRepositoryImplementation() {
+  const dataSource = await getTypeOrmDataSource();
+  console.log('📦 Using TypeORM lab test price repository');
+  const repository = new TypeOrmLabTestPriceRepository(dataSource);
+
+  // Seed initial prices on first run
+  await repository.seedInitialPrices();
+
+  return repository;
 }
 
 // Export container and tokens for use in controllers

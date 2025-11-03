@@ -5,12 +5,13 @@ import { COMMON_SERVICES } from '../config/receiptFormConfig';
 
 export const useReceiptFormActions = (
   append: (item: { serviceName: string; description: string; quantity: number; unitPrice: number }) => void,
-  onSubmit: (data: AddTransactionFormData) => Promise<boolean>
+  onSubmit: (data: AddTransactionFormData) => Promise<boolean>,
+  labRequestId?: string | null
 ) => {
   const { currentStaffId } = useCurrentUser();
 
   const addItem = useCallback(() => {
-    append({ serviceName: '', description: '', quantity: 1, unitPrice: 0 });
+    append({ serviceName: '', description: '', quantity: 1, unitPrice: 0 }, { shouldFocus: true });
   }, [append]);
 
   const addCommonService = useCallback((service: typeof COMMON_SERVICES[0]) => {
@@ -56,6 +57,7 @@ export const useReceiptFormActions = (
       ...data,
       receivedById: currentStaffId,
       items: validItems,
+      labRequestId: labRequestId || undefined,
     } as AddTransactionFormData;
 
     return await onSubmit(formData);

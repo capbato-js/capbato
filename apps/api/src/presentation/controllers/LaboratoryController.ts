@@ -178,7 +178,16 @@ export class LaboratoryController {
     private getBloodChemistryByPatientIdQueryHandler: GetBloodChemistryByPatientIdQueryHandler,
     // Analytics Query Handler
     @inject(TOKENS.GetTopLabTestsQueryHandler)
-    private getTopLabTestsQueryHandler: GetTopLabTestsQueryHandler
+    private getTopLabTestsQueryHandler: GetTopLabTestsQueryHandler,
+    // Lab Test Price Repository
+    @inject(TOKENS.LabTestPriceRepository)
+    private labTestPriceRepository: any,
+    // Receipt Repository
+    @inject(TOKENS.ReceiptRepository)
+    private receiptRepository: any,
+    // Lab Request Repository
+    @inject(TOKENS.LabRequestRepository)
+    private labRequestRepository: any
   ) {}
 
   /**
@@ -731,5 +740,139 @@ export class LaboratoryController {
   async deleteSerologyResult(@Param('id') id: string): Promise<LaboratoryOperationResponse> {
     await this.deleteSerologyResultUseCase.execute({ id });
     return ApiResponseBuilder.successWithMessage('Serology result deleted successfully');
+  }
+
+  /**
+   * GET /api/laboratory/test-prices - Get all lab test prices
+   */
+  @Get('/test-prices')
+  async getLabTestPrices(): Promise<ApiSuccessResponse<any[]>> {
+    const prices = await this.labTestPriceRepository.findAll();
+    const priceDtos = prices.map((price: any) => ({
+      id: price.id,
+      testId: price.testId,
+      testName: price.testName,
+      price: price.price,
+      category: price.category,
+    }));
+    return ApiResponseBuilder.success(priceDtos);
+  }
+
+  /**
+   * GET /api/laboratory/requests/unpaid/:patientId - Get unpaid lab requests for a patient
+   * Returns lab requests that are not linked to any transaction/receipt
+   */
+  @Get('/requests/unpaid/:patientId')
+  async getUnpaidLabRequestsByPatientId(@Param('patientId') patientId: string): Promise<LabRequestListResponse> {
+    const validatedPatientId = LabRequestIdSchema.parse(patientId);
+
+    // Get all lab requests for the patient using repository directly (returns array)
+    const allLabRequests = await this.labRequestRepository.findByPatientId(validatedPatientId);
+
+    // Get all receipts to find which lab requests are already paid
+    const allReceipts = await this.receiptRepository.getAll();
+    const paidLabRequestIds = new Set(
+      allReceipts
+        .map((receipt: any) => receipt.labRequestId)
+        .filter((id: any) => id !== undefined && id !== null)
+    );
+
+    // Filter out paid lab requests
+    const unpaidLabRequests = allLabRequests.filter((lr: any) => {
+      const labRequestId = lr.id?.value || lr.id || lr.stringId;
+      return !paidLabRequestIds.has(labRequestId);
+    });
+
+    const labRequestDtos = LaboratoryMapper.toLabRequestDtoArray(unpaidLabRequests);
+
+    return ApiResponseBuilder.success(labRequestDtos);
+  }
+
+  /**
+   * GET /api/laboratory/requests/:id/receipt-items - Get receipt items for a lab request
+   * Transforms lab request test selections into receipt item format with pricing
+   */
+  @Get('/requests/:id/receipt-items')
+  async getLabRequestReceiptItems(@Param('id') id: string): Promise<ApiSuccessResponse<any[]>> {
+    // Validate the ID
+    LabRequestIdSchema.parse(id);
+
+    // Get the lab request
+    const labRequest = await this.getLabRequestByIdQueryHandler.execute(id);
+    if (!labRequest) {
+      return ApiResponseBuilder.success([]);
+    }
+
+    // Get all lab test prices
+    const allPrices = await this.labTestPriceRepository.findAll();
+    const priceMap = new Map(allPrices.map((p: any) => [p.testId, p]));
+
+    // Transform lab request tests to receipt items
+    const receiptItems: any[] = [];
+    const testsData = labRequest.tests.tests;
+
+    // Map of camelCase field names to snake_case test IDs used in pricing table
+    const testFieldMapping: Record<string, string> = {
+      // ROUTINE
+      cbcWithPlatelet: 'routine_cbc_with_platelet',
+      pregnancyTest: 'routine_pregnancy_test',
+      urinalysis: 'routine_urinalysis',
+      fecalysis: 'routine_fecalysis',
+      occultBloodTest: 'routine_occult_blood_test',
+      // SEROLOGY
+      hepatitisBScreening: 'serology_hepatitis_b_screening',
+      hepatitisAScreening: 'serology_hepatitis_a_screening',
+      hepatitisProfile: 'serology_hepatitis_profile',
+      vdrlRpr: 'serology_vdrl_rpr',
+      dengueNs1: 'serology_dengue_ns1',
+      psa: 'serology_psa',
+      // BLOOD CHEMISTRY
+      fbs: 'blood_chemistry_fbs',
+      bun: 'blood_chemistry_bun',
+      creatinine: 'blood_chemistry_creatinine',
+      bloodUricAcid: 'blood_chemistry_blood_uric_acid',
+      lipidProfile: 'blood_chemistry_lipid_profile',
+      sgot: 'blood_chemistry_sgot',
+      sgpt: 'blood_chemistry_sgpt',
+      alkalinePhosphatase: 'blood_chemistry_alkaline_phosphatase',
+      sodium: 'blood_chemistry_sodium',
+      potassium: 'blood_chemistry_potassium',
+      hba1c: 'blood_chemistry_hba1c',
+      // THYROID
+      t3: 'thyroid_t3',
+      t4: 'thyroid_t4',
+      ft3: 'thyroid_ft3',
+      ft4: 'thyroid_ft4',
+      tsh: 'thyroid_tsh',
+      // MISCELLANEOUS
+      ecg: 'misc_ecg',
+    };
+
+    // Iterate through all test categories
+    const categories = ['routine', 'serology', 'bloodChemistry', 'thyroid', 'miscellaneous'];
+
+    for (const category of categories) {
+      const categoryTests = testsData[category as keyof typeof testsData];
+      if (categoryTests) {
+        for (const [fieldName, isSelected] of Object.entries(categoryTests)) {
+          if (isSelected === true) {
+            const testId = testFieldMapping[fieldName];
+            if (testId) {
+              const priceInfo: any = priceMap.get(testId);
+              if (priceInfo) {
+                receiptItems.push({
+                  serviceName: 'Lab Tests', // Use predefined service category
+                  description: priceInfo.testName, // Specific test name in description
+                  quantity: 1,
+                  unitPrice: priceInfo.price,
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return ApiResponseBuilder.success(receiptItems);
   }
 }

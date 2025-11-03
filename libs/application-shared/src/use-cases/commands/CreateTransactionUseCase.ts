@@ -34,7 +34,8 @@ export class CreateTransactionUseCase {
       command.patientId,
       paymentMethod.value,
       command.receivedById,
-      items
+      items,
+      command.labRequestId
     );
   }
 }

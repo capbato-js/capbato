@@ -69,4 +69,14 @@ export interface ILaboratoryApiService {
   
   // Lab Request Operations
   cancelLabRequest(id: string): Promise<LaboratoryOperationResponse>;
+
+  /**
+   * Get unpaid lab requests for a patient
+   */
+  getUnpaidLabRequestsByPatientId(patientId: string): Promise<LabRequestListResponse>;
+
+  /**
+   * Get receipt items for a lab request
+   */
+  getLabRequestReceiptItems(labRequestId: string): Promise<{ success: boolean; data: any[] }>;
 }

@@ -12,6 +12,7 @@ interface IReceipt {
   paymentMethod: PaymentMethod;
   receivedById: string;
   items: ReceiptItem[];
+  labRequestId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +26,7 @@ export class Receipt implements IReceipt {
   private readonly _paymentMethod: PaymentMethod;
   private readonly _receivedById: string;
   private readonly _items: ReceiptItem[];
+  private readonly _labRequestId?: string;
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
 
@@ -37,7 +39,8 @@ export class Receipt implements IReceipt {
     items: ReceiptItem[],
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
-    id?: string | ReceiptId
+    id?: string | ReceiptId,
+    labRequestId?: string
   ) {
     this._receiptNumber = receiptNumber instanceof ReceiptNumber ? receiptNumber : new ReceiptNumber(receiptNumber);
     this._date = date;
@@ -45,11 +48,12 @@ export class Receipt implements IReceipt {
     this._paymentMethod = paymentMethod instanceof PaymentMethod ? paymentMethod : new PaymentMethod(paymentMethod as any);
     this._receivedById = receivedById;
     this._items = [...items]; // Create defensive copy
+    this._labRequestId = labRequestId;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
     this._id = id instanceof ReceiptId ? id : id ? new ReceiptId(id) : undefined;
     this._totalAmount = this.calculateTotalAmount();
-    
+
     this.validate();
   }
 
@@ -110,6 +114,10 @@ export class Receipt implements IReceipt {
 
   get items(): ReceiptItem[] {
     return [...this._items]; // Return defensive copy
+  }
+
+  get labRequestId(): string | undefined {
+    return this._labRequestId;
   }
 
   get createdAt(): Date {
@@ -178,6 +186,7 @@ export class Receipt implements IReceipt {
     receivedById?: string;
     items?: ReceiptItem[];
     updatedAt?: Date;
+    labRequestId?: string;
   }): Receipt {
     return new Receipt(
       updates.receiptNumber || this._receiptNumber,
@@ -188,7 +197,8 @@ export class Receipt implements IReceipt {
       updates.items || this._items,
       this._createdAt,
       updates.updatedAt || this._updatedAt,
-      this._id
+      this._id,
+      updates.labRequestId !== undefined ? updates.labRequestId : this._labRequestId
     );
   }
 

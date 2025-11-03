@@ -30,6 +30,7 @@ export interface TransactionDto {
   receivedBy: string;
   items: TransactionItemDto[];
   itemsSummary: string;
+  labRequestId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,6 +46,7 @@ export interface CreateTransactionDto {
     quantity: number;
     unitPrice: number;
   }>;
+  labRequestId?: string;
 }
 
 // Request DTOs for consistency with other modules
@@ -59,6 +61,7 @@ export interface CreateTransactionRequestDto {
     quantity: number;
     unitPrice: number;
   }>;
+  labRequestId?: string;
 }
 
 // API Response DTOs matching the spec

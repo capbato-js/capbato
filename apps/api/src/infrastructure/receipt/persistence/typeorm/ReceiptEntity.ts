@@ -44,6 +44,9 @@ export class ReceiptEntity {
   @Column({ type: 'varchar', length: 36, name: 'received_by_id' })
   receivedById!: string;
 
+  @Column({ type: 'varchar', length: 36, name: 'lab_request_id', nullable: true })
+  labRequestId?: string;
+
   @OneToMany(() => ReceiptItemEntity, (item) => item.receipt, {
     cascade: true,
     eager: true,

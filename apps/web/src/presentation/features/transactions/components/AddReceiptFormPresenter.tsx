@@ -13,11 +13,19 @@ import { AddTransactionFormData } from '@nx-starter/application-shared';
 import { Icon } from '../../../components/common';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { PatientSelectionField } from './fields/PatientSelectionField';
+import { LabRequestSelectionField } from './fields/LabRequestSelectionField';
 import { DateField } from './fields/DateField';
 import { PaymentMethodField } from './fields/PaymentMethodField';
 import { ServiceItemCard } from './ServiceItemCard';
 import { FormattedPatient } from '../hooks/usePatientData';
 import { calculateTotal, isFormValid } from '../utils/receiptCalculations';
+
+interface LabRequestOption {
+  value: string;
+  label: string;
+  testCount: number;
+  requestDate: string;
+}
 
 interface AddReceiptFormPresenterProps {
   // Form state
@@ -26,7 +34,7 @@ interface AddReceiptFormPresenterProps {
   watch: UseFormWatch<AddTransactionFormData>;
   errors: FieldErrors<AddTransactionFormData>;
   fields: FieldArrayWithId<AddTransactionFormData, 'items', 'id'>[];
-  
+
   // Data
   patients: FormattedPatient[];
   selectedPatientNumber: string;
@@ -34,12 +42,19 @@ interface AddReceiptFormPresenterProps {
   patientId: string;
   date: string;
   paymentMethod: string;
-  
+
+  // Lab request data
+  labRequests: LabRequestOption[];
+  selectedLabRequestId: string | null;
+  isLoadingLabRequests: boolean;
+  isLoadingLabItems: boolean;
+
   // Actions
   onFormSubmit: (data: AddTransactionFormData) => Promise<boolean>;
   onAddItem: () => void;
   onRemoveItem: (index: number) => void;
-  
+  onLabRequestSelect: (labRequestId: string | null) => void;
+
   // Props
   isLoading: boolean;
   error?: string | null;
@@ -57,9 +72,14 @@ export const AddReceiptFormPresenter: React.FC<AddReceiptFormPresenterProps> = (
   patientId,
   date,
   paymentMethod,
+  labRequests,
+  selectedLabRequestId,
+  isLoadingLabRequests,
+  isLoadingLabItems,
   onFormSubmit,
   onAddItem,
   onRemoveItem,
+  onLabRequestSelect,
   isLoading,
   error,
 }) => {
@@ -82,6 +102,16 @@ export const AddReceiptFormPresenter: React.FC<AddReceiptFormPresenterProps> = (
           errors={errors}
           patients={patients}
           selectedPatientNumber={selectedPatientNumber}
+        />
+
+        {/* Lab Request Selection */}
+        <LabRequestSelectionField
+          labRequests={labRequests}
+          selectedLabRequestId={selectedLabRequestId}
+          isLoadingLabRequests={isLoadingLabRequests}
+          isLoadingLabItems={isLoadingLabItems}
+          onLabRequestSelect={onLabRequestSelect}
+          patientId={patientId}
         />
 
         {/* Date */}

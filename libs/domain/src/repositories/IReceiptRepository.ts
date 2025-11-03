@@ -55,6 +55,7 @@ export interface IReceiptRepository {
       description: string;
       quantity: number;
       unitPrice: number;
-    }>
+    }>,
+    labRequestId?: string
   ): Promise<Receipt>;
 }

@@ -26,6 +26,7 @@ export const TOKENS = {
   FecalysisResultRepository: 'IFecalysisResultRepository',
   SerologyResultRepository: 'ISerologyResultRepository',
   LabTestResultRepository: 'ILabTestResultRepository',
+  LabTestPriceRepository: 'ILabTestPriceRepository',
   PrescriptionRepository: 'IPrescriptionRepository',
   ReceiptRepository: 'IReceiptRepository',
 

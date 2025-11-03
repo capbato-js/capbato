@@ -218,6 +218,7 @@ export const CreateTransactionCommandSchema = z.object({
     quantity: z.number().int().min(1, 'Quantity must be at least 1'),
     unitPrice: z.number().min(0, 'Unit price cannot be negative'),
   })).min(1, 'At least one item is required'),
+  labRequestId: z.string().optional(),
 }).transform((data) => ({
   ...data,
   date: new Date(data.date).toISOString(),

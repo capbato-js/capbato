@@ -278,4 +278,40 @@ export class LaboratoryApiService implements ILaboratoryApiService {
       return [];
     }
   }
+
+  /**
+   * Get unpaid lab requests for a patient
+   */
+  async getUnpaidLabRequestsByPatientId(patientId: string): Promise<LabRequestListResponse> {
+    try {
+      const response = await this.httpClient.get<LabRequestListResponse>(
+        `/api/laboratory/requests/unpaid/${patientId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error fetching unpaid lab requests:', error);
+      return {
+        success: false,
+        data: []
+      } as LabRequestListResponse;
+    }
+  }
+
+  /**
+   * Get receipt items for a lab request
+   */
+  async getLabRequestReceiptItems(labRequestId: string): Promise<{ success: boolean; data: any[] }> {
+    try {
+      const response = await this.httpClient.get<{ success: boolean; data: any[] }>(
+        `/api/laboratory/requests/${labRequestId}/receipt-items`
+      );
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error fetching lab request receipt items:', error);
+      return {
+        success: false,
+        data: []
+      };
+    }
+  }
 }

@@ -48,6 +48,7 @@ export class TransactionMapper {
       receivedBy: receivedByName || 'Unknown',
       items,
       itemsSummary: receipt.getItemsSummary(),
+      labRequestId: receipt.labRequestId,
       createdAt: receipt.createdAt.toISOString(),
       updatedAt: receipt.updatedAt.toISOString(),
     };

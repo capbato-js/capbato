@@ -26,3 +26,4 @@ export * from './Prescription';
 export * from './Medication';
 export * from './Receipt';
 export * from './DoctorScheduleOverride';
+export * from './LabTestPrice';

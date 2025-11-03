@@ -42,6 +42,7 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
     entity.totalAmount = receipt.totalAmount;
     entity.paymentMethod = receipt.paymentMethodValue;
     entity.receivedById = receipt.receivedById;
+    entity.labRequestId = receipt.labRequestId;
 
     // Create receipt items
     const itemEntities = receipt.items.map(item => {
@@ -70,7 +71,8 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
       description: string;
       quantity: number;
       unitPrice: number;
-    }>
+    }>,
+    labRequestId?: string
   ): Promise<Receipt> {
     console.log('🔒 Starting atomic receipt creation transaction...');
     return await this.repository.manager.transaction(async manager => {
@@ -102,6 +104,7 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
       entity.patientId = patientId;
       entity.paymentMethod = paymentMethod;
       entity.receivedById = receivedById;
+      entity.labRequestId = labRequestId;
 
       // Create receipt items and calculate total
       const itemEntities = items.map(item => {
@@ -199,7 +202,8 @@ export class TypeOrmReceiptRepository implements IReceiptRepository {
       items,
       createdAt,
       updatedAt,
-      entity.id
+      entity.id,
+      entity.labRequestId
     );
   }
 }

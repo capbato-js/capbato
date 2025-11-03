@@ -7,6 +7,7 @@ import { DoctorEntity } from '../../doctor/persistence/typeorm/DoctorEntity';
 import { AppointmentEntity } from '../../appointment/persistence/typeorm/AppointmentEntity';
 import { LabRequestEntity } from '../../laboratory/persistence/typeorm/LabRequestEntity';
 import { LabTestResultEntity } from '../../laboratory/persistence/typeorm/LabTestResultEntity';
+import { LabTestPriceEntity } from '../../laboratory/persistence/typeorm/LabTestPriceEntity';
 // import { BloodChemistryEntity } from '../../laboratory/persistence/typeorm/BloodChemistryEntity'; // Outdated - not used in frontend
 // import { UrinalysisResultEntity } from '../../laboratory/persistence/typeorm/UrinalysisResultEntity'; // Outdated - not used in frontend
 // import { HematologyResultEntity } from '../../laboratory/persistence/typeorm/HematologyResultEntity'; // Outdated - not used in frontend
@@ -58,6 +59,7 @@ export const createTypeOrmDataSource = (): DataSource => {
       AppointmentEntity,
       LabRequestEntity,
       LabTestResultEntity,
+      LabTestPriceEntity,
       // BloodChemistryEntity, // Outdated - not used in frontend
       // UrinalysisResultEntity, // Outdated - not used in frontend
       // HematologyResultEntity, // Outdated - not used in frontend
