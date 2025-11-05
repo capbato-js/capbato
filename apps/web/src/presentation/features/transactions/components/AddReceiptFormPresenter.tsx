@@ -15,7 +15,6 @@ import { useCurrentUser } from '../hooks/useCurrentUser';
 import { PatientSelectionField } from './fields/PatientSelectionField';
 import { LabRequestSelectionField } from './fields/LabRequestSelectionField';
 import { DateField } from './fields/DateField';
-import { PaymentMethodField } from './fields/PaymentMethodField';
 import { ServiceItemCard } from './ServiceItemCard';
 import { FormattedPatient } from '../hooks/usePatientData';
 import { calculateTotal, isFormValid } from '../utils/receiptCalculations';
@@ -163,15 +162,17 @@ export const AddReceiptFormPresenter: React.FC<AddReceiptFormPresenterProps> = (
           </Text>
         </Box>
 
-        {/* Payment Method */}
-        <PaymentMethodField
-          control={control}
-          errors={errors}
-        />
+        {/* Payment Method (Cash Only - Read-only) */}
+        <Box>
+          <Text size="sm" fw={500} mb={4}>Payment Method</Text>
+          <Text size="sm" c="dimmed">
+            Cash
+          </Text>
+        </Box>
 
         {/* Received by (Auto-filled) */}
         <Box>
-          <Text size="sm" fw={500} mb={4}>Received by *</Text>
+          <Text size="sm" fw={500} mb={4}>Received by</Text>
           <Text size="sm" c="dimmed">
             {currentStaffName}
           </Text>

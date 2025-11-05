@@ -12,13 +12,13 @@ export const useReceiptFormState = () => {
     defaultValues: {
       patientId: '',
       date: new Date().toISOString().split('T')[0],
-      paymentMethod: '',
+      paymentMethod: 'Cash',
       receivedById: currentStaffId,
-      items: [{ 
-        serviceName: '', 
-        description: '', 
-        quantity: 1, 
-        unitPrice: 0 
+      items: [{
+        serviceName: '',
+        description: '',
+        quantity: 1,
+        unitPrice: 0
       }],
     },
   });
