@@ -105,6 +105,28 @@ export class InMemoryUserRepository implements IUserRepository {
     }
   }
 
+  async deactivateUser(id: string): Promise<void> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+
+    // Create new user with isDeactivated flag set to true
+    const deactivatedUser = User.create(
+      existingUser.id,
+      existingUser.firstName.value,
+      existingUser.lastName.value,
+      existingUser.email.value,
+      existingUser.username.value,
+      existingUser.hashedPassword.value,
+      existingUser.role.value,
+      existingUser.mobile?.value,
+      true // isDeactivated
+    );
+
+    this.users.set(id, deactivatedUser);
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const user = await this.getByEmail(email);
     return user !== undefined;

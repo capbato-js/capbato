@@ -56,6 +56,7 @@ export const TOKENS = {
   LoginUserUseCase: 'LoginUserUseCase',
   ChangeUserPasswordUseCase: 'ChangeUserPasswordUseCase',
   UpdateUserDetailsUseCase: 'UpdateUserDetailsUseCase',
+  DeactivateUserUseCase: 'DeactivateUserUseCase',
   CreatePatientUseCase: 'CreatePatientUseCase',
   UpdatePatientUseCase: 'UpdatePatientUseCase',
   CreateDoctorProfileCommandHandler: 'CreateDoctorProfileCommandHandler',

@@ -63,3 +63,7 @@ export interface UpdateUserDetailsFormData {
   experienceYears?: number;
   schedulePattern?: string;
 }
+
+export interface DeactivateUserCommand {
+  userId: string;
+}

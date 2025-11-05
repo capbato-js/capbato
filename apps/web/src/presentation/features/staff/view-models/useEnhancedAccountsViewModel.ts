@@ -5,6 +5,8 @@ import { IAuthCommandService, RegisterUserCommand, UserDto, UpdateUserDetailsCom
 import { extractErrorMessage, isApiError } from '../../../../infrastructure/utils/ErrorMapping';
 import { UserCommandService } from '../../../../infrastructure/services/UserCommandService';
 import { IDoctorApiService } from '../../../../infrastructure/api/IDoctorApiService';
+import { IUserApiService } from '../../../../infrastructure/api/IUserApiService';
+import { notifications } from '@mantine/notifications';
 
 // Utility function to parse validation error details
 const parseValidationErrors = (error: unknown): Record<string, string> => {
@@ -83,13 +85,14 @@ export interface IAccountsViewModel {
   isLoading: boolean;
   error: string | null;
   fieldErrors: Record<string, string>;
-  
+
   // Actions
   loadAccounts: () => Promise<void>;
   createAccount: (data: CreateAccountData) => Promise<boolean>;
   updateAccount: (data: UpdateAccountData) => Promise<boolean>;
   changeAccountPassword: (accountId: string, newPassword: string) => Promise<boolean>;
   deleteAccount: (accountId: string) => Promise<void>;
+  deactivateAccount: (accountId: string, userName: string) => Promise<boolean>;
   clearError: () => void;
   clearFieldErrors: () => void;
   refreshAccounts: () => Promise<void>;
@@ -274,18 +277,57 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
   const deleteAccount = useCallback(async (accountId: string): Promise<void> => {
     setLocalLoading(true);
     setLocalError(null);
-    
+
     try {
       // TODO: Implement actual delete logic with API
       // For now, simulate the operation
       await new Promise(resolve => setTimeout(resolve, 300));
-      
+
       console.log('Deleting account:', accountId);
-      
+
       // Refresh accounts after deletion
       await refreshAccounts();
     } catch (err) {
       setLocalError(err instanceof Error ? err.message : 'Failed to delete account');
+    } finally {
+      setLocalLoading(false);
+    }
+  }, [refreshAccounts]);
+
+  const deactivateAccount = useCallback(async (accountId: string, userName: string): Promise<boolean> => {
+    setLocalLoading(true);
+    setLocalError(null);
+
+    try {
+      // Get the user API service from the container
+      const userApiService = container.resolve<IUserApiService>(TOKENS.UserApiService);
+
+      // Call the API to deactivate the user account
+      await userApiService.deactivateUser(accountId);
+
+      // Show success notification
+      notifications.show({
+        title: 'Account Deactivated',
+        message: `${userName}'s account has been deactivated successfully.`,
+        color: 'green',
+      });
+
+      // Refresh the accounts list to remove the deactivated account
+      await refreshAccounts();
+
+      return true;
+    } catch (err) {
+      const errorMessage = extractErrorMessage(err);
+      setLocalError(errorMessage);
+
+      // Show error notification
+      notifications.show({
+        title: 'Deactivation Failed',
+        message: errorMessage,
+        color: 'red',
+      });
+
+      return false;
     } finally {
       setLocalLoading(false);
     }
@@ -327,6 +369,7 @@ export const useAccountsViewModel = (): IAccountsViewModel => {
     updateAccount,
     changeAccountPassword,
     deleteAccount,
+    deactivateAccount,
     clearError,
     clearFieldErrors,
     refreshAccounts,

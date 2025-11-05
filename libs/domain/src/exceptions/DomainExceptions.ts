@@ -111,6 +111,12 @@ export class AuthInvalidEmailException extends DomainException {
   }
 }
 
+export class AuthAccountDeactivatedException extends DomainException {
+  constructor() {
+    super('This account has been deactivated. Please contact your administrator.', 'AUTH_ACCOUNT_DEACTIVATED', 403);
+  }
+}
+
 export class InvalidRoleException extends DomainException {
   constructor(reason: string) {
     super(`${reason}`, 'INVALID_ROLE');

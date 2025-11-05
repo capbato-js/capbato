@@ -32,4 +32,7 @@ export class UserEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column('boolean', { default: false })
+  isDeactivated!: boolean;
 }

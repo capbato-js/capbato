@@ -12,6 +12,7 @@ export interface UserDto {
   role: string;
   mobile?: string;
   createdAt: Date;
+  isDeactivated: boolean;
 }
 
 export interface RegisterUserResponseDto {

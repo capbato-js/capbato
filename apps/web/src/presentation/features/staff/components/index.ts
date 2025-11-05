@@ -5,3 +5,4 @@ export { ChangePasswordForm } from './ChangePasswordForm';
 export { UpdateUserDetailsForm } from './UpdateUserDetailsForm';
 export { UpdateStep1Fields } from './UpdateStep1Fields';
 export { UpdateStep2Fields } from './UpdateStep2Fields';
+export { DeactivateAccountModal } from './DeactivateAccountModal';

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAccountsViewModel } from '../view-models/useEnhancedAccountsViewModel';
+import { useAccountsViewModel, Account } from '../view-models/useEnhancedAccountsViewModel';
 import { useAccountModalState } from '../hooks/useAccountModalState';
 import { useAccountActions } from '../hooks/useAccountActions';
 import { transformAccountsWithFullName } from '../utils/accountTransformUtils';
@@ -15,6 +15,7 @@ export const AccountsPageContainer: React.FC = () => {
     createAccount,
     updateAccount,
     changeAccountPassword,
+    deactivateAccount,
     clearError,
     clearFieldErrors,
     getDoctorDetails
@@ -45,6 +46,23 @@ export const AccountsPageContainer: React.FC = () => {
 
   const accountsWithFullName = transformAccountsWithFullName(accounts);
 
+  const handleDeactivateAccount = (account: Account) => {
+    modalState.handleOpenDeactivateModal(account);
+  };
+
+  const handleDeactivateSubmit = async () => {
+    if (!modalState.selectedAccount) return;
+
+    const success = await deactivateAccount(
+      modalState.selectedAccount.id,
+      `${modalState.selectedAccount.firstName} ${modalState.selectedAccount.lastName}`
+    );
+
+    if (success) {
+      modalState.handleCloseDeactivateModal();
+    }
+  };
+
   return (
     <AccountsPagePresenter
       // Data
@@ -52,26 +70,30 @@ export const AccountsPageContainer: React.FC = () => {
       isLoading={isLoading}
       error={error}
       fieldErrors={fieldErrors}
-      
+
       // Modal state
       opened={modalState.opened}
       updateModalOpened={modalState.updateModalOpened}
       passwordModalOpened={modalState.passwordModalOpened}
+      deactivateModalOpened={modalState.deactivateModalOpened}
       selectedAccount={modalState.selectedAccount}
       doctorDetails={modalState.doctorDetails}
       passwordError={modalState.passwordError}
-      
+
       // Actions
       onOpenCreateModal={modalState.handleOpenCreateModal}
       onCloseCreateModal={() => modalState.handleCloseCreateModal(clearError, clearFieldErrors)}
       onCloseUpdateModal={() => modalState.handleCloseUpdateModal(clearError, clearFieldErrors)}
       onClosePasswordModal={modalState.handleClosePasswordModal}
+      onCloseDeactivateModal={modalState.handleCloseDeactivateModal}
       onCreateAccount={actions.handleCreateAccount}
       onEditUserDetails={actions.handleEditUserDetails}
       onUpdateUserDetails={actions.handleUpdateUserDetails}
       onChangePassword={actions.handleChangePassword}
+      onDeactivateAccount={handleDeactivateAccount}
       onPasswordSubmit={(newPassword: string) => actions.handlePasswordSubmit(modalState.selectedAccount, newPassword)}
-      
+      onDeactivateSubmit={handleDeactivateSubmit}
+
       // Error handling
       onClearError={clearError}
       onClearFieldErrors={clearFieldErrors}

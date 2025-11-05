@@ -14,6 +14,7 @@ export interface IUserDocument extends Document {
   role: string;
   mobile?: string;
   createdAt: Date;
+  isDeactivated: boolean;
 }
 
 const UserSchema = new Schema<IUserDocument>({
@@ -63,6 +64,10 @@ const UserSchema = new Schema<IUserDocument>({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  isDeactivated: {
+    type: Boolean,
+    default: false,
   },
 }, {
   collection: 'users',

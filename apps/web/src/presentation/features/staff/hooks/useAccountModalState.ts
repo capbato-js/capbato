@@ -10,6 +10,7 @@ export const useAccountModalState = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [updateModalOpened, { open: openUpdateModal, close: closeUpdateModal }] = useDisclosure(false);
   const [passwordModalOpened, { open: openPasswordModal, close: closePasswordModal }] = useDisclosure(false);
+  const [deactivateModalOpened, { open: openDeactivateModal, close: closeDeactivateModal }] = useDisclosure(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [doctorDetails, setDoctorDetails] = useState<DoctorDto | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -54,6 +55,18 @@ export const useAccountModalState = () => {
     }, MODAL_ANIMATION_DURATION);
   };
 
+  const handleOpenDeactivateModal = (account: Account) => {
+    setSelectedAccount(account);
+    openDeactivateModal();
+  };
+
+  const handleCloseDeactivateModal = () => {
+    closeDeactivateModal();
+    setTimeout(() => {
+      setSelectedAccount(null);
+    }, MODAL_ANIMATION_DURATION);
+  };
+
   const clearSelectedAccountDelayed = () => {
     setTimeout(() => {
       setSelectedAccount(null);
@@ -66,10 +79,11 @@ export const useAccountModalState = () => {
     opened,
     updateModalOpened,
     passwordModalOpened,
+    deactivateModalOpened,
     selectedAccount,
     doctorDetails,
     passwordError,
-    
+
     // Actions
     handleOpenCreateModal,
     handleCloseCreateModal,
@@ -77,6 +91,8 @@ export const useAccountModalState = () => {
     handleCloseUpdateModal,
     handleOpenPasswordModal,
     handleClosePasswordModal,
+    handleOpenDeactivateModal,
+    handleCloseDeactivateModal,
     clearSelectedAccountDelayed,
     setPasswordError,
     setDoctorDetails,

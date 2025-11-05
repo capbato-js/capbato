@@ -20,6 +20,7 @@ export class UserMapper {
       role: user.role.value,
       mobile: user.mobile?.value,
       createdAt: user.createdAt,
+      isDeactivated: user.isDeactivated,
     };
   }
 
@@ -84,6 +85,7 @@ export class UserMapper {
     role: string;
     mobile?: string;
     createdAt: Date;
+    isDeactivated?: boolean;
   }): User {
     return User.create(
       plainObject.id,
@@ -93,7 +95,8 @@ export class UserMapper {
       plainObject.username,
       plainObject.hashedPassword,
       plainObject.role,
-      plainObject.mobile
+      plainObject.mobile,
+      plainObject.isDeactivated
     );
   }
 }

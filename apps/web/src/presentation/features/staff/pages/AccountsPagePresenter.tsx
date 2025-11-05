@@ -3,7 +3,7 @@ import { Alert } from '@mantine/core';
 import { Modal } from '../../../components/common';
 import { DataTable, DataTableHeader } from '../../../components/common/DataTable';
 import { MedicalClinicLayout } from '../../../components/layout';
-import { CreateAccountForm, ChangePasswordForm, UpdateUserDetailsForm } from '../components';
+import { CreateAccountForm, ChangePasswordForm, UpdateUserDetailsForm, DeactivateAccountModal } from '../components';
 import { getAccountsTableColumns, getAccountsTableActions } from '../config/accountsTableConfig';
 import type { Account, CreateAccountData } from '../view-models/useEnhancedAccountsViewModel';
 import { UpdateUserDetailsCommand, DoctorDto } from '@nx-starter/application-shared';
@@ -16,26 +16,30 @@ interface AccountsPagePresenterProps {
   isLoading: boolean;
   error: string | null;
   fieldErrors: Record<string, string>;
-  
+
   // Modal state
   opened: boolean;
   updateModalOpened: boolean;
   passwordModalOpened: boolean;
+  deactivateModalOpened: boolean;
   selectedAccount: Account | null;
   doctorDetails: DoctorDto | null;
   passwordError: string | null;
-  
+
   // Actions
   onOpenCreateModal: () => void;
   onCloseCreateModal: () => void;
   onCloseUpdateModal: () => void;
   onClosePasswordModal: () => void;
+  onCloseDeactivateModal: () => void;
   onCreateAccount: (data: CreateAccountData) => Promise<boolean>;
   onEditUserDetails: (account: Account) => Promise<void>;
   onUpdateUserDetails: (data: UpdateUserDetailsCommand) => Promise<boolean>;
   onChangePassword: (account: Account) => void;
+  onDeactivateAccount: (account: Account) => void;
   onPasswordSubmit: (newPassword: string) => Promise<void>;
-  
+  onDeactivateSubmit: () => Promise<void>;
+
   // Error handling
   onClearError: () => void;
   onClearFieldErrors: () => void;
@@ -49,6 +53,7 @@ export const AccountsPagePresenter: React.FC<AccountsPagePresenterProps> = ({
   opened,
   updateModalOpened,
   passwordModalOpened,
+  deactivateModalOpened,
   selectedAccount,
   doctorDetails,
   passwordError,
@@ -56,11 +61,14 @@ export const AccountsPagePresenter: React.FC<AccountsPagePresenterProps> = ({
   onCloseCreateModal,
   onCloseUpdateModal,
   onClosePasswordModal,
+  onCloseDeactivateModal,
   onCreateAccount,
   onEditUserDetails,
   onUpdateUserDetails,
   onChangePassword,
+  onDeactivateAccount,
   onPasswordSubmit,
+  onDeactivateSubmit,
   onClearError,
   onClearFieldErrors,
 }) => {
@@ -68,6 +76,7 @@ export const AccountsPagePresenter: React.FC<AccountsPagePresenterProps> = ({
   const actions = getAccountsTableActions({
     onEdit: onEditUserDetails,
     onChangePassword: onChangePassword,
+    onDeactivate: onDeactivateAccount,
   });
 
   return (
@@ -165,6 +174,18 @@ export const AccountsPagePresenter: React.FC<AccountsPagePresenterProps> = ({
           />
         )}
       </Modal>
+
+      {/* Deactivate Account Modal */}
+      {selectedAccount && (
+        <DeactivateAccountModal
+          isOpen={deactivateModalOpened}
+          onClose={onCloseDeactivateModal}
+          onConfirm={onDeactivateSubmit}
+          userName={`${selectedAccount.firstName} ${selectedAccount.lastName}`}
+          userEmail={selectedAccount.email}
+          isLoading={isLoading}
+        />
+      )}
     </MedicalClinicLayout>
   );
 };

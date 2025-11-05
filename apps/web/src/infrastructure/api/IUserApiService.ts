@@ -7,4 +7,5 @@ import { UserDto, UpdateUserDetailsRequestDto } from '@nx-starter/application-sh
 export interface IUserApiService {
   getAllUsers(): Promise<UserDto[]>;
   updateUserDetails(id: string, data: UpdateUserDetailsRequestDto): Promise<UserDto>;
+  deactivateUser(id: string): Promise<void>;
 }

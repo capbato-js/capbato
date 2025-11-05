@@ -15,10 +15,13 @@ export class GetAllUsersQueryHandler {
 
   /**
    * Executes get all users query
-   * Returns all users in the system
+   * Returns all active (non-deactivated) users in the system
    */
   async execute(): Promise<User[]> {
     // Retrieve all users from repository
-    return await this.userRepository.getAll();
+    const allUsers = await this.userRepository.getAll();
+
+    // Filter out deactivated users
+    return allUsers.filter(user => !user.isDeactivated);
   }
 }

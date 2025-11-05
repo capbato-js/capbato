@@ -111,7 +111,15 @@ export class TypeOrmUserRepository implements IUserRepository {
 
   async delete(id: string): Promise<void> {
     const result = await this.repository.delete(id);
-    
+
+    if (result.affected === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+  }
+
+  async deactivateUser(id: string): Promise<void> {
+    const result = await this.repository.update(id, { isDeactivated: true });
+
     if (result.affected === 0) {
       throw new Error(`User with ID ${id} not found`);
     }
@@ -165,6 +173,7 @@ export class TypeOrmUserRepository implements IUserRepository {
       role: entity.role,
       mobile: entity.mobile,
       createdAt: entity.createdAt,
+      isDeactivated: entity.isDeactivated,
     });
   }
 }

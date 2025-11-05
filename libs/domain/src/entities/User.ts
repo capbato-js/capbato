@@ -16,6 +16,7 @@ export interface UserProps {
   role: Role;
   mobile?: Mobile;
   createdAt: Date;
+  isDeactivated?: boolean;
 }
 
 export class User extends AggregateRoot<string> {
@@ -27,6 +28,7 @@ export class User extends AggregateRoot<string> {
   private readonly _role: Role;
   private readonly _mobile?: Mobile;
   private readonly _createdAt: Date;
+  private readonly _isDeactivated: boolean;
 
   constructor(id: string, props: UserProps) {
     super(id);
@@ -38,6 +40,7 @@ export class User extends AggregateRoot<string> {
     this._role = props.role;
     this._mobile = props.mobile;
     this._createdAt = props.createdAt;
+    this._isDeactivated = props.isDeactivated ?? false;
 
     // Add domain event when user is created
     this.addDomainEvent(new UserRegisteredEvent(id, props.email.value, props.username.value));
@@ -75,6 +78,10 @@ export class User extends AggregateRoot<string> {
     return this._createdAt;
   }
 
+  get isDeactivated(): boolean {
+    return this._isDeactivated;
+  }
+
   get fullName(): string {
     return `${this._firstName.value} ${this._lastName.value}`;
   }
@@ -87,7 +94,8 @@ export class User extends AggregateRoot<string> {
     username: string,
     hashedPassword: string,
     role: string,
-    mobile?: string
+    mobile?: string,
+    isDeactivated?: boolean
   ): User {
     return new User(id, {
       firstName: Name.create(firstName),
@@ -98,6 +106,7 @@ export class User extends AggregateRoot<string> {
       role: Role.create(role),
       mobile: Mobile.createOptional(mobile),
       createdAt: new Date(),
+      isDeactivated,
     });
   }
 
@@ -112,6 +121,7 @@ export class User extends AggregateRoot<string> {
       role: this._role.value,
       mobile: this._mobile?.value,
       createdAt: this._createdAt,
+      isDeactivated: this._isDeactivated,
     };
   }
 }

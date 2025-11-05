@@ -45,6 +45,7 @@ export class UserApiService implements IUserApiService {
         role: user.role,
         mobile: user.mobile || undefined,
         createdAt: new Date(), // Not provided by API
+        isDeactivated: false, // Active users only returned by API
       }));
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -55,7 +56,7 @@ export class UserApiService implements IUserApiService {
   async updateUserDetails(id: string, data: UpdateUserDetailsRequestDto): Promise<UserDto> {
     try {
       const response = await this.httpClient.put<{ success: boolean; data: UserDto }>(`/api/users/${id}`, data);
-      
+
       if (!response.data.success) {
         throw new Error('Failed to update user details');
       }
@@ -63,6 +64,19 @@ export class UserApiService implements IUserApiService {
       return response.data.data;
     } catch (error) {
       console.error('Error updating user details:', error);
+      throw error;
+    }
+  }
+
+  async deactivateUser(id: string): Promise<void> {
+    try {
+      const response = await this.httpClient.put<{ success: boolean; data: { message: string } }>(`/api/users/${id}/deactivate`, {});
+
+      if (!response.data.success) {
+        throw new Error('Failed to deactivate user');
+      }
+    } catch (error) {
+      console.error('Error deactivating user:', error);
       throw error;
     }
   }

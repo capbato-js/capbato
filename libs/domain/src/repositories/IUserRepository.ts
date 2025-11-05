@@ -10,6 +10,7 @@ export interface IUserRepository {
   update(id: string, changes: Partial<User>): Promise<void>;
   updatePassword(id: string, hashedPassword: string): Promise<void>;
   delete(id: string): Promise<void>;
+  deactivateUser(id: string): Promise<void>;
   existsByEmail(email: string): Promise<boolean>;
   existsByUsername(username: string): Promise<boolean>;
   generateUniqueUsername(baseUsername: string): Promise<string>;

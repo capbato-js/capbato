@@ -1,8 +1,9 @@
 import { injectable, inject } from 'tsyringe';
-import { 
-  User, 
-  IUserRepository, 
-  AuthInvalidCredentialsException 
+import {
+  User,
+  IUserRepository,
+  AuthInvalidCredentialsException,
+  AuthAccountDeactivatedException
 } from '@nx-starter/domain';
 import { LoginUserCommand, TOKENS } from '@nx-starter/application-shared';
 import { IPasswordHashingService } from '../../services/PasswordHashingService';
@@ -26,21 +27,27 @@ export class LoginUserUseCase {
   /**
    * Executes user login
    * 1. Find user by email or username
-   * 2. Verify password
-   * 3. Generate JWT token
-   * 4. Return token with user profile
+   * 2. Check if user is deactivated
+   * 3. Verify password
+   * 4. Generate JWT token
+   * 5. Return token with user profile
    */
   async execute(command: LoginUserCommand): Promise<{ token: string; user: User }> {
     // 1. Find user by email or username
     const user = await this.userRepository.getByEmailOrUsername(command.identifier);
-    
+
     if (!user) {
       throw new AuthInvalidCredentialsException();
     }
 
-    // 2. Verify password
+    // 2. Check if user account is deactivated
+    if (user.isDeactivated) {
+      throw new AuthAccountDeactivatedException();
+    }
+
+    // 3. Verify password
     const isPasswordValid = await this.passwordHashingService.compare(
-      command.password, 
+      command.password,
       user.hashedPassword.value
     );
 
@@ -48,14 +55,14 @@ export class LoginUserUseCase {
       throw new AuthInvalidCredentialsException();
     }
 
-    // 3. Generate JWT token
+    // 4. Generate JWT token
     const token = this.jwtService.generateToken({
       userId: user.id,
       email: user.email.value,
       role: user.role.value
     });
 
-    // 4. Return token with user profile
+    // 5. Return token with user profile
     return {
       token,
       user

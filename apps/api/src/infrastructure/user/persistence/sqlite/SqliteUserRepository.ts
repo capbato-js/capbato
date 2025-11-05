@@ -14,6 +14,7 @@ interface UserRecord {
   role: string;
   mobile?: string;
   createdAt: string; // SQLite datetime as string
+  isDeactivated: number; // SQLite boolean as 0 or 1
 }
 
 /**
@@ -146,6 +147,15 @@ export class SqliteUserRepository implements IUserRepository {
     }
   }
 
+  async deactivateUser(id: string): Promise<void> {
+    const stmt = this.db.prepare('UPDATE users SET isDeactivated = 1 WHERE id = ?');
+    const result = stmt.run(id);
+
+    if (result.changes === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const stmt = this.db.prepare('SELECT COUNT(*) as count FROM users WHERE LOWER(email) = LOWER(?)');
     const result = stmt.get(email) as { count: number };
@@ -192,6 +202,7 @@ export class SqliteUserRepository implements IUserRepository {
       role: row.role,
       mobile: row.mobile,
       createdAt: new Date(row.createdAt),
+      isDeactivated: row.isDeactivated === 1,
     });
   }
 }

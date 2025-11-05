@@ -1,9 +1,9 @@
 import { injectable, inject } from 'tsyringe';
 import { Controller, Get, Put, Param, Body, HttpCode } from 'routing-controllers';
-import { TOKENS, ChangeUserPasswordCommand, UserMapper, UserIdSchema } from '@nx-starter/application-shared';
+import { TOKENS, ChangeUserPasswordCommand, UserMapper, UserIdSchema, DeactivateUserCommand } from '@nx-starter/application-shared';
 import { GetAllUsersQueryHandler } from '@nx-starter/application-api';
 import { ChangeUserPasswordUseCase } from '@nx-starter/application-api';
-import { UpdateUserDetailsUseCase } from '@nx-starter/application-shared';
+import { UpdateUserDetailsUseCase, DeactivateUserUseCase } from '@nx-starter/application-shared';
 import { ApiResponseBuilder } from '../dto/ApiResponse';
 import { UserListResponseDto } from '../dto/UserListResponseDto';
 import { ChangePasswordRequestDto } from '../dto/ChangePasswordRequestDto';
@@ -24,6 +24,8 @@ export class UsersController {
     private changeUserPasswordUseCase: ChangeUserPasswordUseCase,
     @inject(TOKENS.UpdateUserDetailsUseCase)
     private updateUserDetailsUseCase: UpdateUserDetailsUseCase,
+    @inject(TOKENS.DeactivateUserUseCase)
+    private deactivateUserUseCase: DeactivateUserUseCase,
     @inject(TOKENS.UserValidationService)
     private validationService: UserValidationService
   ) {}
@@ -72,7 +74,7 @@ export class UsersController {
   ) {
     // Validate the ID parameter
     const validatedId = UserIdSchema.parse(id);
-    
+
     // Validate the combined data (body + id) using the validation service
     const validatedData = this.validationService.validateUpdateDetailsCommand({
       ...body,
@@ -83,5 +85,20 @@ export class UsersController {
     const userDto = UserMapper.toUpdateResponseDto(user);
 
     return ApiResponseBuilder.success(userDto);
+  }
+
+  /**
+   * PUT /api/users/:id/deactivate - Deactivate user account
+   */
+  @Put('/:id/deactivate')
+  @HttpCode(200)
+  async deactivateUser(@Param('id') id: string) {
+    // Validate the ID parameter
+    const validatedId = UserIdSchema.parse(id);
+
+    const command: DeactivateUserCommand = { userId: validatedId };
+    await this.deactivateUserUseCase.execute(command);
+
+    return ApiResponseBuilder.success({ message: 'User account deactivated successfully.' });
   }
 }

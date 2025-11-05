@@ -8,6 +8,7 @@ export * from './ToggleTodoUseCase';
 export * from './UpdateTodoUseCase';
 export * from './LoginUserUseCase';
 export * from './UpdateUserDetailsUseCase';
+export * from './DeactivateUserUseCase';
 export * from './CreatePatientUseCase';
 export * from './UpdatePatientUseCase';
 export * from './CreateScheduleUseCase';

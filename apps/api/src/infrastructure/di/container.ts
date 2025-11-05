@@ -50,6 +50,7 @@ import {
   DeleteTodoUseCase,
   ToggleTodoUseCase,
   UpdateUserDetailsUseCase,
+  DeactivateUserUseCase,
   GetAllTodosQueryHandler,
   GetActiveTodosQueryHandler,
   GetCompletedTodosQueryHandler,
@@ -408,6 +409,7 @@ export const configureDI = async () => {
   container.registerSingleton(TOKENS.LoginUserUseCase, LoginUserUseCase);
   container.registerSingleton(TOKENS.ChangeUserPasswordUseCase, ChangeUserPasswordUseCase);
   container.registerSingleton(TOKENS.UpdateUserDetailsUseCase, UpdateUserDetailsUseCase);
+  container.registerSingleton(TOKENS.DeactivateUserUseCase, DeactivateUserUseCase);
   container.registerSingleton(TOKENS.CreatePatientUseCase, CreatePatientUseCase);
   container.registerSingleton(TOKENS.UpdatePatientUseCase, UpdatePatientUseCase);
   container.registerSingleton(TOKENS.CreateDoctorProfileCommandHandler, CreateDoctorProfileCommandHandler);

@@ -103,8 +103,16 @@ export class MongooseUserRepository implements IUserRepository {
 
   async delete(id: string): Promise<void> {
     const result = await UserModel.deleteOne({ _id: id }).exec();
-    
+
     if (result.deletedCount === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+  }
+
+  async deactivateUser(id: string): Promise<void> {
+    const result = await UserModel.updateOne({ _id: id }, { isDeactivated: true }).exec();
+
+    if (result.matchedCount === 0) {
       throw new Error(`User with ID ${id} not found`);
     }
   }
@@ -153,6 +161,7 @@ export class MongooseUserRepository implements IUserRepository {
       role: doc.role,
       mobile: doc.mobile,
       createdAt: doc.createdAt,
+      isDeactivated: doc.isDeactivated,
     });
   }
 }
