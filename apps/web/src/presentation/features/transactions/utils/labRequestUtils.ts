@@ -25,7 +25,12 @@ export async function fetchLabRequestReceiptItems(
     const response = await laboratoryApiService.getLabRequestReceiptItems(labRequestId);
 
     if (response.success && response.data) {
-      return response.data;
+      // Ensure unitPrice is converted to a number (API may return strings)
+      return response.data.map(item => ({
+        ...item,
+        unitPrice: typeof item.unitPrice === 'string' ? parseFloat(item.unitPrice) : item.unitPrice,
+        quantity: typeof item.quantity === 'string' ? parseInt(item.quantity, 10) : item.quantity,
+      }));
     }
 
     return [];
