@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text, TextInput } from '@mantine/core';
 import { getReportStyles } from '../../utils/urinalysisReportStyles'; // Reuse the urinalysis styles
+import { getInputBackgroundColor } from '../../utils/labTestRangeValidator';
 
 export type HematologyFieldSize = 'small' | 'medium' | 'large' | 'xlarge' | 'full';
 
@@ -68,10 +69,13 @@ export const HematologyReportField: React.FC<HematologyReportFieldProps> = ({
   };
 
   const fieldEnabled = isFieldEnabled();
-  
+
   const getLabelStyle = () => {
     return labelWidth === 'wide' ? styles.fieldLabelWide : styles.fieldLabel;
   };
+
+  // Get background color based on value and reference range
+  const backgroundColor = getInputBackgroundColor(value, referenceValue);
 
   return (
     <Box style={{ 
@@ -112,7 +116,7 @@ export const HematologyReportField: React.FC<HematologyReportFieldProps> = ({
               borderLeft: 'none',
               borderRight: 'none',
               borderRadius: '0',
-              backgroundColor: 'transparent',
+              backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : 'transparent',
               color: fieldEnabled ? 'inherit' : '#999',
               cursor: fieldEnabled ? 'text' : 'not-allowed',
               opacity: fieldEnabled ? 1 : 0.6,
@@ -136,7 +140,8 @@ export const HematologyReportField: React.FC<HematologyReportFieldProps> = ({
           alignItems: 'center',
           marginRight: '15px',
           paddingLeft: '2px',
-          fontSize: '14px'
+          fontSize: '14px',
+          backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : 'transparent'
         }}>
           {value || ''}
         </Box>

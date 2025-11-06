@@ -29,12 +29,40 @@
     page-break-inside: avoid;
   }
 
-  /* Remove background colors and shadows for print */
+  /* Remove shadows for print, but preserve range indicator backgrounds */
   * {
-    background: transparent !important;
     color: black !important;
     text-shadow: none !important;
     box-shadow: none !important;
+  }
+
+  /* Set default transparent background for most elements */
+  .printArea * {
+    background: transparent !important;
+  }
+
+  /* Exception: Preserve yellow background for below-range values */
+  .printArea [style*="background-color: rgb(255, 249, 196)"],
+  .printArea [style*="background-color: #FFF9C4"],
+  .printArea [style*="background-color:#FFF9C4"],
+  .printArea [style*="backgroundColor: rgb(255, 249, 196)"],
+  .printArea [style*="backgroundColor: #FFF9C4"],
+  .printArea [style*="backgroundColor:#FFF9C4"] {
+    background-color: #FFF9C4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Exception: Preserve light red background for above-range values */
+  .printArea [style*="background-color: rgb(255, 205, 210)"],
+  .printArea [style*="background-color: #FFCDD2"],
+  .printArea [style*="background-color:#FFCDD2"],
+  .printArea [style*="backgroundColor: rgb(255, 205, 210)"],
+  .printArea [style*="backgroundColor: #FFCDD2"],
+  .printArea [style*="backgroundColor:#FFCDD2"] {
+    background-color: #FFCDD2 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Exception: Keep red color for report titles */
@@ -43,7 +71,7 @@
     color: red !important;
   }
 
-  /* Ensure borders show in print */
+  /* Ensure colors show in print */
   .printArea * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Skeleton } from '@mantine/core';
 import { LabTestField } from './LabTestField';
 import { LabTestFieldConfig } from '../constants/labTestFormConfig';
-import { UseFormRegister } from 'react-hook-form';
+import { UseFormRegister, Control } from 'react-hook-form';
 import { createSkeletonArray } from '../utils/labTestResultFormUtils';
 import type { AddLabTestResultFormData } from '../hooks/useLabTestResultFormState';
 
@@ -10,6 +10,7 @@ interface LabTestFieldsGridProps {
   leftFields: LabTestFieldConfig[];
   rightFields: LabTestFieldConfig[];
   register: UseFormRegister<AddLabTestResultFormData>;
+  control: Control<AddLabTestResultFormData>;
   enabledFields?: string[];
   viewMode: boolean;
   isLoadingData: boolean;
@@ -37,6 +38,7 @@ export const LabTestFieldsGrid: React.FC<LabTestFieldsGridProps> = ({
   leftFields,
   rightFields,
   register,
+  control,
   enabledFields,
   viewMode,
   isLoadingData,
@@ -78,6 +80,7 @@ export const LabTestFieldsGrid: React.FC<LabTestFieldsGridProps> = ({
             key={field.id}
             field={field}
             register={register}
+            control={control}
             enabledFields={enabledFields}
             viewMode={viewMode}
           />
@@ -91,6 +94,7 @@ export const LabTestFieldsGrid: React.FC<LabTestFieldsGridProps> = ({
             key={field.id}
             field={field}
             register={register}
+            control={control}
             enabledFields={enabledFields}
             viewMode={viewMode}
           />

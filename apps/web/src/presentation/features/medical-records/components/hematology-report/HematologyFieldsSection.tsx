@@ -7,6 +7,7 @@ import {
   RBC_RANGES,
   DEMOGRAPHIC_CATEGORIES
 } from '../../config/hematologyReportConfig';
+import { getInputBackgroundColor } from '../../utils/labTestRangeValidator';
 
 interface HematologyFieldsSectionProps {
   labData?: Record<string, string | undefined>;
@@ -194,41 +195,47 @@ export const HematologyFieldsSection: React.FC<HematologyFieldsSectionProps> = (
         { key: 'basophils', label: HEMATOLOGY_FIELD_LABELS.basophils, range: '0.01 - 0.03' },
         { key: 'eosinophils', label: HEMATOLOGY_FIELD_LABELS.eosinophils, range: '0.0 - 0.04' },
         { key: 'platelet', label: HEMATOLOGY_FIELD_LABELS.platelet, range: '150-400 g x 10⁹/L' }
-      ].map(field => (
-        <Box key={field.key} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          {/* Column 1: Label */}
-          <Box style={{ minWidth: '155px' }}>
-            <Text size="sm" style={{ fontSize: '14px', textTransform: 'uppercase' }}>
-              {field.label}
-            </Text>
-          </Box>
+      ].map(field => {
+        const fieldValue = labData?.[field.key] || '';
+        const backgroundColor = getInputBackgroundColor(fieldValue, field.range);
 
-          {/* Column 2: Input Field */}
-          <Box style={{ width: '150px', marginLeft: '10px' }}>
-            {editable ? (
-              <TextInput
-                value={labData?.[field.key] || ''}
-                onChange={(e) => onChange?.(field.key, e.currentTarget.value)}
-                styles={{
-                  input: {
-                    border: '1px solid #007bff',
-                    fontSize: '15px',
-                    padding: '4px 8px',
-                  }
-                }}
-                size="xs"
-              />
-            ) : (
-              <Text style={{
-                borderBottom: '1px solid #333',
-                minHeight: '18px',
-                fontSize: '13px',
-                padding: '2px 4px',
-              }}>
-                {formatValue(labData?.[field.key])}
+        return (
+          <Box key={field.key} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            {/* Column 1: Label */}
+            <Box style={{ minWidth: '155px' }}>
+              <Text size="sm" style={{ fontSize: '14px', textTransform: 'uppercase' }}>
+                {field.label}
               </Text>
-            )}
-          </Box>
+            </Box>
+
+            {/* Column 2: Input Field */}
+            <Box style={{ width: '150px', marginLeft: '10px' }}>
+              {editable ? (
+                <TextInput
+                  value={fieldValue}
+                  onChange={(e) => onChange?.(field.key, e.currentTarget.value)}
+                  styles={{
+                    input: {
+                      border: '1px solid #007bff',
+                      fontSize: '15px',
+                      padding: '4px 8px',
+                      backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : 'white',
+                    }
+                  }}
+                  size="xs"
+                />
+              ) : (
+                <Text style={{
+                  borderBottom: '1px solid #333',
+                  minHeight: '18px',
+                  fontSize: '13px',
+                  padding: '2px 4px',
+                  backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : 'transparent',
+                }}>
+                  {formatValue(labData?.[field.key])}
+                </Text>
+              )}
+            </Box>
           
           {/* Column 3: Reference Range */}
           <Box style={{ width: '180px', marginLeft: '20px' }}>
@@ -240,7 +247,8 @@ export const HematologyFieldsSection: React.FC<HematologyFieldsSectionProps> = (
           {/* Column 4: Empty for these fields */}
           <Box style={{ width: '120px', marginLeft: '10px' }} />
         </Box>
-      ))}
+        );
+      })}
 
       {/* OTHERS field with wider input spanning multiple columns */}
       <Box style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>

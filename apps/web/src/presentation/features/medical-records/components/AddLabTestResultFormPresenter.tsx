@@ -66,6 +66,7 @@ export const AddLabTestResultFormPresenter: React.FC<
             leftFields={leftFields}
             rightFields={rightFields}
             register={formMethods.register}
+            control={formMethods.control}
             enabledFields={enabledFields}
             viewMode={viewMode}
             isLoadingData={isLoadingData}

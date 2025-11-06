@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Text, TextInput } from '@mantine/core';
+import { getInputBackgroundColor } from '../../utils/labTestRangeValidator';
 
 interface BloodChemistryReportFieldProps {
   label: string;
@@ -42,6 +43,9 @@ export const BloodChemistryReportField: React.FC<BloodChemistryReportFieldProps>
 
   const fieldEnabled = isFieldEnabled();
 
+  // Get background color based on value and reference range
+  const backgroundColor = getInputBackgroundColor(value, referenceValue);
+
   return (
     <Box style={{
       display: 'flex',
@@ -71,7 +75,7 @@ export const BloodChemistryReportField: React.FC<BloodChemistryReportFieldProps>
           styles={{
             input: {
               border: error ? '1px solid red' : (fieldEnabled ? '1px solid #007bff' : '1px solid #e9ecef'),
-              backgroundColor: fieldEnabled ? 'white' : '#f5f5f5',
+              backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : (fieldEnabled ? 'white' : '#f5f5f5'),
               color: fieldEnabled ? 'inherit' : '#999',
               cursor: fieldEnabled ? 'text' : 'not-allowed',
               opacity: fieldEnabled ? 1 : 0.6,
@@ -95,7 +99,8 @@ export const BloodChemistryReportField: React.FC<BloodChemistryReportFieldProps>
           height: '20px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : 'transparent'
         }}>
           <Text style={{ fontSize: '14px' }}>
             {value}

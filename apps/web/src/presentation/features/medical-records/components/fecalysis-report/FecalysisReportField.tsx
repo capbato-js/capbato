@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text, TextInput } from '@mantine/core';
 import { getReportStyles } from '../../utils/fecalysisReportStyles';
+import { getInputBackgroundColor } from '../../utils/labTestRangeValidator';
 
 export type FieldSize = 'small' | 'medium' | 'large' | 'xlarge' | 'full';
 
@@ -60,6 +61,9 @@ export const FecalysisReportField: React.FC<FecalysisReportFieldProps> = ({
 
   const fieldEnabled = isFieldEnabled();
 
+  // Get background color based on value and reference range
+  const backgroundColor = getInputBackgroundColor(value, referenceValue);
+
   const getInputStyle = () => {
     switch (size) {
       case 'small': return styles.fieldInputSmall;
@@ -89,7 +93,7 @@ export const FecalysisReportField: React.FC<FecalysisReportFieldProps> = ({
             input: {
               ...getInputStyle(),
               border: error ? '1px solid red' : (fieldEnabled ? '1px solid #007bff' : '1px solid #e9ecef'),
-              backgroundColor: fieldEnabled ? 'white' : '#f5f5f5',
+              backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : (fieldEnabled ? 'white' : '#f5f5f5'),
               color: fieldEnabled ? 'inherit' : '#999',
               cursor: fieldEnabled ? 'text' : 'not-allowed',
               opacity: fieldEnabled ? 1 : 0.6,
@@ -102,7 +106,10 @@ export const FecalysisReportField: React.FC<FecalysisReportFieldProps> = ({
           size='xs'
         />
       ) : (
-        <Text style={getInputStyle()}>
+        <Text style={{
+          ...getInputStyle(),
+          backgroundColor: backgroundColor !== 'transparent' ? backgroundColor : 'transparent'
+        }}>
           {value || ''}
         </Text>
       )}
