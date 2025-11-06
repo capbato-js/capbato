@@ -13,33 +13,40 @@ interface PrescriptionsPagePresenterProps {
   displayPrescriptions: DisplayPrescription[];
   isLoading: boolean;
   error: string | null;
-  
+
   // Permissions
   canCreatePrescriptions: boolean;
-  
+
   // Modal state
   addModalOpen: boolean;
   editModalOpen: boolean;
   viewModalOpen: boolean;
   deleteModalOpen: boolean;
   selectedPrescription: Prescription | null;
-  
+
   // Actions
   onAddPrescription: () => void;
   onViewPrescription: (prescription: Prescription | DisplayPrescription) => void;
   onEditPrescription: (prescription: DisplayPrescription) => void;
   onDeletePrescription: (prescription: DisplayPrescription) => void;
-  
+
   // Modal actions
   onCloseAddModal: () => void;
   onCloseEditModal: () => void;
   onCloseViewModal: () => void;
   onCloseDeleteModal: () => void;
-  
+
   // CRUD callbacks
   onPrescriptionCreated: (prescription: Prescription) => void;
   onPrescriptionUpdated: () => void;
   onConfirmDelete: () => Promise<void>;
+
+  // Print props
+  onPrint?: () => void;
+  printRef?: React.RefObject<HTMLDivElement | null>;
+  patientAge?: number;
+  patientSex?: string;
+  patientAddress?: string;
 }
 
 export const PrescriptionsPagePresenter: React.FC<PrescriptionsPagePresenterProps> = ({
@@ -63,6 +70,11 @@ export const PrescriptionsPagePresenter: React.FC<PrescriptionsPagePresenterProp
   onPrescriptionCreated,
   onPrescriptionUpdated,
   onConfirmDelete,
+  onPrint,
+  printRef,
+  patientAge,
+  patientSex,
+  patientAddress,
 }) => {
   const columns = getPrescriptionTableColumns();
   const actions = getPrescriptionTableActions({
@@ -119,6 +131,11 @@ export const PrescriptionsPagePresenter: React.FC<PrescriptionsPagePresenterProp
         opened={viewModalOpen}
         onClose={onCloseViewModal}
         prescription={selectedPrescription}
+        onPrint={onPrint}
+        printRef={printRef}
+        patientAge={patientAge}
+        patientSex={patientSex}
+        patientAddress={patientAddress}
       />
 
       <DeletePrescriptionModal

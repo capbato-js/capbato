@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react';
 import { Box, Text, Alert, Skeleton, useMantineTheme } from '@mantine/core';
 import { usePatientPrescriptions } from '../../view-models';
 import { PrescriptionsTable } from '../../components';
@@ -7,6 +7,8 @@ import { usePermissions } from '../../../../../infrastructure/auth/useRBAC';
 import { usePrescriptionModalState } from '../../../medical-records/hooks/usePrescriptionModalState';
 import { AddPrescriptionModal, ViewPrescriptionModal, DeletePrescriptionModal } from '../../../medical-records/components';
 import { Prescription } from '@nx-starter/domain';
+import { usePrintPrescription, formatPatientAddress } from '../../../medical-records/utils/prescriptionPrintUtils';
+import { usePatientStore } from '../../../../../infrastructure/state/PatientStore';
 
 interface PrescriptionsTabProps {
   patientId: string;
@@ -19,14 +21,46 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
   const { canCreatePrescriptions } = usePermissions();
   const modalState = usePrescriptionModalState();
 
+  // Print functionality
+  const printRef = useRef<HTMLDivElement>(null);
+  const [patientAge, setPatientAge] = useState<number>(0);
+  const [patientSex, setPatientSex] = useState<string>('');
+  const [patientAddress, setPatientAddress] = useState<string>('');
+  const { getPatientDetails } = usePatientStore();
+  const handlePrint = usePrintPrescription(printRef, modalState.selectedPrescription?.patientName);
+
   // Get domain prescriptions from the store
   const domainPrescriptions = useMemo(() => {
     return prescriptionStore.prescriptions.filter(p => p.patientId === patientId);
   }, [prescriptionStore.prescriptions, patientId]);
 
+  // Get patient details when view modal opens (patient is already loaded on this page)
+  useEffect(() => {
+    if (!modalState.viewModalOpen || !patientId) {
+      return;
+    }
+
+    const patientDetails = getPatientDetails(patientId);
+
+    if (patientDetails) {
+      setPatientAge(patientDetails.age || 0);
+      setPatientSex(patientDetails.gender || '');
+      setPatientAddress(formatPatientAddress(patientDetails.address));
+    } else {
+      // Fallback values if patient not found
+      setPatientAge(0);
+      setPatientSex('');
+      setPatientAddress('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalState.viewModalOpen, patientId]);
+
   // Action handlers
   const handleViewPrescription = useCallback((prescriptionId: string) => {
-    const prescription = domainPrescriptions.find(p => p.id?.value === prescriptionId);
+    const prescription = domainPrescriptions.find(p =>
+      p.id?.value === prescriptionId || p.stringId === prescriptionId
+    );
+
     if (prescription) {
       const uiPrescription = transformDomainToUIPrescriptionForModal(prescription);
       modalState.openViewModal(uiPrescription);
@@ -34,7 +68,9 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
   }, [domainPrescriptions, modalState]);
 
   const handleEditPrescription = useCallback((prescriptionId: string) => {
-    const prescription = domainPrescriptions.find(p => p.id?.value === prescriptionId);
+    const prescription = domainPrescriptions.find(p =>
+      p.id?.value === prescriptionId || p.stringId === prescriptionId
+    );
     if (prescription) {
       const uiPrescription = transformDomainToUIPrescriptionForModal(prescription);
       modalState.openEditModal(uiPrescription);
@@ -42,7 +78,9 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
   }, [domainPrescriptions, modalState]);
 
   const handleDeletePrescription = useCallback((prescriptionId: string) => {
-    const prescription = domainPrescriptions.find(p => p.id?.value === prescriptionId);
+    const prescription = domainPrescriptions.find(p =>
+      p.id?.value === prescriptionId || p.stringId === prescriptionId
+    );
     if (prescription) {
       const uiPrescription = transformDomainToUIPrescriptionForModal(prescription);
       modalState.openDeleteModal(uiPrescription);
@@ -130,6 +168,11 @@ export const PrescriptionsTab: React.FC<PrescriptionsTabProps> = ({ patientId })
         opened={modalState.viewModalOpen}
         onClose={modalState.closeViewModal}
         prescription={modalState.selectedPrescription}
+        onPrint={handlePrint}
+        printRef={printRef}
+        patientAge={patientAge}
+        patientSex={patientSex}
+        patientAddress={patientAddress}
       />
 
       {/* Delete/Discontinue Modal - Only show for users who can create prescriptions */}

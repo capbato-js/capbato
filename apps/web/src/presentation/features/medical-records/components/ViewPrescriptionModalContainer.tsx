@@ -1,51 +1,46 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Prescription } from '../types';
 import { normalizeMedications } from '../utils/viewPrescriptionUtils';
 import { ViewPrescriptionModalPresenter } from './ViewPrescriptionModalPresenter';
-import { PrintPrescriptionModal } from './print-prescription-modal/PrintPrescriptionModal';
 
 interface ViewPrescriptionModalContainerProps {
   opened: boolean;
   onClose: () => void;
   prescription: Prescription | null;
+  onPrint?: () => void;
+  printRef?: React.RefObject<HTMLDivElement | null>;
+  patientAge?: number;
+  patientSex?: string;
+  patientAddress?: string;
 }
 
 export const ViewPrescriptionModalContainer: React.FC<ViewPrescriptionModalContainerProps> = ({
   opened,
   onClose,
   prescription,
+  onPrint,
+  printRef,
+  patientAge = 0,
+  patientSex = '',
+  patientAddress = '',
 }) => {
-  const [printModalOpen, setPrintModalOpen] = useState(false);
-
   if (!prescription) {
     return null;
   }
 
   const normalizedMedications = normalizeMedications(prescription);
 
-  const handlePrint = () => {
-    setPrintModalOpen(true);
-  };
-
-  const handleClosePrintModal = () => {
-    setPrintModalOpen(false);
-  };
-
   return (
-    <>
-      <ViewPrescriptionModalPresenter
-        opened={opened}
-        onClose={onClose}
-        prescription={prescription}
-        medications={normalizedMedications}
-        onPrint={handlePrint}
-      />
-
-      <PrintPrescriptionModal
-        opened={printModalOpen}
-        onClose={handleClosePrintModal}
-        prescription={prescription}
-      />
-    </>
+    <ViewPrescriptionModalPresenter
+      opened={opened}
+      onClose={onClose}
+      prescription={prescription}
+      medications={normalizedMedications}
+      onPrint={onPrint}
+      printRef={printRef}
+      patientAge={patientAge}
+      patientSex={patientSex}
+      patientAddress={patientAddress}
+    />
   );
 };
