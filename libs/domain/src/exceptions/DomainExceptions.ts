@@ -438,3 +438,12 @@ export class DoctorNotAvailableForOverrideException extends DomainException {
     super(`Doctor ${doctorId} is not available for override on ${date}`, 'DOCTOR_NOT_AVAILABLE_FOR_OVERRIDE', 409);
   }
 }
+
+/**
+ * Self-deactivation prevention exception
+ */
+export class CannotDeactivateSelfException extends DomainException {
+  constructor() {
+    super('You cannot deactivate your own account', 'CANNOT_DEACTIVATE_SELF', 403);
+  }
+}

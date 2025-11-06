@@ -5,6 +5,7 @@ import { useAccountActions } from '../hooks/useAccountActions';
 import { transformAccountsWithFullName } from '../utils/accountTransformUtils';
 import { AccountsPagePresenter } from './AccountsPagePresenter';
 import { useOverflowHidden } from '../../../hooks/useOverflowHidden';
+import { useAuthStore } from '../../../../infrastructure/state/AuthStore';
 
 export const AccountsPageContainer: React.FC = () => {
   const {
@@ -21,6 +22,7 @@ export const AccountsPageContainer: React.FC = () => {
     getDoctorDetails
   } = useAccountsViewModel();
 
+  const { user } = useAuthStore();
   const modalState = useAccountModalState();
 
   const actions = useAccountActions(
@@ -70,6 +72,7 @@ export const AccountsPageContainer: React.FC = () => {
       isLoading={isLoading}
       error={error}
       fieldErrors={fieldErrors}
+      currentUserId={user?.id}
 
       // Modal state
       opened={modalState.opened}

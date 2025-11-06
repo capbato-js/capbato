@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { Controller, Get, Put, Param, Body, HttpCode } from 'routing-controllers';
+import { Controller, Get, Put, Param, Body, HttpCode, CurrentUser } from 'routing-controllers';
 import { TOKENS, ChangeUserPasswordCommand, UserMapper, UserIdSchema, DeactivateUserCommand } from '@nx-starter/application-shared';
 import { GetAllUsersQueryHandler } from '@nx-starter/application-api';
 import { ChangeUserPasswordUseCase } from '@nx-starter/application-api';
@@ -9,6 +9,12 @@ import { UserListResponseDto } from '../dto/UserListResponseDto';
 import { ChangePasswordRequestDto } from '../dto/ChangePasswordRequestDto';
 import { UpdateUserDetailsRequestDto } from '@nx-starter/application-shared';
 import { UserValidationService } from '@nx-starter/application-shared';
+
+interface CurrentUserPayload {
+  id: string;
+  role: string;
+  email: string;
+}
 
 /**
  * Users Controller
@@ -92,11 +98,17 @@ export class UsersController {
    */
   @Put('/:id/deactivate')
   @HttpCode(200)
-  async deactivateUser(@Param('id') id: string) {
+  async deactivateUser(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: CurrentUserPayload
+  ) {
     // Validate the ID parameter
     const validatedId = UserIdSchema.parse(id);
 
-    const command: DeactivateUserCommand = { userId: validatedId };
+    const command: DeactivateUserCommand = {
+      userId: validatedId,
+      requestingUserId: currentUser.id
+    };
     await this.deactivateUserUseCase.execute(command);
 
     return ApiResponseBuilder.success({ message: 'User account deactivated successfully.' });

@@ -321,7 +321,9 @@ export function DataTable<T extends SearchableItem>({
                               justifyContent: 'center'
                             }}
                           >
-                            {actions.buttons.map((action, actionIndex) => (
+                            {actions.buttons
+                              .filter(action => !action.hidden || !action.hidden(item))
+                              .map((action, actionIndex) => (
                               <Tooltip
                                 key={actionIndex}
                                 label={action.tooltip}
@@ -330,14 +332,14 @@ export function DataTable<T extends SearchableItem>({
                               >
                                 <ActionIcon
                                   variant="subtle"
-                                  color="gray"
+                                  color={action.color || "gray"}
                                   size="sm"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     action.onClick(item);
                                   }}
                                   style={{
-                                    color: theme.colors.customGray[5],
+                                    color: action.color ? undefined : theme.colors.customGray[5],
                                     transition: 'all 0.15s ease',
                                     minWidth: '28px',
                                     minHeight: '28px'
@@ -346,7 +348,7 @@ export function DataTable<T extends SearchableItem>({
                                     root: {
                                       '&:hover': {
                                         backgroundColor: theme.colors.customGray[1],
-                                        color: theme.colors.customGray[8]
+                                        color: action.color ? undefined : theme.colors.customGray[8]
                                       }
                                     }
                                   }}
@@ -445,7 +447,9 @@ export function DataTable<T extends SearchableItem>({
                             justifyContent: 'center'
                           }}
                         >
-                          {actions.buttons.map((action, actionIndex) => (
+                          {actions.buttons
+                            .filter(action => !action.hidden || !action.hidden(item))
+                            .map((action, actionIndex) => (
                             <Tooltip
                               key={actionIndex}
                               label={action.tooltip}
@@ -454,14 +458,14 @@ export function DataTable<T extends SearchableItem>({
                             >
                               <ActionIcon
                                 variant="subtle"
-                                color="gray"
+                                color={action.color || "gray"}
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   action.onClick(item);
                                 }}
                                 style={{
-                                  color: theme.colors.customGray[5],
+                                  color: action.color ? undefined : theme.colors.customGray[5],
                                   transition: 'all 0.15s ease',
                                   minWidth: '28px',
                                   minHeight: '28px'
@@ -470,7 +474,7 @@ export function DataTable<T extends SearchableItem>({
                                   root: {
                                     '&:hover': {
                                       backgroundColor: theme.colors.customGray[1],
-                                      color: theme.colors.customGray[8]
+                                      color: action.color ? undefined : theme.colors.customGray[8]
                                     }
                                   }
                                 }}

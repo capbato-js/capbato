@@ -16,6 +16,7 @@ interface AccountsPagePresenterProps {
   isLoading: boolean;
   error: string | null;
   fieldErrors: Record<string, string>;
+  currentUserId?: string;
 
   // Modal state
   opened: boolean;
@@ -50,6 +51,7 @@ export const AccountsPagePresenter: React.FC<AccountsPagePresenterProps> = ({
   isLoading,
   error,
   fieldErrors,
+  currentUserId,
   opened,
   updateModalOpened,
   passwordModalOpened,
@@ -73,11 +75,14 @@ export const AccountsPagePresenter: React.FC<AccountsPagePresenterProps> = ({
   onClearFieldErrors,
 }) => {
   const columns = getAccountsTableColumns();
-  const actions = getAccountsTableActions({
-    onEdit: onEditUserDetails,
-    onChangePassword: onChangePassword,
-    onDeactivate: onDeactivateAccount,
-  });
+  const actions = getAccountsTableActions(
+    {
+      onEdit: onEditUserDetails,
+      onChangePassword: onChangePassword,
+      onDeactivate: onDeactivateAccount,
+    },
+    currentUserId
+  );
 
   return (
     <MedicalClinicLayout>

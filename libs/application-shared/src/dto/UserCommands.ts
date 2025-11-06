@@ -66,4 +66,5 @@ export interface UpdateUserDetailsFormData {
 
 export interface DeactivateUserCommand {
   userId: string;
+  requestingUserId: string; // ID of the user making the deactivation request
 }

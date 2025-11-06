@@ -55,11 +55,14 @@ export const getAccountsTableColumns = (): TableColumn<AccountWithFullName>[] =>
   }
 ];
 
-export const getAccountsTableActions = (handlers: {
-  onEdit: (account: AccountWithFullName) => void;
-  onChangePassword: (account: AccountWithFullName) => void;
-  onDeactivate: (account: AccountWithFullName) => void;
-}): TableActions<AccountWithFullName> => ({
+export const getAccountsTableActions = (
+  handlers: {
+    onEdit: (account: AccountWithFullName) => void;
+    onChangePassword: (account: AccountWithFullName) => void;
+    onDeactivate: (account: AccountWithFullName) => void;
+  },
+  currentUserId?: string
+): TableActions<AccountWithFullName> => ({
   buttons: [
     {
       icon: 'fas fa-edit',
@@ -75,7 +78,8 @@ export const getAccountsTableActions = (handlers: {
       icon: 'fas fa-user-slash',
       tooltip: 'Deactivate Account',
       onClick: handlers.onDeactivate,
-      color: 'orange'
+      color: 'orange',
+      hidden: (account: AccountWithFullName) => account.id === currentUserId
     }
   ]
 });

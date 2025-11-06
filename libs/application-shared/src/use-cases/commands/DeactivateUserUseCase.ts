@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { IUserRepository } from '@nx-starter/domain';
+import { IUserRepository, CannotDeactivateSelfException } from '@nx-starter/domain';
 import type { DeactivateUserCommand } from '../../dto/UserCommands';
 import { TOKENS } from '../../di/tokens';
 
@@ -15,6 +15,11 @@ export class DeactivateUserUseCase {
 
   async execute(command: DeactivateUserCommand): Promise<void> {
     console.log('[DeactivateUserUseCase] Received command:', JSON.stringify(command, null, 2));
+
+    // Prevent self-deactivation
+    if (command.userId === command.requestingUserId) {
+      throw new CannotDeactivateSelfException();
+    }
 
     // Get existing user
     const existingUser = await this.userRepository.getById(command.userId);

@@ -5,6 +5,8 @@ export interface ActionButton<T> {
   icon: string;
   tooltip: string;
   onClick: (record: T) => void;
+  color?: string;
+  hidden?: (record: T) => boolean;
 }
 
 export interface TableColumn<T> {
