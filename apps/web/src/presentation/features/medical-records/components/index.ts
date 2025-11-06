@@ -5,6 +5,7 @@ export { AddPrescriptionForm } from './AddPrescriptionForm';
 export { AddPrescriptionModal } from './AddPrescriptionModal';
 export { DeletePrescriptionModal } from './DeletePrescriptionModal';
 export { ViewPrescriptionModal } from './ViewPrescriptionModal';
+export { PrintPrescriptionModal } from './print-prescription-modal/PrintPrescriptionModal';
 
 // New modular components
 export { LaboratoryTestsPageHeader } from './LaboratoryTestsPageHeader';
