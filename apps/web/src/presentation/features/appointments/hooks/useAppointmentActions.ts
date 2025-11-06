@@ -1,5 +1,5 @@
 import { AppointmentDto } from '@nx-starter/application-shared';
-import { useAppointmentPageViewModel } from '../view-models/useAppointmentPageViewModel';
+import { useAppointmentStore } from '../../../../infrastructure/state/AppointmentStore';
 import { ConfirmationModalState } from './useModalState';
 
 export const useAppointmentActions = (
@@ -9,7 +9,10 @@ export const useAppointmentActions = (
   openEditModal: (appointment: AppointmentDto, rescheduleMode?: boolean) => void,
   refreshAppointments?: () => void
 ) => {
-  const viewModel = useAppointmentPageViewModel();
+  // Use store methods directly to avoid triggering fetchAllAppointments
+  const cancelAppointment = useAppointmentStore((state) => state.cancelAppointment);
+  const confirmAppointment = useAppointmentStore((state) => state.confirmAppointment);
+  const completeAppointment = useAppointmentStore((state) => state.completeAppointment);
 
   const handleModifyAppointment = (appointmentId: string) => {
     const appointment = appointments.find(apt => apt.id === appointmentId);
@@ -29,7 +32,7 @@ export const useAppointmentActions = (
       confirmColor: 'red',
       onConfirm: async () => {
         try {
-          await viewModel.cancelAppointment(appointmentId);
+          await cancelAppointment(appointmentId);
           closeConfirmationModal();
           if (refreshAppointments) {
             refreshAppointments();
@@ -64,7 +67,7 @@ export const useAppointmentActions = (
           }
         } else {
           try {
-            await viewModel.confirmAppointment(appointmentId);
+            await confirmAppointment(appointmentId);
             closeConfirmationModal();
             if (refreshAppointments) {
               refreshAppointments();
@@ -88,7 +91,7 @@ export const useAppointmentActions = (
       confirmColor: 'blue',
       onConfirm: async () => {
         try {
-          await viewModel.completeAppointment(appointmentId);
+          await completeAppointment(appointmentId);
           closeConfirmationModal();
           if (refreshAppointments) {
             refreshAppointments();
