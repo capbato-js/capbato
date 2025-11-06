@@ -97,23 +97,27 @@ export class TypeOrmPrescriptionRepository implements IPrescriptionRepository {
 
     if (changes.expiryDate !== undefined) {
       updateData.expiryDate = changes.expiryDate;
+      entity.expiryDate = changes.expiryDate;
     }
 
     if (changes.quantity !== undefined) {
       updateData.quantity = changes.quantity;
+      entity.quantity = changes.quantity;
     }
 
     if (changes.additionalNotes !== undefined) {
       updateData.additionalNotes = changes.additionalNotes;
+      entity.additionalNotes = changes.additionalNotes;
     }
 
     if (changes.status !== undefined) {
       updateData.status = changes.status;
+      entity.status = changes.status;
     }
 
     // Update prescription entity
     await this.repository.update(id, updateData);
-    
+
     // Save medications if they were updated
     if (changes.medications !== undefined) {
       await this.repository.save(entity);
