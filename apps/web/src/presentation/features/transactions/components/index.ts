@@ -4,3 +4,4 @@ export * from './AddReceiptForm';
 export * from './ViewTransactionModal';
 export * from './DeleteTransactionModal';
 export * from './PrintReceiptModal';
+export * from './ReceiptContent';

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal } from '../../../components/common';
-import { Stack, Divider } from '@mantine/core';
+import { Stack, Divider, Button, Group } from '@mantine/core';
+import { IconPrinter } from '@tabler/icons-react';
 import { TransactionHeader } from './TransactionHeader';
 import { PatientInfoSection } from './PatientInfoSection';
 import { TransactionItemsTable } from './TransactionItemsTable';
@@ -12,12 +13,14 @@ interface ViewTransactionModalPresenterProps {
   opened: boolean;
   onClose: () => void;
   transaction: Transaction | null;
+  onPrint: () => void;
 }
 
 export const ViewTransactionModalPresenter: React.FC<ViewTransactionModalPresenterProps> = ({
   opened,
   onClose,
   transaction,
+  onPrint,
 }) => {
   if (!transaction) {
     return null;
@@ -47,11 +50,22 @@ export const ViewTransactionModalPresenter: React.FC<ViewTransactionModalPresent
         <Divider />
 
         {/* Payment Summary */}
-        <PaymentSummary 
+        <PaymentSummary
           paymentMethod={transaction.paymentMethod}
           receivedBy={transaction.receivedBy}
           totalAmount={transaction.totalAmount}
         />
+
+        {/* Action Buttons */}
+        <Group justify="flex-end" mt="md">
+          <Button
+            variant="filled"
+            leftSection={<IconPrinter size={20} />}
+            onClick={onPrint}
+          >
+            Print Receipt
+          </Button>
+        </Group>
       </Stack>
     </Modal>
   );
