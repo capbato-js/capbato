@@ -27,7 +27,7 @@ export {
 // Request DTOs for API endpoints
 export interface CreateAppointmentRequestDto {
   patientId: string;
-  reasonForVisit: string;
+  reasonForVisit: string | string[];
   appointmentDate: string; // ISO date string
   appointmentTime: string; // HH:MM format
   status?: 'confirmed' | 'cancelled' | 'completed';
@@ -36,7 +36,7 @@ export interface CreateAppointmentRequestDto {
 
 export interface UpdateAppointmentRequestDto {
   patientId?: string;
-  reasonForVisit?: string;
+  reasonForVisit?: string | string[];
   appointmentDate?: string; // ISO date string
   appointmentTime?: string; // HH:MM format
   status?: 'confirmed' | 'cancelled' | 'completed';
@@ -66,7 +66,7 @@ export interface AppointmentDto {
     fullName: string;
     specialization?: string;
   };
-  reasonForVisit: string;
+  reasonForVisit: string | string[];
   appointmentDate: string; // ISO date string
   appointmentTime: string; // HH:MM format
   status: 'confirmed' | 'cancelled' | 'completed';

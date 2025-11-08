@@ -41,8 +41,13 @@ export const useAppointmentFormViewModel = (appointmentId?: string): IAppointmen
         return false;
       }
 
-      if (!formData.reasonForVisit?.trim()) {
-        setLocalError('Reason for visit is required');
+      // Check if reasonForVisit is provided (can be string or array)
+      const hasReasonForVisit = Array.isArray(formData.reasonForVisit)
+        ? formData.reasonForVisit.length > 0
+        : formData.reasonForVisit?.trim();
+
+      if (!hasReasonForVisit) {
+        setLocalError('At least one reason for visit is required');
         return false;
       }
 

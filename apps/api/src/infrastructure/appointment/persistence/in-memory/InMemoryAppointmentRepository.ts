@@ -242,8 +242,13 @@ export class InMemoryAppointmentRepository implements IAppointmentRepository {
     // Count occurrences of each reason
     const reasonCounts = new Map<string, number>();
     appointments.forEach((appointment) => {
-      const reason = appointment.reasonForVisit;
-      reasonCounts.set(reason, (reasonCounts.get(reason) || 0) + 1);
+      const reasons = Array.isArray(appointment.reasonForVisit)
+        ? appointment.reasonForVisit
+        : [appointment.reasonForVisit];
+
+      reasons.forEach((reason) => {
+        reasonCounts.set(reason, (reasonCounts.get(reason) || 0) + 1);
+      });
     });
 
     // Calculate total for percentage

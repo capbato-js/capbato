@@ -41,6 +41,14 @@ export const AddAppointmentFormContainer: React.FC<AddAppointmentFormProps> = ({
     currentAppointmentId
   );
 
+  // Normalize reasonForVisit to always be an array
+  const normalizeReasonForVisit = (reason: any): string[] => {
+    if (!reason) return [];
+    if (Array.isArray(reason)) return reason;
+    if (typeof reason === 'string') return [reason];
+    return [];
+  };
+
   // React Hook Form setup
   const {
     handleSubmit,
@@ -53,7 +61,7 @@ export const AddAppointmentFormContainer: React.FC<AddAppointmentFormProps> = ({
     mode: 'onBlur',
     defaultValues: {
       patientName: initialData?.patientId || '',
-      reasonForVisit: initialData?.reasonForVisit || '',
+      reasonForVisit: normalizeReasonForVisit(initialData?.reasonForVisit),
       date: initialData?.appointmentDate || '',
       time: initialData?.appointmentTime || '',
       doctor: initialData?.doctorId || '',
@@ -74,20 +82,20 @@ export const AddAppointmentFormContainer: React.FC<AddAppointmentFormProps> = ({
 
     reset({
       patientName: initialData.patientId || '',
-      reasonForVisit: initialData.reasonForVisit || '',
+      reasonForVisit: normalizeReasonForVisit(initialData.reasonForVisit),
       date: initialData.appointmentDate || '',
       time: initialData.appointmentTime || '',
       doctor: initialData.doctorId || '',
     });
-    
+
     if (initialData.patientNumber) {
       setSelectedPatientNumber(initialData.patientNumber);
     }
-    
+
     if (initialData.doctorName) {
       setAssignedDoctor(initialData.doctorName);
     }
-    
+
     if (initialData.appointmentDate) {
       updateTimeSlotsForDate(initialData.appointmentDate);
     }

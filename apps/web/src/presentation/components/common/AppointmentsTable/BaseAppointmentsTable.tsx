@@ -7,7 +7,7 @@ export interface BaseAppointment {
   id: string;
   patientNumber: string;
   patientName: string;
-  reasonForVisit: string;
+  reasonForVisit: string | string[];
   date: string;
   time: string;
   doctor: string;
@@ -183,7 +183,8 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
     header: 'Reason for visit',
     width: compactMode ? '22%' : (showPatientColumns ? '18%' : '30%'), // Wider if patient columns are hidden
     align: 'left',
-    searchable: !compactMode
+    searchable: !compactMode,
+    render: (value) => Array.isArray(value) ? value.join(', ') : value
   });
 
   // Add contact column if enabled

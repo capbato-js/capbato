@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import { UserEntity } from '../../user/persistence/typeorm/UserEntity';
 import { PatientEntity } from '../../patient/persistence/typeorm/PatientEntity';
 import { DoctorEntity } from '../../doctor/persistence/typeorm/DoctorEntity';
-// import { ScheduleEntity } from '../../schedule/persistence/typeorm/ScheduleEntity'; // Outdated - not used in frontend
+import { ScheduleEntity } from '../../schedule/persistence/typeorm/ScheduleEntity';
 import { AppointmentEntity } from '../../appointment/persistence/typeorm/AppointmentEntity';
 import { LabRequestEntity } from '../../laboratory/persistence/typeorm/LabRequestEntity';
 import { LabTestResultEntity } from '../../laboratory/persistence/typeorm/LabTestResultEntity';
@@ -55,7 +55,7 @@ export const createTypeOrmDataSource = (): DataSource => {
       UserEntity,
       PatientEntity,
       DoctorEntity,
-      // ScheduleEntity, // Outdated - not used in frontend
+      ScheduleEntity,
       AppointmentEntity,
       LabRequestEntity,
       LabTestResultEntity,

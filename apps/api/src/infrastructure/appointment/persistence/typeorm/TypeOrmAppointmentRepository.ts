@@ -495,6 +495,29 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
     return currentEntity ? this.toDomain(currentEntity) : undefined;
   }
 
+  /**
+   * Normalize reasonForVisit to always be an array
+   * Handles backward compatibility for old string data
+   */
+  private normalizeReasonForVisit(reasonForVisit: any): string[] {
+    if (Array.isArray(reasonForVisit)) {
+      return reasonForVisit;
+    }
+    if (typeof reasonForVisit === 'string') {
+      // Check if it's a JSON string
+      if (reasonForVisit.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(reasonForVisit);
+          return Array.isArray(parsed) ? parsed : [reasonForVisit];
+        } catch {
+          return [reasonForVisit];
+        }
+      }
+      return [reasonForVisit];
+    }
+    return [];
+  }
+
   private toDomain(entity: AppointmentEntity): Appointment {
     // Convert HH:MM:SS back to HH:MM format if needed
     const timeValue = entity.appointmentTime.includes(':') && entity.appointmentTime.split(':').length === 3
@@ -504,7 +527,7 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
     return AppointmentMapper.fromPlainObject({
       id: entity.id,
       patient_id: entity.patientId,
-      reason_for_visit: entity.reasonForVisit,
+      reason_for_visit: this.normalizeReasonForVisit(entity.reasonForVisit),
       appointment_date: entity.appointmentDate,
       appointment_time: timeValue,
       status: entity.status,
@@ -527,7 +550,7 @@ export class TypeOrmAppointmentRepository implements IAppointmentRepository {
     const appointment = AppointmentMapper.fromPlainObject({
       id: data.appointment.id,
       patient_id: data.appointment.patientId,
-      reason_for_visit: data.appointment.reasonForVisit,
+      reason_for_visit: this.normalizeReasonForVisit(data.appointment.reasonForVisit),
       appointment_date: data.appointment.appointmentDate,
       appointment_time: timeValue,
       status: data.appointment.status,

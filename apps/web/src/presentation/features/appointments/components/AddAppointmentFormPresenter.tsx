@@ -1,6 +1,6 @@
 import React from 'react';
 import { Controller, Control } from 'react-hook-form';
-import { Button, Stack, Box } from '@mantine/core';
+import { Button, Stack, Box, MultiSelect } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { AddAppointmentFormData } from '@nx-starter/application-shared';
 import { Icon } from '../../../components/common';
@@ -9,11 +9,11 @@ import { ReadOnlyField } from './ReadOnlyField';
 import { DoctorAssignmentDisplay } from './DoctorAssignmentDisplay';
 import { PatientNumberDisplay } from './PatientNumberDisplay';
 import { FormErrorMessage } from './FormErrorMessage';
-import { 
-  REASONS_FOR_VISIT_OPTIONS, 
-  FORM_LABELS, 
-  FORM_PLACEHOLDERS, 
-  FORM_MESSAGES 
+import {
+  REASONS_FOR_VISIT_OPTIONS,
+  FORM_LABELS,
+  FORM_PLACEHOLDERS,
+  FORM_MESSAGES
 } from '../config/appointmentFormConfig';
 
 interface AddAppointmentFormPresenterProps {
@@ -130,24 +130,40 @@ export const AddAppointmentFormPresenter: React.FC<AddAppointmentFormPresenterPr
               {isRescheduleMode ? (
                 <ReadOnlyField
                   label={FORM_LABELS.REASON_FOR_VISIT}
-                  value={initialData?.reasonForVisit || 'Unknown Reason'}
+                  value={Array.isArray(initialData?.reasonForVisit)
+                    ? initialData.reasonForVisit.join(', ')
+                    : initialData?.reasonForVisit || 'Unknown Reason'}
                   icon="fas fa-stethoscope"
                   helperText={FORM_MESSAGES.EDIT_MODE.RESCHEDULE_REASON_READONLY}
                   required
                 />
               ) : (
-                <FormSelect
-                  {...field}
+                <MultiSelect
+                  name={field.name}
+                  ref={field.ref}
+                  onBlur={field.onBlur}
                   label={FORM_LABELS.REASON_FOR_VISIT}
                   placeholder={FORM_PLACEHOLDERS.REASON_FOR_VISIT}
                   data={REASONS_FOR_VISIT_OPTIONS}
-                  error={fieldState.error}
+                  error={fieldState.error?.message}
                   disabled={isLoading}
+                  value={(() => {
+                    // Normalize value to clean array
+                    if (Array.isArray(field.value)) {
+                      return field.value.filter(v => v != null && v !== '');
+                    }
+                    if (field.value && typeof field.value === 'string') {
+                      return [field.value];
+                    }
+                    return [];
+                  })()}
                   onChange={(value) => {
                     field.onChange(value);
                     onInputChange();
                   }}
                   leftSection={<Icon icon="fas fa-stethoscope" size={16} />}
+                  searchable
+                  clearable
                 />
               )}
             </>

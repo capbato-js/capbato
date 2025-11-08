@@ -11,7 +11,7 @@ import {
 interface IAppointment {
   id?: AppointmentId;
   patientId: string;
-  reasonForVisit: string;
+  reasonForVisit: string[];
   appointmentDate: Date;
   appointmentTime: AppointmentTime;
   status: AppointmentStatus;
@@ -23,7 +23,7 @@ interface IAppointment {
 export class Appointment implements IAppointment {
   private readonly _id?: AppointmentId;
   private readonly _patientId: string;
-  private readonly _reasonForVisit: string;
+  private readonly _reasonForVisit: string[];
   private readonly _appointmentDate: Date;
   private readonly _appointmentTime: AppointmentTime;
   private readonly _status: AppointmentStatus;
@@ -33,7 +33,7 @@ export class Appointment implements IAppointment {
 
   private constructor(
     patientId: string,
-    reasonForVisit: string,
+    reasonForVisit: string | string[],
     appointmentDate: Date,
     appointmentTime: string | AppointmentTime,
     doctorId: string,
@@ -44,10 +44,10 @@ export class Appointment implements IAppointment {
   ) {
     this._id = id instanceof AppointmentId ? id : id ? new AppointmentId(id) : undefined;
     this._patientId = patientId;
-    this._reasonForVisit = reasonForVisit;
+    this._reasonForVisit = Array.isArray(reasonForVisit) ? reasonForVisit : [reasonForVisit];
     this._appointmentDate = appointmentDate;
-    this._appointmentTime = appointmentTime instanceof AppointmentTime 
-      ? appointmentTime 
+    this._appointmentTime = appointmentTime instanceof AppointmentTime
+      ? appointmentTime
       : new AppointmentTime(appointmentTime);
     this._status = new AppointmentStatus(status);
     this._doctorId = doctorId;
@@ -60,7 +60,7 @@ export class Appointment implements IAppointment {
    */
   public static create(
     patientId: string,
-    reasonForVisit: string,
+    reasonForVisit: string | string[],
     appointmentDate: Date,
     appointmentTime: string | AppointmentTime,
     doctorId: string,
@@ -87,7 +87,7 @@ export class Appointment implements IAppointment {
   public static reconstruct(
     id: string | AppointmentId,
     patientId: string,
-    reasonForVisit: string,
+    reasonForVisit: string | string[],
     appointmentDate: Date,
     appointmentTime: string | AppointmentTime,
     doctorId: string,
@@ -117,7 +117,7 @@ export class Appointment implements IAppointment {
     return this._patientId;
   }
 
-  get reasonForVisit(): string {
+  get reasonForVisit(): string[] {
     return this._reasonForVisit;
   }
 
@@ -215,7 +215,7 @@ export class Appointment implements IAppointment {
   }
 
   updateDetails(
-    reasonForVisit?: string,
+    reasonForVisit?: string | string[],
     doctorId?: string
   ): Appointment {
     return this.createCopy({
@@ -230,8 +230,12 @@ export class Appointment implements IAppointment {
    */
   validate(): void {
     // Additional business validations can be added here
-    if (!this._reasonForVisit.trim()) {
-      throw new Error('Reason for visit is required');
+    if (!this._reasonForVisit || this._reasonForVisit.length === 0) {
+      throw new Error('At least one reason for visit is required');
+    }
+
+    if (this._reasonForVisit.some(reason => !reason.trim())) {
+      throw new Error('Reason for visit cannot be empty');
     }
 
     if (!this._patientId || this._patientId.trim().length === 0) {
@@ -291,7 +295,7 @@ export class Appointment implements IAppointment {
   private createCopy(updates: {
     id?: AppointmentId;
     patientId?: string;
-    reasonForVisit?: string;
+    reasonForVisit?: string | string[];
     appointmentDate?: Date;
     appointmentTime?: AppointmentTime;
     status?: AppointmentStatus;

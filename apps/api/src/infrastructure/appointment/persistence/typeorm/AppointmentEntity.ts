@@ -14,8 +14,8 @@ export class AppointmentEntity {
   @Column({ type: 'varchar', length: 36, name: 'patient_id' })
   patientId!: string;
 
-  @Column({ type: 'text', name: 'reason_for_visit' })
-  reasonForVisit!: string;
+  @Column({ type: 'json', name: 'reason_for_visit' })
+  reasonForVisit!: string[];
 
   @Column({ type: 'date', name: 'appointment_date' })
   appointmentDate!: Date;

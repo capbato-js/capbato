@@ -127,8 +127,11 @@ const validatePatientName = (name: string, ctx: z.RefinementCtx) => {
 };
 
 // Enhanced reason for visit validation function
-const validateReasonForVisit = (reason: string, ctx: z.RefinementCtx) => {
-  if (!reason || reason.trim() === '') {
+const validateReasonForVisit = (reasons: string | string[], ctx: z.RefinementCtx) => {
+  // Convert single string to array for consistent validation
+  const reasonArray = Array.isArray(reasons) ? reasons : [reasons];
+
+  if (!reasonArray || reasonArray.length === 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: APPOINTMENT_VALIDATION_ERRORS.MISSING_REASON_FOR_VISIT,
@@ -136,20 +139,31 @@ const validateReasonForVisit = (reason: string, ctx: z.RefinementCtx) => {
     return;
   }
 
-  if (reason.trim().length < 5) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Reason for visit must be at least 5 characters',
-    });
-    return;
-  }
+  // Validate each reason
+  for (const reason of reasonArray) {
+    if (!reason || reason.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Each reason for visit must not be empty',
+      });
+      return;
+    }
 
-  if (reason.length > 500) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Reason for visit cannot exceed 500 characters',
-    });
-    return;
+    if (reason.trim().length < 5) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Each reason for visit must be at least 5 characters',
+      });
+      return;
+    }
+
+    if (reason.length > 500) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Each reason for visit cannot exceed 500 characters',
+      });
+      return;
+    }
   }
 };
 
@@ -166,7 +180,7 @@ const validateDoctor = (doctor: string, ctx: z.RefinementCtx) => {
 
 // Base validation schemas for forms
 export const PatientNameSchema = z.string().superRefine(validatePatientName);
-export const ReasonForVisitSchema = z.string().superRefine(validateReasonForVisit);
+export const ReasonForVisitSchema = z.union([z.string(), z.array(z.string())]).superRefine(validateReasonForVisit);
 export const AppointmentDateSchema = z.string().superRefine(validateAppointmentDate);
 export const AppointmentTimeSchema = z.string().superRefine(validateAppointmentTime);
 export const DoctorSchema = z.string().superRefine(validateDoctor);
@@ -201,7 +215,7 @@ export const AddAppointmentFormSchema = z.object({
 // API Command schemas
 export const CreateAppointmentCommandSchema = z.object({
   patientId: z.string().min(1, 'Patient ID is required'),
-  reasonForVisit: z.string().superRefine(validateReasonForVisit),
+  reasonForVisit: z.union([z.string(), z.array(z.string())]).superRefine(validateReasonForVisit),
   appointmentDate: ApiAppointmentDateSchema,
   appointmentTime: ApiAppointmentTimeSchema,
   status: AppointmentStatusSchema.default('confirmed'),
@@ -211,7 +225,7 @@ export const CreateAppointmentCommandSchema = z.object({
 export const UpdateAppointmentCommandSchema = z.object({
   id: AppointmentIdSchema,
   patientId: z.string().min(1, 'Patient ID is required').optional(),
-  reasonForVisit: z.string().superRefine(validateReasonForVisit).optional(),
+  reasonForVisit: z.union([z.string(), z.array(z.string())]).superRefine(validateReasonForVisit).optional(),
   appointmentDate: ApiAppointmentDateSchema.optional(),
   appointmentTime: ApiAppointmentTimeSchema.optional(),
   status: AppointmentStatusSchema.optional(),
