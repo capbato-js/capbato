@@ -1,9 +1,18 @@
 import { z } from 'zod';
+import { isWithinClinicHours } from '../utils/clinicHoursValidator';
 
 /**
  * Zod schemas for Laboratory command validation
  * These schemas define the validation rules and generate TypeScript types
  */
+
+/**
+ * Custom refinement to validate clinic hours
+ * Laboratory tests can only be added during clinic operating hours (8am-6pm)
+ */
+const validateClinicHoursRefinement = () => {
+  return isWithinClinicHours();
+};
 
 // Lab Request Status Schema
 export const LabRequestStatusSchema = z.enum(['pending', 'in_progress', 'completed', 'cancelled']);
@@ -73,7 +82,7 @@ export const CreateLabRequestCommandSchema = z.object({
   patientId: z.string().min(1, 'Patient ID is required'),
   requestDate: z.string().datetime('Invalid date format').transform((val) => new Date(val)),
   others: z.string().optional(),
-  
+
   // Grouped test categories
   routine: RoutineTestsSchema,
   serology: SerologyTestsSchema,
@@ -81,6 +90,11 @@ export const CreateLabRequestCommandSchema = z.object({
   miscellaneous: MiscellaneousTestsSchema,
   thyroid: ThyroidTestsSchema,
   coagulation: CoagulationTestsSchema,
+}).refine((data) => {
+  // Validate clinic hours - lab tests can only be added during clinic hours (8am-6pm)
+  return validateClinicHoursRefinement();
+}, {
+  message: 'Laboratory tests can only be added during clinic hours (8:00 AM to 6:00 PM)',
 }).refine((data) => {
   // Check if at least one test is selected across all categories
   const hasAnyTest =

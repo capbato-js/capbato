@@ -30,8 +30,39 @@ export class LaboratoryApiService implements ILaboratoryApiService {
    */
   private getErrorMessage(error: unknown, fallbackMessage: string): string {
     if (error instanceof ApiError && error.data && typeof error.data === 'object') {
-      const errorData = error.data as { message?: string };
-      return errorData.message || error.message || fallbackMessage;
+      const errorData = error.data as {
+        message?: string;
+        error?: string;
+        details?: {
+          message?: string;
+          fieldErrors?: Record<string, string[]>;
+          issues?: Array<{ message: string }>;
+        };
+      };
+
+      // Try to extract the most specific error message
+      // 1. Check for validation field errors (highest priority for user-facing messages)
+      if (errorData.details?.fieldErrors) {
+        const fieldErrors = errorData.details.fieldErrors;
+        // Get the first field error message
+        const firstFieldKey = Object.keys(fieldErrors)[0];
+        if (firstFieldKey && fieldErrors[firstFieldKey]?.[0]) {
+          return fieldErrors[firstFieldKey][0];
+        }
+      }
+
+      // 2. Check for validation issues
+      if (errorData.details?.issues && errorData.details.issues.length > 0) {
+        return errorData.details.issues[0].message;
+      }
+
+      // 3. Check for details message
+      if (errorData.details?.message) {
+        return errorData.details.message;
+      }
+
+      // 4. Check for top-level error or message
+      return errorData.error || errorData.message || error.message || fallbackMessage;
     }
     return error instanceof Error ? error.message : fallbackMessage;
   }

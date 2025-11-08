@@ -3,6 +3,7 @@ import { Prescription, Medication } from '@nx-starter/domain';
 import type { IPrescriptionRepository } from '@nx-starter/domain';
 import type { CreatePrescriptionCommand } from '../../dto/PrescriptionCommands';
 import { TOKENS } from '../../di/tokens';
+import { validateClinicHours } from '../../utils/clinicHoursValidator';
 
 /**
  * Use case for creating a new prescription
@@ -15,6 +16,9 @@ export class CreatePrescriptionUseCase {
   ) {}
 
   async execute(command: CreatePrescriptionCommand): Promise<Prescription> {
+    // Validate clinic hours - prescriptions can only be added during clinic hours (8am-6pm)
+    validateClinicHours();
+
     // Handle both new medications array and legacy single medication fields
     let medications: Medication[] = [];
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isWithinClinicHours } from '../utils/clinicHoursValidator';
 
 // Lab test category enum
 export const LabTestCategory = z.enum([
@@ -25,6 +26,15 @@ const AddLabTestFormSchema = z.object({
   requestDate: z.string().min(1, 'Request date is required'),
   selectedTests: z.array(z.string()).min(1, 'Please select at least one test'),
   otherTests: z.string().optional(),
+}).superRefine((data, ctx) => {
+  // Validate clinic hours - lab tests can only be added during clinic hours (8am-6pm)
+  if (!isWithinClinicHours()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Laboratory tests can only be added during clinic hours (8:00 AM to 6:00 PM)',
+      path: ['requestDate'],
+    });
+  }
 });
 
 // Lab test result schema

@@ -2,6 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { IHttpClient } from '../http/IHttpClient';
 import { IPrescriptionApiService } from './IPrescriptionApiService';
 import { getApiConfig } from './config/ApiConfig';
+import { ApiError } from './errors/ApiError';
 import {
   PrescriptionListResponse,
   PrescriptionResponse,
@@ -18,6 +19,48 @@ export class PrescriptionApiService implements IPrescriptionApiService {
   constructor(
     @inject(TOKENS.HttpClient) private readonly httpClient: IHttpClient
   ) {}
+
+  /**
+   * Extract error message from ApiError or fallback to generic message
+   */
+  private getErrorMessage(error: unknown, fallbackMessage: string): string {
+    if (error instanceof ApiError && error.data && typeof error.data === 'object') {
+      const errorData = error.data as {
+        message?: string;
+        error?: string;
+        details?: {
+          message?: string;
+          fieldErrors?: Record<string, string[]>;
+          issues?: Array<{ message: string }>;
+        };
+      };
+
+      // Try to extract the most specific error message
+      // 1. Check for validation field errors (highest priority for user-facing messages)
+      if (errorData.details?.fieldErrors) {
+        const fieldErrors = errorData.details.fieldErrors;
+        // Get the first field error message
+        const firstFieldKey = Object.keys(fieldErrors)[0];
+        if (firstFieldKey && fieldErrors[firstFieldKey]?.[0]) {
+          return fieldErrors[firstFieldKey][0];
+        }
+      }
+
+      // 2. Check for validation issues
+      if (errorData.details?.issues && errorData.details.issues.length > 0) {
+        return errorData.details.issues[0].message;
+      }
+
+      // 3. Check for details message
+      if (errorData.details?.message) {
+        return errorData.details.message;
+      }
+
+      // 4. Check for top-level error or message
+      return errorData.error || errorData.message || error.message || fallbackMessage;
+    }
+    return error instanceof Error ? error.message : fallbackMessage;
+  }
 
   async getAllPrescriptions(): Promise<PrescriptionListResponse> {
     const response = await this.httpClient.get<PrescriptionListResponse>(
@@ -55,16 +98,20 @@ export class PrescriptionApiService implements IPrescriptionApiService {
   }
 
   async createPrescription(prescriptionData: CreatePrescriptionRequestDto): Promise<PrescriptionResponse> {
-    const response = await this.httpClient.post<PrescriptionResponse>(
-      this.apiConfig.endpoints.prescriptions.base,
-      prescriptionData
-    );
-    
-    if (!response.data.success) {
-      throw new Error('Failed to create prescription');
+    try {
+      const response = await this.httpClient.post<PrescriptionResponse>(
+        this.apiConfig.endpoints.prescriptions.base,
+        prescriptionData
+      );
+
+      if (!response.data.success) {
+        throw new Error('Failed to create prescription');
+      }
+
+      return response.data;
+    } catch (error) {
+      throw new Error(this.getErrorMessage(error, 'Failed to create prescription'));
     }
-    
-    return response.data;
   }
 
   async updatePrescription(id: string, updateData: UpdatePrescriptionRequestDto): Promise<PrescriptionOperationResponse> {

@@ -42,8 +42,8 @@ export const useAddLabTestFormViewModel = (): IAddLabTestFormViewModel => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Get laboratory store actions
-  const { createLabRequest, fetchAllLabRequests } = useLaboratoryStore();
+  // Get laboratory store actions and state
+  const { createLabRequest, fetchAllLabRequests, errorStates } = useLaboratoryStore();
   
   /**
    * Handle form submission
@@ -165,17 +165,19 @@ export const useAddLabTestFormViewModel = (): IAddLabTestFormViewModel => {
       
       
       const success = await createLabRequest(command);
-      
-      
+
+
       if (success) {
         // Success - navigate back to laboratory list
         navigate('/laboratory');
-        
+
         // Refresh the lab tests list
         await fetchAllLabRequests();
-        
+
       } else {
-        throw new Error('Failed to submit lab test request');
+        // Use the detailed error from the store if available
+        const errorMessage = errorStates.createError || 'Failed to submit lab test request';
+        throw new Error(errorMessage);
       }
       
     } catch (err) {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isWithinClinicHours } from '../utils/clinicHoursValidator';
 
 /**
  * Zod schemas for Prescription validation
@@ -14,6 +15,7 @@ export const PRESCRIPTION_VALIDATION_ERRORS = {
   MISSING_MEDICATIONS: 'At least one medication is required',
   INVALID_DATE_FORMAT: 'Invalid date format. Use YYYY-MM-DD',
   FUTURE_DATE: 'Prescription date cannot be in the future',
+  OUTSIDE_CLINIC_HOURS: 'Prescriptions can only be added during clinic hours (8:00 AM to 6:00 PM)',
   INVALID_MEDICATION_NAME: 'Medication name is required',
   INVALID_DOSAGE: 'Dosage is required',
   INVALID_FREQUENCY: 'Frequency is required',
@@ -207,6 +209,17 @@ const validatePrescriptionDate = (date: string, ctx: z.RefinementCtx) => {
   }
 };
 
+// Validate clinic hours - prescriptions can only be added during clinic hours (8am-6pm)
+const validateClinicHoursForPrescription = (ctx: z.RefinementCtx) => {
+  if (!isWithinClinicHours()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: PRESCRIPTION_VALIDATION_ERRORS.OUTSIDE_CLINIC_HOURS,
+      path: ['datePrescribed'],
+    });
+  }
+};
+
 // Flexible ID validation schema that supports both UUID and dashless UUID formats
 export const PrescriptionIdSchema = z.string()
   .min(1, 'Prescription ID cannot be empty')
@@ -265,6 +278,9 @@ export const AddPrescriptionFormSchema = z.object({
   notes: z.string()
     .max(1000, 'Notes must be 1000 characters or less')
     .optional(),
+}).superRefine((data, ctx) => {
+  // Validate clinic hours - prescriptions can only be added during clinic hours
+  validateClinicHoursForPrescription(ctx);
 });
 
 // Update Prescription Form Schema (Frontend UI)
@@ -313,10 +329,13 @@ export const CreatePrescriptionCommandSchema = z
     duration: z.string().min(1, PRESCRIPTION_VALIDATION_ERRORS.INVALID_DURATION).max(100, 'Duration must be 100 characters or less').optional(),
   })
   .superRefine((data, ctx) => {
+    // Validate clinic hours - prescriptions can only be added during clinic hours
+    validateClinicHoursForPrescription(ctx);
+
     // Ensure either medications array or legacy fields are provided
     const hasMedicationsArray = data.medications && data.medications.length > 0;
     const hasLegacyFields = data.medicationName && data.dosage && data.instructions && data.frequency && data.duration;
-    
+
     if (!hasMedicationsArray && !hasLegacyFields) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -329,7 +348,7 @@ export const CreatePrescriptionCommandSchema = z
     if (data.expiryDate && data.prescribedDate) {
       const prescribedDate = new Date(data.prescribedDate);
       const expiryDate = new Date(data.expiryDate);
-      
+
       if (expiryDate <= prescribedDate) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
