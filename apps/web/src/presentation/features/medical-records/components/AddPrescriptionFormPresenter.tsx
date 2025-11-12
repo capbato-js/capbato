@@ -40,6 +40,8 @@ interface AddPrescriptionFormPresenterProps {
   error?: string | null;
   isFormValid: boolean;
   editMode: boolean;
+  hasAnyPatientsWithAppointmentsToday?: boolean;
+  isLoadingAppointments?: boolean;
 }
 
 export const AddPrescriptionFormPresenter: React.FC<AddPrescriptionFormPresenterProps> = ({
@@ -57,6 +59,8 @@ export const AddPrescriptionFormPresenter: React.FC<AddPrescriptionFormPresenter
   error,
   isFormValid,
   editMode,
+  hasAnyPatientsWithAppointmentsToday = true,
+  isLoadingAppointments = false,
 }) => {
   return (
     <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -82,10 +86,16 @@ export const AddPrescriptionFormPresenter: React.FC<AddPrescriptionFormPresenter
                 searchable
                 clearable
                 error={errors.patientId?.message}
+                disabled={isLoadingAppointments}
               />
             )}
           />
           <PatientInfoDisplay patientNumber={selectedPatientNumber} />
+          {!isLoadingAppointments && !hasAnyPatientsWithAppointmentsToday && (
+            <Text size="sm" c="red" mt={4}>
+              There are no patients who have appointments for today.
+            </Text>
+          )}
         </Box>
 
         {/* Doctor Selection */}

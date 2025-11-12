@@ -39,6 +39,8 @@ export const AddPrescriptionFormContainer: React.FC<AddPrescriptionFormContainer
     doctors,
     selectedPatientNumber,
     updateSelectedPatientNumber,
+    hasAnyPatientsWithAppointmentsToday,
+    isLoadingAppointments,
   } = usePrescriptionFormData();
 
   // Get form state
@@ -83,6 +85,8 @@ export const AddPrescriptionFormContainer: React.FC<AddPrescriptionFormContainer
       error={error}
       isFormValid={isFormValid}
       editMode={editMode}
+      hasAnyPatientsWithAppointmentsToday={hasAnyPatientsWithAppointmentsToday}
+      isLoadingAppointments={isLoadingAppointments}
     />
   );
 };

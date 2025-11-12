@@ -57,12 +57,14 @@ export const AddLabTestFormPresenter: React.FC<AddLabTestFormPresenterProps> = (
           control={formState.control}
           register={formState.register}
           errors={formState.formState.errors}
-          patients={patientData.patients}
+          patients={patientSelection.filteredPatients}
           selectedPatientNumber={patientSelection.selectedPatientNumber}
           selectedPatientAgeGender={patientSelection.selectedPatientAgeGender}
           onPatientChange={patientSelection.handlePatientChange}
           isLoading={isLoading}
           isPatientLoading={patientData.isLoading}
+          hasAnyPatientsWithAppointmentsToday={patientSelection.hasAnyPatientsWithAppointmentsToday}
+          isLoadingAppointments={patientSelection.isLoadingAppointments}
         />
 
         <TestSelectionGrid

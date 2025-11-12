@@ -18,6 +18,8 @@ interface PatientInformationSectionProps {
   onPatientChange: (patientId: string) => void;
   isLoading: boolean;
   isPatientLoading: boolean;
+  hasAnyPatientsWithAppointmentsToday?: boolean;
+  isLoadingAppointments?: boolean;
 }
 
 export const PatientInformationSection: React.FC<PatientInformationSectionProps> = ({
@@ -30,6 +32,8 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
   onPatientChange,
   isLoading,
   isPatientLoading,
+  hasAnyPatientsWithAppointmentsToday = true,
+  isLoadingAppointments = false,
 }) => {
   return (
     <Box>
@@ -46,7 +50,7 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
                   placeholder="Search and select patient"
                   data={patients}
                   error={fieldState.error}
-                  disabled={isLoading || isPatientLoading}
+                  disabled={isLoading || isPatientLoading || isLoadingAppointments}
                   onChange={(value) => {
                     field.onChange(value);
                     if (value) onPatientChange(value);
@@ -56,6 +60,11 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
                 {selectedPatientNumber && (
                   <Text size="sm" c="dimmed" mt={4}>
                     Patient #: {selectedPatientNumber}
+                  </Text>
+                )}
+                {!isLoadingAppointments && !hasAnyPatientsWithAppointmentsToday && (
+                  <Text size="sm" c="red" mt={4}>
+                    There are no patients who have appointments for today.
                   </Text>
                 )}
               </Box>

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePatientStore } from '../../../../infrastructure/state/PatientStore';
 import { useDoctorStore } from '../../../../infrastructure/state/DoctorStore';
+import { usePatientsWithTodayAppointments } from './usePatientsWithTodayAppointments';
 
 export interface FormattedPatient {
   value: string;
@@ -17,12 +18,19 @@ export const usePrescriptionFormData = () => {
   const [patients, setPatients] = useState<FormattedPatient[]>([]);
   const [doctors, setDoctors] = useState<FormattedDoctor[]>([]);
   const [selectedPatientNumber, setSelectedPatientNumber] = useState<string>('');
-  
+
   // Get stores with selectors to prevent unnecessary re-renders
   const patientStorePatients = usePatientStore((state) => state.patients);
   const patientStoreLoadPatients = usePatientStore((state) => state.loadPatients);
   const doctorStoreSummaries = useDoctorStore((state) => state.doctorSummaries);
   const doctorStoreGetAllDoctors = useDoctorStore((state) => state.getAllDoctors);
+
+  // Get patients with appointments today
+  const {
+    filterPatientsWithAppointmentsToday,
+    hasAnyPatientsWithAppointmentsToday,
+    isLoading: isLoadingAppointments
+  } = usePatientsWithTodayAppointments();
 
   // Load patients and doctors on component mount
   useEffect(() => {
@@ -30,7 +38,7 @@ export const usePrescriptionFormData = () => {
       try {
         // Load patients
         await patientStoreLoadPatients();
-        
+
         // Load doctors
         await doctorStoreGetAllDoctors(true, 'summary');
       } catch (error) {
@@ -53,6 +61,11 @@ export const usePrescriptionFormData = () => {
     }
   }, [patientStorePatients]);
 
+  // Filter patients to only show those with appointments today
+  const filteredPatients = useMemo(() => {
+    return filterPatientsWithAppointmentsToday(patients);
+  }, [patients, filterPatientsWithAppointmentsToday]);
+
   // Format doctors for select component
   useEffect(() => {
     if (doctorStoreSummaries.length > 0) {
@@ -66,7 +79,7 @@ export const usePrescriptionFormData = () => {
 
   const updateSelectedPatientNumber = (patientId: string) => {
     if (patientId) {
-      const selectedPatient = patients.find(p => p.value === patientId);
+      const selectedPatient = filteredPatients.find(p => p.value === patientId);
       if (selectedPatient) {
         setSelectedPatientNumber(selectedPatient.patientNumber);
       }
@@ -76,9 +89,11 @@ export const usePrescriptionFormData = () => {
   };
 
   return {
-    patients,
+    patients: filteredPatients,
     doctors,
     selectedPatientNumber,
     updateSelectedPatientNumber,
+    hasAnyPatientsWithAppointmentsToday,
+    isLoadingAppointments,
   };
 };
