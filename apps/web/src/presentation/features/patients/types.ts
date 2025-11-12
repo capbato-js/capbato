@@ -8,6 +8,7 @@ export interface Patient {
   age: number;
   gender: 'Male' | 'Female' | 'Other';
   phoneNumber: string;
+  photoUrl?: string;
   email?: string;
   address: string | {
     street: string;

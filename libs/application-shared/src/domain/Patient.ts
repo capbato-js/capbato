@@ -11,27 +11,28 @@ export interface IPatient {
   dateOfBirth: Date;
   gender: 'Male' | 'Female';
   contactNumber: string;
-  
+  photoUrl?: string;
+
   // Address Information
   houseNumber?: string;
   streetName?: string;
   province?: string;
   cityMunicipality?: string;
   barangay?: string;
-  
+
   // Guardian Information
   guardianName?: string;
   guardianGender?: 'Male' | 'Female';
   guardianRelationship?: string;
   guardianContactNumber?: string;
-  
+
   // Guardian Address Information
   guardianHouseNumber?: string;
   guardianStreetName?: string;
   guardianProvince?: string;
   guardianCityMunicipality?: string;
   guardianBarangay?: string;
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,27 +46,28 @@ export class Patient implements IPatient {
   private readonly _dateOfBirth: Date;
   private readonly _gender: 'Male' | 'Female';
   private readonly _contactNumber: string;
-  
+  private readonly _photoUrl?: string;
+
   // Address Information
   private readonly _houseNumber?: string;
   private readonly _streetName?: string;
   private readonly _province?: string;
   private readonly _cityMunicipality?: string;
   private readonly _barangay?: string;
-  
+
   // Guardian Information
   private readonly _guardianName?: string;
   private readonly _guardianGender?: 'Male' | 'Female';
   private readonly _guardianRelationship?: string;
   private readonly _guardianContactNumber?: string;
-  
+
   // Guardian Address Information
   private readonly _guardianHouseNumber?: string;
   private readonly _guardianStreetName?: string;
   private readonly _guardianProvince?: string;
   private readonly _guardianCityMunicipality?: string;
   private readonly _guardianBarangay?: string;
-  
+
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
 
@@ -86,6 +88,7 @@ export class Patient implements IPatient {
     options: {
       id?: string;
       middleName?: string;
+      photoUrl?: string;
       guardianName?: string;
       guardianGender?: 'Male' | 'Female';
       guardianRelationship?: string;
@@ -109,6 +112,7 @@ export class Patient implements IPatient {
     this._dateOfBirth = typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : dateOfBirth;
     this._gender = gender;
     this._contactNumber = contactNumber;
+    this._photoUrl = options.photoUrl;
     
     // Address Information
     this._houseNumber = addressInfo.houseNumber;
@@ -168,6 +172,10 @@ export class Patient implements IPatient {
 
   get contactNumber(): string {
     return this._contactNumber;
+  }
+
+  get photoUrl(): string | undefined {
+    return this._photoUrl;
   }
 
   // Address getters
@@ -421,6 +429,7 @@ export class Patient implements IPatient {
       {
         id: this._id,
         middleName: this._middleName,
+        photoUrl: this._photoUrl,
         guardianName: this._guardianName,
         guardianGender: this._guardianGender,
         guardianRelationship: this._guardianRelationship,

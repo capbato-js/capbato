@@ -20,6 +20,7 @@ interface PatientFormPresenterProps {
     control: any;
     watch: any;
     errors: any;
+    setValue: any;
   };
   handlers: {
     patientAddressSelector: any;
@@ -58,8 +59,24 @@ export const PatientFormPresenter: React.FC<PatientFormPresenterProps> = ({
   formState,
   isFormEmpty
 }) => {
+  const handleFormSubmitWithLogging = async (data: CreatePatientCommand | UpdatePatientCommand) => {
+    console.log('📋 PatientFormPresenter: Form submitted via handleSubmit');
+    console.log('📦 PatientFormPresenter: Raw form data received:', data);
+    console.log('🔍 PatientFormPresenter: photoUrl present?', 'photoUrl' in data);
+    console.log('📸 PatientFormPresenter: photoUrl value:', (data as any).photoUrl);
+
+    const result = await submission.handleFormSubmit(data);
+    console.log('✅ PatientFormPresenter: Submission result:', result);
+    return result;
+  };
+
+  const handleFormSubmitError = (errors: any) => {
+    console.log('❌ PatientFormPresenter: Form validation errors:', errors);
+    console.log('🔍 PatientFormPresenter: Form errors object:', form.errors);
+  };
+
   return (
-    <form onSubmit={form.handleSubmit(submission.handleFormSubmit)} noValidate data-testid={patientFormTestIds.form}>
+    <form onSubmit={form.handleSubmit(handleFormSubmitWithLogging, handleFormSubmitError)} noValidate data-testid={patientFormTestIds.form}>
       <Stack gap="lg">
         {generalError && (
           <Alert color="red" style={FORM_STYLES.alertStyle}>
@@ -83,6 +100,7 @@ export const PatientFormPresenter: React.FC<PatientFormPresenterProps> = ({
               handleNameFieldBlur={handlers.handleNameFieldBlur}
               handleFieldBlur={handlers.handleFieldBlur}
               handleFieldChange={handlers.handleFieldChange}
+              setValue={form.setValue}
             />
           </Grid.Col>
 
@@ -107,7 +125,6 @@ export const PatientFormPresenter: React.FC<PatientFormPresenterProps> = ({
         {/* Form Actions */}
         <PatientFormActions
           onCancel={onCancel}
-          onSubmit={submission.handleDirectSubmit}
           isLoading={isLoading}
           isFormEmpty={isFormEmpty}
         />

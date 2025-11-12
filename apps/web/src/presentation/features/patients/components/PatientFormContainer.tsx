@@ -92,7 +92,8 @@ export const PatientFormContainer: React.FC<PatientFormContainerProps> = ({
         handleSubmit,
         control,
         watch,
-        errors
+        errors,
+        setValue
       }}
       handlers={handlers}
       submission={submission}

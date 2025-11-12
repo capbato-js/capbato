@@ -50,10 +50,12 @@ export const usePatientFormSubmission = ({
   }, [watch, onSubmit, isUpdateMode, initialData?.id, reset]);
 
   const handleFormSubmit = useCallback(async (data: CreatePatientCommand | UpdatePatientCommand) => {
-    
+    console.log('🚀 handleFormSubmit: Received form data', data);
+    console.log('🔍 handleFormSubmit: photoUrl in data?', 'photoUrl' in data, (data as any).photoUrl);
+
     try {
       let submitData: CreatePatientCommand | UpdatePatientCommand;
-      
+
       if (isUpdateMode && initialData?.id) {
         submitData = {
           ...data,
@@ -62,13 +64,16 @@ export const usePatientFormSubmission = ({
       } else {
         submitData = data as CreatePatientCommand;
       }
-      
+
+      console.log('📤 handleFormSubmit: Submitting data', submitData);
+      console.log('🔍 handleFormSubmit: photoUrl in submitData?', 'photoUrl' in submitData, (submitData as any).photoUrl);
+
       const success = await onSubmit(submitData);
-      
+
       if (success && !isUpdateMode) {
         reset();
       }
-      
+
       return success;
     } catch (error) {
       console.error('📝 Error in handleFormSubmit:', error);

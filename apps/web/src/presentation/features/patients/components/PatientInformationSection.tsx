@@ -4,13 +4,14 @@ import { Select, Stack, Grid, Text, Box, useMantineTheme } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { FormTextInput } from '../../../components/ui/FormTextInput';
 import { AddressSelector } from '../../../components/ui/AddressSelector';
-import { 
-  GENDER_OPTIONS, 
-  FORM_FIELD_CONFIG, 
-  SECTION_HEADERS, 
+import { ImageUpload } from '../../../shared/components/ImageUpload';
+import {
+  GENDER_OPTIONS,
+  FORM_FIELD_CONFIG,
+  SECTION_HEADERS,
   SUBSECTION_HEADERS,
   FORM_STYLES,
-  getDateInputProps 
+  getDateInputProps
 } from '../config/patientFormConfig';
 import { getErrorMessage, calculateAge } from '../utils/patientFormUtils';
 import { patientFormTestIds } from '@nx-starter/utils-core';
@@ -28,6 +29,7 @@ interface PatientInformationSectionProps {
   handleNameFieldBlur: (fieldName: 'firstName' | 'lastName' | 'middleName') => void;
   handleFieldBlur: (fieldName: string) => void;
   handleFieldChange: (fieldName: string) => void;
+  setValue: any;
 }
 
 export const PatientInformationSection: React.FC<PatientInformationSectionProps> = ({
@@ -42,11 +44,13 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
   handlePatientBarangayChange,
   handleNameFieldBlur,
   handleFieldBlur,
-  handleFieldChange
+  handleFieldChange,
+  setValue
 }) => {
   const theme = useMantineTheme();
   const dateOfBirth = watch('dateOfBirth');
-  
+  const photoUrl = watch('photoUrl');
+
   const computedAge = calculateAge(dateOfBirth);
   const ageDisplayValue = computedAge !== null ? computedAge.toString() : '';
 
@@ -65,45 +69,69 @@ export const PatientInformationSection: React.FC<PatientInformationSectionProps>
       </Text>
 
       <Stack gap="md">
-        {/* Name Fields Row */}
+        {/* Name Fields and Photo Upload Row */}
         <Grid>
-          <Grid.Col span={4}>
-            <FormTextInput
-              label="Last Name"
-              placeholder={FORM_FIELD_CONFIG.placeholders.lastName}
-              error={getErrorMessage(errors.lastName)}
-              disabled={isLoading}
-              required
-              data-testid={patientFormTestIds.lastNameInput}
-              {...register('lastName', {
-                onBlur: () => handleNameFieldBlur('lastName')
-              })}
-            />
+          <Grid.Col span={7}>
+            <Stack gap="sm">
+              <FormTextInput
+                label="Last Name"
+                placeholder={FORM_FIELD_CONFIG.placeholders.lastName}
+                error={getErrorMessage(errors.lastName)}
+                disabled={isLoading}
+                required
+                data-testid={patientFormTestIds.lastNameInput}
+                {...register('lastName', {
+                  onBlur: () => handleNameFieldBlur('lastName')
+                })}
+              />
+              <FormTextInput
+                label="First Name"
+                placeholder={FORM_FIELD_CONFIG.placeholders.firstName}
+                error={getErrorMessage(errors.firstName)}
+                disabled={isLoading}
+                required
+                data-testid={patientFormTestIds.firstNameInput}
+                {...register('firstName', {
+                  onBlur: () => handleNameFieldBlur('firstName')
+                })}
+              />
+              <FormTextInput
+                label="Middle Name"
+                placeholder={FORM_FIELD_CONFIG.placeholders.middleName}
+                error={getErrorMessage(errors.middleName)}
+                disabled={isLoading}
+                data-testid={patientFormTestIds.middleNameInput}
+                {...register('middleName', {
+                  onBlur: () => handleNameFieldBlur('middleName')
+                })}
+              />
+            </Stack>
           </Grid.Col>
-          <Grid.Col span={4}>
-            <FormTextInput
-              label="First Name"
-              placeholder={FORM_FIELD_CONFIG.placeholders.firstName}
-              error={getErrorMessage(errors.firstName)}
-              disabled={isLoading}
-              required
-              data-testid={patientFormTestIds.firstNameInput}
-              {...register('firstName', {
-                onBlur: () => handleNameFieldBlur('firstName')
-              })}
-            />
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <FormTextInput
-              label="Middle Name"
-              placeholder={FORM_FIELD_CONFIG.placeholders.middleName}
-              error={getErrorMessage(errors.middleName)}
-              disabled={isLoading}
-              data-testid={patientFormTestIds.middleNameInput}
-              {...register('middleName', {
-                onBlur: () => handleNameFieldBlur('middleName')
-              })}
-            />
+          <Grid.Col span={5}>
+            <Box>
+              <Text size="sm" fw={500} mb={4}>
+                Patient Photo
+              </Text>
+              <Controller
+                name="photoUrl"
+                control={control}
+                render={({ field }) => {
+                  console.log('🎯 Controller render - current photoUrl value:', field.value);
+                  return (
+                    <ImageUpload
+                      value={field.value || ''}
+                      onChange={(url) => {
+                        console.log('📝 PatientInformationSection: Received URL from ImageUpload:', url);
+                        field.onChange(url);
+                        setValue('photoUrl', url, { shouldDirty: true, shouldTouch: true });
+                        console.log('✅ PatientInformationSection: Set photoUrl in form');
+                      }}
+                      disabled={isLoading}
+                    />
+                  );
+                }}
+              />
+            </Box>
           </Grid.Col>
         </Grid>
 

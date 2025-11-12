@@ -19,16 +19,20 @@ export const usePatientFormState = ({ mode, initialData }: UsePatientFormStatePr
   const isUpdateMode = mode === 'update';
   const validationSchema = isUpdateMode ? UpdatePatientCommandSchema : CreatePatientCommandSchema;
 
+  console.log('🔧 usePatientFormState: Initializing form', { mode, photoUrl: initialData?.photoUrl });
+
   const form = useForm<CreatePatientCommand | UpdatePatientCommand>({
     resolver: zodResolver(validationSchema) as any,
     mode: 'onBlur',
     defaultValues: {
+      ...(isUpdateMode && initialData?.id ? { id: initialData.id } : {}),
       firstName: initialData?.firstName || '',
       lastName: initialData?.lastName || '',
       middleName: initialData?.middleName || '',
       dateOfBirth: initialData?.dateOfBirth || '',
       gender: initialData?.gender || undefined,
       contactNumber: initialData?.contactNumber || '',
+      photoUrl: initialData?.photoUrl || '',
       houseNumber: initialData?.houseNumber || '',
       streetName: initialData?.streetName || '',
       province: initialData?.province || '',
@@ -45,6 +49,8 @@ export const usePatientFormState = ({ mode, initialData }: UsePatientFormStatePr
       guardianBarangay: initialData?.guardianBarangay || '',
     },
   });
+
+  console.log('✅ usePatientFormState: Form initialized, current photoUrl:', form.getValues('photoUrl'));
 
   return {
     ...form,

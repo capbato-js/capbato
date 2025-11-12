@@ -23,7 +23,8 @@ export class PatientMapper {
       age: patient.age, // Computed dynamically
       gender: patient.gender,
       contactNumber: patient.contactNumber,
-      
+      photoUrl: patient.photoUrl,
+
       // Address Information
       houseNumber: patient.houseNumber,
       streetName: patient.streetName,
@@ -31,13 +32,13 @@ export class PatientMapper {
       cityMunicipality: patient.cityMunicipality,
       barangay: patient.barangay,
       address: patient.address, // Computed full address for backward compatibility
-      
+
       // Guardian Information
       guardianName: patient.guardianName,
       guardianGender: patient.guardianGender,
       guardianRelationship: patient.guardianRelationship,
       guardianContactNumber: patient.guardianContactNumber,
-      
+
       // Guardian Address Information
       guardianHouseNumber: patient.guardianHouseNumber,
       guardianStreetName: patient.guardianStreetName,
@@ -45,7 +46,7 @@ export class PatientMapper {
       guardianCityMunicipality: patient.guardianCityMunicipality,
       guardianBarangay: patient.guardianBarangay,
       guardianAddress: patient.guardianAddress, // Computed full address for backward compatibility
-      
+
       createdAt: patient.createdAt.toISOString(),
       updatedAt: patient.updatedAt.toISOString(),
     };
@@ -65,6 +66,7 @@ export class PatientMapper {
       gender: patient.gender,
       dateOfBirth: patient.dateOfBirth.toISOString().split('T')[0], // YYYY-MM-DD format
       contactNumber: patient.contactNumber,
+      photoUrl: patient.photoUrl,
       address: patient.address, // Computed full address
       guardianName: patient.guardianName,
     };
@@ -105,6 +107,7 @@ export class PatientMapper {
       {
         id: dto.id,
         middleName: dto.middleName ? NameFormattingService.formatToProperCase(dto.middleName) : undefined,
+        photoUrl: dto.photoUrl,
         guardianName: dto.guardianName ? NameFormattingService.formatToProperCase(dto.guardianName) : undefined,
         guardianGender: dto.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: dto.guardianRelationship,
@@ -172,6 +175,7 @@ export class PatientMapper {
     dateOfBirth: Date;
     gender: 'Male' | 'Female';
     contactNumber: string;
+    photoUrl?: string;
     // Address fields
     houseNumber?: string;
     streetName?: string;
@@ -209,6 +213,7 @@ export class PatientMapper {
       {
         id: obj.id,
         middleName: obj.middleName ? NameFormattingService.formatToProperCase(obj.middleName) : undefined,
+        photoUrl: obj.photoUrl,
         guardianName: obj.guardianName ? NameFormattingService.formatToProperCase(obj.guardianName) : undefined,
         guardianGender: obj.guardianGender,
         guardianRelationship: obj.guardianRelationship,
@@ -241,6 +246,7 @@ export class PatientMapper {
     dateOfBirth: Date;
     gender: 'Male' | 'Female';
     contactNumber: string;
+    photoUrl?: string;
     // Address fields
     houseNumber?: string;
     streetName?: string;
@@ -270,6 +276,7 @@ export class PatientMapper {
       dateOfBirth: patient.dateOfBirth,
       gender: patient.gender,
       contactNumber: patient.contactNumber,
+      photoUrl: patient.photoUrl,
       // Address fields
       houseNumber: patient.houseNumber,
       streetName: patient.streetName,

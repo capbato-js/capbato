@@ -10,7 +10,8 @@ export interface PatientDto {
   age: number; // Computed dynamically from dateOfBirth
   gender: string;
   contactNumber: string;
-  
+  photoUrl?: string;
+
   // Address Information
   houseNumber?: string;
   streetName?: string;
@@ -18,13 +19,13 @@ export interface PatientDto {
   cityMunicipality?: string;
   barangay?: string;
   address: string; // Computed full address for backward compatibility
-  
+
   // Guardian Information
   guardianName?: string;
   guardianGender?: string;
   guardianRelationship?: string;
   guardianContactNumber?: string;
-  
+
   // Guardian Address Information
   guardianHouseNumber?: string;
   guardianStreetName?: string;
@@ -32,7 +33,7 @@ export interface PatientDto {
   guardianCityMunicipality?: string;
   guardianBarangay?: string;
   guardianAddress?: string; // Computed full address for backward compatibility
-  
+
   createdAt: string;
   updatedAt: string;
 }
@@ -89,6 +90,7 @@ export interface PatientListDto {
   gender: string;
   dateOfBirth: string;
   contactNumber?: string;
+  photoUrl?: string;
   address?: string;
   guardianName?: string;
   guardianGender?: string;

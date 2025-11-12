@@ -36,6 +36,7 @@ export class TypeOrmPatientRepository implements IPatientRepository {
       dateOfBirth: patient.dateOfBirth,
       gender: patient.gender,
       contactNumber: patient.contactNumber,
+      photoUrl: patient.photoUrl,
       // Address fields
       houseNumber: patient.houseNumber,
       streetName: patient.streetName,
@@ -97,7 +98,8 @@ export class TypeOrmPatientRepository implements IPatientRepository {
     if (changes.dateOfBirth !== undefined) updateData.dateOfBirth = changes.dateOfBirth;
     if (changes.gender !== undefined) updateData.gender = changes.gender;
     if (changes.contactNumber !== undefined) updateData.contactNumber = changes.contactNumber;
-    
+    if (changes.photoUrl !== undefined) updateData.photoUrl = changes.photoUrl;
+
     // Address fields
     if (changes.houseNumber !== undefined) updateData.houseNumber = changes.houseNumber;
     if (changes.streetName !== undefined) updateData.streetName = changes.streetName;
@@ -311,6 +313,7 @@ export class TypeOrmPatientRepository implements IPatientRepository {
       {
         id: entity.id, // ID is already dashless since we use @PrimaryColumn('varchar') + generateId()
         middleName: entity.middleName,
+        photoUrl: entity.photoUrl,
         guardianName: entity.guardianName,
         guardianGender: entity.guardianGender,
         guardianRelationship: entity.guardianRelationship,

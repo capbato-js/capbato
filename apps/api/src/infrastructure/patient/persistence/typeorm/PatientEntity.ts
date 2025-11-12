@@ -45,13 +45,21 @@ export class PatientEntity {
   })
   gender!: 'Male' | 'Female';
 
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 11,
     unique: true,
     name: 'contact_number'
   })
   contactNumber!: string;
+
+  @Column({
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+    name: 'photo_url'
+  })
+  photoUrl?: string;
 
   // Address Information
   @Column({ 
