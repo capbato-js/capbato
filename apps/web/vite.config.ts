@@ -10,11 +10,11 @@ export default defineConfig(async () => {
     root: __dirname,
     cacheDir: '../../node_modules/.vite/web',
     server: {
-      port: 3000,
+      port: Number(process.env.WEB_PORT) || 3000,
       host: 'localhost',
     },
     preview: {
-      port: 3000,
+      port: Number(process.env.WEB_PORT) || 3000,
       host: 'localhost',
     },
     plugins: [
