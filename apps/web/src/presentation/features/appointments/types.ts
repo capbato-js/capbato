@@ -1,5 +1,6 @@
 export interface Appointment {
   id: string;
+  appointmentNumber?: number; // Queue number based on time slot
   patientNumber: string;
   patientName: string;
   reasonForVisit: string | string[];

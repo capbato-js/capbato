@@ -14,6 +14,7 @@ interface IAppointment {
   reasonForVisit: string[];
   appointmentDate: Date;
   appointmentTime: AppointmentTime;
+  appointmentNumber: number;
   status: AppointmentStatus;
   doctorId: string;
   createdAt: Date;
@@ -26,6 +27,7 @@ export class Appointment implements IAppointment {
   private readonly _reasonForVisit: string[];
   private readonly _appointmentDate: Date;
   private readonly _appointmentTime: AppointmentTime;
+  private readonly _appointmentNumber: number;
   private readonly _status: AppointmentStatus;
   private readonly _doctorId: string;
   private readonly _createdAt: Date;
@@ -36,6 +38,7 @@ export class Appointment implements IAppointment {
     reasonForVisit: string | string[],
     appointmentDate: Date,
     appointmentTime: string | AppointmentTime,
+    appointmentNumber: number,
     doctorId: string,
     status: AppointmentStatusType = 'confirmed',
     id?: string | AppointmentId,
@@ -49,6 +52,7 @@ export class Appointment implements IAppointment {
     this._appointmentTime = appointmentTime instanceof AppointmentTime
       ? appointmentTime
       : new AppointmentTime(appointmentTime);
+    this._appointmentNumber = appointmentNumber;
     this._status = new AppointmentStatus(status);
     this._doctorId = doctorId;
     this._createdAt = createdAt;
@@ -63,6 +67,7 @@ export class Appointment implements IAppointment {
     reasonForVisit: string | string[],
     appointmentDate: Date,
     appointmentTime: string | AppointmentTime,
+    appointmentNumber: number,
     doctorId: string,
     status: AppointmentStatusType = 'confirmed'
   ): Appointment {
@@ -76,6 +81,7 @@ export class Appointment implements IAppointment {
       reasonForVisit,
       appointmentDate,
       appointmentTime,
+      appointmentNumber,
       doctorId,
       status
     );
@@ -90,6 +96,7 @@ export class Appointment implements IAppointment {
     reasonForVisit: string | string[],
     appointmentDate: Date,
     appointmentTime: string | AppointmentTime,
+    appointmentNumber: number,
     doctorId: string,
     status: AppointmentStatusType,
     createdAt: Date,
@@ -100,6 +107,7 @@ export class Appointment implements IAppointment {
       reasonForVisit,
       appointmentDate,
       appointmentTime,
+      appointmentNumber,
       doctorId,
       status,
       id,
@@ -127,6 +135,10 @@ export class Appointment implements IAppointment {
 
   get appointmentTime(): AppointmentTime {
     return this._appointmentTime;
+  }
+
+  get appointmentNumber(): number {
+    return this._appointmentNumber;
   }
 
   get status(): AppointmentStatus {
@@ -298,6 +310,7 @@ export class Appointment implements IAppointment {
     reasonForVisit?: string | string[];
     appointmentDate?: Date;
     appointmentTime?: AppointmentTime;
+    appointmentNumber?: number;
     status?: AppointmentStatus;
     doctorId?: string;
     createdAt?: Date;
@@ -309,6 +322,7 @@ export class Appointment implements IAppointment {
       updates.reasonForVisit ?? this._reasonForVisit,
       updates.appointmentDate ?? this._appointmentDate,
       updates.appointmentTime ?? this._appointmentTime,
+      updates.appointmentNumber ?? this._appointmentNumber,
       updates.doctorId ?? this._doctorId,
       updates.status?.value ?? this._status.value,
       updates.createdAt ?? this._createdAt,
@@ -326,6 +340,7 @@ export class Appointment implements IAppointment {
       reasonForVisit: this._reasonForVisit,
       appointmentDate: this._appointmentDate,
       appointmentTime: this._appointmentTime.value,
+      appointmentNumber: this._appointmentNumber,
       status: this._status.value,
       doctorId: this._doctorId,
       createdAt: this._createdAt,
@@ -343,6 +358,7 @@ export class Appointment implements IAppointment {
       data['reasonForVisit'],
       data['appointmentDate'],
       data['appointmentTime'],
+      data['appointmentNumber'],
       data['doctorId'],
       data['status'],
       data['createdAt'],

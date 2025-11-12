@@ -1,7 +1,7 @@
 import { injectable, inject } from 'tsyringe';
-import { 
-  Appointment, 
-  AppointmentDomainService, 
+import {
+  Appointment,
+  AppointmentDomainService,
   type IAppointmentRepository,
   Schedule,
   type IScheduleRepository,
@@ -10,6 +10,7 @@ import {
 import { type IPatientRepository } from '../../domain/IPatientRepository';
 import type { CreateAppointmentCommand } from '../../dto/AppointmentCommands';
 import { TOKENS } from '../../di/tokens';
+import { calculateAppointmentNumber } from '../../utils/appointmentNumber';
 
 /**
  * Use case for creating a new appointment
@@ -30,12 +31,16 @@ export class CreateAppointmentUseCase {
     const patient = await this.patientRepository.getById(command.patientId);
     const patientName = patient ? patient.fullName : undefined;
 
+    // Calculate appointment number based on time slot
+    const appointmentNumber = calculateAppointmentNumber(command.appointmentTime);
+
     // Create appointment entity with domain logic
     const appointment = Appointment.create(
       command.patientId,
       command.reasonForVisit,
       command.appointmentDate,
       command.appointmentTime,
+      appointmentNumber,
       command.doctorId,
       command.status || 'confirmed'
     );
@@ -68,6 +73,7 @@ export class CreateAppointmentUseCase {
       appointment.reasonForVisit,
       appointment.appointmentDate,
       appointment.appointmentTime,
+      appointment.appointmentNumber,
       appointment.doctorId,
       appointment.statusValue,
       appointment.createdAt

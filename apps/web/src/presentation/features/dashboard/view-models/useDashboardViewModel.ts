@@ -42,15 +42,16 @@ export const useDashboardViewModel = (): DashboardViewModel => {
   // Convert AppointmentDto to BaseAppointment
   const mapToBaseAppointment = (dto: AppointmentDto): BaseAppointment => ({
     id: dto.id,
+    appointmentNumber: dto.appointmentNumber,
     patientNumber: dto.patient?.patientNumber || 'Unknown',
     patientName: dto.patient?.fullName || 'Unknown Patient',
     reasonForVisit: dto.reasonForVisit,
     date: dto.appointmentDate,
     time: dto.appointmentTime,
     doctor: dto.doctor?.fullName || 'Unknown Doctor',
-    status: dto.status === 'confirmed' ? 'confirmed' 
-      : dto.status === 'cancelled' ? 'cancelled' 
-      : dto.status === 'completed' ? 'completed' 
+    status: dto.status === 'confirmed' ? 'confirmed'
+      : dto.status === 'cancelled' ? 'cancelled'
+      : dto.status === 'completed' ? 'completed'
       : 'confirmed'
   });
 

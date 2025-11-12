@@ -23,6 +23,9 @@ export class AppointmentEntity {
   @Column({ type: 'varchar', length: 5, name: 'appointment_time' })
   appointmentTime!: string;
 
+  @Column({ type: 'int', name: 'appointment_number' })
+  appointmentNumber!: number;
+
   @Column({ type: 'varchar', length: 20, default: 'scheduled' })
   status!: string;
 

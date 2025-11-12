@@ -16,6 +16,7 @@ export const DashboardAppointmentsTable: React.FC<DashboardAppointmentsTableProp
     showActions: false, // Dashboard doesn't show actions
     showContactColumn: false, // Dashboard shows simplified view
     showDateColumn: false, // Dashboard is for "today's" appointments, so date is implied
+    showAppointmentNumber: true, // Always show appointment number on dashboard (today's appointments)
     compactMode: true, // More compact for dashboard
     maxRows,
     useViewportHeight: false, // Dashboard table should be fixed height

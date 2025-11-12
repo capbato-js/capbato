@@ -5,6 +5,7 @@ import { useMantineTheme } from '@mantine/core';
 
 export interface BaseAppointment {
   id: string;
+  appointmentNumber?: number; // Queue number based on time slot
   patientNumber: string;
   patientName: string;
   reasonForVisit: string | string[];
@@ -19,6 +20,7 @@ export interface AppointmentsTableConfig {
   showContactColumn?: boolean;
   showDateColumn?: boolean;
   showPatientColumns?: boolean; // Add option to hide Patient # and Patient Name columns
+  showAppointmentNumber?: boolean; // Add option to show Appointment # column
   compactMode?: boolean;
   maxRows?: number;
   useViewportHeight?: boolean;
@@ -51,6 +53,7 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
     showContactColumn = false,
     showDateColumn = true,
     showPatientColumns = true, // Default to true for backward compatibility
+    showAppointmentNumber = false, // Default to false
     compactMode = false,
     maxRows,
     useViewportHeight = false,
@@ -157,20 +160,31 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
   // Build columns dynamically based on configuration
   const columns: TableColumn<BaseAppointment>[] = [];
 
+  // Add Queue # column if enabled (first column)
+  if (showAppointmentNumber) {
+    columns.push({
+      key: 'appointmentNumber',
+      header: 'Queue #',
+      width: compactMode ? '8%' : '9%',
+      align: 'center',
+      searchable: false
+    });
+  }
+
   // Conditionally add patient columns only if showPatientColumns is true
   if (showPatientColumns) {
     columns.push(
       {
         key: 'patientNumber',
         header: 'Patient #',
-        width: compactMode ? '12%' : '10%',
+        width: compactMode ? '9%' : '10%',
         align: 'center',
         searchable: !compactMode
       },
       {
         key: 'patientName',
         header: 'Patient',
-        width: compactMode ? '20%' : '20%',
+        width: compactMode ? '13%' : '14%',
         align: 'left',
         searchable: !compactMode
       }
@@ -181,7 +195,7 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
   columns.push({
     key: 'reasonForVisit',
     header: 'Reason for visit',
-    width: compactMode ? '22%' : (showPatientColumns ? '18%' : '30%'), // Wider if patient columns are hidden
+    width: compactMode ? '22%' : (showPatientColumns ? '20%' : '30%'), // Wider if patient columns are hidden
     align: 'left',
     searchable: !compactMode,
     render: (value) => Array.isArray(value) ? value.join(', ') : value
@@ -192,35 +206,35 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
     columns.push({
       key: 'contact', // This would need to be added to BaseAppointment interface if used
       header: 'Contact',
-      width: '12%',
+      width: '10%',
       align: 'center'
     });
   }
 
-  // Add date column if enabled
+  // Add date/time column if date is enabled
   if (showDateColumn) {
     columns.push({
       key: 'date',
-      header: 'Date',
-      width: compactMode ? '12%' : '12%',
+      header: 'Date/Time',
+      width: compactMode ? '14%' : '15%',
       align: 'center',
-      render: (value) => formatDate(value)
+      render: (value, appointment) => `${formatDate(value)}, ${appointment.time}`
+    });
+  } else {
+    // If date column is hidden (like in dashboard), just show time
+    columns.push({
+      key: 'time',
+      header: 'Time',
+      width: compactMode ? '10%' : '10%',
+      align: 'center'
     });
   }
-
-  // Add time column
-  columns.push({
-    key: 'time',
-    header: 'Time',
-    width: compactMode ? '10%' : '10%',
-    align: 'center'
-  });
 
   // Add doctor column
   columns.push({
     key: 'doctor',
     header: 'Doctor',
-    width: compactMode ? '16%' : (showPatientColumns ? '17%' : '25%'), // Wider if patient columns are hidden
+    width: compactMode ? '12%' : (showPatientColumns ? '13%' : '25%'), // Wider if patient columns are hidden
     align: 'left',
     searchable: !compactMode
   });
@@ -229,7 +243,7 @@ export const BaseAppointmentsTable: React.FC<BaseAppointmentsTableProps> = ({
   columns.push({
     key: 'status',
     header: 'Status',
-    width: compactMode ? '13%' : '13%',
+    width: compactMode ? '10%' : '11%',
     align: 'center',
     render: (value) => getStatusBadge(value)
   });

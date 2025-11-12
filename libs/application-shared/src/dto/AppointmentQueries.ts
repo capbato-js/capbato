@@ -69,6 +69,7 @@ export interface AppointmentDto {
   reasonForVisit: string | string[];
   appointmentDate: string; // ISO date string
   appointmentTime: string; // HH:MM format
+  appointmentNumber: number; // Queue number based on time slot
   status: 'confirmed' | 'cancelled' | 'completed';
   createdAt: string; // ISO date string
   updatedAt?: string; // ISO date string;

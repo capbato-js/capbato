@@ -70,6 +70,17 @@ export const AppointmentsPagePresenter: React.FC<AppointmentsPagePresenterProps>
   onReconfirmAppointment,
   onCompleteAppointment,
 }) => {
+  // Show appointment number only when:
+  // 1. Not showing all appointments
+  // 2. Selected date is today or future (regardless of status filter)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const selected = new Date(selectedDate);
+  selected.setHours(0, 0, 0, 0);
+
+  const isTodayOrFuture = selected.getTime() >= today.getTime();
+  const showAppointmentNumber = !showAll && isTodayOrFuture;
+
   return (
     <MedicalClinicLayout>
       <DataTableHeader
@@ -78,7 +89,7 @@ export const AppointmentsPagePresenter: React.FC<AppointmentsPagePresenterProps>
         addButtonText="Add Appointment"
         addButtonIcon="fas fa-calendar-plus"
       />
-      
+
       <AppointmentsFilterControls
         selectedDate={selectedDate}
         onDateChange={onDateChange}
@@ -92,6 +103,7 @@ export const AppointmentsPagePresenter: React.FC<AppointmentsPagePresenterProps>
 
       <AppointmentsTable
         appointments={appointments}
+        showAppointmentNumber={showAppointmentNumber}
         onModifyAppointment={onModifyAppointment}
         onCancelAppointment={onCancelAppointment}
         onReconfirmAppointment={onReconfirmAppointment}

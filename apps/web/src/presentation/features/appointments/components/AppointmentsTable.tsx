@@ -4,6 +4,7 @@ import { Appointment } from '../types';
 
 interface AppointmentsTableProps {
   appointments: Appointment[];
+  showAppointmentNumber?: boolean;
   onModifyAppointment: (appointmentId: string) => void;
   onCancelAppointment: (appointmentId: string) => void;
   onReconfirmAppointment: (appointmentId: string) => void;
@@ -12,6 +13,7 @@ interface AppointmentsTableProps {
 
 export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   appointments,
+  showAppointmentNumber = false,
   onModifyAppointment,
   onCancelAppointment,
   onReconfirmAppointment,
@@ -20,6 +22,7 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   // Convert local Appointment type to BaseAppointment
   const baseAppointments: BaseAppointment[] = appointments.map(appointment => ({
     id: appointment.id,
+    appointmentNumber: appointment.appointmentNumber,
     patientNumber: appointment.patientNumber,
     patientName: appointment.patientName,
     reasonForVisit: appointment.reasonForVisit,
@@ -40,6 +43,7 @@ export const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     <FullAppointmentsTable
       appointments={baseAppointments}
       callbacks={callbacks}
+      showAppointmentNumber={showAppointmentNumber}
     />
   );
 };

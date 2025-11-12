@@ -28,6 +28,7 @@ export class AppointmentMapper {
       reasonForVisit: appointment.reasonForVisit,
       appointmentDate: this.formatDateToLocal(appointment.appointmentDate), // Return simple YYYY-MM-DD format in local timezone
       appointmentTime: appointment.timeValue,
+      appointmentNumber: appointment.appointmentNumber,
       status: appointment.statusValue,
       createdAt: appointment.createdAt.toISOString(),
       updatedAt: appointment.updatedAt?.toISOString(),
@@ -79,6 +80,7 @@ export class AppointmentMapper {
       data['reasonForVisit'] || data['reason_for_visit'],
       new Date(data['appointmentDate'] || data['appointment_date']),
       data['appointmentTime'] || data['appointment_time'],
+      data['appointmentNumber'] || data['appointment_number'] || 0,
       data['doctorId'] || data['doctor_id'],
       data['status'],
       new Date(data['createdAt'] || data['created_at'] || Date.now()),
@@ -107,6 +109,7 @@ export class AppointmentMapper {
       reason_for_visit: appointment.reasonForVisit,
       appointment_date: appointment.appointmentDate,
       appointment_time: appointment.timeValue,
+      appointment_number: appointment.appointmentNumber,
       status: appointment.statusValue,
       doctor_id: appointment.doctorId,
       created_at: appointment.createdAt,
