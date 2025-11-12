@@ -5,18 +5,24 @@ import { patientFormTestIds } from '@nx-starter/utils-core';
 
 interface PatientFormActionsProps {
   onCancel: () => void;
-  onSubmit: () => void;
   isLoading: boolean;
   isFormEmpty: boolean;
 }
 
 export const PatientFormActions: React.FC<PatientFormActionsProps> = ({
   onCancel,
-  onSubmit,
   isLoading,
   isFormEmpty
 }) => {
   const { cancelIcon, submitIcon } = getFormActionButtons();
+
+  const handleSubmitClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('🖱️ PatientFormActions: Submit button clicked');
+    console.log('🔍 PatientFormActions: isFormEmpty:', isFormEmpty);
+    console.log('🔍 PatientFormActions: isLoading:', isLoading);
+    console.log('🔍 PatientFormActions: Button disabled?', isFormEmpty || isLoading);
+    // Don't prevent default - let the form handle submission
+  };
 
   return (
     <Box style={FORM_STYLES.formActions}>
@@ -31,10 +37,10 @@ export const PatientFormActions: React.FC<PatientFormActionsProps> = ({
         {FORM_ACTIONS.cancel.text}
       </Button>
       <Button
-        type="button"
+        type="submit"
         disabled={isFormEmpty || isLoading}
         loading={isLoading}
-        onClick={onSubmit}
+        onClick={handleSubmitClick}
         data-testid={patientFormTestIds.savePatientButton}
       >
         {submitIcon}

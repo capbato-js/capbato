@@ -16,6 +16,7 @@ export function mapDomainPatientToFrontend(domainPatient: DomainPatient): Patien
     age: domainPatient.age,
     gender: domainPatient.gender as 'Male' | 'Female' | 'Other',
     phoneNumber: domainPatient.contactNumber,
+    photoUrl: domainPatient.photoUrl,
     email: undefined, // Not available in domain model
     address: {
       street: domainPatient.address,
@@ -94,6 +95,7 @@ export function mapApiPatientDtoToPatientDetails(dto: PatientDto): PatientDetail
     age: dto.age,
     gender: dto.gender as 'Male' | 'Female' | 'Other',
     phoneNumber: dto.contactNumber,
+    photoUrl: dto.photoUrl,
     email: undefined, // Not available in API DTO
     address: patientAddress,
     emergencyContact: {
@@ -102,7 +104,7 @@ export function mapApiPatientDtoToPatientDetails(dto: PatientDto): PatientDetail
       phoneNumber: dto.guardianContactNumber || ''
     },
     medicalHistory: [], // Not available in current API DTO
-    allergies: [], // Not available in current API DTO  
+    allergies: [], // Not available in current API DTO
     bloodType: undefined, // Not available in current API DTO
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,

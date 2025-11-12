@@ -13,6 +13,11 @@ export class PatientApiService implements IPatientApiService {
   ) {}
 
   async createPatient(command: CreatePatientCommand): Promise<PatientResponse> {
+    console.log('🌐 PatientApiService: createPatient called');
+    console.log('📦 PatientApiService: Command received:', command);
+    console.log('🔍 PatientApiService: photoUrl in command?', 'photoUrl' in command);
+    console.log('📸 PatientApiService: photoUrl value:', command.photoUrl);
+
     // Map CreatePatientCommand to CreatePatientRequestDto for API consistency
     const requestDto: CreatePatientRequestDto = {
       firstName: command.firstName,
@@ -21,20 +26,21 @@ export class PatientApiService implements IPatientApiService {
       dateOfBirth: command.dateOfBirth,
       gender: command.gender,
       contactNumber: command.contactNumber,
-      
+      photoUrl: command.photoUrl,
+
       // Address Information
       houseNumber: command.houseNumber,
       streetName: command.streetName,
       province: command.province,
       cityMunicipality: command.cityMunicipality,
       barangay: command.barangay,
-      
+
       // Guardian Information
       guardianName: command.guardianName,
       guardianGender: command.guardianGender,
       guardianRelationship: command.guardianRelationship,
       guardianContactNumber: command.guardianContactNumber,
-      
+
       // Guardian Address Information
       guardianHouseNumber: command.guardianHouseNumber,
       guardianStreetName: command.guardianStreetName,
@@ -42,6 +48,10 @@ export class PatientApiService implements IPatientApiService {
       guardianCityMunicipality: command.guardianCityMunicipality,
       guardianBarangay: command.guardianBarangay,
     };
+
+    console.log('📤 PatientApiService: Request DTO:', requestDto);
+    console.log('🔍 PatientApiService: photoUrl in requestDto?', 'photoUrl' in requestDto);
+    console.log('📸 PatientApiService: requestDto.photoUrl:', requestDto.photoUrl);
 
     const response = await this.httpClient.post<PatientResponse>(
       this.apiConfig.endpoints.patients.create,
@@ -56,6 +66,11 @@ export class PatientApiService implements IPatientApiService {
   }
 
   async updatePatient(command: UpdatePatientCommand): Promise<PatientResponse> {
+    console.log('🌐 PatientApiService.updatePatient: Called');
+    console.log('📦 PatientApiService.updatePatient: Command:', command);
+    console.log('🔍 PatientApiService.updatePatient: photoUrl in command?', 'photoUrl' in command);
+    console.log('📸 PatientApiService.updatePatient: photoUrl value:', command.photoUrl);
+
     // Map UpdatePatientCommand to UpdatePatientRequestDto for API consistency
     const requestDto: UpdatePatientRequestDto = {
       id: command.id,
@@ -65,20 +80,21 @@ export class PatientApiService implements IPatientApiService {
       dateOfBirth: command.dateOfBirth,
       gender: command.gender,
       contactNumber: command.contactNumber,
-      
+      photoUrl: command.photoUrl,
+
       // Address Information
       houseNumber: command.houseNumber,
       streetName: command.streetName,
       province: command.province,
       cityMunicipality: command.cityMunicipality,
       barangay: command.barangay,
-      
+
       // Guardian Information
       guardianName: command.guardianName,
       guardianGender: command.guardianGender,
       guardianRelationship: command.guardianRelationship,
       guardianContactNumber: command.guardianContactNumber,
-      
+
       // Guardian Address Information
       guardianHouseNumber: command.guardianHouseNumber,
       guardianStreetName: command.guardianStreetName,
@@ -86,6 +102,10 @@ export class PatientApiService implements IPatientApiService {
       guardianCityMunicipality: command.guardianCityMunicipality,
       guardianBarangay: command.guardianBarangay,
     };
+
+    console.log('📤 PatientApiService.updatePatient: Request DTO:', requestDto);
+    console.log('🔍 PatientApiService.updatePatient: photoUrl in requestDto?', 'photoUrl' in requestDto);
+    console.log('📸 PatientApiService.updatePatient: requestDto.photoUrl:', requestDto.photoUrl);
     
     const endpoint = this.apiConfig.endpoints.patients.update(command.id);
 

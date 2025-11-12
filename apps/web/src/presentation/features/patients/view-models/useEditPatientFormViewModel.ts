@@ -14,6 +14,7 @@ interface EditPatientFormViewModel {
     dateOfBirth: string;
     gender: 'Male' | 'Female';
     contactNumber: string;
+    photoUrl?: string;
     houseNumber?: string;
     streetName?: string;
     province?: string;
@@ -81,20 +82,27 @@ export const useEditPatientFormViewModel = (): EditPatientFormViewModel => {
   }, [patientId, clearUpdatePatientError]);
 
   const handleFormSubmit = useCallback(async (data: UpdatePatientCommand): Promise<boolean> => {
-    console.log('🎯 ViewModel.handleFormSubmit called with:', data);
+    console.log('🎯 EditPatientViewModel.handleFormSubmit called');
+    console.log('📦 EditPatientViewModel: Data received:', data);
+    console.log('🔍 EditPatientViewModel: photoUrl in data?', 'photoUrl' in data);
+    console.log('📸 EditPatientViewModel: photoUrl value:', (data as any).photoUrl);
+    console.log('🆔 EditPatientViewModel: Patient ID:', data.id);
+
     try {
-      console.log('🚀 Calling updatePatient from store...');
+      console.log('🚀 EditPatientViewModel: Calling updatePatient from store...');
       const result = await updatePatient(data);
-      console.log('📋 UpdatePatient result:', result);
+      console.log('📋 EditPatientViewModel: UpdatePatient result:', result);
+
       if (result) {
-        console.log('✅ Update successful, navigating to /patients');
+        console.log('✅ EditPatientViewModel: Update successful, navigating to /patients');
         navigate('/patients');
         return true;
       }
-      console.log('❌ Update failed, staying on form');
+
+      console.log('❌ EditPatientViewModel: Update failed, staying on form');
       return false;
     } catch (error) {
-      console.error('Failed to update patient:', error);
+      console.error('❌ EditPatientViewModel: Failed to update patient:', error);
       return false;
     }
   }, [updatePatient, navigate]);
@@ -112,6 +120,7 @@ export const useEditPatientFormViewModel = (): EditPatientFormViewModel => {
     dateOfBirth: patient.dateOfBirth,
     gender: patient.gender,
     contactNumber: patient.contactNumber,
+    photoUrl: patient.photoUrl,
     houseNumber: patient.houseNumber,
     streetName: patient.streetName,
     province: patient.province,

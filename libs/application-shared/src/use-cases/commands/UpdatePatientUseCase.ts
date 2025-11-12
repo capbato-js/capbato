@@ -82,9 +82,10 @@ export class UpdatePatientUseCase {
       {
         id: existingPatient.id,
         middleName: formattedMiddleName,
+        photoUrl: command.photoUrl !== undefined ? command.photoUrl : existingPatient.photoUrl,
         guardianName: formattedGuardianName,
-        guardianGender: (command.guardianGender as 'Male' | 'Female' | undefined) !== undefined 
-          ? (command.guardianGender as 'Male' | 'Female' | undefined) 
+        guardianGender: (command.guardianGender as 'Male' | 'Female' | undefined) !== undefined
+          ? (command.guardianGender as 'Male' | 'Female' | undefined)
           : existingPatient.guardianGender,
         guardianRelationship: command.guardianRelationship !== undefined ? command.guardianRelationship : existingPatient.guardianRelationship,
         guardianContactNumber: sanitizedGuardianContactNumber,

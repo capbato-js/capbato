@@ -117,13 +117,20 @@ export const usePatientStore = create<PatientStore>()(
           },
 
           async createPatient(command) {
+            console.log('🏪 PatientStore: createPatient called');
+            console.log('📦 PatientStore: Command received:', command);
+            console.log('🔍 PatientStore: photoUrl in command?', 'photoUrl' in command);
+            console.log('📸 PatientStore: photoUrl value:', (command as any).photoUrl);
+
             set((state) => {
               state.createPatientStatus = 'loading';
               state.createPatientError = null;
             });
 
             try {
+              console.log('🌐 PatientStore: Calling API service createPatient');
               const response = await getApiService().createPatient(command);
+              console.log('✅ PatientStore: API response received:', response);
               const newPatient = response.data;
               
               set((state) => {
@@ -161,13 +168,20 @@ export const usePatientStore = create<PatientStore>()(
           },
 
           async updatePatient(command) {
+            console.log('🏪 PatientStore.updatePatient: Called');
+            console.log('📦 PatientStore.updatePatient: Command:', command);
+            console.log('🔍 PatientStore.updatePatient: photoUrl in command?', 'photoUrl' in command);
+            console.log('📸 PatientStore.updatePatient: photoUrl value:', (command as any).photoUrl);
+
             set((state) => {
               state.updatePatientStatus[command.id] = 'loading';
               state.updatePatientErrors[command.id] = null;
             });
 
             try {
+              console.log('🌐 PatientStore.updatePatient: Calling API service updatePatient');
               const response = await getApiService().updatePatient(command);
+              console.log('✅ PatientStore.updatePatient: API response:', response);
               const updatedPatient = response.data;
               
               set((state) => {

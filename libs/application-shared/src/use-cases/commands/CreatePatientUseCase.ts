@@ -72,6 +72,7 @@ export class CreatePatientUseCase {
       },
       {
         middleName: formattedMiddleName,
+        photoUrl: command.photoUrl,
         guardianName: formattedGuardianName,
         guardianGender: command.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: command.guardianRelationship,
@@ -112,6 +113,7 @@ export class CreatePatientUseCase {
       {
         id,
         middleName: formattedMiddleName,
+        photoUrl: command.photoUrl,
         guardianName: formattedGuardianName,
         guardianGender: command.guardianGender as 'Male' | 'Female' | undefined,
         guardianRelationship: command.guardianRelationship,

@@ -47,11 +47,18 @@ export const useAddPatientFormViewModel = (): IAddPatientFormViewModel => {
    * Processes the patient creation command and handles success/error states
    */
   const handleFormSubmit = useCallback(async (data: CreatePatientCommand): Promise<boolean> => {
+    console.log('🎯 useAddPatientFormViewModel: handleFormSubmit called');
+    console.log('📦 useAddPatientFormViewModel: Data received:', data);
+    console.log('🔍 useAddPatientFormViewModel: photoUrl in data?', 'photoUrl' in data);
+    console.log('📸 useAddPatientFormViewModel: photoUrl value:', (data as any).photoUrl);
+
     setLocalError(null);
-    
+
     try {
+      console.log('🚀 useAddPatientFormViewModel: Calling createPatient with data:', data);
       const result = await createPatient(data);
-      
+      console.log('✅ useAddPatientFormViewModel: createPatient result:', result);
+
       if (result) {
         // Success - navigate back to patients list
         navigate('/patients');
@@ -62,6 +69,7 @@ export const useAddPatientFormViewModel = (): IAddPatientFormViewModel => {
       }
     } catch (error) {
       // Handle unexpected errors - preserve error object for classification
+      console.error('❌ useAddPatientFormViewModel: Error:', error);
       setLocalError(error);
       return false;
     }

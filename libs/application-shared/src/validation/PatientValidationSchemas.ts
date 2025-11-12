@@ -135,7 +135,14 @@ export const CreatePatientCommandSchema = z.object({
   dateOfBirth: z.string().superRefine(validateDateOfBirth),
   gender: GenderSchema,
   contactNumber: z.string().superRefine(validatePhilippineMobile),
-  
+  photoUrl: z.string().optional().transform((val) => val === '' ? undefined : val).refine(
+    (val) => !val || /^https?:\/\/.+/.test(val),
+    'Photo URL must be a valid URL'
+  ).refine(
+    (val) => !val || val.length <= 500,
+    'Photo URL cannot exceed 500 characters'
+  ),
+
   // Address Information
   houseNumber: z.string().max(20, 'House number cannot exceed 20 characters').optional(),
   streetName: z.string().max(100, 'Street name cannot exceed 100 characters').optional(),
@@ -204,7 +211,14 @@ export const UpdatePatientCommandSchema = z.object({
   contactNumber: z.string().optional().superRefine((val, ctx) => {
     if (val !== undefined) validatePhilippineMobile(val, ctx);
   }),
-  
+  photoUrl: z.string().optional().transform((val) => val === '' ? undefined : val).refine(
+    (val) => !val || /^https?:\/\/.+/.test(val),
+    'Photo URL must be a valid URL'
+  ).refine(
+    (val) => !val || val.length <= 500,
+    'Photo URL cannot exceed 500 characters'
+  ),
+
   // Address Information
   houseNumber: z.string().max(20, 'House number cannot exceed 20 characters').optional(),
   streetName: z.string().max(100, 'Street name cannot exceed 100 characters').optional(),
